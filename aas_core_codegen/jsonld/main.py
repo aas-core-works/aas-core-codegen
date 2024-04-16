@@ -24,7 +24,8 @@ from typing import (
     Optional,
     Tuple,
     Union,
-    cast, OrderedDict,
+    cast,
+    OrderedDict,
 )
 
 from icontract import require
@@ -52,13 +53,13 @@ def _property_uri(prop: intermediate.Property) -> Stripped:
 
 
 def _get_underlying_atomic_type(
-        type_annotation: Union[
-            intermediate.PrimitiveTypeAnnotation,
-            intermediate.ListTypeAnnotation,
-            intermediate.OptionalTypeAnnotation,
-            intermediate.PrimitiveTypeAnnotation,
-            intermediate.TypeAnnotationUnion,
-        ]
+    type_annotation: Union[
+        intermediate.PrimitiveTypeAnnotation,
+        intermediate.ListTypeAnnotation,
+        intermediate.OptionalTypeAnnotation,
+        intermediate.PrimitiveTypeAnnotation,
+        intermediate.TypeAnnotationUnion,
+    ]
 ) -> Union[intermediate.OurType, intermediate.PrimitiveTypeAnnotation]:
     """Flatten recursively ``our_type`` to obtain the underlying atomic type."""
     if isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
@@ -80,12 +81,12 @@ def _get_underlying_atomic_type(
 )
 # fmt: on
 def _generate_for_property(
-        cls: Optional[intermediate.ClassUnion],
-        prop: intermediate.Property,
-        symbol_table: intermediate.SymbolTable,
-        our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
-        name_set_of_generated_classes: Optional[Set[str]] = None,
-        name_set_of_exported_properties: Optional[Set[str]] = None,
+    cls: Optional[intermediate.ClassUnion],
+    prop: intermediate.Property,
+    symbol_table: intermediate.SymbolTable,
+    our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
+    name_set_of_generated_classes: Optional[Set[str]] = None,
+    name_set_of_exported_properties: Optional[Set[str]] = None,
 ) -> JsonLdType:
     """
     Generate the definition of a property of a class.
@@ -139,8 +140,8 @@ def _generate_for_property(
         [("@id", property_uri)]
     )
     if isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.ListTypeAnnotation,
+        intermediate.beneath_optional(prop.type_annotation),
+        intermediate.ListTypeAnnotation,
     ):
         property_json_ld_context["@container"] = "@set"
 
@@ -169,24 +170,24 @@ def _generate_for_property(
             #
             # Otherwise, adding the "@vocab" is enough.
             if not json_item_name.startswith("xs:") and (
-                    (json_item_name in name_set_of_generated_classes)
-                    or json_item_name != rdf_item_name
+                (json_item_name in name_set_of_generated_classes)
+                or json_item_name != rdf_item_name
             ):
                 property_json_ld_context["@context"][
                     json_item_name
-                ] = collections.OrderedDict([
-                    ("@id", f"aas:{enum_fragment}/{rdf_item_name}")
-                ])
+                ] = collections.OrderedDict(
+                    [("@id", f"aas:{enum_fragment}/{rdf_item_name}")]
+                )
 
     elif rdfs_range.startswith("aas:"):
         property_json_ld_context["@type"] = "@id"
 
         if (
-                isinstance(
-                    underlying_atomic_type_annotation,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                )
-                and cls is not underlying_atomic_type_annotation
+            isinstance(
+                underlying_atomic_type_annotation,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            )
+            and cls is not underlying_atomic_type_annotation
         ):
             property_json_ld_context["@context"] = collections.OrderedDict()
             for range_property in underlying_atomic_type_annotation.properties:
@@ -204,8 +205,8 @@ def _generate_for_property(
                         name_set_of_exported_properties=name_set_of_exported_properties,
                     )
     elif rdfs_range.startswith("xs:") and rdfs_range not in (
-            "xs:string",
-            "xs:boolean",
+        "xs:string",
+        "xs:boolean",
     ):
         property_json_ld_context["@type"] = rdfs_range
     elif rdfs_range == "rdf:langString":
@@ -220,11 +221,11 @@ def _generate_for_property(
 
 
 def _generate_class_context(
-        cls: intermediate.ClassUnion,
-        symbol_table: intermediate.SymbolTable,
-        our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
-        name_set_of_generated_classes: Optional[Set[str]] = None,
-        name_set_of_exported_properties: Optional[Set[str]] = None,
+    cls: intermediate.ClassUnion,
+    symbol_table: intermediate.SymbolTable,
+    our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
+    name_set_of_generated_classes: Optional[Set[str]] = None,
+    name_set_of_exported_properties: Optional[Set[str]] = None,
 ) -> JsonLdType:
     """
     Generate the JSON LD representation for a dedicated class
@@ -269,15 +270,16 @@ def _generate_class_context(
         [
             ("@id", uri_fragment),
             (
-                "@context", collections.OrderedDict(
+                "@context",
+                collections.OrderedDict(
                     [
                         (
                             "@vocab",
-                            f"{symbol_table.meta_model.xml_namespace}/{uri_fragment}/"
+                            f"{symbol_table.meta_model.xml_namespace}/{uri_fragment}/",
                         )
                     ]
-                )
-            )
+                ),
+            ),
         ]
     )
 
@@ -309,8 +311,8 @@ class UriAndProperty:
 
 
 def _generate(
-        symbol_table: intermediate.SymbolTable,
-        our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
+    symbol_table: intermediate.SymbolTable,
+    our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """
     Generate the JSON-LD context based on the symbol_table.
@@ -326,7 +328,7 @@ def _generate(
             ("aas", f"{xml_namespace}/"),
             ("xs", "http://www.w3.org/2001/XMLSchema#"),
             ("@vocab", f"{xml_namespace}/"),
-            ("modelType", "@type")
+            ("modelType", "@type"),
         ]
     )
     errors: List[Error] = []
@@ -345,8 +347,8 @@ def _generate(
             property_uri = _property_uri(prop)
 
             if (
-                    property_name in uris_and_properties_by_name
-                    and uris_and_properties_by_name[property_name].uri != property_uri
+                property_name in uris_and_properties_by_name
+                and uris_and_properties_by_name[property_name].uri != property_uri
             ):
                 set_of_property_names_with_double_uris.add(property_name)
 
@@ -412,7 +414,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if error is not None:
         run.write_error_report(
             message=f"Failed to determine the mapping our type to ``rdfs:range`` "
-                    f"based on {context.model_path}",
+            f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error)],
             stderr=stderr,
         )
