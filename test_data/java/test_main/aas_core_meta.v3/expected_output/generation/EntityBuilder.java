@@ -134,12 +134,12 @@ public class EntityBuilder {
     return this;
   }
 
-  public EntityBuilder setIdshort(String idShort) {
+  public EntityBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public EntityBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public EntityBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -149,12 +149,12 @@ public class EntityBuilder {
     return this;
   }
 
-  public EntityBuilder setSemanticid(IReference semanticId) {
+  public EntityBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public EntityBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public EntityBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -164,7 +164,7 @@ public class EntityBuilder {
     return this;
   }
 
-  public EntityBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public EntityBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
@@ -174,12 +174,12 @@ public class EntityBuilder {
     return this;
   }
 
-  public EntityBuilder setGlobalassetid(String globalAssetId) {
+  public EntityBuilder setGlobalAssetId(String globalAssetId) {
     this.globalAssetId = globalAssetId;
     return this;
   }
 
-  public EntityBuilder setSpecificassetids(List<ISpecificAssetId> specificAssetIds) {
+  public EntityBuilder setSpecificAssetIds(List<ISpecificAssetId> specificAssetIds) {
     this.specificAssetIds = specificAssetIds;
     return this;
   }

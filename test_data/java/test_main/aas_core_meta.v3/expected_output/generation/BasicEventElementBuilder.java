@@ -189,12 +189,12 @@ public class BasicEventElementBuilder {
     return this;
   }
 
-  public BasicEventElementBuilder setIdshort(String idShort) {
+  public BasicEventElementBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public BasicEventElementBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public BasicEventElementBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -204,12 +204,12 @@ public class BasicEventElementBuilder {
     return this;
   }
 
-  public BasicEventElementBuilder setSemanticid(IReference semanticId) {
+  public BasicEventElementBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public BasicEventElementBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public BasicEventElementBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -219,32 +219,32 @@ public class BasicEventElementBuilder {
     return this;
   }
 
-  public BasicEventElementBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public BasicEventElementBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
 
-  public BasicEventElementBuilder setMessagetopic(String messageTopic) {
+  public BasicEventElementBuilder setMessageTopic(String messageTopic) {
     this.messageTopic = messageTopic;
     return this;
   }
 
-  public BasicEventElementBuilder setMessagebroker(IReference messageBroker) {
+  public BasicEventElementBuilder setMessageBroker(IReference messageBroker) {
     this.messageBroker = messageBroker;
     return this;
   }
 
-  public BasicEventElementBuilder setLastupdate(String lastUpdate) {
+  public BasicEventElementBuilder setLastUpdate(String lastUpdate) {
     this.lastUpdate = lastUpdate;
     return this;
   }
 
-  public BasicEventElementBuilder setMininterval(String minInterval) {
+  public BasicEventElementBuilder setMinInterval(String minInterval) {
     this.minInterval = minInterval;
     return this;
   }
 
-  public BasicEventElementBuilder setMaxinterval(String maxInterval) {
+  public BasicEventElementBuilder setMaxInterval(String maxInterval) {
     this.maxInterval = maxInterval;
     return this;
   }

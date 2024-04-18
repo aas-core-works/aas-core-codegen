@@ -44,7 +44,7 @@ public class ReferenceBuilder {
       "Argument \"keys\" must be non-null.");
   }
 
-  public ReferenceBuilder setReferredsemanticid(IReference referredSemanticId) {
+  public ReferenceBuilder setReferredSemanticId(IReference referredSemanticId) {
     this.referredSemanticId = referredSemanticId;
     return this;
   }

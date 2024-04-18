@@ -119,12 +119,12 @@ public class OperationBuilder {
     return this;
   }
 
-  public OperationBuilder setIdshort(String idShort) {
+  public OperationBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public OperationBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public OperationBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -134,12 +134,12 @@ public class OperationBuilder {
     return this;
   }
 
-  public OperationBuilder setSemanticid(IReference semanticId) {
+  public OperationBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public OperationBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public OperationBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -149,22 +149,22 @@ public class OperationBuilder {
     return this;
   }
 
-  public OperationBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public OperationBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
 
-  public OperationBuilder setInputvariables(List<IOperationVariable> inputVariables) {
+  public OperationBuilder setInputVariables(List<IOperationVariable> inputVariables) {
     this.inputVariables = inputVariables;
     return this;
   }
 
-  public OperationBuilder setOutputvariables(List<IOperationVariable> outputVariables) {
+  public OperationBuilder setOutputVariables(List<IOperationVariable> outputVariables) {
     this.outputVariables = outputVariables;
     return this;
   }
 
-  public OperationBuilder setInoutputvariables(List<IOperationVariable> inoutputVariables) {
+  public OperationBuilder setInoutputVariables(List<IOperationVariable> inoutputVariables) {
     this.inoutputVariables = inoutputVariables;
     return this;
   }

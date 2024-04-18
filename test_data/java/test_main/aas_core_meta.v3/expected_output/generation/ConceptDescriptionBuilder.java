@@ -104,12 +104,12 @@ public class ConceptDescriptionBuilder {
     return this;
   }
 
-  public ConceptDescriptionBuilder setIdshort(String idShort) {
+  public ConceptDescriptionBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public ConceptDescriptionBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public ConceptDescriptionBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -124,12 +124,12 @@ public class ConceptDescriptionBuilder {
     return this;
   }
 
-  public ConceptDescriptionBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public ConceptDescriptionBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
 
-  public ConceptDescriptionBuilder setIscaseof(List<IReference> isCaseOf) {
+  public ConceptDescriptionBuilder setIsCaseOf(List<IReference> isCaseOf) {
     this.isCaseOf = isCaseOf;
     return this;
   }

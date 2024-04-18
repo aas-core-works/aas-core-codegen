@@ -104,12 +104,12 @@ public class CapabilityBuilder {
     return this;
   }
 
-  public CapabilityBuilder setIdshort(String idShort) {
+  public CapabilityBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public CapabilityBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public CapabilityBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -119,12 +119,12 @@ public class CapabilityBuilder {
     return this;
   }
 
-  public CapabilityBuilder setSemanticid(IReference semanticId) {
+  public CapabilityBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public CapabilityBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public CapabilityBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -134,7 +134,7 @@ public class CapabilityBuilder {
     return this;
   }
 
-  public CapabilityBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public CapabilityBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }

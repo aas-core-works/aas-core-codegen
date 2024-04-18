@@ -26,7 +26,7 @@ public class EnvironmentBuilder {
    */
   private List<IConceptDescription> conceptDescriptions;
 
-  public EnvironmentBuilder setAssetadministrationshells(List<IAssetAdministrationShell> assetAdministrationShells) {
+  public EnvironmentBuilder setAssetAdministrationShells(List<IAssetAdministrationShell> assetAdministrationShells) {
     this.assetAdministrationShells = assetAdministrationShells;
     return this;
   }
@@ -36,7 +36,7 @@ public class EnvironmentBuilder {
     return this;
   }
 
-  public EnvironmentBuilder setConceptdescriptions(List<IConceptDescription> conceptDescriptions) {
+  public EnvironmentBuilder setConceptDescriptions(List<IConceptDescription> conceptDescriptions) {
     this.conceptDescriptions = conceptDescriptions;
     return this;
   }

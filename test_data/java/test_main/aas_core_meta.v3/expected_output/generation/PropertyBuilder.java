@@ -127,12 +127,12 @@ public class PropertyBuilder {
     return this;
   }
 
-  public PropertyBuilder setIdshort(String idShort) {
+  public PropertyBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public PropertyBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public PropertyBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -142,12 +142,12 @@ public class PropertyBuilder {
     return this;
   }
 
-  public PropertyBuilder setSemanticid(IReference semanticId) {
+  public PropertyBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public PropertyBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public PropertyBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -157,7 +157,7 @@ public class PropertyBuilder {
     return this;
   }
 
-  public PropertyBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public PropertyBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
@@ -167,7 +167,7 @@ public class PropertyBuilder {
     return this;
   }
 
-  public PropertyBuilder setValueid(IReference valueId) {
+  public PropertyBuilder setValueId(IReference valueId) {
     this.valueId = valueId;
     return this;
   }

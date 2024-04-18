@@ -59,22 +59,22 @@ public class AssetInformationBuilder {
       "Argument \"assetKind\" must be non-null.");
   }
 
-  public AssetInformationBuilder setGlobalassetid(String globalAssetId) {
+  public AssetInformationBuilder setGlobalAssetId(String globalAssetId) {
     this.globalAssetId = globalAssetId;
     return this;
   }
 
-  public AssetInformationBuilder setSpecificassetids(List<ISpecificAssetId> specificAssetIds) {
+  public AssetInformationBuilder setSpecificAssetIds(List<ISpecificAssetId> specificAssetIds) {
     this.specificAssetIds = specificAssetIds;
     return this;
   }
 
-  public AssetInformationBuilder setAssettype(String assetType) {
+  public AssetInformationBuilder setAssetType(String assetType) {
     this.assetType = assetType;
     return this;
   }
 
-  public AssetInformationBuilder setDefaultthumbnail(IResource defaultThumbnail) {
+  public AssetInformationBuilder setDefaultThumbnail(IResource defaultThumbnail) {
     this.defaultThumbnail = defaultThumbnail;
     return this;
   }

@@ -55,17 +55,17 @@ public class SpecificAssetIdBuilder {
       "Argument \"value\" must be non-null.");
   }
 
-  public SpecificAssetIdBuilder setSemanticid(IReference semanticId) {
+  public SpecificAssetIdBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public SpecificAssetIdBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public SpecificAssetIdBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
 
-  public SpecificAssetIdBuilder setExternalsubjectid(IReference externalSubjectId) {
+  public SpecificAssetIdBuilder setExternalSubjectId(IReference externalSubjectId) {
     this.externalSubjectId = externalSubjectId;
     return this;
   }

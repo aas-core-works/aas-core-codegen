@@ -120,12 +120,12 @@ public class AssetAdministrationShellBuilder {
     return this;
   }
 
-  public AssetAdministrationShellBuilder setIdshort(String idShort) {
+  public AssetAdministrationShellBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public AssetAdministrationShellBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public AssetAdministrationShellBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -140,12 +140,12 @@ public class AssetAdministrationShellBuilder {
     return this;
   }
 
-  public AssetAdministrationShellBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public AssetAdministrationShellBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
 
-  public AssetAdministrationShellBuilder setDerivedfrom(IReference derivedFrom) {
+  public AssetAdministrationShellBuilder setDerivedFrom(IReference derivedFrom) {
     this.derivedFrom = derivedFrom;
     return this;
   }
