@@ -130,12 +130,12 @@ public class BlobBuilder {
     return this;
   }
 
-  public BlobBuilder setIdshort(String idShort) {
+  public BlobBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public BlobBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public BlobBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -145,12 +145,12 @@ public class BlobBuilder {
     return this;
   }
 
-  public BlobBuilder setSemanticid(IReference semanticId) {
+  public BlobBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public BlobBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public BlobBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -160,7 +160,7 @@ public class BlobBuilder {
     return this;
   }
 
-  public BlobBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public BlobBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }

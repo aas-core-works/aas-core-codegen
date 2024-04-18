@@ -111,12 +111,12 @@ public class ReferenceElementBuilder {
     return this;
   }
 
-  public ReferenceElementBuilder setIdshort(String idShort) {
+  public ReferenceElementBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public ReferenceElementBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public ReferenceElementBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -126,12 +126,12 @@ public class ReferenceElementBuilder {
     return this;
   }
 
-  public ReferenceElementBuilder setSemanticid(IReference semanticId) {
+  public ReferenceElementBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public ReferenceElementBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public ReferenceElementBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -141,7 +141,7 @@ public class ReferenceElementBuilder {
     return this;
   }
 
-  public ReferenceElementBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public ReferenceElementBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }

@@ -142,12 +142,12 @@ public class SubmodelElementListBuilder {
     return this;
   }
 
-  public SubmodelElementListBuilder setIdshort(String idShort) {
+  public SubmodelElementListBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public SubmodelElementListBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public SubmodelElementListBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -157,12 +157,12 @@ public class SubmodelElementListBuilder {
     return this;
   }
 
-  public SubmodelElementListBuilder setSemanticid(IReference semanticId) {
+  public SubmodelElementListBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public SubmodelElementListBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public SubmodelElementListBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -172,22 +172,22 @@ public class SubmodelElementListBuilder {
     return this;
   }
 
-  public SubmodelElementListBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public SubmodelElementListBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }
 
-  public SubmodelElementListBuilder setOrderrelevant(Boolean orderRelevant) {
+  public SubmodelElementListBuilder setOrderRelevant(Boolean orderRelevant) {
     this.orderRelevant = orderRelevant;
     return this;
   }
 
-  public SubmodelElementListBuilder setSemanticidlistelement(IReference semanticIdListElement) {
+  public SubmodelElementListBuilder setSemanticIdListElement(IReference semanticIdListElement) {
     this.semanticIdListElement = semanticIdListElement;
     return this;
   }
 
-  public SubmodelElementListBuilder setValuetypelistelement(DataTypeDefXsd valueTypeListElement) {
+  public SubmodelElementListBuilder setValueTypeListElement(DataTypeDefXsd valueTypeListElement) {
     this.valueTypeListElement = valueTypeListElement;
     return this;
   }

@@ -124,12 +124,12 @@ public class FileBuilder {
     return this;
   }
 
-  public FileBuilder setIdshort(String idShort) {
+  public FileBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public FileBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public FileBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -139,12 +139,12 @@ public class FileBuilder {
     return this;
   }
 
-  public FileBuilder setSemanticid(IReference semanticId) {
+  public FileBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public FileBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public FileBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -154,7 +154,7 @@ public class FileBuilder {
     return this;
   }
 
-  public FileBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public FileBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }

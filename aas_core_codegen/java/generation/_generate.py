@@ -168,7 +168,7 @@ private {prop_type} {prop_name};"""
 
         arg_name = java_naming.argument_name(arg.name)
 
-        setter_name = java_naming.setter_name(arg_name)
+        setter_name = java_naming.setter_name(arg.name)
 
         setter_blocks.append(
             Stripped(

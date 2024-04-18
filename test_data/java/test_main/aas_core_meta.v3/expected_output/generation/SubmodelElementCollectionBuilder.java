@@ -109,12 +109,12 @@ public class SubmodelElementCollectionBuilder {
     return this;
   }
 
-  public SubmodelElementCollectionBuilder setIdshort(String idShort) {
+  public SubmodelElementCollectionBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public SubmodelElementCollectionBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public SubmodelElementCollectionBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -124,12 +124,12 @@ public class SubmodelElementCollectionBuilder {
     return this;
   }
 
-  public SubmodelElementCollectionBuilder setSemanticid(IReference semanticId) {
+  public SubmodelElementCollectionBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public SubmodelElementCollectionBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public SubmodelElementCollectionBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -139,7 +139,7 @@ public class SubmodelElementCollectionBuilder {
     return this;
   }
 
-  public SubmodelElementCollectionBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public SubmodelElementCollectionBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }

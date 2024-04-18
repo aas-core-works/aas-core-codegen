@@ -27,7 +27,7 @@ public class EmbeddedDataSpecificationBuilder {
       "Argument \"dataSpecificationContent\" must be non-null.");
   }
 
-  public EmbeddedDataSpecificationBuilder setDataspecification(IReference dataSpecification) {
+  public EmbeddedDataSpecificationBuilder setDataSpecification(IReference dataSpecification) {
     this.dataSpecification = dataSpecification;
     return this;
   }

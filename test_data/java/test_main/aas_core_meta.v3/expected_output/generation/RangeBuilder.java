@@ -129,12 +129,12 @@ public class RangeBuilder {
     return this;
   }
 
-  public RangeBuilder setIdshort(String idShort) {
+  public RangeBuilder setIdShort(String idShort) {
     this.idShort = idShort;
     return this;
   }
 
-  public RangeBuilder setDisplayname(List<ILangStringNameType> displayName) {
+  public RangeBuilder setDisplayName(List<ILangStringNameType> displayName) {
     this.displayName = displayName;
     return this;
   }
@@ -144,12 +144,12 @@ public class RangeBuilder {
     return this;
   }
 
-  public RangeBuilder setSemanticid(IReference semanticId) {
+  public RangeBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public RangeBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public RangeBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -159,7 +159,7 @@ public class RangeBuilder {
     return this;
   }
 
-  public RangeBuilder setEmbeddeddataspecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  public RangeBuilder setEmbeddedDataSpecifications(List<IEmbeddedDataSpecification> embeddedDataSpecifications) {
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     return this;
   }

@@ -63,17 +63,17 @@ public class ExtensionBuilder {
       "Argument \"name\" must be non-null.");
   }
 
-  public ExtensionBuilder setSemanticid(IReference semanticId) {
+  public ExtensionBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public ExtensionBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public ExtensionBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
 
-  public ExtensionBuilder setValuetype(DataTypeDefXsd valueType) {
+  public ExtensionBuilder setValueType(DataTypeDefXsd valueType) {
     this.valueType = valueType;
     return this;
   }
@@ -83,7 +83,7 @@ public class ExtensionBuilder {
     return this;
   }
 
-  public ExtensionBuilder setRefersto(List<IReference> refersTo) {
+  public ExtensionBuilder setRefersTo(List<IReference> refersTo) {
     this.refersTo = refersTo;
     return this;
   }

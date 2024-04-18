@@ -93,7 +93,7 @@ public class DataSpecificationIec61360Builder {
       "Argument \"preferredName\" must be non-null.");
   }
 
-  public DataSpecificationIec61360Builder setShortname(List<ILangStringShortNameTypeIec61360> shortName) {
+  public DataSpecificationIec61360Builder setShortName(List<ILangStringShortNameTypeIec61360> shortName) {
     this.shortName = shortName;
     return this;
   }
@@ -103,12 +103,12 @@ public class DataSpecificationIec61360Builder {
     return this;
   }
 
-  public DataSpecificationIec61360Builder setUnitid(IReference unitId) {
+  public DataSpecificationIec61360Builder setUnitId(IReference unitId) {
     this.unitId = unitId;
     return this;
   }
 
-  public DataSpecificationIec61360Builder setSourceofdefinition(String sourceOfDefinition) {
+  public DataSpecificationIec61360Builder setSourceOfDefinition(String sourceOfDefinition) {
     this.sourceOfDefinition = sourceOfDefinition;
     return this;
   }
@@ -118,7 +118,7 @@ public class DataSpecificationIec61360Builder {
     return this;
   }
 
-  public DataSpecificationIec61360Builder setDatatype(DataTypeIec61360 dataType) {
+  public DataSpecificationIec61360Builder setDataType(DataTypeIec61360 dataType) {
     this.dataType = dataType;
     return this;
   }
@@ -128,12 +128,12 @@ public class DataSpecificationIec61360Builder {
     return this;
   }
 
-  public DataSpecificationIec61360Builder setValueformat(String valueFormat) {
+  public DataSpecificationIec61360Builder setValueFormat(String valueFormat) {
     this.valueFormat = valueFormat;
     return this;
   }
 
-  public DataSpecificationIec61360Builder setValuelist(IValueList valueList) {
+  public DataSpecificationIec61360Builder setValueList(IValueList valueList) {
     this.valueList = valueList;
     return this;
   }
@@ -143,7 +143,7 @@ public class DataSpecificationIec61360Builder {
     return this;
   }
 
-  public DataSpecificationIec61360Builder setLeveltype(ILevelType levelType) {
+  public DataSpecificationIec61360Builder setLevelType(ILevelType levelType) {
     this.levelType = levelType;
     return this;
   }

@@ -69,12 +69,12 @@ public class QualifierBuilder {
       "Argument \"valueType\" must be non-null.");
   }
 
-  public QualifierBuilder setSemanticid(IReference semanticId) {
+  public QualifierBuilder setSemanticId(IReference semanticId) {
     this.semanticId = semanticId;
     return this;
   }
 
-  public QualifierBuilder setSupplementalsemanticids(List<IReference> supplementalSemanticIds) {
+  public QualifierBuilder setSupplementalSemanticIds(List<IReference> supplementalSemanticIds) {
     this.supplementalSemanticIds = supplementalSemanticIds;
     return this;
   }
@@ -89,7 +89,7 @@ public class QualifierBuilder {
     return this;
   }
 
-  public QualifierBuilder setValueid(IReference valueId) {
+  public QualifierBuilder setValueId(IReference valueId) {
     this.valueId = valueId;
     return this;
   }
