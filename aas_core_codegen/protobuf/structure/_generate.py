@@ -294,16 +294,6 @@ def _generate_enum(
     return Stripped(writer.getvalue()), None
 
 
-@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
-def _generate_interface(
-    cls: intermediate.ClassUnion,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate ProtoBuf interface for the given class ``cls``."""
-    raise NotImplementedError("Interfaces are not supported by proto3. Treat as class instead.")
-
-    # TODO: re-use interface generation code for generating properties that are not defined at higher hierarchy level
-
-
 @require(lambda cls: not cls.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
@@ -340,9 +330,15 @@ def _generate_class(
             prop_blocks.append(prop_comment)
 
         # start counting IDs from 1
-        prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
+        prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
 
         blocks.append(Stripped("\n".join(prop_blocks)))
+
+    # one additional property indicating the concrete class type (in case multiple inherit from the same interface)
+    # when instantiating a class of this proto, the field must be set (ideally in the constructor)
+    blocks.append(Stripped(
+        f"MessageType message_type = 1;"
+    ))
 
     # endregion
 
@@ -373,6 +369,32 @@ def _generate_class(
             writer.write("\n\n")
 
         writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
+def _generate_message_type_enum(symbol_table: VerifiedIntermediateSymbolTable) -> Tuple[Optional[Stripped], Optional[Error]]:
+    writer = io.StringIO()
+
+    name = "MessageType"
+
+    # write enum and its name
+    writer.write(f"enum {name} {{\n")
+    # write at least the unspecified enum entry
+    writer.write(textwrap.indent(f"{name}_UNSPECIFIED = 0;", I))
+
+    # generate one enum entry for each concrete class
+    for i, cls in enumerate(symbol_table.concrete_classes):
+        writer.write("\n\n")
+
+        writer.write(
+            textwrap.indent(
+                f"{name}_{proto_naming.enum_literal_name(cls.name)} = {i + 1};",
+                I,
+            )
+        )
 
     writer.write("\n}")
 
@@ -452,6 +474,10 @@ def generate(
 
         else:
             assert_never(our_type)
+
+    code, error = _generate_message_type_enum(symbol_table)
+    if error is None:
+        code_blocks.append(code)
 
     if len(errors) > 0:
         return None, errors
