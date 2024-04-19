@@ -24043,22 +24043,8 @@ class _ReaderAndSetterForEmbeddedDataSpecification:
 
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
-        self.data_specification: Optional[aas_types.Reference] = None
         self.data_specification_content: Optional[aas_types.DataSpecificationContent] = None
-
-    def read_and_set_data_specification(
-        self,
-        element: Element,
-        iterator: Iterator[Tuple[str, Element]]
-    ) -> None:
-        """
-        Read :paramref:`element` as the property
-        :py:attr:`.types.EmbeddedDataSpecification.data_specification` and set it.
-        """
-        self.data_specification = _read_reference_as_sequence(
-            element,
-            iterator
-        )
+        self.data_specification: Optional[aas_types.Reference] = None
 
     def read_and_set_data_specification_content(
         self,
@@ -24096,6 +24082,20 @@ class _ReaderAndSetterForEmbeddedDataSpecification:
         _read_end_element(element, iterator)
 
         self.data_specification_content = result
+
+    def read_and_set_data_specification(
+        self,
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+    ) -> None:
+        """
+        Read :paramref:`element` as the property
+        :py:attr:`.types.EmbeddedDataSpecification.data_specification` and set it.
+        """
+        self.data_specification = _read_reference_as_sequence(
+            element,
+            iterator
+        )
 
 
 def _read_embedded_data_specification_as_sequence(
@@ -24176,19 +24176,14 @@ def _read_embedded_data_specification_as_sequence(
             exception.path._prepend(ElementSegment(next_element))
             raise
 
-    if reader_and_setter.data_specification is None:
-        raise DeserializationException(
-            "The required property 'dataSpecification' is missing"
-        )
-
     if reader_and_setter.data_specification_content is None:
         raise DeserializationException(
             "The required property 'dataSpecificationContent' is missing"
         )
 
     return aas_types.EmbeddedDataSpecification(
-        reader_and_setter.data_specification,
-        reader_and_setter.data_specification_content
+        reader_and_setter.data_specification_content,
+        reader_and_setter.data_specification
     )
 
 
@@ -27070,10 +27065,10 @@ _READ_AND_SET_DISPATCH_FOR_EMBEDDED_DATA_SPECIFICATION: Mapping[
         None
     ]
 ] = {
-    'dataSpecification':
-        _ReaderAndSetterForEmbeddedDataSpecification.read_and_set_data_specification,
     'dataSpecificationContent':
         _ReaderAndSetterForEmbeddedDataSpecification.read_and_set_data_specification_content,
+    'dataSpecification':
+        _ReaderAndSetterForEmbeddedDataSpecification.read_and_set_data_specification,
 }
 
 
@@ -30473,15 +30468,16 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_start_element('dataSpecification')
-        self._write_reference_as_sequence(
-            that.data_specification
-        )
-        self._write_end_element('dataSpecification')
-
         self._write_start_element('dataSpecificationContent')
         self.visit(that.data_specification_content)
         self._write_end_element('dataSpecificationContent')
+
+        if that.data_specification is not None:
+            self._write_start_element('dataSpecification')
+            self._write_reference_as_sequence(
+                that.data_specification
+            )
+            self._write_end_element('dataSpecification')
 
     def visit_embedded_data_specification(
         self,

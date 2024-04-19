@@ -1,6 +1,6 @@
 """Infer the constraints on a property based on constant sets."""
 import collections
-from typing import Optional, Tuple, MutableMapping, List, Mapping, Union, Set, Sequence
+from typing import Optional, Tuple, MutableMapping, List, Mapping, Union, Sequence
 
 from icontract import ensure, require
 

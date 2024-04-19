@@ -12325,32 +12325,6 @@ func VerifyEmbeddedDataSpecification(
 ) (abort bool) {
 	abort = false
 
-	if that.DataSpecification() == nil {
-		abort = onError(
-			newVerificationError(
-				"Required property not set: DataSpecification",
-			),
-		)
-		if abort {
-			return
-		}
-	} else {
-		abort = Verify(
-			that.DataSpecification(),
-			func(err *VerificationError) bool {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DataSpecification",
-					},
-				)
-				return onError(err)
-			},
-		)
-		if abort {
-			return
-		}
-	}
-
 	if that.DataSpecificationContent() == nil {
 		abort = onError(
 			newVerificationError(
@@ -12367,6 +12341,23 @@ func VerifyEmbeddedDataSpecification(
 				err.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "DataSpecificationContent",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.DataSpecification() != nil {
+		abort = Verify(
+			that.DataSpecification(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DataSpecification",
 					},
 				)
 				return onError(err)

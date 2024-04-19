@@ -505,15 +505,14 @@
     "EmbeddedDataSpecification": {
       "type": "object",
       "properties": {
-        "dataSpecification": {
-          "$ref": "#/definitions/Reference"
-        },
         "dataSpecificationContent": {
           "$ref": "#/definitions/DataSpecificationContent_choice"
+        },
+        "dataSpecification": {
+          "$ref": "#/definitions/Reference"
         }
       },
       "required": [
-        "dataSpecification",
         "dataSpecificationContent"
       ]
     },

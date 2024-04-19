@@ -11426,18 +11426,18 @@ func IsDataSpecificationContent(
 type IEmbeddedDataSpecification interface {
 	IClass
 
-	// Reference to the data specification
-	DataSpecification() IReference;
-
-	SetDataSpecification(
-		value IReference,
-	);
-
 	// Actual content of the data specification
 	DataSpecificationContent() IDataSpecificationContent;
 
 	SetDataSpecificationContent(
 		value IDataSpecificationContent,
+	);
+
+	// Reference to the data specification
+	DataSpecification() IReference;
+
+	SetDataSpecification(
+		value IReference,
 	);
 }
 
@@ -11455,19 +11455,8 @@ func IsEmbeddedDataSpecification(
 
 // Implements IEmbeddedDataSpecification.
 type EmbeddedDataSpecification struct {
-	dataSpecification IReference
 	dataSpecificationContent IDataSpecificationContent
-}
-
-func (eds *EmbeddedDataSpecification) DataSpecification(
-) IReference {
-	return eds.dataSpecification
-}
-
-func (eds *EmbeddedDataSpecification) SetDataSpecification(
-	value IReference,
-) {
-	eds.dataSpecification = value
+	dataSpecification IReference
 }
 
 func (eds *EmbeddedDataSpecification) DataSpecificationContent(
@@ -11479,6 +11468,17 @@ func (eds *EmbeddedDataSpecification) SetDataSpecificationContent(
 	value IDataSpecificationContent,
 ) {
 	eds.dataSpecificationContent = value
+}
+
+func (eds *EmbeddedDataSpecification) DataSpecification(
+) IReference {
+	return eds.dataSpecification
+}
+
+func (eds *EmbeddedDataSpecification) SetDataSpecification(
+	value IReference,
+) {
+	eds.dataSpecification = value
 }
 
 func (eds *EmbeddedDataSpecification) ModelType(
@@ -11498,17 +11498,19 @@ func (eds *EmbeddedDataSpecification) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
 	abort = action(
-		eds.dataSpecification,
+		eds.dataSpecificationContent,
 	)
 	if abort {
 		return
 	}
 
-	abort = action(
-		eds.dataSpecificationContent,
-	)
-	if abort {
-		return
+	if eds.dataSpecification != nil {
+		abort = action(
+			eds.dataSpecification,
+		)
+		if abort {
+			return
+		}
 	}
 
 	return
@@ -11524,19 +11526,6 @@ func (eds *EmbeddedDataSpecification) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
 	abort = action(
-		eds.dataSpecification,
-	)
-	if abort {
-		return
-	}
-	abort = eds.dataSpecification.Descend(
-		action,
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
 		eds.dataSpecificationContent,
 	)
 	if abort {
@@ -11549,18 +11538,32 @@ func (eds *EmbeddedDataSpecification) Descend(
 		return
 	}
 
+	if eds.dataSpecification != nil {
+		abort = action(
+			eds.dataSpecification,
+		)
+		if abort {
+			return
+		}
+		abort = eds.dataSpecification.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
 	return
 }
 
 // Create a new instance of EmbeddedDataSpecification with
 // the given properties.
 func NewEmbeddedDataSpecification(
-	dataSpecification IReference,
 	dataSpecificationContent IDataSpecificationContent,
 ) *EmbeddedDataSpecification {
 	return &EmbeddedDataSpecification{
-		dataSpecification: dataSpecification,
 		dataSpecificationContent: dataSpecificationContent,
+		dataSpecification: nil,
 	}
 }
 

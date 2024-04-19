@@ -12,7 +12,7 @@ For more information about JSON-LD, see https://www.w3.org/TR/json-ld11/.
 This code has been originally developed by Fabien Amarger (murloc6),
 Elodie Thieblin (ethieblin), and Christian Glomb (wiresio).
 """
-
+import collections
 import dataclasses
 import json
 from typing import (
@@ -25,6 +25,7 @@ from typing import (
     Tuple,
     Union,
     cast,
+    OrderedDict,
 )
 
 from icontract import require
@@ -40,7 +41,7 @@ from aas_core_codegen.rdf_shacl import (
     common as rdf_shacl_common,
 )
 
-JsonLdType = Dict[str, Any]
+JsonLdType = OrderedDict[str, Any]
 
 
 def _property_uri(prop: intermediate.Property) -> Stripped:
@@ -135,7 +136,9 @@ def _generate_for_property(
         type_annotation=prop.type_annotation,
         our_type_to_rdfs_range=our_type_to_rdfs_range,
     )
-    property_json_ld_context: JsonLdType = {"@id": property_uri}
+    property_json_ld_context: JsonLdType = collections.OrderedDict(
+        [("@id", property_uri)]
+    )
     if isinstance(
         intermediate.beneath_optional(prop.type_annotation),
         intermediate.ListTypeAnnotation,
@@ -151,7 +154,7 @@ def _generate_for_property(
             underlying_atomic_type_annotation.name
         )
         property_json_ld_context["@context"] = cast(
-            JsonLdType, {"@vocab": f"aas:{enum_fragment}/"}
+            JsonLdType, collections.OrderedDict([("@vocab", f"aas:{enum_fragment}/")])
         )
         property_json_ld_context["@type"] = "@vocab"
 
@@ -170,9 +173,11 @@ def _generate_for_property(
                 (json_item_name in name_set_of_generated_classes)
                 or json_item_name != rdf_item_name
             ):
-                property_json_ld_context["@context"][json_item_name] = {
-                    "@id": f"aas:{enum_fragment}/{rdf_item_name}"
-                }
+                property_json_ld_context["@context"][
+                    json_item_name
+                ] = collections.OrderedDict(
+                    [("@id", f"aas:{enum_fragment}/{rdf_item_name}")]
+                )
 
     elif rdfs_range.startswith("aas:"):
         property_json_ld_context["@type"] = "@id"
@@ -184,7 +189,7 @@ def _generate_for_property(
             )
             and cls is not underlying_atomic_type_annotation
         ):
-            property_json_ld_context["@context"] = {}
+            property_json_ld_context["@context"] = collections.OrderedDict()
             for range_property in underlying_atomic_type_annotation.properties:
                 range_property_name = naming.json_property(range_property.name)
 
@@ -206,10 +211,12 @@ def _generate_for_property(
         property_json_ld_context["@type"] = rdfs_range
     elif rdfs_range == "rdf:langString":
         property_json_ld_context["@container"] = "@set"
-        property_json_ld_context["@context"] = {
-            "language": "@language",
-            "text": "@value",
-        }
+        property_json_ld_context["@context"] = collections.OrderedDict(
+            [
+                ("language", "@language"),
+                ("text", "@value"),
+            ]
+        )
     return property_json_ld_context
 
 
@@ -256,15 +263,26 @@ def _generate_class_context(
     # This is necessary for mypy.
     assert name_set_of_exported_properties is not None
 
-    class_context_definition: JsonLdType = {}
+    class_context_definition: JsonLdType = collections.OrderedDict()
     class_name = naming.json_model_type(cls.name)
     uri_fragment = rdf_shacl_naming.class_name(cls.name)
-    class_context_definition[class_name] = {
-        "@id": uri_fragment,
-        "@context": {
-            "@vocab": f"{symbol_table.meta_model.xml_namespace}/{uri_fragment}/"
-        },
-    }
+    class_context_definition[class_name] = collections.OrderedDict(
+        [
+            ("@id", uri_fragment),
+            (
+                "@context",
+                collections.OrderedDict(
+                    [
+                        (
+                            "@vocab",
+                            f"{symbol_table.meta_model.xml_namespace}/{uri_fragment}/",
+                        )
+                    ]
+                ),
+            ),
+        ]
+    )
+
     for prop in cls.properties:
         property_name = naming.json_property(prop.name)
         if property_name in name_set_of_exported_properties:
@@ -305,12 +323,14 @@ def _generate(
     :return: The JSON-LD context as text
     """
     xml_namespace = symbol_table.meta_model.xml_namespace
-    json_ld_context: JsonLdType = {
-        "aas": f"{xml_namespace}/",
-        "xs": "http://www.w3.org/2001/XMLSchema#",
-        "@vocab": f"{xml_namespace}/",
-        "modelType": "@type",
-    }
+    json_ld_context: JsonLdType = collections.OrderedDict(
+        [
+            ("aas", f"{xml_namespace}/"),
+            ("xs", "http://www.w3.org/2001/XMLSchema#"),
+            ("@vocab", f"{xml_namespace}/"),
+            ("modelType", "@type"),
+        ]
+    )
     errors: List[Error] = []
 
     class_name_set: Set[str] = set(

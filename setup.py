@@ -41,8 +41,8 @@ setup(
     extras_require={
         "dev": [
             "black==22.3.0",
-            "mypy==0.950",
-            "pylint==2.12.2",
+            "mypy==1.9.0",
+            "pylint==3.1.0",
             "pydocstyle>=2.1.1, <3",
             "coverage>=4.5.1, <5",
             "pygments>=2, <3",
@@ -50,7 +50,7 @@ setup(
             "twine",
             "jsonschema==3.2.0",
             "xmlschema==1.10.0",
-            "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@cb28d18#egg=aas-core-meta",
+            "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@6d5411b#egg=aas-core-meta",
             "ssort==0.12.3",
         ]
     },
