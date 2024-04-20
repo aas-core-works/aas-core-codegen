@@ -2376,13 +2376,11 @@ def _find_all_in_description_of_meta_model(
     yield from description.summary.findall(element_type)
 
     for remark in description.remarks:
-        for element in remark.findall(element_type):
-            yield element
+        yield from remark.findall(element_type)
 
     for constraint in description.constraints_by_identifier.values():
         # noinspection PyUnresolvedReferences
-        for element in constraint.findall(element_type):
-            yield element
+        yield from constraint.findall(element_type)
 
 
 def _over_descriptions_and_our_types(
@@ -3594,7 +3592,7 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
                 errors.append(
                     Error(
                         description.parsed.node,
-                        "Unexpected empty reference " "to a property or a literal",
+                        "Unexpected empty reference to a property or a literal",
                     )
                 )
                 continue

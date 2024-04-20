@@ -11692,28 +11692,13 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 	result aastypes.IEmbeddedDataSpecification,
 	err *DeserializationError,
 ) {
-	var theDataSpecification aastypes.IReference
 	var theDataSpecificationContent aastypes.IDataSpecificationContent
+	var theDataSpecification aastypes.IReference
 
-	foundDataSpecification := false
 	foundDataSpecificationContent := false
 
 	for k, v := range m {
 		switch k {
-		case "dataSpecification":
-			theDataSpecification, err = ReferenceFromJsonable(
-				v,
-			)
-			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "dataSpecification",
-					},
-				)
-				return
-			}
-			foundDataSpecification = true
-
 		case "dataSpecificationContent":
 			theDataSpecificationContent, err = DataSpecificationContentFromJsonable(
 				v,
@@ -11728,6 +11713,19 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 			}
 			foundDataSpecificationContent = true
 
+		case "dataSpecification":
+			theDataSpecification, err = ReferenceFromJsonable(
+				v,
+			)
+			if err != nil {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "dataSpecification",
+					},
+				)
+				return
+			}
+
 		default:
 			err = newDeserializationError(
 				fmt.Sprintf(
@@ -11739,13 +11737,6 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 		}
 	}
 
-	if !foundDataSpecification {
-		err = newDeserializationError(
-			"The required property 'dataSpecification' is missing",
-		)
-		return
-	}
-
 	if !foundDataSpecificationContent {
 		err = newDeserializationError(
 			"The required property 'dataSpecificationContent' is missing",
@@ -11754,8 +11745,10 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 	}
 
 	result = aastypes.NewEmbeddedDataSpecification(
-		theDataSpecification,
 		theDataSpecificationContent,
+	)
+	result.SetDataSpecification(
+		theDataSpecification,
 	)
 
 	return
@@ -19308,21 +19301,6 @@ func embeddedDataSpecificationToMap(
 ) (result map[string]interface{}, err *SerializationError) {
 	result = make(map[string]interface{})
 
-	var jsonableDataSpecification interface{}
-	jsonableDataSpecification, err = ToJsonable(
-		that.DataSpecification(),
-	)
-	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "DataSpecification()",
-			},
-		)
-
-		return
-	}
-	result["dataSpecification"] = jsonableDataSpecification
-
 	var jsonableDataSpecificationContent interface{}
 	jsonableDataSpecificationContent, err = ToJsonable(
 		that.DataSpecificationContent(),
@@ -19337,6 +19315,23 @@ func embeddedDataSpecificationToMap(
 		return
 	}
 	result["dataSpecificationContent"] = jsonableDataSpecificationContent
+
+	if that.DataSpecification() != nil {
+		var jsonableDataSpecification interface{}
+		jsonableDataSpecification, err = ToJsonable(
+			that.DataSpecification(),
+		)
+		if err != nil {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "DataSpecification()",
+				},
+			)
+
+			return
+		}
+		result["dataSpecification"] = jsonableDataSpecification
+	}
 
 	return
 }

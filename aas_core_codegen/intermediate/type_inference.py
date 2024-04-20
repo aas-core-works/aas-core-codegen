@@ -1281,7 +1281,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                 self._non_null.increment(canonical_repr)
 
                 exit_stack.callback(
-                    lambda a_canonical_repr=canonical_repr: self._non_null.decrement(
+                    lambda a_canonical_repr=canonical_repr: self._non_null.decrement(  # type: ignore
                         a_canonical_repr
                     )
                 )
@@ -1294,7 +1294,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
                         # fmt: off
                         exit_stack.callback(
-                            lambda a_canonical_repr=canonical_repr:
+                            lambda a_canonical_repr=canonical_repr:  # type: ignore
                             self._non_null.decrement(a_canonical_repr)
                         )
                         # fmt: on
@@ -1565,7 +1565,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
                     # fmt: off
                     exit_stack.callback(
-                        lambda a_canonical_repr=canonical_repr:
+                        lambda a_canonical_repr=canonical_repr:  # type: ignore
                         self._non_null.decrement(a_canonical_repr)
                     )
                     # fmt: on

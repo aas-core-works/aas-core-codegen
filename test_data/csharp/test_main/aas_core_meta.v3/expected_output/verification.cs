@@ -9111,20 +9111,23 @@ namespace AasCore.Aas3_0
                 Aas.IEmbeddedDataSpecification that
             )
             {
-                foreach (var error in Verification.Verify(that.DataSpecification))
-                {
-                    error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "dataSpecification"));
-                    yield return error;
-                }
-
                 foreach (var error in Verification.Verify(that.DataSpecificationContent))
                 {
                     error.PrependSegment(
                         new Reporting.NameSegment(
                             "dataSpecificationContent"));
                     yield return error;
+                }
+
+                if (that.DataSpecification != null)
+                {
+                    foreach (var error in Verification.Verify(that.DataSpecification))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "dataSpecification"));
+                        yield return error;
+                    }
                 }
             }
 

@@ -9137,25 +9137,12 @@ class _SetterForEmbeddedDataSpecification:
 
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
-        self.data_specification: Optional[aas_types.Reference] = None
         self.data_specification_content: Optional[aas_types.DataSpecificationContent] = None
+        self.data_specification: Optional[aas_types.Reference] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
-
-    def set_data_specification_from_jsonable(
-            self,
-            jsonable: Jsonable
-    ) -> None:
-        """
-        Parse :paramref:`jsonable` as the value of :py:attr:`~data_specification`.
-
-        :param jsonable: input to be parsed
-        """
-        self.data_specification = reference_from_jsonable(
-            jsonable
-        )
 
     def set_data_specification_content_from_jsonable(
             self,
@@ -9167,6 +9154,19 @@ class _SetterForEmbeddedDataSpecification:
         :param jsonable: input to be parsed
         """
         self.data_specification_content = data_specification_content_from_jsonable(
+            jsonable
+        )
+
+    def set_data_specification_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
+        """
+        Parse :paramref:`jsonable` as the value of :py:attr:`~data_specification`.
+
+        :param jsonable: input to be parsed
+        """
+        self.data_specification = reference_from_jsonable(
             jsonable
         )
 
@@ -9209,19 +9209,14 @@ def embedded_data_specification_from_jsonable(
             )
             raise exception
 
-    if setter.data_specification is None:
-        raise DeserializationException(
-            "The required property 'dataSpecification' is missing"
-        )
-
     if setter.data_specification_content is None:
         raise DeserializationException(
             "The required property 'dataSpecificationContent' is missing"
         )
 
     return aas_types.EmbeddedDataSpecification(
-        setter.data_specification,
-        setter.data_specification_content
+        setter.data_specification_content,
+        setter.data_specification
     )
 
 
@@ -11229,10 +11224,10 @@ _SETTER_MAP_FOR_EMBEDDED_DATA_SPECIFICATION: Mapping[
         None
     ]
 ] = {
-    'dataSpecification':
-        _SetterForEmbeddedDataSpecification.set_data_specification_from_jsonable,
     'dataSpecificationContent':
         _SetterForEmbeddedDataSpecification.set_data_specification_content_from_jsonable,
+    'dataSpecification':
+        _SetterForEmbeddedDataSpecification.set_data_specification_from_jsonable,
     'modelType':
         _SetterForEmbeddedDataSpecification.ignore
 }
@@ -12793,13 +12788,14 @@ class _Serializer(
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable['dataSpecification'] = (
-            self.transform(that.data_specification)
-        )
-
         jsonable['dataSpecificationContent'] = (
             self.transform(that.data_specification_content)
         )
+
+        if that.data_specification is not None:
+            jsonable['dataSpecification'] = (
+                self.transform(that.data_specification)
+            )
 
         return jsonable
 

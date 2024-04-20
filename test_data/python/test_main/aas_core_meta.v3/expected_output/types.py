@@ -5554,11 +5554,11 @@ class DataSpecificationContent(Class):
 class EmbeddedDataSpecification(Class):
     """Embed the content of a data specification."""
 
-    #: Reference to the data specification
-    data_specification: 'Reference'
-
     #: Actual content of the data specification
     data_specification_content: 'DataSpecificationContent'
+
+    #: Reference to the data specification
+    data_specification: Optional['Reference']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -5568,9 +5568,10 @@ class EmbeddedDataSpecification(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.data_specification
-
         yield self.data_specification_content
+
+        if self.data_specification is not None:
+            yield self.data_specification
 
     def descend(self) -> Iterator[Class]:
         """
@@ -5578,13 +5579,14 @@ class EmbeddedDataSpecification(Class):
 
         :yield: instances recursively referenced from this instance
         """
-        yield self.data_specification
-
-        yield from self.data_specification.descend()
-
         yield self.data_specification_content
 
         yield from self.data_specification_content.descend()
+
+        if self.data_specification is not None:
+            yield self.data_specification
+
+            yield from self.data_specification.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -5618,12 +5620,12 @@ class EmbeddedDataSpecification(Class):
 
     def __init__(
             self,
-            data_specification: 'Reference',
-            data_specification_content: 'DataSpecificationContent'
+            data_specification_content: 'DataSpecificationContent',
+            data_specification: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
-        self.data_specification = data_specification
         self.data_specification_content = data_specification_content
+        self.data_specification = data_specification
 
 
 class DataTypeIEC61360(enum.Enum):

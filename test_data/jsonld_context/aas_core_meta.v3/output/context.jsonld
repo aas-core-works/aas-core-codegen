@@ -679,6 +679,11 @@
       "@type": "@id",
       "@context": {}
     },
+    "dataSpecificationContent": {
+      "@id": "aas:EmbeddedDataSpecification/dataSpecificationContent",
+      "@type": "@id",
+      "@context": {}
+    },
     "dataSpecification": {
       "@id": "aas:EmbeddedDataSpecification/dataSpecification",
       "@type": "@id",
@@ -691,11 +696,6 @@
           "@type": "@vocab"
         }
       }
-    },
-    "dataSpecificationContent": {
-      "@id": "aas:EmbeddedDataSpecification/dataSpecificationContent",
-      "@type": "@id",
-      "@context": {}
     },
     "nom": {
       "@id": "aas:LevelType/nom"

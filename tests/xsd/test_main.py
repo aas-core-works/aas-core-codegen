@@ -206,7 +206,7 @@ class Test_against_recorded(unittest.TestCase):
                             f"The files {expected_pth} and {output_pth} do not match.",
                         )
 
-    def test_on_examples(self) -> None:  # pylint: disable=no-self-use
+    def test_on_examples(self) -> None:
         assert (
             Test_against_recorded.PARENT_CASE_DIR.exists()
             and Test_against_recorded.PARENT_CASE_DIR.is_dir()

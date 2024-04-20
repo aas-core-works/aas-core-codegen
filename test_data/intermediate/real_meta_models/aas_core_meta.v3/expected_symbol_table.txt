@@ -25625,18 +25625,6 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specification',
-          type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Reference',
-            parsed=...),
-          description=DescriptionOfProperty(
-            summary='<paragraph>Reference to the data specification</paragraph>',
-            remarks=[],
-            constraints_by_identifier=[],
-            parsed=...),
-          specified_for='Reference to ConcreteClass Embedded_data_specification',
-          parsed=...),
-        Property(
           name='data_specification_content',
           type_annotation=OurTypeAnnotation(
             our_type='Reference to our type Data_specification_content',
@@ -25647,24 +25635,42 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Embedded_data_specification',
+          parsed=...),
+        Property(
+          name='data_specification',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Reference',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Reference to the data specification</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Embedded_data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(
         name='__init__',
         arguments=[
           Argument(
-            name='data_specification',
-            type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Reference',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
             name='data_specification_content',
             type_annotation=OurTypeAnnotation(
               our_type='Reference to our type Data_specification_content',
               parsed=...),
             default=None,
+            parsed=...),
+          Argument(
+            name='data_specification',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Reference',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
             parsed=...)],
         returns=None,
         description=None,
@@ -25678,24 +25684,24 @@ SymbolTable(
         statements=[
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specification',
-              argument='data_specification',
+              name='data_specification_content',
+              argument='data_specification_content',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specification_content',
-              argument='data_specification_content',
+              name='data_specification',
+              argument='data_specification',
               default=None)""")],
         inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specification',
-              argument='data_specification',
+              name='data_specification_content',
+              argument='data_specification_content',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specification_content',
-              argument='data_specification_content',
+              name='data_specification',
+              argument='data_specification',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(

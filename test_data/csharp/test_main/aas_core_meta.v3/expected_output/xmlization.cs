@@ -16958,8 +16958,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                IReference? theDataSpecification = null;
                 IDataSpecificationContent? theDataSpecificationContent = null;
+                IReference? theDataSpecification = null;
 
                 if (!isEmptySequence)
                 {
@@ -17005,20 +17005,6 @@ namespace AasCore.Aas3_0
 
                         switch (elementName)
                         {
-                            case "dataSpecification":
-                            {
-                                theDataSpecification = ReferenceFromSequence(
-                                    reader, isEmptyProperty, out error);
-
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "dataSpecification"));
-                                    return null;
-                                }
-                                break;
-                            }
                             case "dataSpecificationContent":
                             {
                                 if (isEmptyProperty)
@@ -17068,6 +17054,20 @@ namespace AasCore.Aas3_0
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
                                             "dataSpecificationContent"));
+                                    return null;
+                                }
+                                break;
+                            }
+                            case "dataSpecification":
+                            {
+                                theDataSpecification = ReferenceFromSequence(
+                                    reader, isEmptyProperty, out error);
+
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "dataSpecification"));
                                     return null;
                                 }
                                 break;
@@ -17125,14 +17125,6 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (theDataSpecification == null)
-                {
-                    error = new Reporting.Error(
-                        "The required property DataSpecification has not been given " +
-                        "in the XML representation of an instance of class EmbeddedDataSpecification");
-                    return null;
-                }
-
                 if (theDataSpecificationContent == null)
                 {
                     error = new Reporting.Error(
@@ -17142,12 +17134,10 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.EmbeddedDataSpecification(
-                    theDataSpecification
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
                     theDataSpecificationContent
                          ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
+                            "Unexpected null, had to be handled before"),
+                    theDataSpecification);
             }  // internal static Aas.EmbeddedDataSpecification? EmbeddedDataSpecificationFromSequence
 
             /// <summary>
@@ -25823,16 +25813,6 @@ namespace AasCore.Aas3_0
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
-                    "dataSpecification",
-                    NS);
-
-                this.ReferenceToSequence(
-                    that.DataSpecification,
-                    writer);
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
                     "dataSpecificationContent",
                     NS);
 
@@ -25841,6 +25821,19 @@ namespace AasCore.Aas3_0
                     writer);
 
                 writer.WriteEndElement();
+
+                if (that.DataSpecification != null)
+                {
+                    writer.WriteStartElement(
+                        "dataSpecification",
+                        NS);
+
+                    this.ReferenceToSequence(
+                        that.DataSpecification,
+                        writer);
+
+                    writer.WriteEndElement();
+                }
             }  // private void EmbeddedDataSpecificationToSequence
 
             public override void VisitEmbeddedDataSpecification(
