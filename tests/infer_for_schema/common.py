@@ -1,5 +1,4 @@
 """Provide functions shared among the tests."""
-
 from typing import Tuple, MutableMapping
 
 import tests.common
