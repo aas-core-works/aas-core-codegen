@@ -1,4 +1,5 @@
 """Render descriptions to C# documentation comments."""
+
 import abc
 import collections
 import io

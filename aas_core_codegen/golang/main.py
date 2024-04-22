@@ -1,4 +1,5 @@
 """Generate Golang code to handle AAS models based on the meta-model."""
+
 from typing import TextIO
 
 from aas_core_codegen import run, intermediate, specific_implementations

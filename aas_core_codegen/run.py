@@ -1,4 +1,5 @@
 """Encapsulate the entry point to different generators."""
+
 import io
 import pathlib
 import textwrap

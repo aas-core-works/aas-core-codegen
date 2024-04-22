@@ -1,4 +1,5 @@
 """Generate the invariant verifiers from the intermediate representation."""
+
 import io
 import textwrap
 from typing import (

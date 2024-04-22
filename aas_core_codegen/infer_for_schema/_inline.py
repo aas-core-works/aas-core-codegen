@@ -1,4 +1,5 @@
 """Merge constrained primitives as property constraints."""
+
 import collections
 from typing import Tuple, Optional, List, Mapping, MutableMapping, Sequence
 

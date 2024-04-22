@@ -1,4 +1,5 @@
 """Generate Java identifiers based on the identifiers from the meta-model."""
+
 from typing import Union
 
 import aas_core_codegen.naming

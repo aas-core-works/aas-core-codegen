@@ -12,6 +12,7 @@ For more information about JSON-LD, see https://www.w3.org/TR/json-ld11/.
 This code has been originally developed by Fabien Amarger (murloc6),
 Elodie Thieblin (ethieblin), and Christian Glomb (wiresio).
 """
+
 import collections
 import dataclasses
 import json

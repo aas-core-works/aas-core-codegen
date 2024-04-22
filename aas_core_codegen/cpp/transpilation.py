@@ -1,4 +1,5 @@
 """Transpile meta-model Python code to C++ code."""
+
 import abc
 import io
 from typing import (

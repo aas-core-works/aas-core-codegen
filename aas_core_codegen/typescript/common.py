@@ -1,4 +1,5 @@
 """Provide functions shared among different TypeScript code generation modules."""
+
 import io
 import math
 from typing import List, Tuple, Optional, Union

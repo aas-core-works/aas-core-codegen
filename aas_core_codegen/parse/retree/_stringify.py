@@ -1,4 +1,5 @@
 """Provide a string representation of the regular expressions."""
+
 from typing import Union, Optional
 
 from aas_core_codegen import stringify

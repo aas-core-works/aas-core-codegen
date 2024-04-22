@@ -1,4 +1,5 @@
 """Provide data structures and types for representing regular expressions."""
+
 import abc
 import enum
 from typing import List, Union, Optional, TypeVar, Generic

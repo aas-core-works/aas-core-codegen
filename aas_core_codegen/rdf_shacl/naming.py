@@ -1,4 +1,5 @@
 """Generate RDF and SHACL identifiers based on the identifiers from the meta-model."""
+
 from typing import List
 
 from icontract import require

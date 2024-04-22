@@ -1,4 +1,5 @@
 """Render descriptions to Java documentation comments."""
+
 import dataclasses
 import html
 import io

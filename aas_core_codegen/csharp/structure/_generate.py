@@ -1,4 +1,5 @@
 """Generate the C# data structures from the intermediate representation."""
+
 import io
 import textwrap
 from typing import (

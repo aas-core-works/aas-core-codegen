@@ -1,4 +1,5 @@
 """Render the description of a class or a property as a plain text."""
+
 from typing import Optional, List, Tuple, Sequence, cast, Union
 
 import docutils.nodes

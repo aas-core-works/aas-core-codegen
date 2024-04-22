@@ -4,6 +4,7 @@ Generate Go identifiers based on the identifiers from the meta-model.
 The methods all generate public names (capitalized), unless their prefix indicates
 otherwise.
 """
+
 from typing import List, Iterator, Optional
 
 from icontract import require

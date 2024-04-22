@@ -4,6 +4,7 @@ See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
+
 import os
 
 from setuptools import find_packages, setup

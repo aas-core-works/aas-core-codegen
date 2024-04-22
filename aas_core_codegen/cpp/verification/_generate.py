@@ -1,4 +1,5 @@
 """Generate the C++ verification functions."""
+
 import enum
 import io
 from typing import (

@@ -1,4 +1,5 @@
 """Represent inferred constraints as strings."""
+
 import collections
 from typing import Union, Optional
 

@@ -1,4 +1,5 @@
 """Render the parsed (and possibly modified) regular expression back into values."""
+
 import io
 from typing import List, Union, Optional, Mapping
 

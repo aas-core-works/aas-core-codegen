@@ -1011,6 +1011,7 @@ class _Serializer(
 
 # endregion
 
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(

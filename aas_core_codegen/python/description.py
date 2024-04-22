@@ -1,4 +1,5 @@
 """Render descriptions to documentation comments."""
+
 import io
 import textwrap
 from typing import (

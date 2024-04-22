@@ -1,4 +1,5 @@
 """Provide common functionality across different tests."""
+
 import os
 import pathlib
 from types import ModuleType

@@ -1,4 +1,5 @@
 """Generate ProtoBuf identifiers based on the identifiers from the meta-model."""
+
 from typing import Union
 
 import aas_core_codegen.naming
@@ -84,7 +85,9 @@ def property_name(identifier: Identifier) -> Identifier:
 
 
 def private_property_name(identifier: Identifier) -> Identifier:
-    raise NotImplementedError("Private properties are not supported by proto3 Messages.")
+    raise NotImplementedError(
+        "Private properties are not supported by proto3 Messages."
+    )
 
 
 def private_method_name(identifier: Identifier) -> Identifier:

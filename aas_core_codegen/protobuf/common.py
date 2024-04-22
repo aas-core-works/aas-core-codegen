@@ -1,4 +1,5 @@
 """Provide common functions shared among different ProtoBuf code generation modules."""
+
 import re
 from typing import List, cast, Optional
 
@@ -17,7 +18,7 @@ def string_literal(text: str) -> Stripped:
 
     for character in text:
         code_point = ord(character)
-        
+
         if character == "\a":
             escaped.append("\\a")
         elif character == "\b":
@@ -150,9 +151,7 @@ def generate_type(
             return PRIMITIVE_TYPE_MAP[our_type.constrainee]
 
         elif isinstance(our_type, intermediate.Class):
-            return Stripped(
-                our_type_prefix + proto_naming.class_name(our_type.name)
-            )
+            return Stripped(our_type_prefix + proto_naming.class_name(our_type.name))
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         item_type = generate_type(

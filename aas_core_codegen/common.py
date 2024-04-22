@@ -1,4 +1,5 @@
 """Provide common functions and types for the code generation."""
+
 import ast
 import inspect
 import io

@@ -1,4 +1,5 @@
 """Generate the SHACL schema based on the meta-model."""
+
 import io
 import textwrap
 from typing import Tuple, Optional, List

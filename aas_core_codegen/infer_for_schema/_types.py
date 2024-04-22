@@ -1,4 +1,5 @@
 """Provide data structures for the constraint inferences."""
+
 from typing import Mapping, Sequence, Optional
 
 from icontract import require
