@@ -1,5 +1,4 @@
 """Infer and retrieve whether a node in our AST denotes a ``common::optional``."""
-
 from typing import Optional, Final, MutableMapping, List, Mapping, Union
 
 from aas_core_codegen import intermediate
