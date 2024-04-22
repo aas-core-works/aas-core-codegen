@@ -8,7 +8,7 @@ from typing import (
     List,
     Tuple,
     cast,
-    Union,
+    Union, Set,
 )
 
 from icontract import ensure, require
@@ -297,10 +297,12 @@ def _generate_enum(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
+) -> Tuple[Optional[Stripped], Optional[Error], List[Union[intermediate.AbstractClass, intermediate.Interface]]]:
     """Generate ProtoBuf code for the given concrete class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
+
+    required_choice_object = [] # type: List[Union[intermediate.AbstractClass, intermediate.Interface]]
 
     # region Getters and setters
     for i, prop in enumerate(
@@ -325,7 +327,7 @@ def _generate_class(
                     f"Failed to generate the documentation comment "
                     f"for the property {prop.name!r}",
                     prop_comment_errors,
-                )
+                ), []
 
             assert prop_comment is not None
 
@@ -341,19 +343,8 @@ def _generate_class(
             )
         ):
             # -> must create a new message (choice object) since "oneof" and "repeated" do not go together
-            prop_string = f"""\
-{prop_type}Choice {prop_name}_choice = {i + 2};
-message {prop_type.replace("repeated ", "")}Choice {{
-{I}oneof {prop_name} {{\n"""
-
-            for j, subtype in enumerate(
-                prop.type_annotation.items.our_type.concrete_descendants
-            ):
-                subtype_type = proto_naming.class_name(subtype.name)
-                subtype_name = proto_naming.property_name(subtype.name)
-                prop_string += f"{II}{subtype_type} {subtype_name} = {300 + j};\n"
-            prop_string += f"{I}}}\n}}"
-            prop_blocks.append(Stripped(prop_string))
+            prop_blocks.append(Stripped(f"{prop_type}Choice {prop_name} = {i + 2};"))
+            required_choice_object.append(prop.type_annotation.items.our_type)
 
         # optional lists of our types where our types are abstract/interfaces
         elif (
@@ -368,19 +359,8 @@ message {prop_type.replace("repeated ", "")}Choice {{
             )
         ):
             # -> same as the case before
-            prop_string = f"""\
-{prop_type}Choice {prop_name}_choice = {i + 2};
-message {prop_type.replace("repeated ", "")}Choice {{
-{I}oneof {prop_name} {{\n"""
-
-            for j, subtype in enumerate(
-                prop.type_annotation.value.items.our_type.concrete_descendants
-            ):
-                subtype_type = proto_naming.class_name(subtype.name)
-                subtype_name = proto_naming.property_name(subtype.name)
-                prop_string += f"{II}{subtype_type} {subtype_name} = {300 + j};\n"
-            prop_string += f"{I}}}\n}}"
-            prop_blocks.append(Stripped(prop_string))
+            prop_blocks.append(Stripped(f"{prop_type}Choice {prop_name} = {i + 2};"))
+            required_choice_object.append(prop.type_annotation.value.items.our_type)
 
         # our types where our types are abstract/interfaces
         elif isinstance(
@@ -425,7 +405,7 @@ message {prop_type.replace("repeated ", "")}Choice {{
                 cls.description.parsed.node,
                 "Failed to generate the comment description",
                 comment_errors,
-            )
+            ), required_choice_object
 
         assert comment is not None
 
@@ -442,7 +422,7 @@ message {prop_type.replace("repeated ", "")}Choice {{
 
     writer.write("\n}")
 
-    return Stripped(writer.getvalue()), None
+    return Stripped(writer.getvalue()), None, required_choice_object
 
 
 def _generate_message_type_enum(
@@ -473,6 +453,18 @@ def _generate_message_type_enum(
     return Stripped(writer.getvalue()), None
 
 
+def _generate_choice_class(cls: Union[intermediate.AbstractClass, intermediate.Interface]) -> str:
+    msg_header = f"message {proto_naming.class_name(cls.name)}Choice {{\n"
+    msg_body = f"{I}oneof {proto_naming.property_name(cls.name)}_choice {{\n"
+
+    for j, subtype in enumerate(cls.concrete_descendants):
+        subtype_type = proto_naming.class_name(subtype.name)
+        subtype_name = proto_naming.property_name(subtype.name)
+        msg_body += f"{II}{subtype_type} {subtype_name} = {j + 1};\n"
+
+    return msg_header + msg_body + f"{I}}}\n}}"
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
     lambda result: not (result[0] is not None) or result[0].endswith("\n"),
@@ -493,6 +485,8 @@ def generate(
 
     errors = []  # type: List[Error]
 
+    required_choice_objects = set([])    # type: Set[Union[intermediate.AbstractClass, intermediate.Interface]]
+
     for our_type in symbol_table.our_types:
         if not isinstance(
             our_type,
@@ -504,8 +498,7 @@ def generate(
             continue
 
         if isinstance(our_type, intermediate.ConcreteClass):
-            # do not generate ProtoBuf-Messages for "Has*" classes
-            code, error = _generate_class(cls=our_type)
+            code, error, req_obj = _generate_class(cls=our_type)
             if error is not None:
                 errors.append(
                     Error(
@@ -519,6 +512,7 @@ def generate(
 
             assert code is not None
             code_blocks.append(code)
+            required_choice_objects = required_choice_objects.union(set(req_obj))
 
         elif isinstance(our_type, intermediate.Enumeration):
             code, error = _generate_enum(enum=our_type)
@@ -538,6 +532,10 @@ def generate(
 
         else:
             assert_never(our_type)
+
+    # generate the necessary classes for choice (i.e. a class for every property that was like "repeated <interface>")
+    for cls in required_choice_objects:
+        code_blocks.append(Stripped(_generate_choice_class(cls)))
 
     code, error = _generate_message_type_enum(symbol_table)
     if error is None:
