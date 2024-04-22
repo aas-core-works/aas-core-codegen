@@ -42,7 +42,7 @@ def enum_literal_name(identifier: Identifier) -> Identifier:
     >>> enum_literal_name(Identifier("URL_to_something"))
     'URL_TO_SOMETHING'
     """
-    return aas_core_codegen.naming.upper_pascal_case(identifier)
+    return aas_core_codegen.naming.upper_snake_case(identifier)
 
 
 def class_name(identifier: Identifier) -> Identifier:

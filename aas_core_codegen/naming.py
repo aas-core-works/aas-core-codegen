@@ -1,4 +1,5 @@
-"""Generate names from our ``Pascal_case`` for the respective targets."""
+"""Generate names from ``Our_identifier_snake_case`` to other cases."""
+
 from typing import List
 
 from icontract import ensure, require
@@ -7,7 +8,7 @@ from aas_core_codegen.common import Identifier
 
 
 def lower_snake_case(identifier: Identifier) -> Identifier:
-    """Convert the identifier to a ``pascal_case``."""
+    """Convert the identifier to a ``lower_snake_case``."""
     parts = identifier.split("_")
 
     assert len(parts) > 0, "Expected at least one part in the identifier"
@@ -16,7 +17,7 @@ def lower_snake_case(identifier: Identifier) -> Identifier:
 
 
 def upper_snake_case(identifier: Identifier) -> Identifier:
-    """Convert the identifier to a ``PASCAL_CASE``."""
+    """Convert the identifier to a ``UPPER_SNAKE_CASE``."""
     parts = identifier.split("_")
 
     assert len(parts) > 0, "Expected at least one part in the identifier"
