@@ -1,5 +1,4 @@
 """Provide parsing functions to get started with testing some of the ReST rendering."""
-
 import io
 from typing import Optional
 
