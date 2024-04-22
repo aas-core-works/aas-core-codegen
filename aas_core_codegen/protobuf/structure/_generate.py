@@ -8,7 +8,8 @@ from typing import (
     List,
     Tuple,
     cast,
-    Union, Set,
+    Union,
+    Set,
 )
 
 from icontract import ensure, require
@@ -34,9 +35,9 @@ from aas_core_codegen.protobuf.common import INDENT as I, INDENT2 as II
 
 
 def _human_readable_identifier(
-        something: Union[
-            intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
-        ]
+    something: Union[
+        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
+    ]
 ) -> str:
     """
     Represent ``something`` in a human-readable text.
@@ -58,7 +59,7 @@ def _human_readable_identifier(
 
 
 def _verify_intra_structure_collisions(
-        our_type: intermediate.OurType,
+    our_type: intermediate.OurType,
 ) -> Optional[Error]:
     """Verify that no member names collide in the ProtoBuf structure of our type."""
     errors = []  # type: List[Error]
@@ -105,7 +106,7 @@ def _verify_intra_structure_collisions(
 
 
 def _verify_structure_name_collisions(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Error]:
     """Verify that the ProtoBuf names of the structures do not collide."""
     observed_structure_names: Dict[
@@ -122,11 +123,11 @@ def _verify_structure_name_collisions(
 
     for our_type in symbol_table.our_types:
         if not isinstance(
-                our_type,
-                (
-                        intermediate.Enumeration,
-                        intermediate.Class,
-                ),
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.Class,
+            ),
         ):
             continue
 
@@ -187,14 +188,14 @@ class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
 
     # noinspection PyInitNewSignature
     def __new__(
-            cls, symbol_table: intermediate.SymbolTable
+        cls, symbol_table: intermediate.SymbolTable
     ) -> "VerifiedIntermediateSymbolTable":
         raise AssertionError("Only for type annotation")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def verify(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
     """Verify that ProtoBuf code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
@@ -218,7 +219,7 @@ def verify(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-        enum: intermediate.Enumeration,
+    enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the ProtoBuf code for the enum."""
     writer = io.StringIO()
@@ -296,19 +297,25 @@ def _generate_enum(
 @require(lambda cls: not cls.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
-        cls: intermediate.ConcreteClass,
-) -> Tuple[Optional[Stripped], Optional[Error], List[Union[intermediate.AbstractClass, intermediate.Interface]]]:
+    cls: intermediate.ConcreteClass,
+) -> Tuple[
+    Optional[Stripped],
+    Optional[Error],
+    List[Union[intermediate.AbstractClass, intermediate.Interface]],
+]:
     """Generate ProtoBuf code for the given concrete class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
-    required_choice_object = []  # type: List[Union[intermediate.AbstractClass, intermediate.Interface]]
+    required_choice_object = (
+        []
+    )  # type: List[Union[intermediate.AbstractClass, intermediate.Interface]]
 
     # region Getters and setters
     for i, prop in enumerate(
-            set(cls.properties).union(
-                set(cls.interface.properties if cls.interface is not None else [])
-            )
+        set(cls.properties).union(
+            set(cls.interface.properties if cls.interface is not None else [])
+        )
     ):
         prop_type = proto_common.generate_type(type_annotation=prop.type_annotation)
 
@@ -322,12 +329,16 @@ def _generate_class(
                 prop_comment_errors,
             ) = proto_description.generate_comment_for_property(prop.description)
             if prop_comment_errors:
-                return None, Error(
-                    prop.description.parsed.node,
-                    f"Failed to generate the documentation comment "
-                    f"for the property {prop.name!r}",
-                    prop_comment_errors,
-                ), []
+                return (
+                    None,
+                    Error(
+                        prop.description.parsed.node,
+                        f"Failed to generate the documentation comment "
+                        f"for the property {prop.name!r}",
+                        prop_comment_errors,
+                    ),
+                    [],
+                )
 
             assert prop_comment is not None
 
@@ -335,12 +346,12 @@ def _generate_class(
 
         # lists of our types where our types are abstract/interfaces
         if (
-                isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
-                and isinstance(prop.type_annotation.items, intermediate.OurTypeAnnotation)
-                and isinstance(
-            prop.type_annotation.items.our_type,
-            (intermediate.Interface, intermediate.AbstractClass),
-        )
+            isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
+            and isinstance(prop.type_annotation.items, intermediate.OurTypeAnnotation)
+            and isinstance(
+                prop.type_annotation.items.our_type,
+                (intermediate.Interface, intermediate.AbstractClass),
+            )
         ):
             # -> must create a new message (choice object) since "oneof" and "repeated" do not go together
             prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
@@ -348,15 +359,15 @@ def _generate_class(
 
         # optional lists of our types where our types are abstract/interfaces
         elif (
-                isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-                and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation)
-                and isinstance(
-            prop.type_annotation.value.items, intermediate.OurTypeAnnotation
-        )
-                and isinstance(
-            prop.type_annotation.value.items.our_type,
-            (intermediate.Interface, intermediate.AbstractClass),
-        )
+            isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+            and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation)
+            and isinstance(
+                prop.type_annotation.value.items, intermediate.OurTypeAnnotation
+            )
+            and isinstance(
+                prop.type_annotation.value.items.our_type,
+                (intermediate.Interface, intermediate.AbstractClass),
+            )
         ):
             # -> same as the case before
             prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
@@ -364,7 +375,7 @@ def _generate_class(
 
         # our types where our types are abstract/interfaces
         elif isinstance(
-                prop.type_annotation, intermediate.OurTypeAnnotation
+            prop.type_annotation, intermediate.OurTypeAnnotation
         ) and isinstance(
             prop.type_annotation.our_type,
             (intermediate.Interface, intermediate.AbstractClass),
@@ -394,11 +405,15 @@ def _generate_class(
             cls.description
         )
         if comment_errors is not None:
-            return None, Error(
-                cls.description.parsed.node,
-                "Failed to generate the comment description",
-                comment_errors,
-            ), []
+            return (
+                None,
+                Error(
+                    cls.description.parsed.node,
+                    "Failed to generate the comment description",
+                    comment_errors,
+                ),
+                [],
+            )
 
         assert comment is not None
 
@@ -419,7 +434,7 @@ def _generate_class(
 
 
 def _generate_message_type_enum(
-        symbol_table: VerifiedIntermediateSymbolTable,
+    symbol_table: VerifiedIntermediateSymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     writer = io.StringIO()
 
@@ -446,7 +461,9 @@ def _generate_message_type_enum(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_choice_class(cls: Union[intermediate.AbstractClass, intermediate.Interface]) -> str:
+def _generate_choice_class(
+    cls: Union[intermediate.AbstractClass, intermediate.Interface]
+) -> str:
     msg_header = f"message {proto_naming.class_name(cls.name)} {{\n"
     msg_body = f"{I}oneof value {{\n"
 
@@ -465,9 +482,9 @@ def _generate_choice_class(cls: Union[intermediate.AbstractClass, intermediate.I
 )
 # fmt: on
 def generate(
-        symbol_table: VerifiedIntermediateSymbolTable,
-        namespace: proto_common.NamespaceIdentifier,
-        spec_impls: specific_implementations.SpecificImplementations,
+    symbol_table: VerifiedIntermediateSymbolTable,
+    namespace: proto_common.NamespaceIdentifier,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the ProtoBuf code of the structures based on the symbol table.
@@ -478,15 +495,17 @@ def generate(
 
     errors = []  # type: List[Error]
 
-    required_choice_objects = set([])  # type: Set[Union[intermediate.AbstractClass, intermediate.Interface]]
+    required_choice_objects = set(
+        []
+    )  # type: Set[Union[intermediate.AbstractClass, intermediate.Interface]]
 
     for our_type in symbol_table.our_types:
         if not isinstance(
-                our_type,
-                (
-                        intermediate.Enumeration,
-                        intermediate.ConcreteClass,
-                ),
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.ConcreteClass,
+            ),
         ):
             continue
 
