@@ -27,10 +27,7 @@ from aas_core_codegen.protobuf import (
     naming as proto_naming,
     description as proto_description,
 )
-from aas_core_codegen.protobuf.common import (
-    INDENT as I,
-    INDENT2 as II
-)
+from aas_core_codegen.protobuf.common import INDENT as I, INDENT2 as II
 
 
 # region Checks
@@ -307,7 +304,10 @@ def _generate_class(
 
     # region Getters and setters
     for i, prop in enumerate(
-            set(cls.properties).union(set(cls.interface.properties if cls.interface is not None else []))):
+        set(cls.properties).union(
+            set(cls.interface.properties if cls.interface is not None else [])
+        )
+    ):
         prop_type = proto_common.generate_type(type_annotation=prop.type_annotation)
 
         prop_name = proto_naming.property_name(prop.name)
@@ -332,17 +332,23 @@ def _generate_class(
             prop_blocks.append(prop_comment)
 
         # lists of our types where our types are abstract/interfaces
-        if (isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
-                and isinstance(prop.type_annotation.items, intermediate.OurTypeAnnotation)
-                and isinstance(prop.type_annotation.items.our_type,
-                               (intermediate.Interface, intermediate.AbstractClass))):
+        if (
+            isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
+            and isinstance(prop.type_annotation.items, intermediate.OurTypeAnnotation)
+            and isinstance(
+                prop.type_annotation.items.our_type,
+                (intermediate.Interface, intermediate.AbstractClass),
+            )
+        ):
             # -> must create a new message (choice object) since "oneof" and "repeated" do not go together
             prop_string = f"""\
 {prop_type}Choice {prop_name}_choice = {i + 2};
 message {prop_type.replace("repeated ", "")}Choice {{
 {I}oneof {prop_name} {{\n"""
 
-            for j, subtype in enumerate(prop.type_annotation.items.our_type.concrete_descendants):
+            for j, subtype in enumerate(
+                prop.type_annotation.items.our_type.concrete_descendants
+            ):
                 subtype_type = proto_naming.class_name(subtype.name)
                 subtype_name = proto_naming.property_name(subtype.name)
                 prop_string += f"{II}{subtype_type} {subtype_name} = {300 + j};\n"
@@ -350,18 +356,26 @@ message {prop_type.replace("repeated ", "")}Choice {{
             prop_blocks.append(Stripped(prop_string))
 
         # optional lists of our types where our types are abstract/interfaces
-        elif (isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-                and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation)
-                and isinstance(prop.type_annotation.value.items, intermediate.OurTypeAnnotation)
-                and isinstance(prop.type_annotation.value.items.our_type,
-                               (intermediate.Interface, intermediate.AbstractClass))):
+        elif (
+            isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+            and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation)
+            and isinstance(
+                prop.type_annotation.value.items, intermediate.OurTypeAnnotation
+            )
+            and isinstance(
+                prop.type_annotation.value.items.our_type,
+                (intermediate.Interface, intermediate.AbstractClass),
+            )
+        ):
             # -> same as the case before
             prop_string = f"""\
 {prop_type}Choice {prop_name}_choice = {i + 2};
 message {prop_type.replace("repeated ", "")}Choice {{
 {I}oneof {prop_name} {{\n"""
 
-            for j, subtype in enumerate(prop.type_annotation.value.items.our_type.concrete_descendants):
+            for j, subtype in enumerate(
+                prop.type_annotation.value.items.our_type.concrete_descendants
+            ):
                 subtype_type = proto_naming.class_name(subtype.name)
                 subtype_name = proto_naming.property_name(subtype.name)
                 prop_string += f"{II}{subtype_type} {subtype_name} = {300 + j};\n"
@@ -369,11 +383,17 @@ message {prop_type.replace("repeated ", "")}Choice {{
             prop_blocks.append(Stripped(prop_string))
 
         # our types where our types are abstract/interfaces
-        elif (isinstance(prop.type_annotation, intermediate.OurTypeAnnotation)
-                and isinstance(prop.type_annotation.our_type, (intermediate.Interface, intermediate.AbstractClass))):
+        elif isinstance(
+            prop.type_annotation, intermediate.OurTypeAnnotation
+        ) and isinstance(
+            prop.type_annotation.our_type,
+            (intermediate.Interface, intermediate.AbstractClass),
+        ):
             # -> must use "oneof"
             prop_string = f"oneof {prop_name} {{\n"
-            for j, subtype in enumerate(prop.type_annotation.our_type.concrete_descendants):
+            for j, subtype in enumerate(
+                prop.type_annotation.our_type.concrete_descendants
+            ):
                 subtype_type = proto_naming.class_name(subtype.name)
                 subtype_name = proto_naming.property_name(subtype.name)
                 prop_string += f"{I}{subtype_type} {subtype_name} = {200 + j};\n"
