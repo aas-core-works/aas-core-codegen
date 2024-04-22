@@ -1,4 +1,5 @@
 """Generate the ProtoBuf data structures from the intermediate representation."""
+
 import io
 import textwrap
 from typing import (
@@ -329,16 +330,26 @@ def _generate_class(
 
             prop_blocks.append(prop_comment)
 
-        # start counting IDs from 1
-        prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
+        if (isinstance(prop.type_annotation, intermediate.OurTypeAnnotation)
+                and isinstance(prop.type_annotation.our_type, (intermediate.Interface, intermediate.AbstractClass))):
+            # property type is an interface and not a concrete class
+            # -> must use "oneof"
+            prop_string = f"oneof {prop_name} {{\n"
+            for j, subtype in enumerate(prop.type_annotation.our_type.concrete_descendants):
+                subtype_type = proto_naming.class_name(subtype.name)
+                subtype_name = proto_naming.property_name(subtype.name)
+                prop_string += f"{I}{subtype_type} {subtype_name} = {200 + j};\n"
+            prop_string += "}"
+            prop_blocks.append(Stripped(prop_string))
+        else:
+            # just a normal property with type
+            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
 
         blocks.append(Stripped("\n".join(prop_blocks)))
 
     # one additional property indicating the concrete class type (in case multiple inherit from the same interface)
     # when instantiating a class of this proto, the field must be set (ideally in the constructor)
-    blocks.append(Stripped(
-        f"MessageType message_type = 1;"
-    ))
+    blocks.append(Stripped(f"MessageType message_type = 1;"))
 
     # endregion
 
@@ -375,7 +386,9 @@ def _generate_class(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_message_type_enum(symbol_table: VerifiedIntermediateSymbolTable) -> Tuple[Optional[Stripped], Optional[Error]]:
+def _generate_message_type_enum(
+    symbol_table: VerifiedIntermediateSymbolTable,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
     writer = io.StringIO()
 
     name = "MessageType"
@@ -403,9 +416,8 @@ def _generate_message_type_enum(symbol_table: VerifiedIntermediateSymbolTable) -
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
-    lambda result:
-    not (result[0] is not None) or result[0].endswith('\n'),
-    "Trailing newline mandatory for valid end-of-files"
+    lambda result: not (result[0] is not None) or result[0].endswith("\n"),
+    "Trailing newline mandatory for valid end-of-files",
 )
 # fmt: on
 def generate(
@@ -427,15 +439,12 @@ def generate(
             our_type,
             (
                 intermediate.Enumeration,
-                intermediate.Class,
+                intermediate.ConcreteClass,
             ),
         ):
             continue
 
-        if (
-                isinstance(our_type, intermediate.Class)
-                and not ("Has" in our_type.name)
-        ):
+        if isinstance(our_type, intermediate.ConcreteClass):
             # do not generate ProtoBuf-Messages for "Has*" classes
             code, error = _generate_class(cls=our_type)
             if error is not None:
@@ -451,10 +460,6 @@ def generate(
 
             assert code is not None
             code_blocks.append(code)
-
-        elif "Has" in our_type.name:
-            # catch these unwanted cases so the execution does not complain
-            pass
 
         elif isinstance(our_type, intermediate.Enumeration):
             code, error = _generate_enum(enum=our_type)
