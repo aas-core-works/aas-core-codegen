@@ -1,5 +1,4 @@
 """Render descriptions to documentation comments."""
-
 import io
 from typing import (
     Tuple,
