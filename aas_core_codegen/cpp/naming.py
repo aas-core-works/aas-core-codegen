@@ -63,7 +63,7 @@ def getter_name(identifier: Identifier) -> Identifier:
     >>> getter_name(Identifier("something_to_URL"))
     'something_to_url'
     """
-    return naming.lower_pascal_case(identifier)
+    return naming.lower_snake_case(identifier)
 
 
 def mutable_getter_name(identifier: Identifier) -> Identifier:
@@ -76,7 +76,7 @@ def mutable_getter_name(identifier: Identifier) -> Identifier:
     >>> mutable_getter_name(Identifier("something_to_URL"))
     'mutable_something_to_url'
     """
-    return naming.lower_pascal_case(Identifier(f"mutable_{identifier}"))
+    return naming.lower_snake_case(Identifier(f"mutable_{identifier}"))
 
 
 def setter_name(identifier: Identifier) -> Identifier:
@@ -89,7 +89,7 @@ def setter_name(identifier: Identifier) -> Identifier:
     >>> setter_name(Identifier("something_to_URL"))
     'set_something_to_url'
     """
-    return naming.lower_pascal_case(Identifier(f"set_{identifier}"))
+    return naming.lower_snake_case(Identifier(f"set_{identifier}"))
 
 
 def private_property_name(identifier: Identifier) -> Identifier:
@@ -102,7 +102,7 @@ def private_property_name(identifier: Identifier) -> Identifier:
     >>> private_property_name(Identifier("something_to_URL"))
     'something_to_url_'
     """
-    return Identifier(f"{naming.lower_pascal_case(identifier)}_")
+    return Identifier(f"{naming.lower_snake_case(identifier)}_")
 
 
 def method_name(identifier: Identifier) -> Identifier:
@@ -141,7 +141,7 @@ def argument_name(identifier: Identifier) -> Identifier:
     >>> argument_name(Identifier("something_to_URL"))
     'something_to_url'
     """
-    return naming.lower_pascal_case(identifier)
+    return naming.lower_snake_case(identifier)
 
 
 def variable_name(identifier: Identifier) -> Identifier:
@@ -154,7 +154,7 @@ def variable_name(identifier: Identifier) -> Identifier:
     >>> variable_name(Identifier("something_to_URL"))
     'something_to_url'
     """
-    return naming.lower_pascal_case(identifier)
+    return naming.lower_snake_case(identifier)
 
 
 def constant_name(identifier: Identifier) -> Identifier:
