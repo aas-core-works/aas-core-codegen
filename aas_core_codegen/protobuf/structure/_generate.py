@@ -305,8 +305,7 @@ def _generate_class(
     blocks = []  # type: List[Stripped]
 
     # region Getters and setters
-
-    for i, prop in enumerate(cls.properties):
+    for i, prop in enumerate(set(cls.properties).union(set(cls.interface.properties))):
         prop_type = proto_common.generate_type(type_annotation=prop.type_annotation)
 
         prop_name = proto_naming.property_name(prop.name)
@@ -341,6 +340,7 @@ def _generate_class(
                 prop_string += f"{I}{subtype_type} {subtype_name} = {200 + j};\n"
             prop_string += "}"
             prop_blocks.append(Stripped(prop_string))
+
         else:
             # just a normal property with type
             prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
@@ -439,12 +439,12 @@ def generate(
             our_type,
             (
                 intermediate.Enumeration,
-                intermediate.ConcreteClass,
+                intermediate.Class,
             ),
         ):
             continue
 
-        if isinstance(our_type, intermediate.ConcreteClass):
+        if isinstance(our_type, intermediate.Class):
             # do not generate ProtoBuf-Messages for "Has*" classes
             code, error = _generate_class(cls=our_type)
             if error is not None:
