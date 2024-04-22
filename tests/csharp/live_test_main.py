@@ -3,7 +3,6 @@ Transpile the meta-model into C# and compile them into a project.
 
 This live tests expects dotnet to be installed on the machine.
 """
-
 import io
 import os
 import pathlib
