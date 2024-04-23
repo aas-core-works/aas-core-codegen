@@ -5,7 +5,6 @@ The identifiers are based on the meta-model. Unlike
 :py:mod:`aas_core_codegen.naming`, which are used with different generators,
 these identifiers are used only for the XSD.
 """
-
 from aas_core_codegen.common import Identifier
 
 

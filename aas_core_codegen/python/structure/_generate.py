@@ -1,5 +1,4 @@
 """Generate the Python data structures from the intermediate representation."""
-
 import io
 import itertools
 import textwrap

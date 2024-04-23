@@ -1,5 +1,4 @@
 """Generate the Python constants corresponding to the constants of the meta-model."""
-
 import io
 import textwrap
 from typing import (

@@ -1,5 +1,4 @@
 """Generate Java code for XML-ization based on the intermediate representation."""
-
 import io
 import textwrap
 

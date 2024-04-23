@@ -1,5 +1,4 @@
 """Stringify the parsed meta-model."""
-
 from typing import Optional, Union
 
 from aas_core_codegen import stringify

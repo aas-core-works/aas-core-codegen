@@ -1,5 +1,4 @@
 """Transpile meta-model Python code to TypeScript code."""
-
 import abc
 import io
 from typing import (

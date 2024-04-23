@@ -1,5 +1,4 @@
 """Generate TypeScript constants corresponding to the constants of the meta-model."""
-
 import io
 from typing import (
     Optional,

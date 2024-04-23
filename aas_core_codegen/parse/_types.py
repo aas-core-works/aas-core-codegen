@@ -1,5 +1,4 @@
 """Provide the types into which we parse the original meta-model."""
-
 import abc
 import ast
 import os

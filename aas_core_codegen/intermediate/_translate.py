@@ -1,5 +1,4 @@
 """Translate the parsed representation into the intermediate representation."""
-
 import ast
 import collections
 import itertools

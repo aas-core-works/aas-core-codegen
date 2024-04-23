@@ -1,5 +1,4 @@
 """Provide common functions for both RDF and SHACL generators."""
-
 from typing import MutableMapping, Tuple, Optional, List
 
 from icontract import ensure

@@ -1,5 +1,4 @@
 """Transpile Python to C# code."""
-
 import abc
 import io
 from typing import (

@@ -1,5 +1,4 @@
 """Understand the hierarchy of classes in the symbol table as an ontology."""
-
 from typing import (
     Sequence,
     Optional,

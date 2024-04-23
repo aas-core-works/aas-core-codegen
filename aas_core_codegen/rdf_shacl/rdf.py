@@ -1,5 +1,4 @@
 """Generate the RDF ontology based on the meta-model."""
-
 import io
 from typing import Tuple, Optional, List
 

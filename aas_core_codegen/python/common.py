@@ -1,5 +1,4 @@
 """Provide common functions shared among different Python code generation modules."""
-
 import enum
 import io
 import re

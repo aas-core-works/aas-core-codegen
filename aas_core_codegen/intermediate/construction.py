@@ -1,5 +1,4 @@
 """Understand the constructors of the classes."""
-
 import abc
 import ast
 import collections

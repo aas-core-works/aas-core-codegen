@@ -1,5 +1,4 @@
 """Translate the abstract syntax tree of the meta-model into parsed structures."""
-
 import ast
 import collections
 import enum
@@ -333,8 +332,6 @@ _PRIMITIVE_TYPE_NAMES_TO_CONSTANT_FUNCTION_NAMES: Dict[Identifier, Identifier] =
     Identifier("str"): Identifier("constant_str"),
     Identifier("bytearray"): Identifier("constant_bytearray"),
 }
-
-
 # fmt: off
 assert all(
     primitive_type in _PRIMITIVE_TYPE_NAMES_TO_CONSTANT_FUNCTION_NAMES

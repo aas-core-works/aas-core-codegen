@@ -1,5 +1,4 @@
 """Generate the C++ data structures from the intermediate representation."""
-
 import io
 import itertools
 import textwrap

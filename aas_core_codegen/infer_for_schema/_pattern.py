@@ -1,5 +1,4 @@
 """Infer the constraints on a property based on regular expressions."""
-
 from typing import (
     Optional,
     List,

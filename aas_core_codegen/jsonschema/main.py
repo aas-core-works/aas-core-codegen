@@ -1,5 +1,4 @@
 """Generate JSON schema corresponding to the meta-model."""
-
 import collections
 import json
 import re

@@ -6,7 +6,6 @@ The classes
 and :py:class:`aas_core_codegen.intermediate._types.PatternVerification` had to be
 defined in :py:mod:`aas_core_codegen.intermediate._types` to avoid circular imports.
 """
-
 import collections
 import re
 from typing import Optional, Tuple, List, MutableMapping, Mapping

@@ -1,5 +1,4 @@
 """Generate the C++ code for linearized control flows."""
-
 import io
 from typing import Sequence, List, Optional
 

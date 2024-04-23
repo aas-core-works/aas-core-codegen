@@ -1,5 +1,4 @@
 """Provide common functions shared among different Go code generation modules."""
-
 import io
 import math
 from typing import List, Tuple, Optional

@@ -1,5 +1,4 @@
 """Provide types of the intermediate representation."""
-
 import abc
 import enum
 import pathlib

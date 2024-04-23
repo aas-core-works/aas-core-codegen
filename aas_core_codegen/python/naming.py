@@ -1,5 +1,4 @@
 """Generate Python identifiers based on the identifiers from the meta-model."""
-
 from typing import Union
 
 from icontract import require

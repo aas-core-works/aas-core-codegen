@@ -1,5 +1,4 @@
 """Generate C# code to handle asset administration shells based on the meta-model."""
-
 from typing import TextIO
 
 from aas_core_codegen import specific_implementations, run, intermediate

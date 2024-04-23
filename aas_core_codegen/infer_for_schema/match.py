@@ -9,7 +9,6 @@ refer to member access in form of ``self.some_property``.
     This module is not only used by aas-core-codegen, but also by downstream clients
     or continuous integrations of other packages, *e.g.*, aas-core-meta.
 """
-
 from typing import Optional, Union
 
 from aas_core_codegen.common import Identifier

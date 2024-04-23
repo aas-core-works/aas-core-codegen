@@ -1,5 +1,4 @@
 """Provide common functions shared among different C# code generation modules."""
-
 import re
 from typing import List, cast, Optional
 

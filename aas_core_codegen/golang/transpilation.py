@@ -1,5 +1,4 @@
 """Transpile Python to Go code."""
-
 import abc
 from typing import (
     Tuple,

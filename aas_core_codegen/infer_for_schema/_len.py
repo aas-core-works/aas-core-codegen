@@ -1,5 +1,4 @@
 """Infer the constraints on the length of a property value."""
-
 from typing import MutableMapping, Optional, Tuple, List, Union, Sequence
 
 from icontract import require, ensure

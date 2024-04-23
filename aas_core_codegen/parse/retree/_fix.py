@@ -1,5 +1,4 @@
 """Fix regular expressions for different engines."""
-
 from typing import Tuple, List
 
 from icontract import require, ensure
