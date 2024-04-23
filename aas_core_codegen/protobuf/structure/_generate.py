@@ -277,13 +277,13 @@ def _generate_enum(
             writer.write(textwrap.indent(literal_comment, I))
             writer.write("\n")
 
-        # Enums cannot have string-values assigned to them in proto3. Instead,
-        # they each get assigned an ID that is used for (de-)serialization.
-        # If that ID is re-assigned to another literal in the same enum in a later
-        # version, a system using the old version will (de-)serialize that literal
-        # differently. Hence, hope that the order of writing the literals stays the
-        # same in each build so that one literal always gets the same ID.
-        # Otherwise, don't mix versions.
+        # Enums cannot have string-values assigned to them in proto3. Instead, they each get assigned
+        # an ID that is used for (de-)serialization.
+        # If that ID is re-assigned to another literal in the same enum in a later version, a system using the
+        # old version will (de-)serialize that literal differently. Hence, hope that the order of writing the literals
+        # stays the same in each build so that one literal always gets the same ID. Otherwise, don't mix versions.
+        # With each version, compare to the previous one and assign same ID.
+        # With each version, add a `reserved`-statement for deleted literals and their IDs.
         writer.write(
             textwrap.indent(
                 f"""\
