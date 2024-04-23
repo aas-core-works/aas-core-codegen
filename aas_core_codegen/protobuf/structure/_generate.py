@@ -249,7 +249,7 @@ def _generate_enum(
     writer.write(textwrap.indent(f"{proto_naming.enum_name(name)}_UNSPECIFIED = 0;", I))
 
     if len(enum.literals) == 0:
-        writer.write("\n}}")
+        writer.write("\n}")
         return Stripped(writer.getvalue()), None
 
     for i, literal in enumerate(enum.literals):
