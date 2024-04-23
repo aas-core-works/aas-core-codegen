@@ -224,4 +224,9 @@ WARNING = Stripped(
 def generate_using_aas_directive_if_necessary(
     namespace: NamespaceIdentifier,
 ) -> List[Stripped]:
+    """
+    Generates the import directive for the AAS namespace.
+
+    This method is not to be used because proto3 does not need namespaces.
+    """
     raise NotImplementedError("Not using the Aas namespace.")
