@@ -249,7 +249,7 @@ def _generate_enum(
     writer.write(textwrap.indent(f"{proto_naming.enum_name(name)}_UNSPECIFIED = 0;", I))
 
     if len(enum.literals) == 0:
-        writer.write(f"\n}}")
+        writer.write("\n}}")
         return Stripped(writer.getvalue()), None
 
     for i, literal in enumerate(enum.literals):
@@ -281,8 +281,8 @@ def _generate_enum(
         # If that ID is re-assigned to another literal in the same enum in a later version, a system using the
         # old version will (de-)serialize that literal differently. Hence, hope that the order of writing the literals
         # stays the same in each build so that one literal always gets the same ID. Otherwise, don't mix versions.
-        # TODO: With each version, compare to the previous one and assign same ID.
-        # TODO: With each version, add a `reserved`-statement for deleted literals and their IDs.
+        # With each version, compare to the previous one and assign same ID.
+        # With each version, add a `reserved`-statement for deleted literals and their IDs.
         writer.write(
             textwrap.indent(
                 f"{proto_naming.enum_name(name)}_{proto_naming.enum_literal_name(literal.name)} = {i + 1};",
@@ -387,7 +387,7 @@ def _generate_class(
 
     # one additional property indicating the concrete class type (in case multiple inherit from the same interface)
     # when instantiating a class of this proto, the field must be set (ideally in the constructor)
-    blocks.append(Stripped(f"MessageType message_type = 1;"))
+    blocks.append(Stripped("MessageType message_type = 1;"))
 
     # endregion
 
