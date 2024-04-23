@@ -138,8 +138,8 @@ Call the generator with the appropriate target:
 .. code-block::
 
     usage: aas-core-codegen [-h] --model_path MODEL_PATH --snippets_dir
-                            SNIPPETS_DIR --output_dir OUTPUT_DIR --target
-                            {csharp,cpp,golang,java,jsonschema,python,typescript,rdf_shacl,xsd,jsonld_context}
+                            SNIPPETS_DIR --output_dir OUTPUT_DIR --target                          
+                            {csharp,cpp,golang,java,jsonschema,python,typescript,rdf_shacl,xsd,jsonld_context,protobuf}
                             [--version]
 
     Generate implementations and schemas based on an AAS meta-model.
@@ -153,7 +153,7 @@ Call the generator with the appropriate target:
                             specific code snippets
       --output_dir OUTPUT_DIR
                             path to the generated code
-      --target {csharp,cpp,golang,java,jsonschema,python,typescript,rdf_shacl,xsd,jsonld_context}
+      --target {csharp,cpp,golang,java,jsonschema,python,typescript,rdf_shacl,xsd,jsonld_context,protobuf}
                             target language or schema
       --version             show the current version and exit
 

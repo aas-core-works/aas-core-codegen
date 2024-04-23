@@ -1044,9 +1044,11 @@ def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
         Argument(
             name=parsed_arg.name,
             type_annotation=_to_type_annotation(parsed_arg.type_annotation),
-            default=_DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
-            if parsed_arg.default is not None
-            else None,
+            default=(
+                _DefaultPlaceholder(parsed=parsed_arg.default)  # type: ignore
+                if parsed_arg.default is not None
+                else None
+            ),
             parsed=parsed_arg,
         )
         for parsed_arg in parsed
@@ -3446,9 +3448,11 @@ def _second_pass_to_stack_constructors_in_place(
                 if ancestor is None:
                     errors.append(
                         Error(
-                            cls.constructor.parsed.node
-                            if cls.constructor.parsed is not None
-                            else cls.parsed.node,
+                            (
+                                cls.constructor.parsed.node
+                                if cls.constructor.parsed is not None
+                                else cls.parsed.node
+                            ),
                             f"In the constructor of the class {cls.name!r} "
                             f"the super-constructor for "
                             f"the class {statement.super_name!r} is invoked, "
@@ -3461,9 +3465,11 @@ def _second_pass_to_stack_constructors_in_place(
                 if id(ancestor) not in cls.inheritance_id_set:
                     errors.append(
                         Error(
-                            cls.constructor.parsed.node
-                            if cls.constructor.parsed is not None
-                            else cls.parsed.node,
+                            (
+                                cls.constructor.parsed.node
+                                if cls.constructor.parsed is not None
+                                else cls.parsed.node
+                            ),
                             f"In the constructor of the class {cls.name!r} "
                             f"the super-constructor for "
                             f"the class {statement.super_name!r} is invoked, "
