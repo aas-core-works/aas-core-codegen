@@ -249,7 +249,7 @@ def _generate_enum(
     writer.write(textwrap.indent(f"{proto_naming.enum_name(name)}_UNSPECIFIED = 0;", I))
 
     if len(enum.literals) == 0:
-        writer.write(f"\n}}")
+        writer.write("\n}")
         return Stripped(writer.getvalue()), None
 
     for i, literal in enumerate(enum.literals):
@@ -387,7 +387,7 @@ def _generate_class(
 
     # one additional property indicating the concrete class type (in case multiple inherit from the same interface)
     # when instantiating a class of this proto, the field must be set (ideally in the constructor)
-    blocks.append(Stripped(f"MessageType message_type = 1;"))
+    blocks.append(Stripped("MessageType message_type = 1;"))
 
     # endregion
 
