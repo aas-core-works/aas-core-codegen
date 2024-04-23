@@ -113,7 +113,8 @@ def _verify_structure_name_collisions(
         Identifier,
         Union[
             intermediate.Enumeration,
-            intermediate.Class,
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
         ],
     ] = dict()
 
@@ -298,18 +299,12 @@ def _generate_enum(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
-) -> Tuple[
-    Optional[Stripped],
-    Optional[Error],
-    List[Union[intermediate.AbstractClass, intermediate.Interface]],
-]:
+) -> Tuple[Optional[Stripped], Optional[Error], List[intermediate.AbstractClass],]:
     """Generate ProtoBuf code for the given concrete class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
-    required_choice_object = (
-        []
-    )  # type: List[Union[intermediate.AbstractClass, intermediate.Interface]]
+    required_choice_object = []  # type: List[intermediate.AbstractClass]
 
     # region Getters and setters
     for i, prop in enumerate(
@@ -435,7 +430,7 @@ def _generate_class(
 
 def _generate_message_type_enum(
     symbol_table: VerifiedIntermediateSymbolTable,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
+) -> Tuple[Stripped, Optional[Error]]:
     writer = io.StringIO()
 
     name = "MessageType"
@@ -461,9 +456,7 @@ def _generate_message_type_enum(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_choice_class(
-    cls: Union[intermediate.AbstractClass, intermediate.Interface]
-) -> str:
+def _generate_choice_class(cls: intermediate.AbstractClass) -> str:
     msg_header = f"message {proto_naming.class_name(cls.name)} {{\n"
     msg_body = f"{I}oneof value {{\n"
 
@@ -495,9 +488,7 @@ def generate(
 
     errors = []  # type: List[Error]
 
-    required_choice_objects = set(
-        []
-    )  # type: Set[Union[intermediate.AbstractClass, intermediate.Interface]]
+    required_choice_objects = set([])  # type: Set[intermediate.AbstractClass]
 
     for our_type in symbol_table.our_types:
         if not isinstance(
