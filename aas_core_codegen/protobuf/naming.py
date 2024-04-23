@@ -8,6 +8,11 @@ from aas_core_codegen.common import Identifier, assert_never
 
 
 def interface_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a ProtoBuf name for an interface based on its meta-model ``identifier``.
+
+    This method is not to be used because proto3 does not support interfaces.
+    """
     raise NotImplementedError("Interfaces are not supported by proto3.")
 
 
@@ -85,22 +90,48 @@ def property_name(identifier: Identifier) -> Identifier:
 
 
 def private_property_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a ProtoBuf name for a private property.
+
+    This method is not to be used because proto3 does not support private properties.
+    """
     raise NotImplementedError(
         "Private properties are not supported by proto3 Messages."
     )
 
 
 def private_method_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a ProtoBuf name for a private method.
+
+    This method is not to be used because proto3 does not support private methods.
+    """
     raise NotImplementedError("Methods are not supported by proto3 Messages.")
 
 
 def method_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a ProtoBuf name for a method.
+
+    This method is not to be used because proto3 does not support methods.
+    """
     raise NotImplementedError("Methods are not supported by proto3 Messages.")
 
 
 def argument_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a ProtoBuf name for an argument.
+
+    This method is not to be used because proto3 does not support methods and
+    thus no arguments.
+    """
     raise NotImplementedError("Arguments are not supported by proto3 Messages.")
 
 
 def variable_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a ProtoBuf name for a variable.
+
+    This method is not to be used because proto3 does not support variables.
+    """
     raise NotImplementedError("Variables are not supported by proto3 Messages.")
