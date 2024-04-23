@@ -141,6 +141,6 @@ dmypy.json
 .idea/
 
 # generated output
-out/*
+out/
 # namespace configuration for output
 snippets/namespace.txt
