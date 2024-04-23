@@ -64,9 +64,10 @@ For example, `Crafting Interpreters`_ is a good book.
 
 Please also read relevant publications related to the aas-core-codegen:
 
-* https://www.researchgate.net/publication/373325991_Generation_of_Digital_Twins_for_Information_Exchange_Between_Partners_in_the_Industrie_40_Value_Chain,
+* https://www.researchgate.net/publication/375497058_Empowering_Industry_40_with_Generative_and_Model-Driven_SDK_Development
 * https://www.researchgate.net/publication/356039469_Generative_and_Model-driven_SDK_development_for_the_Industrie_40_Digital_Twin,
-* *(Still to be published)* IECON 2023, Empowering Industry 4.0 with Generative and Model-Driven SDK Development.
+* https://www.researchgate.net/publication/373325991_Generation_of_Digital_Twins_for_Information_Exchange_Between_Partners_in_the_Industrie_40_Value_Chain,
+
 
 Coding Style Guide
 ==================
