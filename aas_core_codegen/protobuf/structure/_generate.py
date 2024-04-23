@@ -140,7 +140,8 @@ def _verify_structure_name_collisions(
                 errors.append(
                     Error(
                         our_type.parsed.node,
-                        f"The ProtoBuf name {name!r} for the enumeration {our_type.name!r} "
+                        f"The ProtoBuf name {name!r} for the enumeration"
+                        f" {our_type.name!r} "
                         f"collides with the same ProtoBuf name "
                         f"coming from the {_human_readable_identifier(other)}",
                     )
@@ -276,16 +277,18 @@ def _generate_enum(
             writer.write(textwrap.indent(literal_comment, I))
             writer.write("\n")
 
-        # Enums cannot have string-values assigned to them in proto3. Instead, they each get assigned
-        # an ID that is used for (de-)serialization.
-        # If that ID is re-assigned to another literal in the same enum in a later version, a system using the
-        # old version will (de-)serialize that literal differently. Hence, hope that the order of writing the literals
-        # stays the same in each build so that one literal always gets the same ID. Otherwise, don't mix versions.
-        # TODO: With each version, compare to the previous one and assign same ID.
-        # TODO: With each version, add a `reserved`-statement for deleted literals and their IDs.
+        # Enums cannot have string-values assigned to them in proto3. Instead,
+        # they each get assigned an ID that is used for (de-)serialization.
+        # If that ID is re-assigned to another literal in the same enum in a later
+        # version, a system using the old version will (de-)serialize that literal
+        # differently. Hence, hope that the order of writing the literals stays the
+        # same in each build so that one literal always gets the same ID.
+        # Otherwise, don't mix versions.
         writer.write(
             textwrap.indent(
-                f"{proto_naming.enum_name(name)}_{proto_naming.enum_literal_name(literal.name)} = {i + 1};",
+                f"""\
+{proto_naming.enum_name(name)}_{proto_naming.enum_literal_name(literal.name)}\
+ = {i + 1};""",
                 I,
             )
         )
@@ -348,7 +351,8 @@ def _generate_class(
                 (intermediate.Interface, intermediate.AbstractClass),
             )
         ):
-            # -> must create a new message (choice object) since "oneof" and "repeated" do not go together
+            # -> must create a new message (choice object) since "oneof"
+            # and "repeated" do not go together
             prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
             required_choice_object.append(prop.type_annotation.items.our_type)
 
@@ -385,8 +389,9 @@ def _generate_class(
 
         blocks.append(Stripped("\n".join(prop_blocks)))
 
-    # one additional property indicating the concrete class type (in case multiple inherit from the same interface)
-    # when instantiating a class of this proto, the field must be set (ideally in the constructor)
+    # one additional property indicating the concrete class type (in case multiple
+    # inherit from the same interface) when instantiating a class of this proto,
+    # the field must be set (ideally in the constructor)
     blocks.append(Stripped("MessageType message_type = 1;"))
 
     # endregion
@@ -536,7 +541,8 @@ def generate(
         else:
             assert_never(our_type)
 
-    # generate the necessary classes for choice (i.e. a class for every property that was like "repeated <interface>")
+    # generate the necessary classes for choice (i.e. a class for every property that
+    # was like "repeated <interface>")
     for cls in required_choice_objects:
         code_blocks.append(Stripped(_generate_choice_class(cls)))
 

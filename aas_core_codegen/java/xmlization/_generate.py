@@ -2031,7 +2031,7 @@ def _generate_serialize(
 public static void to(
 {I}IClass that,
 {I}XMLStreamWriter writer) throws SerializeException {{
-{I}VisitorWithWriter visitor = new VisitorWithWriter(); 
+{I}VisitorWithWriter visitor = new VisitorWithWriter();
 {I}visitor.visit(
 {II}that, writer);
 }}"""
