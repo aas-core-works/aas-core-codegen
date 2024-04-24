@@ -292,11 +292,14 @@ We follow Chris Beams' `guidelines on commit messages`_:
 2) Limit the subject line to 50 characters
 3) Capitalize the subject line
 4) Do not end the subject line with a period
-5) Use the imperative mood in the subject line
+5) Use the imperative mood in the subject line, full sentences in the body
 6) Wrap the body at 72 characters
 7) Use the body to explain *what* and *why* vs. *how*
 
 .. _guidelines on commit messages: https://chris.beams.io/posts/git-commit/
+
+If you are merging in a pull request, please squash before merging.
+We want to keep the Git history as simple as possible, and the commits during the development are rarely insightful later.
 
 Development Scripts
 ===================
