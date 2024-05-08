@@ -1,5 +1,5 @@
 """Parse a regular expression defined over a possibly-formatted string."""
-import collections
+import collections.abc
 import io
 import math
 import re
@@ -97,7 +97,7 @@ class Cursor:
     # as a string during development, causing an unnecessary long debugging session.
     @require(
         lambda values:
-        isinstance(values, collections.Sequence),
+        isinstance(values, collections.abc.Sequence),
         "values must be a sequence"
     )
     # fmt: on
