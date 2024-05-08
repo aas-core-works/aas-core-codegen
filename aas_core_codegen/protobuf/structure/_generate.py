@@ -353,7 +353,7 @@ def _generate_class(
         ):
             # -> must create a new message (choice object) since "oneof"
             # and "repeated" do not go together
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
+            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
             required_choice_object.append(prop.type_annotation.items.our_type)
 
         # optional lists of our types where our types are abstract/interfaces
@@ -369,7 +369,7 @@ def _generate_class(
             )
         ):
             # -> same as the case before
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
+            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
             required_choice_object.append(prop.type_annotation.value.items.our_type)
 
         # our types where our types are abstract/interfaces
@@ -380,19 +380,14 @@ def _generate_class(
             (intermediate.Interface, intermediate.AbstractClass),
         ):
             # -> must use "oneof"
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
+            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
             required_choice_object.append(prop.type_annotation.our_type)
 
         else:
             # just a normal property with type
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 2};"))
+            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
 
         blocks.append(Stripped("\n".join(prop_blocks)))
-
-    # one additional property indicating the concrete class type (in case multiple
-    # inherit from the same interface) when instantiating a class of this proto,
-    # the field must be set (ideally in the constructor)
-    blocks.append(Stripped("MessageType message_type = 1;"))
 
     # endregion
 
@@ -431,34 +426,6 @@ def _generate_class(
     writer.write("\n}")
 
     return Stripped(writer.getvalue()), None, required_choice_object
-
-
-def _generate_message_type_enum(
-    symbol_table: VerifiedIntermediateSymbolTable,
-) -> Tuple[Stripped, Optional[Error]]:
-    writer = io.StringIO()
-
-    name = "MessageType"
-
-    # write enum and its name
-    writer.write(f"enum {name} {{\n")
-    # write at least the unspecified enum entry
-    writer.write(textwrap.indent(f"{name}_UNSPECIFIED = 0;", I))
-
-    # generate one enum entry for each concrete class
-    for i, cls in enumerate(symbol_table.concrete_classes):
-        writer.write("\n\n")
-
-        writer.write(
-            textwrap.indent(
-                f"{name}_{proto_naming.enum_literal_name(cls.name)} = {i + 1};",
-                I,
-            )
-        )
-
-    writer.write("\n}")
-
-    return Stripped(writer.getvalue()), None
 
 
 def _generate_choice_class(cls: intermediate.AbstractClass) -> str:
@@ -545,10 +512,6 @@ def generate(
     # was like "repeated <interface>")
     for cls in required_choice_objects:
         code_blocks.append(Stripped(_generate_choice_class(cls)))
-
-    code, error = _generate_message_type_enum(symbol_table)
-    if error is None:
-        code_blocks.append(code)
 
     if len(errors) > 0:
         return None, errors
