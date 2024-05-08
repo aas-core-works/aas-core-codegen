@@ -1,5 +1,5 @@
 """Parse a regular expression defined over a possibly-formatted string."""
-
+import collections.abc
 import io
 import math
 import re
@@ -89,7 +89,16 @@ class Cursor:
             )
             for first, second in zip(values, values[1:])
         ),
-        "No consecutive strings"
+        "No consecutive strings expected in the parsed sequence of an AST expression "
+        "representing a string interpolation"
+    )
+    # NOTE (mristin, 2024-05-08):
+    # We add a runtime test here since it already happened that we supplied ``values``
+    # as a string during development, causing an unnecessary long debugging session.
+    @require(
+        lambda values:
+        isinstance(values, collections.abc.Sequence),
+        "values must be a sequence"
     )
     # fmt: on
     def __init__(self, values: Sequence[Union[str, FormattedValue]]) -> None:

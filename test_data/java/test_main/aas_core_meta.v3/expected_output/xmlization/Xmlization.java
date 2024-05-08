@@ -22378,7 +22378,7 @@ public class Xmlization {
     public static void to(
       IClass that,
       XMLStreamWriter writer) throws SerializeException {
-      VisitorWithWriter visitor = new VisitorWithWriter(); 
+      VisitorWithWriter visitor = new VisitorWithWriter();
       visitor.visit(
         that, writer);
     }
