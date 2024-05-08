@@ -25,8 +25,11 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip3 install --upgrade coveralls
           pip3 install -e .[dev]
+
+      - name: Install coveralls
+        run: pip3 install --upgrade coveralls
+        if: github.event.repository.fork == false
 
       # NOTE (mristin, 2022-12-21):
       # Have this as a fast-fail
@@ -44,6 +47,7 @@ jobs:
 
       - name: Upload Coverage
         run: coveralls --service=github
+        if: github.event.repository.fork == false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
@@ -54,6 +58,7 @@ jobs:
     needs: Execute-continuous-integration
     runs-on: ubuntu-latest
     container: python:3-slim
+    if: github.event.repository.fork == false
     steps:
       - name: Finish Coveralls
         run: |
