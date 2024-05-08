@@ -1,5 +1,4 @@
 """Generate the C++ verification functions."""
-import enum
 import io
 from typing import (
     Optional,
@@ -9,7 +8,6 @@ from typing import (
     Sequence,
     Mapping,
     Final,
-    Set,
 )
 
 from icontract import ensure, require
@@ -37,10 +35,9 @@ from aas_core_codegen.cpp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
-from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
+from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.yielding import flow as yielding_flow
 
 
@@ -230,6 +227,7 @@ def generate_header(
             f"""\
 #include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/iteration.hpp"
+#include "{include_prefix_path}/pattern.hpp"
 #include "{include_prefix_path}/types.hpp"
 
 #pragma warning(push, 0)
@@ -2005,319 +2003,10 @@ std::unique_ptr<impl::IVerificator> RecursiveVerificator::Clone() const {{
     return blocks
 
 
-class _RegexRendererForUTF16(parse_retree.Renderer):
-    """Render the regular expressions for C++ consisting of only 2-byte characters."""
-
-    def char_to_str_and_escape_or_encode_if_necessary(
-        self, node: parse_retree.Char, escaping: Mapping[str, str]
-    ) -> List[Union[str, parse_tree.FormattedValue]]:
-        """Convert the ``node`` to a string, and escape and/or encode appropriately."""
-        if not node.explicitly_encoded:
-            escaped = escaping.get(node.character, None)
-            if escaped is not None:
-                result: List[Union[str, parse_tree.FormattedValue]] = [escaped]
-            else:
-                result = [node.character]
-
-            return result
-        else:
-            code = ord(node.character)
-
-            if code <= 255:
-                return [f"\\x{code:02x}"]
-            elif code <= 65535:
-                # NOTE (mristin, 2023-10-18):
-                # We have to escape, i.e., use ``\\u{code}`` instead of ``\u{code}``
-                # since the regex engine in C++ can work with it, but the C++ compiler
-                # complains if we do not supply valid Unicode code points.
-                return [f"\\u{code:04x}"]
-            else:
-                raise AssertionError(
-                    f"No code points expected above 65535, but got: {code} "
-                    f"for character {node.character!r}"
-                )
-
-
-_REGEX_RENDERER_FOR_UTF16 = _RegexRendererForUTF16()
-
-
-class _RegexRendererForUTF32(parse_retree.Renderer):
-    """Render the regular expressions for C++ consisting of 4-byte characters."""
-
-    def char_to_str_and_escape_or_encode_if_necessary(
-        self, node: parse_retree.Char, escaping: Mapping[str, str]
-    ) -> List[Union[str, parse_tree.FormattedValue]]:
-        """Convert the ``node`` to a string, and escape and/or encode appropriately."""
-        if not node.explicitly_encoded:
-            escaped = escaping.get(node.character, None)
-            if escaped is not None:
-                result: List[Union[str, parse_tree.FormattedValue]] = [escaped]
-            else:
-                result = [node.character]
-
-            return result
-        else:
-            code = ord(node.character)
-
-            if code <= 255:
-                return [f"\\x{code:02x}"]
-            else:
-                # NOTE (mristin, 2023-10-18):
-                # We assume here that the character will be escaped in the wstring
-                # literal in ``cpp_common.wstring_literal``.
-                return [node.character]
-
-
-_REGEX_RENDERER_FOR_UTF32 = _RegexRendererForUTF32()
-
-
-class _WstringEncoding(enum.Enum):
-    UTF16 = "UTF16"
-    UTF32 = "UTF32"
-
-
-class _PatternVerificationTranspiler(
-    parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
-):
-    """Transpile a statement of a pattern verification into C++."""
-
-    def __init__(self, wstring_encoding: _WstringEncoding) -> None:
-        """Initialize with the given values."""
-        self.wstring_encoding = wstring_encoding
-        self.defined_variable_set = set()  # type: Set[Identifier]
-
-    def _fix_regex_in_place(self, regex: parse_retree.Regex) -> None:
-        """Fix the regex in-place to conform to the wstring encoding."""
-        if self.wstring_encoding is _WstringEncoding.UTF16:
-            parse_retree.fix_for_utf16_regex_in_place(regex)
-
-    def _render_regex(
-        self, regex: parse_retree.Regex
-    ) -> List[Union[str, parse_tree.FormattedValue]]:
-        """Render the regular expression to parts of a joined string."""
-        if self.wstring_encoding is _WstringEncoding.UTF16:
-            return parse_retree.render(regex=regex, renderer=_REGEX_RENDERER_FOR_UTF16)
-
-        elif self.wstring_encoding is _WstringEncoding.UTF32:
-            return parse_retree.render(regex=regex, renderer=_REGEX_RENDERER_FOR_UTF32)
-
-        else:
-            assert_never(self.wstring_encoding)
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def _transform_joined_str_values(
-        self, values: Sequence[Union[str, parse_tree.FormattedValue]]
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """Transform the values of a joined string to a Python string literal."""
-        # If we do not need interpolation, simply return the string literals
-        # joined together.
-        needs_interpolation = any(
-            isinstance(value, parse_tree.FormattedValue) for value in values
-        )
-        if not needs_interpolation:
-            return (
-                Stripped(
-                    cpp_common.wstring_literal(
-                        "".join(value for value in values)  # type: ignore
-                    )
-                ),
-                None,
-            )
-
-        args = []  # type: List[Stripped]
-
-        for value in values:
-            if isinstance(value, str):
-                args.append(cpp_common.wstring_literal(value))
-
-            elif isinstance(value, parse_tree.FormattedValue):
-                code, error = self.transform(value.value)
-                if error is not None:
-                    return None, error
-
-                assert code is not None
-
-                assert (
-                    "\n" not in code
-                ), f"New-lines are not expected in formatted values, but got: {code}"
-
-                args.append(code)
-            else:
-                assert_never(value)
-
-        if len(args) == 1:
-            return args[0], None
-
-        args_joined = ",\n".join(args)
-        return (
-            Stripped(
-                f"""\
-common::Concat(
-{I}{indent_but_first_line(args_joined, I)}
-)"""
-            ),
-            None,
-        )
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_constant(
-        self, node: parse_tree.Constant
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, str):
-            # NOTE (mristin, 2023-10-18):
-            # We assume that all the string constants are valid regular expressions.
-
-            regex, parse_error = parse_retree.parse(values=[node.value])
-            if parse_error is not None:
-                regex_line, pointer_line = parse_retree.render_pointer(
-                    parse_error.cursor
-                )
-
-                return (
-                    None,
-                    Error(
-                        node.original_node,
-                        f"The string constant could not be parsed "
-                        f"as a regular expression: \n"
-                        f"{parse_error.message}\n"
-                        f"{regex_line}\n"
-                        f"{pointer_line}",
-                    ),
-                )
-
-            assert regex is not None
-            self._fix_regex_in_place(regex=regex)
-
-            # NOTE (mristin, 2023-10-18):
-            # Strictly speaking, this is a joined string with a single value, a string
-            # literal.
-            return self._transform_joined_str_values(
-                values=self._render_regex(regex=regex)
-            )
-        else:
-            raise AssertionError(f"Unexpected {node=}")
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_name(
-        self, node: parse_tree.Name
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return Stripped(cpp_naming.variable_name(node.identifier)), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_joined_str(
-        self, node: parse_tree.JoinedStr
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        regex, parse_error = parse_retree.parse(values=node.values)
-        if parse_error is not None:
-            regex_line, pointer_line = parse_retree.render_pointer(parse_error.cursor)
-
-            return (
-                None,
-                Error(
-                    node.original_node,
-                    f"The joined string could not be parsed "
-                    f"as a regular expression: \n"
-                    f"{parse_error.message}\n"
-                    f"{regex_line}\n"
-                    f"{pointer_line}",
-                ),
-            )
-
-        assert regex is not None
-        self._fix_regex_in_place(regex=regex)
-
-        return self._transform_joined_str_values(values=self._render_regex(regex=regex))
-
-    def transform_assignment(
-        self, node: parse_tree.Assignment
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        assert isinstance(node.target, parse_tree.Name)
-        variable = cpp_naming.variable_name(node.target.identifier)
-        code, error = self.transform(node.value)
-        if error is not None:
-            return None, error
-        assert code is not None
-
-        if variable in self.defined_variable_set:
-            return Stripped(f"{variable} = {code};"), None
-
-        self.defined_variable_set.add(variable)
-        return Stripped(f"std::wstring {variable} = {code};"), None
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_pattern_verification_implementation(
     verification: intermediate.PatternVerification,
-) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
+) -> Stripped:
     """Generate the implementation of the given pattern verification function."""
-    # NOTE (mristin, 2023-10-18):
-    # We assume that we performed all the checks at the intermediate stage.
-
-    errors = []  # type: List[Error]
-
-    transpiler_utf16 = _PatternVerificationTranspiler(
-        wstring_encoding=_WstringEncoding.UTF16
-    )
-    stmts_utf16 = []  # type: List[Stripped]
-
-    for i, stmt in enumerate(verification.parsed.body):
-        # NOTE (mristin, 2023-10-18):
-        # We will transpile the return statement separately.
-        if i == len(verification.parsed.body) - 1:
-            break
-
-        code, error = transpiler_utf16.transform(stmt)
-        if error is not None:
-            errors.append(error)
-        else:
-            assert code is not None
-            stmts_utf16.append(code)
-
-    pattern_expr_utf16, error = transpiler_utf16.transform(verification.pattern_expr)
-    if error is not None:
-        errors.append(error)
-
-    transpiler_utf32 = _PatternVerificationTranspiler(
-        wstring_encoding=_WstringEncoding.UTF32
-    )
-    stmts_utf32 = []  # type: List[Stripped]
-
-    for i, stmt in enumerate(verification.parsed.body):
-        # NOTE (mristin, 2023-10-18):
-        # We will transpile the return statement separately.
-        if i == len(verification.parsed.body) - 1:
-            break
-
-        code, error = transpiler_utf32.transform(stmt)
-        if error is not None:
-            errors.append(error)
-        else:
-            assert code is not None
-            stmts_utf32.append(code)
-
-    pattern_expr_utf32, error = transpiler_utf32.transform(verification.pattern_expr)
-    if error is not None:
-        errors.append(error)
-
-    if len(errors) > 0:
-        return None, Error(
-            verification.parsed.node,
-            f"Failed to transpile verification function {verification.name!r}",
-            errors,
-        )
-
-    assert pattern_expr_utf16 is not None
-    assert pattern_expr_utf32 is not None
-
-    construct_name = cpp_naming.function_name(
-        Identifier(f"construct_{verification.name}")
-    )
-
-    stmts_utf16_joined = "\n".join(stmts_utf16)
-    stmts_utf32_joined = "\n".join(stmts_utf32)
-
-    regex_name = cpp_naming.constant_name(Identifier(f"regex_{verification.name}"))
-
     assert len(verification.arguments) == 1
     arg = verification.arguments[0]
 
@@ -2328,78 +2017,19 @@ def _generate_pattern_verification_implementation(
 
     verification_name = cpp_naming.function_name(verification.name)
 
-    blocks: List[Stripped]
+    program_name = cpp_naming.constant_name(Identifier(f"{verification.name}_program"))
 
-    if (
-        stmts_utf16_joined == stmts_utf32_joined
-        and pattern_expr_utf16 == pattern_expr_utf32
-    ):
-        blocks = [
-            Stripped(
-                f"""\
-std::wregex {construct_name}() {{
-{I}{indent_but_first_line(stmts_utf16_joined, I)}
-{I}return std::wregex(
-{II}{indent_but_first_line(pattern_expr_utf16, II)}
-{I});
-}}"""
-            )
-        ]
-    else:
-        blocks = [
-            Stripped(
-                f"""\
-std::wregex {construct_name}() {{
-{I}static_assert(
-{II}sizeof(wchar_t) == 2 || sizeof(wchar_t) == 4,
-{II}"Expected either 2 or 4 bytes for wchar_t, but got something else."
-{I});
-
-{I}switch (sizeof(wchar_t)) {{
-{II}case 2: {{
-{III}{indent_but_first_line(stmts_utf16_joined, III)}
-{III}return std::wregex(
-{IIII}{indent_but_first_line(pattern_expr_utf16, IIII)}
-{III});
-{II}}}
-
-{II}case 4: {{
-{III}{indent_but_first_line(stmts_utf32_joined, III)}
-{III}return std::wregex(
-{IIII}{indent_but_first_line(pattern_expr_utf32, IIII)}
-{III});
-{II}}}
-
-{II}default:
-{III}throw std::logic_error(
-{IIII}common::Concat(
-{IIIII}"Unexpected size of wchar_t: ",
-{IIIII}std::to_string(sizeof(wchar_t))
-{IIII})
-{III});
-{I}}}
-}}"""
-            )
-        ]
-
-    blocks.extend(
-        [
-            Stripped(f"const std::wregex {regex_name} = {construct_name}();"),
-            Stripped(
-                f"""\
+    return Stripped(
+        f"""\
 bool {verification_name}(
 {I}{indent_but_first_line(arg_type, I)} {arg_name}
 ) {{
-{I}return std::regex_search(
-{II}{arg_name},
-{II}{regex_name}
+{I}return revm::Match(
+{II}pattern::{program_name},
+{II}{arg_name}
 {I});
 }}"""
-            ),
-        ]
     )
-
-    return blocks, None
 
 
 class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
@@ -3272,11 +2902,12 @@ def generate_implementation(
             f"""\
 #include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/constants.hpp"
+#include "{include_prefix_path}/pattern.hpp"
+#include "{include_prefix_path}/revm.hpp"
 #include "{include_prefix_path}/verification.hpp"
 
 #pragma warning(push, 0)
 #include <map>
-#include <regex>
 #include <set>
 #pragma warning(pop)"""
         ),
@@ -3290,18 +2921,11 @@ def generate_implementation(
 
         for verification in symbol_table.verification_functions:
             if isinstance(verification, intermediate.PatternVerification):
-                (
-                    verification_blocks,
-                    error,
-                ) = _generate_pattern_verification_implementation(
-                    verification=verification
+                blocks.append(
+                    _generate_pattern_verification_implementation(
+                        verification=verification
+                    )
                 )
-
-                if error is not None:
-                    errors.append(error)
-                else:
-                    assert verification_blocks is not None
-                    blocks.extend(verification_blocks)
 
             elif isinstance(verification, intermediate.TranspilableVerification):
                 block, error = _generate_implementation_of_transpilable_verification(

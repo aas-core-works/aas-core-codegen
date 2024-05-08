@@ -1,0 +1,1 @@
+(mristin, 2024-05-31): We did not implement the transpilation of non-greedy quantifiers to instructions of a RegEx virtual machine as this is more complex than the transpilation of the greedy ones. If you need this feature, please contact the developers.

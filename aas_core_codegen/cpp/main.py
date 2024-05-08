@@ -9,6 +9,8 @@ from aas_core_codegen.cpp import (
     enhancing as cpp_enhancing,
     iteration as cpp_iteration,
     jsonization as cpp_jsonization,
+    pattern as cpp_pattern,
+    revm as cpp_revm,
     stringification as cpp_stringification,
     structure as cpp_structure,
     verification as cpp_verification,
@@ -313,6 +315,85 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             message=(
                 f"Failed to write the implementation of the C++ jsonization code "
                 f"to {pth}"
+            ),
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+    # endregion
+
+    # region Pattern
+    code = cpp_pattern.generate_header(
+        symbol_table=context.symbol_table, library_namespace=namespace
+    )
+
+    pth = context.output_dir / "pattern.hpp"
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=(f"Failed to write the header for the C++ pattern code to {pth}"),
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    code, errors = cpp_pattern.generate_implementation(
+        symbol_table=context.symbol_table,
+        library_namespace=namespace,
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=(
+                f"Failed to generate the implementation of the C++ pattern code "
+                f"based on {context.model_path}"
+            ),
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+    assert code is not None
+
+    pth = context.output_dir / "pattern.cpp"
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=(
+                f"Failed to write the implementation of the C++ pattern code to {pth}"
+            ),
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+    # endregion
+
+    # region REVM
+    code = cpp_revm.generate_header(library_namespace=namespace)
+
+    pth = context.output_dir / "revm.hpp"
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=(f"Failed to write the header for the C++ REVM code to {pth}"),
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    code = cpp_revm.generate_implementation(
+        library_namespace=namespace,
+    )
+
+    pth = context.output_dir / "revm.cpp"
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=(
+                f"Failed to write the implementation of the C++ REVM code to {pth}"
             ),
             errors=[str(exception)],
             stderr=stderr,

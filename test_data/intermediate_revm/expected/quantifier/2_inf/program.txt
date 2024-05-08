@@ -1,0 +1,12 @@
+   # ^a{2,}$
+   {
+     # a{2,}
+     {
+       char 'a'
+1:     char 'a'
+       split 1, 3
+     }
+     # $
+3:   end
+     match
+   }

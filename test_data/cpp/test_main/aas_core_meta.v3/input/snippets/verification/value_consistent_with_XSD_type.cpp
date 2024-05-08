@@ -1,53 +1,15 @@
 bool IsXsDate(const std::wstring& text) {
-  std::wsmatch match;
-  const bool matched = std::regex_match(text, match, kRegexMatchesXsDate);
+  // NOTE (mristin):
+  // Optimally, we would re-use the parts of `MatchesXsDate` program and
+  // `IsXsDateWithoutOffset`, but this would make the implementation much more
+  // difficult to read and maintain. Hence, we opt here for simplicity of implementation
+  // to computational performance.
 
-  if (!matched) {
+  if (!MatchesXsDate(text)) {
     return false;
   }
 
-  size_t cursor = 0;
-  if (text[0] == L'-') {
-    cursor = 1;
-  }
-
-  while (std::isdigit(text[cursor])) {
-    ++cursor;
-  }
-
-  if (text[cursor] != L'-') {
-    throw std::logic_error(
-      common::Concat(
-        "Expected a dash after a year, but got the date text: ",
-        common::WstringToUtf8(text)
-      )
-    );
-  }
-  ++cursor;
-
-  while (std::isdigit(text[cursor])) {
-    ++cursor;
-  }
-
-  if (text[cursor] != L'-') {
-    throw std::logic_error(
-      common::Concat(
-        "Expected a dash after a month, but got the date text: ",
-        common::WstringToUtf8(text)
-      )
-    );
-  }
-  ++cursor;
-
-  while (std::isdigit(text[cursor])) {
-    ++cursor;
-  }
-
-  const std::wstring date_without_offset(
-    text.substr(0, cursor)
-  );
-
-  return IsXsDateWithoutOffset(date_without_offset);
+  return IsXsDateWithoutOffset(text);
 }
 
 bool IsXsDouble(const std::wstring& value) {
