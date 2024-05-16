@@ -54,7 +54,7 @@ func (de *DeserializationError) PathString() string {
 // Parse `jsonable` as a boolean, or return an error.
 func boolFromJsonable(
 	jsonable interface{},
-) (result bool, err *DeserializationError) {
+) (result bool, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a boolean, but got null",
@@ -78,7 +78,7 @@ func boolFromJsonable(
 // Parse `jsonable` as a 64-bit integer, or return an error.
 func int64FromJsonable(
 	jsonable interface{},
-) (result int64, err *DeserializationError) {
+) (result int64, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected an integer number, but got null",
@@ -138,7 +138,7 @@ func int64FromJsonable(
 // Parse `jsonable` as a 64-bit float, or return an error.
 func float64FromJsonable(
 	jsonable interface{},
-) (result float64, err *DeserializationError) {
+) (result float64, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a number, but got null",
@@ -164,9 +164,9 @@ func float64FromJsonable(
 // Parse `jsonable` as a string, or return an error.
 func stringFromJsonable(
 	jsonable interface{},
-) (result string, error *DeserializationError) {
+) (result string, err error) {
 	if jsonable == nil {
-		error = newDeserializationError(
+		err = newDeserializationError(
 			"Expected a string, but got null",
 		)
 		return
@@ -177,7 +177,7 @@ func stringFromJsonable(
 	if ok {
 		return
 	} else {
-		error = newDeserializationError(
+		err = newDeserializationError(
 			fmt.Sprintf("Expected a boolean, but got %T", jsonable),
 		)
 		return
@@ -187,7 +187,7 @@ func stringFromJsonable(
 // Parse `jsonable` as a byte array, or return an error.
 func bytesFromJsonable(
 	jsonable interface{},
-) (result []byte, err *DeserializationError) {
+) (result []byte, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a base64-encoded string, but got null",
@@ -227,7 +227,7 @@ func HasSemanticsFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IHasSemantics,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -258,7 +258,7 @@ func ExtensionFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IExtension,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -289,7 +289,7 @@ func extensionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IExtension,
-	err *DeserializationError,
+	err error,
 ) {
 	var theSemanticID aastypes.IReference
 	var theSupplementalSemanticIDs []aastypes.IReference
@@ -307,29 +307,33 @@ func extensionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -344,17 +348,19 @@ func extensionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -368,11 +374,13 @@ func extensionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "name",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "name",
+						},
+					)
+				}
 				return
 			}
 			foundName = true
@@ -383,11 +391,13 @@ func extensionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueType",
+						},
+					)
+				}
 				return
 			}
 			theValueType = &parsed
@@ -398,11 +408,13 @@ func extensionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			theValue = &parsed
@@ -410,18 +422,20 @@ func extensionFromMapWithoutDispatch(
 		case "refersTo":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "refersTo",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -436,17 +450,19 @@ func extensionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "refersTo",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "refersTo",
+							},
+						)
+					}
 
 					return
 				}
@@ -501,7 +517,7 @@ func HasExtensionsFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IHasExtensions,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -532,7 +548,7 @@ func ReferableFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IReferable,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -563,7 +579,7 @@ func IdentifiableFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IIdentifiable,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -592,7 +608,7 @@ func IdentifiableFromJsonable(
 // or return an error.
 func ModellingKindFromJsonable(
 	jsonable interface{},
-) (result aastypes.ModellingKind, err *DeserializationError) {
+) (result aastypes.ModellingKind, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of ModellingKind, " +
@@ -634,7 +650,7 @@ func HasKindFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IHasKind,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -665,7 +681,7 @@ func HasDataSpecificationFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IHasDataSpecification,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -696,7 +712,7 @@ func AdministrativeInformationFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IAdministrativeInformation,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -727,7 +743,7 @@ func administrativeInformationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IAdministrativeInformation,
-	err *DeserializationError,
+	err error,
 ) {
 	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
 	var theVersion *string
@@ -740,18 +756,20 @@ func administrativeInformationFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -766,17 +784,19 @@ func administrativeInformationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -791,11 +811,13 @@ func administrativeInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "version",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "version",
+						},
+					)
+				}
 				return
 			}
 			theVersion = &parsed
@@ -806,11 +828,13 @@ func administrativeInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "revision",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "revision",
+						},
+					)
+				}
 				return
 			}
 			theRevision = &parsed
@@ -820,11 +844,13 @@ func administrativeInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "creator",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "creator",
+						},
+					)
+				}
 				return
 			}
 
@@ -834,11 +860,13 @@ func administrativeInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "templateId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "templateId",
+						},
+					)
+				}
 				return
 			}
 			theTemplateID = &parsed
@@ -880,7 +908,7 @@ func QualifiableFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IQualifiable,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -909,7 +937,7 @@ func QualifiableFromJsonable(
 // or return an error.
 func QualifierKindFromJsonable(
 	jsonable interface{},
-) (result aastypes.QualifierKind, err *DeserializationError) {
+) (result aastypes.QualifierKind, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of QualifierKind, " +
@@ -951,7 +979,7 @@ func QualifierFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IQualifier,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -982,7 +1010,7 @@ func qualifierFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IQualifier,
-	err *DeserializationError,
+	err error,
 ) {
 	var theSemanticID aastypes.IReference
 	var theSupplementalSemanticIDs []aastypes.IReference
@@ -1002,29 +1030,33 @@ func qualifierFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1039,17 +1071,19 @@ func qualifierFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -1064,11 +1098,13 @@ func qualifierFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "kind",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "kind",
+						},
+					)
+				}
 				return
 			}
 			theKind = &parsed
@@ -1078,11 +1114,13 @@ func qualifierFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "type",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "type",
+						},
+					)
+				}
 				return
 			}
 			foundType = true
@@ -1092,11 +1130,13 @@ func qualifierFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueType",
+						},
+					)
+				}
 				return
 			}
 			foundValueType = true
@@ -1107,11 +1147,13 @@ func qualifierFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			theValue = &parsed
@@ -1121,11 +1163,13 @@ func qualifierFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueId",
+						},
+					)
+				}
 				return
 			}
 
@@ -1183,7 +1227,7 @@ func AssetAdministrationShellFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IAssetAdministrationShell,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -1214,7 +1258,7 @@ func assetAdministrationShellFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IAssetAdministrationShell,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -1236,18 +1280,20 @@ func assetAdministrationShellFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1262,17 +1308,19 @@ func assetAdministrationShellFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -1287,11 +1335,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -1302,11 +1352,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -1314,18 +1366,20 @@ func assetAdministrationShellFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1340,17 +1394,19 @@ func assetAdministrationShellFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -1362,18 +1418,20 @@ func assetAdministrationShellFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1388,17 +1446,19 @@ func assetAdministrationShellFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -1412,11 +1472,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "administration",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "administration",
+						},
+					)
+				}
 				return
 			}
 
@@ -1425,11 +1487,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "id",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "id",
+						},
+					)
+				}
 				return
 			}
 			foundID = true
@@ -1437,18 +1501,20 @@ func assetAdministrationShellFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1463,17 +1529,19 @@ func assetAdministrationShellFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -1487,11 +1555,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "derivedFrom",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "derivedFrom",
+						},
+					)
+				}
 				return
 			}
 
@@ -1500,11 +1570,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "assetInformation",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "assetInformation",
+						},
+					)
+				}
 				return
 			}
 			foundAssetInformation = true
@@ -1512,18 +1584,20 @@ func assetAdministrationShellFromMapWithoutDispatch(
 		case "submodels":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "submodels",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1538,17 +1612,19 @@ func assetAdministrationShellFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "submodels",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "submodels",
+							},
+						)
+					}
 
 					return
 				}
@@ -1627,7 +1703,7 @@ func AssetInformationFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IAssetInformation,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -1658,7 +1734,7 @@ func assetInformationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IAssetInformation,
-	err *DeserializationError,
+	err error,
 ) {
 	var theAssetKind aastypes.AssetKind
 	var theGlobalAssetID *string
@@ -1675,11 +1751,13 @@ func assetInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "assetKind",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "assetKind",
+						},
+					)
+				}
 				return
 			}
 			foundAssetKind = true
@@ -1690,11 +1768,13 @@ func assetInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "globalAssetId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "globalAssetId",
+						},
+					)
+				}
 				return
 			}
 			theGlobalAssetID = &parsed
@@ -1702,18 +1782,20 @@ func assetInformationFromMapWithoutDispatch(
 		case "specificAssetIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "specificAssetIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -1728,17 +1810,19 @@ func assetInformationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "specificAssetIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "specificAssetIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -1753,11 +1837,13 @@ func assetInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "assetType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "assetType",
+						},
+					)
+				}
 				return
 			}
 			theAssetType = &parsed
@@ -1767,11 +1853,13 @@ func assetInformationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "defaultThumbnail",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "defaultThumbnail",
+						},
+					)
+				}
 				return
 			}
 
@@ -1818,7 +1906,7 @@ func ResourceFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IResource,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -1849,7 +1937,7 @@ func resourceFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IResource,
-	err *DeserializationError,
+	err error,
 ) {
 	var thePath string
 	var theContentType *string
@@ -1863,11 +1951,13 @@ func resourceFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "path",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "path",
+						},
+					)
+				}
 				return
 			}
 			foundPath = true
@@ -1878,11 +1968,13 @@ func resourceFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "contentType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "contentType",
+						},
+					)
+				}
 				return
 			}
 			theContentType = &parsed
@@ -1919,7 +2011,7 @@ func resourceFromMapWithoutDispatch(
 // or return an error.
 func AssetKindFromJsonable(
 	jsonable interface{},
-) (result aastypes.AssetKind, err *DeserializationError) {
+) (result aastypes.AssetKind, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of AssetKind, " +
@@ -1961,7 +2053,7 @@ func SpecificAssetIDFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ISpecificAssetID,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -1992,7 +2084,7 @@ func specificAssetIDFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ISpecificAssetID,
-	err *DeserializationError,
+	err error,
 ) {
 	var theSemanticID aastypes.IReference
 	var theSupplementalSemanticIDs []aastypes.IReference
@@ -2010,29 +2102,33 @@ func specificAssetIDFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2047,17 +2143,19 @@ func specificAssetIDFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -2071,11 +2169,13 @@ func specificAssetIDFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "name",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "name",
+						},
+					)
+				}
 				return
 			}
 			foundName = true
@@ -2085,11 +2185,13 @@ func specificAssetIDFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			foundValue = true
@@ -2099,11 +2201,13 @@ func specificAssetIDFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "externalSubjectId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "externalSubjectId",
+						},
+					)
+				}
 				return
 			}
 
@@ -2155,7 +2259,7 @@ func SubmodelFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ISubmodel,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -2186,7 +2290,7 @@ func submodelFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ISubmodel,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -2209,18 +2313,20 @@ func submodelFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2235,17 +2341,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -2260,11 +2368,13 @@ func submodelFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -2275,11 +2385,13 @@ func submodelFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -2287,18 +2399,20 @@ func submodelFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2313,17 +2427,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -2335,18 +2451,20 @@ func submodelFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2361,17 +2479,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -2385,11 +2505,13 @@ func submodelFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "administration",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "administration",
+						},
+					)
+				}
 				return
 			}
 
@@ -2398,11 +2520,13 @@ func submodelFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "id",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "id",
+						},
+					)
+				}
 				return
 			}
 			foundID = true
@@ -2413,11 +2537,13 @@ func submodelFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "kind",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "kind",
+						},
+					)
+				}
 				return
 			}
 			theKind = &parsed
@@ -2427,29 +2553,33 @@ func submodelFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2464,17 +2594,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -2486,18 +2618,20 @@ func submodelFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2512,17 +2646,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -2534,18 +2670,20 @@ func submodelFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2560,17 +2698,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -2582,18 +2722,20 @@ func submodelFromMapWithoutDispatch(
 		case "submodelElements":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "submodelElements",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2608,17 +2750,19 @@ func submodelFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "submodelElements",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "submodelElements",
+							},
+						)
+					}
 
 					return
 				}
@@ -2698,7 +2842,7 @@ func SubmodelElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ISubmodelElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -2729,7 +2873,7 @@ func RelationshipElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IRelationshipElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -2767,7 +2911,7 @@ func relationshipElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IRelationshipElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -2789,18 +2933,20 @@ func relationshipElementFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2815,17 +2961,19 @@ func relationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -2840,11 +2988,13 @@ func relationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -2855,11 +3005,13 @@ func relationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -2867,18 +3019,20 @@ func relationshipElementFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2893,17 +3047,19 @@ func relationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -2915,18 +3071,20 @@ func relationshipElementFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -2941,17 +3099,19 @@ func relationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -2965,29 +3125,33 @@ func relationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3002,17 +3166,19 @@ func relationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -3024,18 +3190,20 @@ func relationshipElementFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3050,17 +3218,19 @@ func relationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -3072,18 +3242,20 @@ func relationshipElementFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3098,17 +3270,19 @@ func relationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -3122,11 +3296,13 @@ func relationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "first",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "first",
+						},
+					)
+				}
 				return
 			}
 			foundFirst = true
@@ -3136,11 +3312,13 @@ func relationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "second",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "second",
+						},
+					)
+				}
 				return
 			}
 			foundSecond = true
@@ -3213,7 +3391,7 @@ func relationshipElementFromMapWithoutDispatch(
 // or return an error.
 func AASSubmodelElementsFromJsonable(
 	jsonable interface{},
-) (result aastypes.AASSubmodelElements, err *DeserializationError) {
+) (result aastypes.AASSubmodelElements, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of AASSubmodelElements, " +
@@ -3255,7 +3433,7 @@ func SubmodelElementListFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ISubmodelElementList,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -3286,7 +3464,7 @@ func submodelElementListFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ISubmodelElementList,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -3310,18 +3488,20 @@ func submodelElementListFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3336,17 +3516,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -3361,11 +3543,13 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -3376,11 +3560,13 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -3388,18 +3574,20 @@ func submodelElementListFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3414,17 +3602,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -3436,18 +3626,20 @@ func submodelElementListFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3462,17 +3654,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -3486,29 +3680,33 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3523,17 +3721,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -3545,18 +3745,20 @@ func submodelElementListFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3571,17 +3773,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -3593,18 +3797,20 @@ func submodelElementListFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3619,17 +3825,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -3644,11 +3852,13 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "orderRelevant",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "orderRelevant",
+						},
+					)
+				}
 				return
 			}
 			theOrderRelevant = &parsed
@@ -3658,11 +3868,13 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticIdListElement",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticIdListElement",
+						},
+					)
+				}
 				return
 			}
 
@@ -3671,11 +3883,13 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "typeValueListElement",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "typeValueListElement",
+						},
+					)
+				}
 				return
 			}
 			foundTypeValueListElement = true
@@ -3686,11 +3900,13 @@ func submodelElementListFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueTypeListElement",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueTypeListElement",
+						},
+					)
+				}
 				return
 			}
 			theValueTypeListElement = &parsed
@@ -3698,18 +3914,20 @@ func submodelElementListFromMapWithoutDispatch(
 		case "value":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "value",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3724,17 +3942,19 @@ func submodelElementListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "value",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "value",
+							},
+						)
+					}
 
 					return
 				}
@@ -3817,7 +4037,7 @@ func SubmodelElementCollectionFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ISubmodelElementCollection,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -3848,7 +4068,7 @@ func submodelElementCollectionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ISubmodelElementCollection,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -3866,18 +4086,20 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3892,17 +4114,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -3917,11 +4141,13 @@ func submodelElementCollectionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -3932,11 +4158,13 @@ func submodelElementCollectionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -3944,18 +4172,20 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -3970,17 +4200,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -3992,18 +4224,20 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4018,17 +4252,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -4042,29 +4278,33 @@ func submodelElementCollectionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4079,17 +4319,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -4101,18 +4343,20 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4127,17 +4371,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -4149,18 +4395,20 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4175,17 +4423,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -4197,18 +4447,20 @@ func submodelElementCollectionFromMapWithoutDispatch(
 		case "value":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "value",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4223,17 +4475,19 @@ func submodelElementCollectionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "value",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "value",
+							},
+						)
+					}
 
 					return
 				}
@@ -4298,7 +4552,7 @@ func DataElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IDataElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -4329,7 +4583,7 @@ func PropertyFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IProperty,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -4360,7 +4614,7 @@ func propertyFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IProperty,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -4382,18 +4636,20 @@ func propertyFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4408,17 +4664,19 @@ func propertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -4433,11 +4691,13 @@ func propertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -4448,11 +4708,13 @@ func propertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -4460,18 +4722,20 @@ func propertyFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4486,17 +4750,19 @@ func propertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -4508,18 +4774,20 @@ func propertyFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4534,17 +4802,19 @@ func propertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -4558,29 +4828,33 @@ func propertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4595,17 +4869,19 @@ func propertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -4617,18 +4893,20 @@ func propertyFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4643,17 +4921,19 @@ func propertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -4665,18 +4945,20 @@ func propertyFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4691,17 +4973,19 @@ func propertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -4715,11 +4999,13 @@ func propertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueType",
+						},
+					)
+				}
 				return
 			}
 			foundValueType = true
@@ -4730,11 +5016,13 @@ func propertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			theValue = &parsed
@@ -4744,11 +5032,13 @@ func propertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueId",
+						},
+					)
+				}
 				return
 			}
 
@@ -4820,7 +5110,7 @@ func MultiLanguagePropertyFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IMultiLanguageProperty,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -4851,7 +5141,7 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IMultiLanguageProperty,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -4870,18 +5160,20 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4896,17 +5188,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -4921,11 +5215,13 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -4936,11 +5232,13 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -4948,18 +5246,20 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -4974,17 +5274,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -4996,18 +5298,20 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5022,17 +5326,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -5046,29 +5352,33 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5083,17 +5393,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -5105,18 +5417,20 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5131,17 +5445,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -5153,18 +5469,20 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5179,17 +5497,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -5201,18 +5521,20 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 		case "value":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "value",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5227,17 +5549,19 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "value",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "value",
+							},
+						)
+					}
 
 					return
 				}
@@ -5251,11 +5575,13 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueId",
+						},
+					)
+				}
 				return
 			}
 
@@ -5318,7 +5644,7 @@ func RangeFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IRange,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -5349,7 +5675,7 @@ func rangeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IRange,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -5371,18 +5697,20 @@ func rangeFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5397,17 +5725,19 @@ func rangeFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -5422,11 +5752,13 @@ func rangeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -5437,11 +5769,13 @@ func rangeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -5449,18 +5783,20 @@ func rangeFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5475,17 +5811,19 @@ func rangeFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -5497,18 +5835,20 @@ func rangeFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5523,17 +5863,19 @@ func rangeFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -5547,29 +5889,33 @@ func rangeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5584,17 +5930,19 @@ func rangeFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -5606,18 +5954,20 @@ func rangeFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5632,17 +5982,19 @@ func rangeFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -5654,18 +6006,20 @@ func rangeFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5680,17 +6034,19 @@ func rangeFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -5704,11 +6060,13 @@ func rangeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueType",
+						},
+					)
+				}
 				return
 			}
 			foundValueType = true
@@ -5719,11 +6077,13 @@ func rangeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "min",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "min",
+						},
+					)
+				}
 				return
 			}
 			theMin = &parsed
@@ -5734,11 +6094,13 @@ func rangeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "max",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "max",
+						},
+					)
+				}
 				return
 			}
 			theMax = &parsed
@@ -5811,7 +6173,7 @@ func ReferenceElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IReferenceElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -5842,7 +6204,7 @@ func referenceElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IReferenceElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -5860,18 +6222,20 @@ func referenceElementFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5886,17 +6250,19 @@ func referenceElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -5911,11 +6277,13 @@ func referenceElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -5926,11 +6294,13 @@ func referenceElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -5938,18 +6308,20 @@ func referenceElementFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -5964,17 +6336,19 @@ func referenceElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -5986,18 +6360,20 @@ func referenceElementFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6012,17 +6388,19 @@ func referenceElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -6036,29 +6414,33 @@ func referenceElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6073,17 +6455,19 @@ func referenceElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -6095,18 +6479,20 @@ func referenceElementFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6121,17 +6507,19 @@ func referenceElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -6143,18 +6531,20 @@ func referenceElementFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6169,17 +6559,19 @@ func referenceElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -6193,11 +6585,13 @@ func referenceElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 
@@ -6257,7 +6651,7 @@ func BlobFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IBlob,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -6288,7 +6682,7 @@ func blobFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IBlob,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -6309,18 +6703,20 @@ func blobFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6335,17 +6731,19 @@ func blobFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -6360,11 +6758,13 @@ func blobFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -6375,11 +6775,13 @@ func blobFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -6387,18 +6789,20 @@ func blobFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6413,17 +6817,19 @@ func blobFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -6435,18 +6841,20 @@ func blobFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6461,17 +6869,19 @@ func blobFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -6485,29 +6895,33 @@ func blobFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6522,17 +6936,19 @@ func blobFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -6544,18 +6960,20 @@ func blobFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6570,17 +6988,19 @@ func blobFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -6592,18 +7012,20 @@ func blobFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6618,17 +7040,19 @@ func blobFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -6642,11 +7066,13 @@ func blobFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 
@@ -6655,11 +7081,13 @@ func blobFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "contentType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "contentType",
+						},
+					)
+				}
 				return
 			}
 			foundContentType = true
@@ -6729,7 +7157,7 @@ func FileFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IFile,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -6760,7 +7188,7 @@ func fileFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IFile,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -6781,18 +7209,20 @@ func fileFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6807,17 +7237,19 @@ func fileFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -6832,11 +7264,13 @@ func fileFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -6847,11 +7281,13 @@ func fileFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -6859,18 +7295,20 @@ func fileFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6885,17 +7323,19 @@ func fileFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -6907,18 +7347,20 @@ func fileFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6933,17 +7375,19 @@ func fileFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -6957,29 +7401,33 @@ func fileFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -6994,17 +7442,19 @@ func fileFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -7016,18 +7466,20 @@ func fileFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7042,17 +7494,19 @@ func fileFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -7064,18 +7518,20 @@ func fileFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7090,17 +7546,19 @@ func fileFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -7115,11 +7573,13 @@ func fileFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			theValue = &parsed
@@ -7129,11 +7589,13 @@ func fileFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "contentType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "contentType",
+						},
+					)
+				}
 				return
 			}
 			foundContentType = true
@@ -7203,7 +7665,7 @@ func AnnotatedRelationshipElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IAnnotatedRelationshipElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -7234,7 +7696,7 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IAnnotatedRelationshipElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -7257,18 +7719,20 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7283,17 +7747,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -7308,11 +7774,13 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -7323,11 +7791,13 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -7335,18 +7805,20 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7361,17 +7833,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -7383,18 +7857,20 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7409,17 +7885,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -7433,29 +7911,33 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7470,17 +7952,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -7492,18 +7976,20 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7518,17 +8004,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -7540,18 +8028,20 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7566,17 +8056,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -7590,11 +8082,13 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "first",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "first",
+						},
+					)
+				}
 				return
 			}
 			foundFirst = true
@@ -7604,11 +8098,13 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "second",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "second",
+						},
+					)
+				}
 				return
 			}
 			foundSecond = true
@@ -7616,18 +8112,20 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 		case "annotations":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "annotations",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7642,17 +8140,19 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "annotations",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "annotations",
+							},
+						)
+					}
 
 					return
 				}
@@ -7734,7 +8234,7 @@ func EntityFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IEntity,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -7765,7 +8265,7 @@ func entityFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IEntity,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -7788,18 +8288,20 @@ func entityFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7814,17 +8316,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -7839,11 +8343,13 @@ func entityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -7854,11 +8360,13 @@ func entityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -7866,18 +8374,20 @@ func entityFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7892,17 +8402,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -7914,18 +8426,20 @@ func entityFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -7940,17 +8454,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -7964,29 +8480,33 @@ func entityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8001,17 +8521,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -8023,18 +8545,20 @@ func entityFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8049,17 +8573,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -8071,18 +8597,20 @@ func entityFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8097,17 +8625,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -8119,18 +8649,20 @@ func entityFromMapWithoutDispatch(
 		case "statements":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "statements",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8145,17 +8677,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "statements",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "statements",
+							},
+						)
+					}
 
 					return
 				}
@@ -8169,11 +8703,13 @@ func entityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "entityType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "entityType",
+						},
+					)
+				}
 				return
 			}
 			foundEntityType = true
@@ -8184,11 +8720,13 @@ func entityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "globalAssetId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "globalAssetId",
+						},
+					)
+				}
 				return
 			}
 			theGlobalAssetID = &parsed
@@ -8196,18 +8734,20 @@ func entityFromMapWithoutDispatch(
 		case "specificAssetIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "specificAssetIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8222,17 +8762,19 @@ func entityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "specificAssetIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "specificAssetIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -8310,7 +8852,7 @@ func entityFromMapWithoutDispatch(
 // or return an error.
 func EntityTypeFromJsonable(
 	jsonable interface{},
-) (result aastypes.EntityType, err *DeserializationError) {
+) (result aastypes.EntityType, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of EntityType, " +
@@ -8350,7 +8892,7 @@ func EntityTypeFromJsonable(
 // or return an error.
 func DirectionFromJsonable(
 	jsonable interface{},
-) (result aastypes.Direction, err *DeserializationError) {
+) (result aastypes.Direction, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of Direction, " +
@@ -8390,7 +8932,7 @@ func DirectionFromJsonable(
 // or return an error.
 func StateOfEventFromJsonable(
 	jsonable interface{},
-) (result aastypes.StateOfEvent, err *DeserializationError) {
+) (result aastypes.StateOfEvent, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of StateOfEvent, " +
@@ -8432,7 +8974,7 @@ func EventPayloadFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IEventPayload,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -8463,7 +9005,7 @@ func eventPayloadFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IEventPayload,
-	err *DeserializationError,
+	err error,
 ) {
 	var theSource aastypes.IReference
 	var theSourceSemanticID aastypes.IReference
@@ -8485,11 +9027,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "source",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "source",
+						},
+					)
+				}
 				return
 			}
 			foundSource = true
@@ -8499,11 +9043,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "sourceSemanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "sourceSemanticId",
+						},
+					)
+				}
 				return
 			}
 
@@ -8512,11 +9058,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "observableReference",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "observableReference",
+						},
+					)
+				}
 				return
 			}
 			foundObservableReference = true
@@ -8526,11 +9074,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "observableSemanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "observableSemanticId",
+						},
+					)
+				}
 				return
 			}
 
@@ -8540,11 +9090,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "topic",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "topic",
+						},
+					)
+				}
 				return
 			}
 			theTopic = &parsed
@@ -8554,11 +9106,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "subjectId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "subjectId",
+						},
+					)
+				}
 				return
 			}
 
@@ -8567,11 +9121,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "timeStamp",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "timeStamp",
+						},
+					)
+				}
 				return
 			}
 			foundTimeStamp = true
@@ -8581,11 +9137,13 @@ func eventPayloadFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "payload",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "payload",
+						},
+					)
+				}
 				return
 			}
 
@@ -8651,7 +9209,7 @@ func EventElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IEventElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -8682,7 +9240,7 @@ func BasicEventElementFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IBasicEventElement,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -8713,7 +9271,7 @@ func basicEventElementFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IBasicEventElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -8742,18 +9300,20 @@ func basicEventElementFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8768,17 +9328,19 @@ func basicEventElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -8793,11 +9355,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -8808,11 +9372,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -8820,18 +9386,20 @@ func basicEventElementFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8846,17 +9414,19 @@ func basicEventElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -8868,18 +9438,20 @@ func basicEventElementFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8894,17 +9466,19 @@ func basicEventElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -8918,29 +9492,33 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -8955,17 +9533,19 @@ func basicEventElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -8977,18 +9557,20 @@ func basicEventElementFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9003,17 +9585,19 @@ func basicEventElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -9025,18 +9609,20 @@ func basicEventElementFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9051,17 +9637,19 @@ func basicEventElementFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -9075,11 +9663,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "observed",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "observed",
+						},
+					)
+				}
 				return
 			}
 			foundObserved = true
@@ -9089,11 +9679,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "direction",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "direction",
+						},
+					)
+				}
 				return
 			}
 			foundDirection = true
@@ -9103,11 +9695,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "state",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "state",
+						},
+					)
+				}
 				return
 			}
 			foundState = true
@@ -9118,11 +9712,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "messageTopic",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "messageTopic",
+						},
+					)
+				}
 				return
 			}
 			theMessageTopic = &parsed
@@ -9132,11 +9728,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "messageBroker",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "messageBroker",
+						},
+					)
+				}
 				return
 			}
 
@@ -9146,11 +9744,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "lastUpdate",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "lastUpdate",
+						},
+					)
+				}
 				return
 			}
 			theLastUpdate = &parsed
@@ -9161,11 +9761,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "minInterval",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "minInterval",
+						},
+					)
+				}
 				return
 			}
 			theMinInterval = &parsed
@@ -9176,11 +9778,13 @@ func basicEventElementFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "maxInterval",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "maxInterval",
+						},
+					)
+				}
 				return
 			}
 			theMaxInterval = &parsed
@@ -9278,7 +9882,7 @@ func OperationFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IOperation,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -9309,7 +9913,7 @@ func operationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IOperation,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -9329,18 +9933,20 @@ func operationFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9355,17 +9961,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -9380,11 +9988,13 @@ func operationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -9395,11 +10005,13 @@ func operationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -9407,18 +10019,20 @@ func operationFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9433,17 +10047,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -9455,18 +10071,20 @@ func operationFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9481,17 +10099,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -9505,29 +10125,33 @@ func operationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9542,17 +10166,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -9564,18 +10190,20 @@ func operationFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9590,17 +10218,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -9612,18 +10242,20 @@ func operationFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9638,17 +10270,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -9660,18 +10294,20 @@ func operationFromMapWithoutDispatch(
 		case "inputVariables":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "inputVariables",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9686,17 +10322,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "inputVariables",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "inputVariables",
+							},
+						)
+					}
 
 					return
 				}
@@ -9708,18 +10346,20 @@ func operationFromMapWithoutDispatch(
 		case "outputVariables":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "outputVariables",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9734,17 +10374,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "outputVariables",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "outputVariables",
+							},
+						)
+					}
 
 					return
 				}
@@ -9756,18 +10398,20 @@ func operationFromMapWithoutDispatch(
 		case "inoutputVariables":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "inoutputVariables",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -9782,17 +10426,19 @@ func operationFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "inoutputVariables",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "inoutputVariables",
+							},
+						)
+					}
 
 					return
 				}
@@ -9863,7 +10509,7 @@ func OperationVariableFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IOperationVariable,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -9894,7 +10540,7 @@ func operationVariableFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IOperationVariable,
-	err *DeserializationError,
+	err error,
 ) {
 	var theValue aastypes.ISubmodelElement
 
@@ -9907,11 +10553,13 @@ func operationVariableFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			foundValue = true
@@ -9947,7 +10595,7 @@ func CapabilityFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ICapability,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -9978,7 +10626,7 @@ func capabilityFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ICapability,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -9995,18 +10643,20 @@ func capabilityFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10021,17 +10671,19 @@ func capabilityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -10046,11 +10698,13 @@ func capabilityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -10061,11 +10715,13 @@ func capabilityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -10073,18 +10729,20 @@ func capabilityFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10099,17 +10757,19 @@ func capabilityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -10121,18 +10781,20 @@ func capabilityFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10147,17 +10809,19 @@ func capabilityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -10171,29 +10835,33 @@ func capabilityFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "semanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "semanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "supplementalSemanticIds":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "supplementalSemanticIds",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10208,17 +10876,19 @@ func capabilityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "supplementalSemanticIds",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "supplementalSemanticIds",
+							},
+						)
+					}
 
 					return
 				}
@@ -10230,18 +10900,20 @@ func capabilityFromMapWithoutDispatch(
 		case "qualifiers":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "qualifiers",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10256,17 +10928,19 @@ func capabilityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "qualifiers",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "qualifiers",
+							},
+						)
+					}
 
 					return
 				}
@@ -10278,18 +10952,20 @@ func capabilityFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10304,17 +10980,19 @@ func capabilityFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -10376,7 +11054,7 @@ func ConceptDescriptionFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IConceptDescription,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -10407,7 +11085,7 @@ func conceptDescriptionFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IConceptDescription,
-	err *DeserializationError,
+	err error,
 ) {
 	var theExtensions []aastypes.IExtension
 	var theCategory *string
@@ -10426,18 +11104,20 @@ func conceptDescriptionFromMapWithoutDispatch(
 		case "extensions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "extensions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10452,17 +11132,19 @@ func conceptDescriptionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "extensions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "extensions",
+							},
+						)
+					}
 
 					return
 				}
@@ -10477,11 +11159,13 @@ func conceptDescriptionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "category",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "category",
+						},
+					)
+				}
 				return
 			}
 			theCategory = &parsed
@@ -10492,11 +11176,13 @@ func conceptDescriptionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "idShort",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "idShort",
+						},
+					)
+				}
 				return
 			}
 			theIDShort = &parsed
@@ -10504,18 +11190,20 @@ func conceptDescriptionFromMapWithoutDispatch(
 		case "displayName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "displayName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10530,17 +11218,19 @@ func conceptDescriptionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "displayName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "displayName",
+							},
+						)
+					}
 
 					return
 				}
@@ -10552,18 +11242,20 @@ func conceptDescriptionFromMapWithoutDispatch(
 		case "description":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "description",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10578,17 +11270,19 @@ func conceptDescriptionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "description",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "description",
+							},
+						)
+					}
 
 					return
 				}
@@ -10602,11 +11296,13 @@ func conceptDescriptionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "administration",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "administration",
+						},
+					)
+				}
 				return
 			}
 
@@ -10615,11 +11311,13 @@ func conceptDescriptionFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "id",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "id",
+						},
+					)
+				}
 				return
 			}
 			foundID = true
@@ -10627,18 +11325,20 @@ func conceptDescriptionFromMapWithoutDispatch(
 		case "embeddedDataSpecifications":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "embeddedDataSpecifications",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10653,17 +11353,19 @@ func conceptDescriptionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "embeddedDataSpecifications",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "embeddedDataSpecifications",
+							},
+						)
+					}
 
 					return
 				}
@@ -10675,18 +11377,20 @@ func conceptDescriptionFromMapWithoutDispatch(
 		case "isCaseOf":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "isCaseOf",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10701,17 +11405,19 @@ func conceptDescriptionFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "isCaseOf",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "isCaseOf",
+							},
+						)
+					}
 
 					return
 				}
@@ -10777,7 +11483,7 @@ func conceptDescriptionFromMapWithoutDispatch(
 // or return an error.
 func ReferenceTypesFromJsonable(
 	jsonable interface{},
-) (result aastypes.ReferenceTypes, err *DeserializationError) {
+) (result aastypes.ReferenceTypes, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of ReferenceTypes, " +
@@ -10819,7 +11525,7 @@ func ReferenceFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IReference,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -10850,7 +11556,7 @@ func referenceFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IReference,
-	err *DeserializationError,
+	err error,
 ) {
 	var theType aastypes.ReferenceTypes
 	var theReferredSemanticID aastypes.IReference
@@ -10866,11 +11572,13 @@ func referenceFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "type",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "type",
+						},
+					)
+				}
 				return
 			}
 			foundType = true
@@ -10880,29 +11588,33 @@ func referenceFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "referredSemanticId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "referredSemanticId",
+						},
+					)
+				}
 				return
 			}
 
 		case "keys":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "keys",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -10917,17 +11629,19 @@ func referenceFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "keys",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "keys",
+							},
+						)
+					}
 
 					return
 				}
@@ -10979,7 +11693,7 @@ func KeyFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IKey,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11010,7 +11724,7 @@ func keyFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IKey,
-	err *DeserializationError,
+	err error,
 ) {
 	var theType aastypes.KeyTypes
 	var theValue string
@@ -11025,11 +11739,13 @@ func keyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "type",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "type",
+						},
+					)
+				}
 				return
 			}
 			foundType = true
@@ -11039,11 +11755,13 @@ func keyFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			foundValue = true
@@ -11085,7 +11803,7 @@ func keyFromMapWithoutDispatch(
 // or return an error.
 func KeyTypesFromJsonable(
 	jsonable interface{},
-) (result aastypes.KeyTypes, err *DeserializationError) {
+) (result aastypes.KeyTypes, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of KeyTypes, " +
@@ -11125,7 +11843,7 @@ func KeyTypesFromJsonable(
 // or return an error.
 func DataTypeDefXSDFromJsonable(
 	jsonable interface{},
-) (result aastypes.DataTypeDefXSD, err *DeserializationError) {
+) (result aastypes.DataTypeDefXSD, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of DataTypeDefXSD, " +
@@ -11167,7 +11885,7 @@ func AbstractLangStringFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IAbstractLangString,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11198,7 +11916,7 @@ func LangStringNameTypeFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ILangStringNameType,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11229,7 +11947,7 @@ func langStringNameTypeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ILangStringNameType,
-	err *DeserializationError,
+	err error,
 ) {
 	var theLanguage string
 	var theText string
@@ -11244,11 +11962,13 @@ func langStringNameTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "language",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "language",
+						},
+					)
+				}
 				return
 			}
 			foundLanguage = true
@@ -11258,11 +11978,13 @@ func langStringNameTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "text",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "text",
+						},
+					)
+				}
 				return
 			}
 			foundText = true
@@ -11306,7 +12028,7 @@ func LangStringTextTypeFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ILangStringTextType,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11337,7 +12059,7 @@ func langStringTextTypeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ILangStringTextType,
-	err *DeserializationError,
+	err error,
 ) {
 	var theLanguage string
 	var theText string
@@ -11352,11 +12074,13 @@ func langStringTextTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "language",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "language",
+						},
+					)
+				}
 				return
 			}
 			foundLanguage = true
@@ -11366,11 +12090,13 @@ func langStringTextTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "text",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "text",
+						},
+					)
+				}
 				return
 			}
 			foundText = true
@@ -11414,7 +12140,7 @@ func EnvironmentFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IEnvironment,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11445,7 +12171,7 @@ func environmentFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IEnvironment,
-	err *DeserializationError,
+	err error,
 ) {
 	var theAssetAdministrationShells []aastypes.IAssetAdministrationShell
 	var theSubmodels []aastypes.ISubmodel
@@ -11456,18 +12182,20 @@ func environmentFromMapWithoutDispatch(
 		case "assetAdministrationShells":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "assetAdministrationShells",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -11482,17 +12210,19 @@ func environmentFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "assetAdministrationShells",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "assetAdministrationShells",
+							},
+						)
+					}
 
 					return
 				}
@@ -11504,18 +12234,20 @@ func environmentFromMapWithoutDispatch(
 		case "submodels":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "submodels",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -11530,17 +12262,19 @@ func environmentFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "submodels",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "submodels",
+							},
+						)
+					}
 
 					return
 				}
@@ -11552,18 +12286,20 @@ func environmentFromMapWithoutDispatch(
 		case "conceptDescriptions":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "conceptDescriptions",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -11578,17 +12314,19 @@ func environmentFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "conceptDescriptions",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "conceptDescriptions",
+							},
+						)
+					}
 
 					return
 				}
@@ -11628,7 +12366,7 @@ func DataSpecificationContentFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IDataSpecificationContent,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11659,7 +12397,7 @@ func EmbeddedDataSpecificationFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IEmbeddedDataSpecification,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11690,7 +12428,7 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IEmbeddedDataSpecification,
-	err *DeserializationError,
+	err error,
 ) {
 	var theDataSpecificationContent aastypes.IDataSpecificationContent
 	var theDataSpecification aastypes.IReference
@@ -11704,11 +12442,13 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "dataSpecificationContent",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "dataSpecificationContent",
+						},
+					)
+				}
 				return
 			}
 			foundDataSpecificationContent = true
@@ -11718,11 +12458,13 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "dataSpecification",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "dataSpecification",
+						},
+					)
+				}
 				return
 			}
 
@@ -11758,7 +12500,7 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 // or return an error.
 func DataTypeIEC61360FromJsonable(
 	jsonable interface{},
-) (result aastypes.DataTypeIEC61360, err *DeserializationError) {
+) (result aastypes.DataTypeIEC61360, err error) {
 	if jsonable == nil {
 		err = newDeserializationError(
 			"Expected a string representation of DataTypeIEC61360, " +
@@ -11800,7 +12542,7 @@ func LevelTypeFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ILevelType,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11831,7 +12573,7 @@ func levelTypeFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ILevelType,
-	err *DeserializationError,
+	err error,
 ) {
 	var theMin bool
 	var theNom bool
@@ -11850,11 +12592,13 @@ func levelTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "min",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "min",
+						},
+					)
+				}
 				return
 			}
 			foundMin = true
@@ -11864,11 +12608,13 @@ func levelTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "nom",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "nom",
+						},
+					)
+				}
 				return
 			}
 			foundNom = true
@@ -11878,11 +12624,13 @@ func levelTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "typ",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "typ",
+						},
+					)
+				}
 				return
 			}
 			foundTyp = true
@@ -11892,11 +12640,13 @@ func levelTypeFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "max",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "max",
+						},
+					)
+				}
 				return
 			}
 			foundMax = true
@@ -11956,7 +12706,7 @@ func ValueReferencePairFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IValueReferencePair,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -11987,7 +12737,7 @@ func valueReferencePairFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IValueReferencePair,
-	err *DeserializationError,
+	err error,
 ) {
 	var theValue string
 	var theValueID aastypes.IReference
@@ -12002,11 +12752,13 @@ func valueReferencePairFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			foundValue = true
@@ -12016,11 +12768,13 @@ func valueReferencePairFromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueId",
+						},
+					)
+				}
 				return
 			}
 			foundValueID = true
@@ -12064,7 +12818,7 @@ func ValueListFromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IValueList,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -12095,7 +12849,7 @@ func valueListFromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IValueList,
-	err *DeserializationError,
+	err error,
 ) {
 	var theValueReferencePairs []aastypes.IValueReferencePair
 
@@ -12106,18 +12860,20 @@ func valueListFromMapWithoutDispatch(
 		case "valueReferencePairs":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "valueReferencePairs",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -12132,17 +12888,19 @@ func valueListFromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "valueReferencePairs",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "valueReferencePairs",
+							},
+						)
+					}
 
 					return
 				}
@@ -12183,7 +12941,7 @@ func LangStringPreferredNameTypeIEC61360FromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ILangStringPreferredNameTypeIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -12214,7 +12972,7 @@ func langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ILangStringPreferredNameTypeIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	var theLanguage string
 	var theText string
@@ -12229,11 +12987,13 @@ func langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "language",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "language",
+						},
+					)
+				}
 				return
 			}
 			foundLanguage = true
@@ -12243,11 +13003,13 @@ func langStringPreferredNameTypeIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "text",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "text",
+						},
+					)
+				}
 				return
 			}
 			foundText = true
@@ -12291,7 +13053,7 @@ func LangStringShortNameTypeIEC61360FromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ILangStringShortNameTypeIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -12322,7 +13084,7 @@ func langStringShortNameTypeIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ILangStringShortNameTypeIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	var theLanguage string
 	var theText string
@@ -12337,11 +13099,13 @@ func langStringShortNameTypeIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "language",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "language",
+						},
+					)
+				}
 				return
 			}
 			foundLanguage = true
@@ -12351,11 +13115,13 @@ func langStringShortNameTypeIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "text",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "text",
+						},
+					)
+				}
 				return
 			}
 			foundText = true
@@ -12399,7 +13165,7 @@ func LangStringDefinitionTypeIEC61360FromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.ILangStringDefinitionTypeIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -12430,7 +13196,7 @@ func langStringDefinitionTypeIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.ILangStringDefinitionTypeIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	var theLanguage string
 	var theText string
@@ -12445,11 +13211,13 @@ func langStringDefinitionTypeIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "language",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "language",
+						},
+					)
+				}
 				return
 			}
 			foundLanguage = true
@@ -12459,11 +13227,13 @@ func langStringDefinitionTypeIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "text",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "text",
+						},
+					)
+				}
 				return
 			}
 			foundText = true
@@ -12507,7 +13277,7 @@ func DataSpecificationIEC61360FromJsonable(
 	jsonable interface{},
 ) (
 	result aastypes.IDataSpecificationIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	if jsonable == nil {
 		err = newDeserializationError(
@@ -12538,7 +13308,7 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 	m map[string]interface{},
 ) (
 	result aastypes.IDataSpecificationIEC61360,
-	err *DeserializationError,
+	err error,
 ) {
 	var thePreferredName []aastypes.ILangStringPreferredNameTypeIEC61360
 	var theShortName []aastypes.ILangStringShortNameTypeIEC61360
@@ -12560,18 +13330,20 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 		case "preferredName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "preferredName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -12586,17 +13358,19 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "preferredName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "preferredName",
+							},
+						)
+					}
 
 					return
 				}
@@ -12609,18 +13383,20 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 		case "shortName":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "shortName",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -12635,17 +13411,19 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "shortName",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "shortName",
+							},
+						)
+					}
 
 					return
 				}
@@ -12660,11 +13438,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "unit",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "unit",
+						},
+					)
+				}
 				return
 			}
 			theUnit = &parsed
@@ -12674,11 +13454,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "unitId",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "unitId",
+						},
+					)
+				}
 				return
 			}
 
@@ -12688,11 +13470,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "sourceOfDefinition",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "sourceOfDefinition",
+						},
+					)
+				}
 				return
 			}
 			theSourceOfDefinition = &parsed
@@ -12703,11 +13487,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "symbol",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "symbol",
+						},
+					)
+				}
 				return
 			}
 			theSymbol = &parsed
@@ -12718,11 +13504,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "dataType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "dataType",
+						},
+					)
+				}
 				return
 			}
 			theDataType = &parsed
@@ -12730,18 +13518,20 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 		case "definition":
 			jsonableArray, ok := v.([]interface{})
 			if !ok {
-				err = newDeserializationError(
+				deseriaErr := newDeserializationError(
 					fmt.Sprintf(
 						"Expected an array, but got %T",
 						v,
 					),
 				)
 
-				err.Path.PrependName(
+				deseriaErr.Path.PrependName(
 					&aasreporting.NameSegment{
 						Name: "definition",
 					},
 				)
+
+				err = deseriaErr
 
 				return
 			}
@@ -12756,17 +13546,19 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 					itemJsonable,
 				)
 				if err != nil {
-					err.Path.PrependIndex(
-						&aasreporting.IndexSegment{
-							Index: i,
-						},
-					)
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
 
-					err.Path.PrependName(
-						&aasreporting.NameSegment{
-							Name: "definition",
-						},
-					)
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "definition",
+							},
+						)
+					}
 
 					return
 				}
@@ -12781,11 +13573,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueFormat",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueFormat",
+						},
+					)
+				}
 				return
 			}
 			theValueFormat = &parsed
@@ -12795,11 +13589,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "valueList",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "valueList",
+						},
+					)
+				}
 				return
 			}
 
@@ -12809,11 +13605,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "value",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "value",
+						},
+					)
+				}
 				return
 			}
 			theValue = &parsed
@@ -12823,11 +13621,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "levelType",
-					},
-				)
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "levelType",
+						},
+					)
+				}
 				return
 			}
 
@@ -12899,7 +13699,7 @@ func hasSemanticsFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IHasSemantics,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -12980,7 +13780,7 @@ func hasExtensionsFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IHasExtensions,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13059,7 +13859,7 @@ func referableFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IReferable,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13138,7 +13938,7 @@ func identifiableFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IIdentifiable,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13189,7 +13989,7 @@ func hasKindFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IHasKind,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13236,7 +14036,7 @@ func hasDataSpecificationFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IHasDataSpecification,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13317,7 +14117,7 @@ func qualifiableFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IQualifiable,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13392,7 +14192,7 @@ func submodelElementFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.ISubmodelElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13465,7 +14265,7 @@ func relationshipElementFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IRelationshipElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13514,7 +14314,7 @@ func dataElementFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IDataElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13571,7 +14371,7 @@ func eventElementFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IEventElement,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13618,7 +14418,7 @@ func abstractLangStringFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IAbstractLangString,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13673,7 +14473,7 @@ func dataSpecificationContentFromMap(
 	m map[string]interface{},
 ) (
 	result aastypes.IDataSpecificationContent,
-	err *DeserializationError,
+	err error,
 ) {
 	var modelTypeAny interface{}
 	var ok bool
@@ -13749,7 +14549,7 @@ func (se *SerializationError) PathString() string {
 // Try to cast `that` to a float64, or return an error.
 func int64ToJsonable(
 	that int64,
-) (result float64, err *SerializationError) {
+) (result float64, err error) {
 	if that > 9007199254740991 || that < -9007199254740991 {
 		err = newSerializationError(
 			fmt.Sprintf(
@@ -13767,7 +14567,7 @@ func int64ToJsonable(
 // Encode `bytes` to a base64 string.
 func bytesToJsonable(
 	bytes []byte,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	if bytes == nil {
 		err = newSerializationError(
 			"Expected an array of bytes, but got nil",
@@ -13784,7 +14584,7 @@ func bytesToJsonable(
 // Serialize `that` to a string, or return an error.
 func ModellingKindToJsonable(
 	that aastypes.ModellingKind,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.ModellingKindToString(
 		that,
@@ -13805,7 +14605,7 @@ func ModellingKindToJsonable(
 // Serialize `that` to a string, or return an error.
 func QualifierKindToJsonable(
 	that aastypes.QualifierKind,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.QualifierKindToString(
 		that,
@@ -13826,7 +14626,7 @@ func QualifierKindToJsonable(
 // Serialize `that` to a string, or return an error.
 func AssetKindToJsonable(
 	that aastypes.AssetKind,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.AssetKindToString(
 		that,
@@ -13847,7 +14647,7 @@ func AssetKindToJsonable(
 // Serialize `that` to a string, or return an error.
 func AASSubmodelElementsToJsonable(
 	that aastypes.AASSubmodelElements,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.AASSubmodelElementsToString(
 		that,
@@ -13868,7 +14668,7 @@ func AASSubmodelElementsToJsonable(
 // Serialize `that` to a string, or return an error.
 func EntityTypeToJsonable(
 	that aastypes.EntityType,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.EntityTypeToString(
 		that,
@@ -13889,7 +14689,7 @@ func EntityTypeToJsonable(
 // Serialize `that` to a string, or return an error.
 func DirectionToJsonable(
 	that aastypes.Direction,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.DirectionToString(
 		that,
@@ -13910,7 +14710,7 @@ func DirectionToJsonable(
 // Serialize `that` to a string, or return an error.
 func StateOfEventToJsonable(
 	that aastypes.StateOfEvent,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.StateOfEventToString(
 		that,
@@ -13931,7 +14731,7 @@ func StateOfEventToJsonable(
 // Serialize `that` to a string, or return an error.
 func ReferenceTypesToJsonable(
 	that aastypes.ReferenceTypes,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.ReferenceTypesToString(
 		that,
@@ -13952,7 +14752,7 @@ func ReferenceTypesToJsonable(
 // Serialize `that` to a string, or return an error.
 func KeyTypesToJsonable(
 	that aastypes.KeyTypes,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.KeyTypesToString(
 		that,
@@ -13973,7 +14773,7 @@ func KeyTypesToJsonable(
 // Serialize `that` to a string, or return an error.
 func DataTypeDefXSDToJsonable(
 	that aastypes.DataTypeDefXSD,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.DataTypeDefXSDToString(
 		that,
@@ -13994,7 +14794,7 @@ func DataTypeDefXSDToJsonable(
 // Serialize `that` to a string, or return an error.
 func DataTypeIEC61360ToJsonable(
 	that aastypes.DataTypeIEC61360,
-) (result string, err *SerializationError) {
+) (result string, err error) {
 	var ok bool
 	result, ok = aasstringification.DataTypeIEC61360ToString(
 		that,
@@ -14020,7 +14820,7 @@ func DataTypeIEC61360ToJsonable(
 // [ToJsonable].
 func extensionToMap(
 	that aastypes.IExtension,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.SemanticID() != nil {
@@ -14029,11 +14829,13 @@ func extensionToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14051,17 +14853,19 @@ func extensionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14078,11 +14882,13 @@ func extensionToMap(
 			*(that.ValueType()),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueType()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueType()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14104,17 +14910,19 @@ func extensionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "RefersTo()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "RefersTo()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14134,7 +14942,7 @@ func extensionToMap(
 // [ToJsonable].
 func administrativeInformationToMap(
 	that aastypes.IAdministrativeInformation,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.EmbeddedDataSpecifications() != nil {
@@ -14148,17 +14956,19 @@ func administrativeInformationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14181,11 +14991,13 @@ func administrativeInformationToMap(
 			that.Creator(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Creator()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Creator()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14207,7 +15019,7 @@ func administrativeInformationToMap(
 // [ToJsonable].
 func qualifierToMap(
 	that aastypes.IQualifier,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.SemanticID() != nil {
@@ -14216,11 +15028,13 @@ func qualifierToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14238,17 +15052,19 @@ func qualifierToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14263,11 +15079,13 @@ func qualifierToMap(
 			*(that.Kind()),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Kind()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Kind()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14281,11 +15099,13 @@ func qualifierToMap(
 		that.ValueType(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueType()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueType()",
+				},
+			)
+		}
 
 		return
 	}
@@ -14301,11 +15121,13 @@ func qualifierToMap(
 			that.ValueID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14323,7 +15145,7 @@ func qualifierToMap(
 // [ToJsonable].
 func assetAdministrationShellToMap(
 	that aastypes.IAssetAdministrationShell,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -14337,17 +15159,19 @@ func assetAdministrationShellToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14375,17 +15199,19 @@ func assetAdministrationShellToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14405,17 +15231,19 @@ func assetAdministrationShellToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14430,11 +15258,13 @@ func assetAdministrationShellToMap(
 			that.Administration(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Administration()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Administration()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14454,17 +15284,19 @@ func assetAdministrationShellToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14479,11 +15311,13 @@ func assetAdministrationShellToMap(
 			that.DerivedFrom(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "DerivedFrom()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DerivedFrom()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14495,11 +15329,13 @@ func assetAdministrationShellToMap(
 		that.AssetInformation(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "AssetInformation()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "AssetInformation()",
+				},
+			)
+		}
 
 		return
 	}
@@ -14516,17 +15352,19 @@ func assetAdministrationShellToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Submodels()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Submodels()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14548,7 +15386,7 @@ func assetAdministrationShellToMap(
 // [ToJsonable].
 func assetInformationToMap(
 	that aastypes.IAssetInformation,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	var jsonableAssetKind interface{}
@@ -14556,11 +15394,13 @@ func assetInformationToMap(
 		that.AssetKind(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "AssetKind()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "AssetKind()",
+				},
+			)
+		}
 
 		return
 	}
@@ -14581,17 +15421,19 @@ func assetInformationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SpecificAssetIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SpecificAssetIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14610,11 +15452,13 @@ func assetInformationToMap(
 			that.DefaultThumbnail(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "DefaultThumbnail()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DefaultThumbnail()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14632,7 +15476,7 @@ func assetInformationToMap(
 // [ToJsonable].
 func resourceToMap(
 	that aastypes.IResource,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["path"] = that.Path()
@@ -14652,7 +15496,7 @@ func resourceToMap(
 // [ToJsonable].
 func specificAssetIDToMap(
 	that aastypes.ISpecificAssetID,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.SemanticID() != nil {
@@ -14661,11 +15505,13 @@ func specificAssetIDToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14683,17 +15529,19 @@ func specificAssetIDToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14712,11 +15560,13 @@ func specificAssetIDToMap(
 			that.ExternalSubjectID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ExternalSubjectID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ExternalSubjectID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14734,7 +15584,7 @@ func specificAssetIDToMap(
 // [ToJsonable].
 func submodelToMap(
 	that aastypes.ISubmodel,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -14748,17 +15598,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14786,17 +15638,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14816,17 +15670,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14841,11 +15697,13 @@ func submodelToMap(
 			that.Administration(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Administration()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Administration()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14860,11 +15718,13 @@ func submodelToMap(
 			*(that.Kind()),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Kind()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Kind()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14877,11 +15737,13 @@ func submodelToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -14899,17 +15761,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14929,17 +15793,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14959,17 +15825,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -14989,17 +15857,19 @@ func submodelToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SubmodelElements()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SubmodelElements()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15021,7 +15891,7 @@ func submodelToMap(
 // [ToJsonable].
 func relationshipElementToMap(
 	that aastypes.IRelationshipElement,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -15035,17 +15905,19 @@ func relationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15073,17 +15945,19 @@ func relationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15103,17 +15977,19 @@ func relationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15128,11 +16004,13 @@ func relationshipElementToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -15150,17 +16028,19 @@ func relationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15180,17 +16060,19 @@ func relationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15210,17 +16092,19 @@ func relationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15234,11 +16118,13 @@ func relationshipElementToMap(
 		that.First(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "First()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "First()",
+				},
+			)
+		}
 
 		return
 	}
@@ -15249,11 +16135,13 @@ func relationshipElementToMap(
 		that.Second(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Second()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Second()",
+				},
+			)
+		}
 
 		return
 	}
@@ -15272,7 +16160,7 @@ func relationshipElementToMap(
 // [ToJsonable].
 func submodelElementListToMap(
 	that aastypes.ISubmodelElementList,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -15286,17 +16174,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15324,17 +16214,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15354,17 +16246,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15379,11 +16273,13 @@ func submodelElementListToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -15401,17 +16297,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15431,17 +16329,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15461,17 +16361,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15490,11 +16392,13 @@ func submodelElementListToMap(
 			that.SemanticIDListElement(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticIDListElement()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticIDListElement()",
+					},
+				)
+			}
 
 			return
 		}
@@ -15506,11 +16410,13 @@ func submodelElementListToMap(
 		that.TypeValueListElement(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "TypeValueListElement()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "TypeValueListElement()",
+				},
+			)
+		}
 
 		return
 	}
@@ -15522,11 +16428,13 @@ func submodelElementListToMap(
 			*(that.ValueTypeListElement()),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueTypeListElement()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueTypeListElement()",
+					},
+				)
+			}
 
 			return
 		}
@@ -15544,17 +16452,19 @@ func submodelElementListToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Value()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Value()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15576,7 +16486,7 @@ func submodelElementListToMap(
 // [ToJsonable].
 func submodelElementCollectionToMap(
 	that aastypes.ISubmodelElementCollection,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -15590,17 +16500,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15628,17 +16540,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15658,17 +16572,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15683,11 +16599,13 @@ func submodelElementCollectionToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -15705,17 +16623,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15735,17 +16655,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15765,17 +16687,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15795,17 +16719,19 @@ func submodelElementCollectionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Value()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Value()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15827,7 +16753,7 @@ func submodelElementCollectionToMap(
 // [ToJsonable].
 func propertyToMap(
 	that aastypes.IProperty,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -15841,17 +16767,19 @@ func propertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15879,17 +16807,19 @@ func propertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15909,17 +16839,19 @@ func propertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15934,11 +16866,13 @@ func propertyToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -15956,17 +16890,19 @@ func propertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -15986,17 +16922,19 @@ func propertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16016,17 +16954,19 @@ func propertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16040,11 +16980,13 @@ func propertyToMap(
 		that.ValueType(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueType()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueType()",
+				},
+			)
+		}
 
 		return
 	}
@@ -16060,11 +17002,13 @@ func propertyToMap(
 			that.ValueID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16084,7 +17028,7 @@ func propertyToMap(
 // [ToJsonable].
 func multiLanguagePropertyToMap(
 	that aastypes.IMultiLanguageProperty,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -16098,17 +17042,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16136,17 +17082,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16166,17 +17114,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16191,11 +17141,13 @@ func multiLanguagePropertyToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16213,17 +17165,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16243,17 +17197,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16273,17 +17229,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16303,17 +17261,19 @@ func multiLanguagePropertyToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Value()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Value()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16328,11 +17288,13 @@ func multiLanguagePropertyToMap(
 			that.ValueID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16352,7 +17314,7 @@ func multiLanguagePropertyToMap(
 // [ToJsonable].
 func rangeToMap(
 	that aastypes.IRange,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -16366,17 +17328,19 @@ func rangeToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16404,17 +17368,19 @@ func rangeToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16434,17 +17400,19 @@ func rangeToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16459,11 +17427,13 @@ func rangeToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16481,17 +17451,19 @@ func rangeToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16511,17 +17483,19 @@ func rangeToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16541,17 +17515,19 @@ func rangeToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16565,11 +17541,13 @@ func rangeToMap(
 		that.ValueType(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueType()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueType()",
+				},
+			)
+		}
 
 		return
 	}
@@ -16596,7 +17574,7 @@ func rangeToMap(
 // [ToJsonable].
 func referenceElementToMap(
 	that aastypes.IReferenceElement,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -16610,17 +17588,19 @@ func referenceElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16648,17 +17628,19 @@ func referenceElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16678,17 +17660,19 @@ func referenceElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16703,11 +17687,13 @@ func referenceElementToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16725,17 +17711,19 @@ func referenceElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16755,17 +17743,19 @@ func referenceElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16785,17 +17775,19 @@ func referenceElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16810,11 +17802,13 @@ func referenceElementToMap(
 			that.Value(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Value()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Value()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16834,7 +17828,7 @@ func referenceElementToMap(
 // [ToJsonable].
 func blobToMap(
 	that aastypes.IBlob,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -16848,17 +17842,19 @@ func blobToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16886,17 +17882,19 @@ func blobToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16916,17 +17914,19 @@ func blobToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16941,11 +17941,13 @@ func blobToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -16963,17 +17965,19 @@ func blobToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -16993,17 +17997,19 @@ func blobToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17023,17 +18029,19 @@ func blobToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17048,11 +18056,13 @@ func blobToMap(
 			that.Value(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Value()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Value()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17074,7 +18084,7 @@ func blobToMap(
 // [ToJsonable].
 func fileToMap(
 	that aastypes.IFile,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -17088,17 +18098,19 @@ func fileToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17126,17 +18138,19 @@ func fileToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17156,17 +18170,19 @@ func fileToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17181,11 +18197,13 @@ func fileToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17203,17 +18221,19 @@ func fileToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17233,17 +18253,19 @@ func fileToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17263,17 +18285,19 @@ func fileToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17301,7 +18325,7 @@ func fileToMap(
 // [ToJsonable].
 func annotatedRelationshipElementToMap(
 	that aastypes.IAnnotatedRelationshipElement,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -17315,17 +18339,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17353,17 +18379,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17383,17 +18411,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17408,11 +18438,13 @@ func annotatedRelationshipElementToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17430,17 +18462,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17460,17 +18494,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17490,17 +18526,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17514,11 +18552,13 @@ func annotatedRelationshipElementToMap(
 		that.First(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "First()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "First()",
+				},
+			)
+		}
 
 		return
 	}
@@ -17529,11 +18569,13 @@ func annotatedRelationshipElementToMap(
 		that.Second(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Second()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Second()",
+				},
+			)
+		}
 
 		return
 	}
@@ -17550,17 +18592,19 @@ func annotatedRelationshipElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Annotations()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Annotations()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17582,7 +18626,7 @@ func annotatedRelationshipElementToMap(
 // [ToJsonable].
 func entityToMap(
 	that aastypes.IEntity,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -17596,17 +18640,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17634,17 +18680,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17664,17 +18712,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17689,11 +18739,13 @@ func entityToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17711,17 +18763,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17741,17 +18795,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17771,17 +18827,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17801,17 +18859,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Statements()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Statements()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17825,11 +18885,13 @@ func entityToMap(
 		that.EntityType(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "EntityType()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "EntityType()",
+				},
+			)
+		}
 
 		return
 	}
@@ -17850,17 +18912,19 @@ func entityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SpecificAssetIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SpecificAssetIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -17882,7 +18946,7 @@ func entityToMap(
 // [ToJsonable].
 func eventPayloadToMap(
 	that aastypes.IEventPayload,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	var jsonableSource interface{}
@@ -17890,11 +18954,13 @@ func eventPayloadToMap(
 		that.Source(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Source()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Source()",
+				},
+			)
+		}
 
 		return
 	}
@@ -17906,11 +18972,13 @@ func eventPayloadToMap(
 			that.SourceSemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SourceSemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SourceSemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17922,11 +18990,13 @@ func eventPayloadToMap(
 		that.ObservableReference(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ObservableReference()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ObservableReference()",
+				},
+			)
+		}
 
 		return
 	}
@@ -17938,11 +19008,13 @@ func eventPayloadToMap(
 			that.ObservableSemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ObservableSemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ObservableSemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17959,11 +19031,13 @@ func eventPayloadToMap(
 			that.SubjectID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SubjectID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SubjectID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -17978,11 +19052,13 @@ func eventPayloadToMap(
 			that.Payload(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Payload()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Payload()",
+					},
+				)
+			}
 
 			return
 		}
@@ -18000,7 +19076,7 @@ func eventPayloadToMap(
 // [ToJsonable].
 func basicEventElementToMap(
 	that aastypes.IBasicEventElement,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -18014,17 +19090,19 @@ func basicEventElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18052,17 +19130,19 @@ func basicEventElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18082,17 +19162,19 @@ func basicEventElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18107,11 +19189,13 @@ func basicEventElementToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -18129,17 +19213,19 @@ func basicEventElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18159,17 +19245,19 @@ func basicEventElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18189,17 +19277,19 @@ func basicEventElementToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18213,11 +19303,13 @@ func basicEventElementToMap(
 		that.Observed(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Observed()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Observed()",
+				},
+			)
+		}
 
 		return
 	}
@@ -18228,11 +19320,13 @@ func basicEventElementToMap(
 		that.Direction(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Direction()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Direction()",
+				},
+			)
+		}
 
 		return
 	}
@@ -18243,11 +19337,13 @@ func basicEventElementToMap(
 		that.State(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "State()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "State()",
+				},
+			)
+		}
 
 		return
 	}
@@ -18263,11 +19359,13 @@ func basicEventElementToMap(
 			that.MessageBroker(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "MessageBroker()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "MessageBroker()",
+					},
+				)
+			}
 
 			return
 		}
@@ -18299,7 +19397,7 @@ func basicEventElementToMap(
 // [ToJsonable].
 func operationToMap(
 	that aastypes.IOperation,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -18313,17 +19411,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18351,17 +19451,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18381,17 +19483,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18406,11 +19510,13 @@ func operationToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -18428,17 +19534,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18458,17 +19566,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18488,17 +19598,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18518,17 +19630,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "InputVariables()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "InputVariables()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18548,17 +19662,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "OutputVariables()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "OutputVariables()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18578,17 +19694,19 @@ func operationToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "InoutputVariables()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "InoutputVariables()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18610,7 +19728,7 @@ func operationToMap(
 // [ToJsonable].
 func operationVariableToMap(
 	that aastypes.IOperationVariable,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	var jsonableValue interface{}
@@ -18618,11 +19736,13 @@ func operationVariableToMap(
 		that.Value(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Value()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Value()",
+				},
+			)
+		}
 
 		return
 	}
@@ -18639,7 +19759,7 @@ func operationVariableToMap(
 // [ToJsonable].
 func capabilityToMap(
 	that aastypes.ICapability,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -18653,17 +19773,19 @@ func capabilityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18691,17 +19813,19 @@ func capabilityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18721,17 +19845,19 @@ func capabilityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18746,11 +19872,13 @@ func capabilityToMap(
 			that.SemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "SemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -18768,17 +19896,19 @@ func capabilityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SupplementalSemanticIDs()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SupplementalSemanticIDs()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18798,17 +19928,19 @@ func capabilityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Qualifiers()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Qualifiers()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18828,17 +19960,19 @@ func capabilityToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18860,7 +19994,7 @@ func capabilityToMap(
 // [ToJsonable].
 func conceptDescriptionToMap(
 	that aastypes.IConceptDescription,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.Extensions() != nil {
@@ -18874,17 +20008,19 @@ func conceptDescriptionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Extensions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Extensions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18912,17 +20048,19 @@ func conceptDescriptionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DisplayName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "DisplayName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18942,17 +20080,19 @@ func conceptDescriptionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Description()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Description()",
+						},
+					)
+				}
 
 				return
 			}
@@ -18967,11 +20107,13 @@ func conceptDescriptionToMap(
 			that.Administration(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Administration()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Administration()",
+					},
+				)
+			}
 
 			return
 		}
@@ -18991,17 +20133,19 @@ func conceptDescriptionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "EmbeddedDataSpecifications()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "EmbeddedDataSpecifications()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19021,17 +20165,19 @@ func conceptDescriptionToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "IsCaseOf()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "IsCaseOf()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19053,7 +20199,7 @@ func conceptDescriptionToMap(
 // [ToJsonable].
 func referenceToMap(
 	that aastypes.IReference,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	var jsonableType interface{}
@@ -19061,11 +20207,13 @@ func referenceToMap(
 		that.Type(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Type()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Type()",
+				},
+			)
+		}
 
 		return
 	}
@@ -19077,11 +20225,13 @@ func referenceToMap(
 			that.ReferredSemanticID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ReferredSemanticID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ReferredSemanticID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19098,17 +20248,19 @@ func referenceToMap(
 			v,
 		)
 		if err != nil {
-			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
-					Index: i,
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{
+						Index: i,
+					},
+				)
 
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Keys()",
-				},
-			)
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Keys()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19127,7 +20279,7 @@ func referenceToMap(
 // [ToJsonable].
 func keyToMap(
 	that aastypes.IKey,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	var jsonableType interface{}
@@ -19135,11 +20287,13 @@ func keyToMap(
 		that.Type(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Type()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Type()",
+				},
+			)
+		}
 
 		return
 	}
@@ -19158,7 +20312,7 @@ func keyToMap(
 // [ToJsonable].
 func langStringNameTypeToMap(
 	that aastypes.ILangStringNameType,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["language"] = that.Language()
@@ -19176,7 +20330,7 @@ func langStringNameTypeToMap(
 // [ToJsonable].
 func langStringTextTypeToMap(
 	that aastypes.ILangStringTextType,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["language"] = that.Language()
@@ -19194,7 +20348,7 @@ func langStringTextTypeToMap(
 // [ToJsonable].
 func environmentToMap(
 	that aastypes.IEnvironment,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	if that.AssetAdministrationShells() != nil {
@@ -19208,17 +20362,19 @@ func environmentToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "AssetAdministrationShells()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "AssetAdministrationShells()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19238,17 +20394,19 @@ func environmentToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Submodels()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Submodels()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19268,17 +20426,19 @@ func environmentToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "ConceptDescriptions()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "ConceptDescriptions()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19298,7 +20458,7 @@ func environmentToMap(
 // [ToJsonable].
 func embeddedDataSpecificationToMap(
 	that aastypes.IEmbeddedDataSpecification,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	var jsonableDataSpecificationContent interface{}
@@ -19306,11 +20466,13 @@ func embeddedDataSpecificationToMap(
 		that.DataSpecificationContent(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "DataSpecificationContent()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "DataSpecificationContent()",
+				},
+			)
+		}
 
 		return
 	}
@@ -19322,11 +20484,13 @@ func embeddedDataSpecificationToMap(
 			that.DataSpecification(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "DataSpecification()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DataSpecification()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19344,7 +20508,7 @@ func embeddedDataSpecificationToMap(
 // [ToJsonable].
 func levelTypeToMap(
 	that aastypes.ILevelType,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["min"] = that.Min()
@@ -19366,7 +20530,7 @@ func levelTypeToMap(
 // [ToJsonable].
 func valueReferencePairToMap(
 	that aastypes.IValueReferencePair,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["value"] = that.Value()
@@ -19376,11 +20540,13 @@ func valueReferencePairToMap(
 		that.ValueID(),
 	)
 	if err != nil {
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueID()",
-			},
-		)
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueID()",
+				},
+			)
+		}
 
 		return
 	}
@@ -19397,7 +20563,7 @@ func valueReferencePairToMap(
 // [ToJsonable].
 func valueListToMap(
 	that aastypes.IValueList,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	jsonableValueReferencePairs := make(
@@ -19410,17 +20576,19 @@ func valueListToMap(
 			v,
 		)
 		if err != nil {
-			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
-					Index: i,
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{
+						Index: i,
+					},
+				)
 
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueReferencePairs()",
-				},
-			)
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueReferencePairs()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19439,7 +20607,7 @@ func valueListToMap(
 // [ToJsonable].
 func langStringPreferredNameTypeIEC61360ToMap(
 	that aastypes.ILangStringPreferredNameTypeIEC61360,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["language"] = that.Language()
@@ -19457,7 +20625,7 @@ func langStringPreferredNameTypeIEC61360ToMap(
 // [ToJsonable].
 func langStringShortNameTypeIEC61360ToMap(
 	that aastypes.ILangStringShortNameTypeIEC61360,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["language"] = that.Language()
@@ -19475,7 +20643,7 @@ func langStringShortNameTypeIEC61360ToMap(
 // [ToJsonable].
 func langStringDefinitionTypeIEC61360ToMap(
 	that aastypes.ILangStringDefinitionTypeIEC61360,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	result["language"] = that.Language()
@@ -19493,7 +20661,7 @@ func langStringDefinitionTypeIEC61360ToMap(
 // [ToJsonable].
 func dataSpecificationIEC61360ToMap(
 	that aastypes.IDataSpecificationIEC61360,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
 	jsonablePreferredName := make(
@@ -19506,17 +20674,19 @@ func dataSpecificationIEC61360ToMap(
 			v,
 		)
 		if err != nil {
-			err.Path.PrependIndex(
-				&aasreporting.IndexSegment{
-					Index: i,
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{
+						Index: i,
+					},
+				)
 
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "PreferredName()",
-				},
-			)
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "PreferredName()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19535,17 +20705,19 @@ func dataSpecificationIEC61360ToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "ShortName()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "ShortName()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19564,11 +20736,13 @@ func dataSpecificationIEC61360ToMap(
 			that.UnitID(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "UnitID()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "UnitID()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19589,11 +20763,13 @@ func dataSpecificationIEC61360ToMap(
 			*(that.DataType()),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "DataType()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DataType()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19611,17 +20787,19 @@ func dataSpecificationIEC61360ToMap(
 				v,
 			)
 			if err != nil {
-				err.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
+				if seriaErr, ok := err.(*SerializationError); ok {
+					seriaErr.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
 
-				err.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "Definition()",
-					},
-				)
+					seriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "Definition()",
+						},
+					)
+				}
 
 				return
 			}
@@ -19640,11 +20818,13 @@ func dataSpecificationIEC61360ToMap(
 			that.ValueList(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueList()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueList()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19661,11 +20841,13 @@ func dataSpecificationIEC61360ToMap(
 			that.LevelType(),
 		)
 		if err != nil {
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "LevelType()",
-				},
-			)
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "LevelType()",
+					},
+				)
+			}
 
 			return
 		}
@@ -19683,7 +20865,7 @@ func dataSpecificationIEC61360ToMap(
 // or an error if some value could not be converted.
 func ToJsonable(
 	that aastypes.IClass,
-) (result map[string]interface{}, err *SerializationError) {
+) (result map[string]interface{}, err error) {
 	switch that.ModelType() {
 	case aastypes.ModelTypeExtension:
 		result, err = extensionToMap(
