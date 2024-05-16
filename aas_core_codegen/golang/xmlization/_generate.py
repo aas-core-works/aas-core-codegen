@@ -402,19 +402,23 @@ def _generate_check_start_element() -> Stripped:
 func checkStartElement(
 {I}current xml.StartElement,
 ) (err error) {{
-{I}var unexpectedAttr []xml.Attr
+{I}const xmlnsLen = len("xmlns")
+
+{I}unexpectedAttr := 0
 {I}for _, attr := range current.Attr {{
-{II}if attr.Name.Space == "" && attr.Name.Local == "xmlns" {{
+{II}if (attr.Name.Space == "" && attr.Name.Local == "xmlns") ||
+{III}attr.Name.Space == "xmlns" {{
 {III}continue
 {II}}}
-{II}unexpectedAttr = append(unexpectedAttr, attr)
+
+{II}unexpectedAttr++
 {I}}}
-{I}if len(unexpectedAttr) != 0 {{
-{II} err = newDeserializationError(
+{I}if unexpectedAttr != 0 {{
+{II}err = newDeserializationError(
 {III}fmt.Sprintf(
 {IIII}"Expected no attributes except 'xmlns' in the start element, "+
-{IIII}"but got %d in the start element %s",
-{IIII}len(unexpectedAttr), current.Name.Local,
+{IIIII}"but got %d in the start element %s",
+{IIII}unexpectedAttr, current.Name.Local,
 {III}),
 {II})
 {II}return

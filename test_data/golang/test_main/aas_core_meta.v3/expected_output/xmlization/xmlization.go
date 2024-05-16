@@ -344,19 +344,23 @@ const Namespace = "https://admin-shell.io/aas/3/0"
 func checkStartElement(
 	current xml.StartElement,
 ) (err error) {
-	var unexpectedAttr []xml.Attr
+	const xmlnsLen = len("xmlns")
+
+	unexpectedAttr := 0
 	for _, attr := range current.Attr {
-		if attr.Name.Space == "" && attr.Name.Local == "xmlns" {
+		if (attr.Name.Space == "" && attr.Name.Local == "xmlns") ||
+			attr.Name.Space == "xmlns" {
 			continue
 		}
-		unexpectedAttr = append(unexpectedAttr, attr)
+
+		unexpectedAttr++
 	}
-	if len(unexpectedAttr) != 0 {
-		 err = newDeserializationError(
+	if unexpectedAttr != 0 {
+		err = newDeserializationError(
 			fmt.Sprintf(
 				"Expected no attributes except 'xmlns' in the start element, "+
-				"but got %d in the start element %s",
-				len(unexpectedAttr), current.Name.Local,
+					"but got %d in the start element %s",
+				unexpectedAttr, current.Name.Local,
 			),
 		)
 		return
