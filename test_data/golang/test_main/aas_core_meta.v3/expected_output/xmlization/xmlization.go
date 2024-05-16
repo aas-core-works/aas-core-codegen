@@ -569,7 +569,8 @@ func readList[T aastypes.IClass](
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readHasSemanticsWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -682,32 +683,6 @@ func readHasSemanticsWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IHasSemantics]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalHasSemantics(
-	decoder *xml.Decoder,
-) (instance aastypes.IHasSemantics,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IHasSemantics "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readHasSemanticsWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -892,7 +867,8 @@ func readExtensionAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readExtensionWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -941,37 +917,12 @@ func readExtensionWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IExtension]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalExtension(
-	decoder *xml.Decoder,
-) (instance aastypes.IExtension,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IExtension "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readExtensionWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IHasExtensions]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readHasExtensionsWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1083,37 +1034,12 @@ func readHasExtensionsWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IHasExtensions]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalHasExtensions(
-	decoder *xml.Decoder,
-) (instance aastypes.IHasExtensions,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IHasExtensions "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readHasExtensionsWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IReferable]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readReferableWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1225,37 +1151,12 @@ func readReferableWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IReferable]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalReferable(
-	decoder *xml.Decoder,
-) (instance aastypes.IReferable,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IReferable "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readReferableWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IIdentifiable]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readIdentifiableWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1311,32 +1212,6 @@ func readIdentifiableWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IIdentifiable]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalIdentifiable(
-	decoder *xml.Decoder,
-) (instance aastypes.IIdentifiable,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IIdentifiable "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readIdentifiableWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // Consume the text tokens (char data) as a string-encoded literal of
 // [aastypes.ModellingKind].
 //
@@ -1378,7 +1253,8 @@ func readTextAsModellingKind(
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readHasKindWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1426,37 +1302,12 @@ func readHasKindWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IHasKind]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalHasKind(
-	decoder *xml.Decoder,
-) (instance aastypes.IHasKind,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IHasKind "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readHasKindWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IHasDataSpecification]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readHasDataSpecificationWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1569,32 +1420,6 @@ func readHasDataSpecificationWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IHasDataSpecification]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalHasDataSpecification(
-	decoder *xml.Decoder,
-) (instance aastypes.IHasDataSpecification,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IHasDataSpecification "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readHasDataSpecificationWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -1761,7 +1586,8 @@ func readAdministrativeInformationAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readAdministrativeInformationWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1810,37 +1636,12 @@ func readAdministrativeInformationWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IAdministrativeInformation]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalAdministrativeInformation(
-	decoder *xml.Decoder,
-) (instance aastypes.IAdministrativeInformation,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IAdministrativeInformation "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readAdministrativeInformationWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IQualifiable]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readQualifiableWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -1941,32 +1742,6 @@ func readQualifiableWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IQualifiable]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalQualifiable(
-	decoder *xml.Decoder,
-) (instance aastypes.IQualifiable,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IQualifiable "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readQualifiableWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -2204,7 +1979,8 @@ func readQualifierAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readQualifierWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -2250,32 +2026,6 @@ func readQualifierWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IQualifier]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalQualifier(
-	decoder *xml.Decoder,
-) (instance aastypes.IQualifier,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IQualifier "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readQualifierWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -2520,7 +2270,8 @@ func readAssetAdministrationShellAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readAssetAdministrationShellWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -2566,32 +2317,6 @@ func readAssetAdministrationShellWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IAssetAdministrationShell]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalAssetAdministrationShell(
-	decoder *xml.Decoder,
-) (instance aastypes.IAssetAdministrationShell,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IAssetAdministrationShell "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readAssetAdministrationShellWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -2765,7 +2490,8 @@ func readAssetInformationAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readAssetInformationWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -2811,32 +2537,6 @@ func readAssetInformationWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IAssetInformation]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalAssetInformation(
-	decoder *xml.Decoder,
-) (instance aastypes.IAssetInformation,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IAssetInformation "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readAssetInformationWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -2977,7 +2677,8 @@ func readResourceAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readResourceWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -3023,32 +2724,6 @@ func readResourceWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IResource]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalResource(
-	decoder *xml.Decoder,
-) (instance aastypes.IResource,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IResource "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readResourceWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -3262,7 +2937,8 @@ func readSpecificAssetIDAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readSpecificAssetIDWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -3308,32 +2984,6 @@ func readSpecificAssetIDWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ISpecificAssetID]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalSpecificAssetID(
-	decoder *xml.Decoder,
-) (instance aastypes.ISpecificAssetID,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ISpecificAssetID "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readSpecificAssetIDWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -3595,7 +3245,8 @@ func readSubmodelAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readSubmodelWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -3644,37 +3295,12 @@ func readSubmodelWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.ISubmodel]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalSubmodel(
-	decoder *xml.Decoder,
-) (instance aastypes.ISubmodel,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ISubmodel "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readSubmodelWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.ISubmodelElement]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readSubmodelElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -3771,32 +3397,6 @@ func readSubmodelElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ISubmodelElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalSubmodelElement(
-	decoder *xml.Decoder,
-) (instance aastypes.ISubmodelElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ISubmodelElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readSubmodelElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -4042,7 +3642,8 @@ func readRelationshipElementAsSequence(
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readRelationshipElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -4091,32 +3692,6 @@ func readRelationshipElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IRelationshipElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalRelationshipElement(
-	decoder *xml.Decoder,
-) (instance aastypes.IRelationshipElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IRelationshipElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readRelationshipElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -4427,7 +4002,8 @@ func readSubmodelElementListAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readSubmodelElementListWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -4473,32 +4049,6 @@ func readSubmodelElementListWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ISubmodelElementList]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalSubmodelElementList(
-	decoder *xml.Decoder,
-) (instance aastypes.ISubmodelElementList,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ISubmodelElementList "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readSubmodelElementListWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -4719,7 +4269,8 @@ func readSubmodelElementCollectionAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readSubmodelElementCollectionWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -4768,37 +4319,12 @@ func readSubmodelElementCollectionWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.ISubmodelElementCollection]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalSubmodelElementCollection(
-	decoder *xml.Decoder,
-) (instance aastypes.ISubmodelElementCollection,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ISubmodelElementCollection "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readSubmodelElementCollectionWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IDataElement]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readDataElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -4863,32 +4389,6 @@ func readDataElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IDataElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalDataElement(
-	decoder *xml.Decoder,
-) (instance aastypes.IDataElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IDataElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readDataElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -5139,7 +4639,8 @@ func readPropertyAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readPropertyWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -5185,32 +4686,6 @@ func readPropertyWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IProperty]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalProperty(
-	decoder *xml.Decoder,
-) (instance aastypes.IProperty,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IProperty "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readPropertyWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -5441,7 +4916,8 @@ func readMultiLanguagePropertyAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readMultiLanguagePropertyWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -5487,32 +4963,6 @@ func readMultiLanguagePropertyWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IMultiLanguageProperty]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalMultiLanguageProperty(
-	decoder *xml.Decoder,
-) (instance aastypes.IMultiLanguageProperty,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IMultiLanguageProperty "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readMultiLanguagePropertyWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -5765,7 +5215,8 @@ func readRangeAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readRangeWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -5811,32 +5262,6 @@ func readRangeWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IRange]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalRange(
-	decoder *xml.Decoder,
-) (instance aastypes.IRange,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IRange "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readRangeWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -6056,7 +5481,8 @@ func readReferenceElementAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readReferenceElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -6102,32 +5528,6 @@ func readReferenceElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IReferenceElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalReferenceElement(
-	decoder *xml.Decoder,
-) (instance aastypes.IReferenceElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IReferenceElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readReferenceElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -6366,7 +5766,8 @@ func readBlobAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readBlobWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -6412,32 +5813,6 @@ func readBlobWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IBlob]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalBlob(
-	decoder *xml.Decoder,
-) (instance aastypes.IBlob,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IBlob "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readBlobWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -6678,7 +6053,8 @@ func readFileAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readFileWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -6724,32 +6100,6 @@ func readFileWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IFile]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalFile(
-	decoder *xml.Decoder,
-) (instance aastypes.IFile,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IFile "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readFileWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -7006,7 +6356,8 @@ func readAnnotatedRelationshipElementAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readAnnotatedRelationshipElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -7052,32 +6403,6 @@ func readAnnotatedRelationshipElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IAnnotatedRelationshipElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalAnnotatedRelationshipElement(
-	decoder *xml.Decoder,
-) (instance aastypes.IAnnotatedRelationshipElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IAnnotatedRelationshipElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readAnnotatedRelationshipElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -7340,7 +6665,8 @@ func readEntityAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readEntityWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -7386,32 +6712,6 @@ func readEntityWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IEntity]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalEntity(
-	decoder *xml.Decoder,
-) (instance aastypes.IEntity,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IEntity "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readEntityWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -7737,7 +7037,8 @@ func readEventPayloadAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readEventPayloadWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -7786,37 +7087,12 @@ func readEventPayloadWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IEventPayload]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalEventPayload(
-	decoder *xml.Decoder,
-) (instance aastypes.IEventPayload,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IEventPayload "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readEventPayloadWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IEventElement]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readEventElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -7861,32 +7137,6 @@ func readEventElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IEventElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalEventElement(
-	decoder *xml.Decoder,
-) (instance aastypes.IEventElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IEventElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readEventElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -8207,7 +7457,8 @@ func readBasicEventElementAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readBasicEventElementWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -8253,32 +7504,6 @@ func readBasicEventElementWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IBasicEventElement]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalBasicEventElement(
-	decoder *xml.Decoder,
-) (instance aastypes.IBasicEventElement,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IBasicEventElement "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readBasicEventElementWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -8521,7 +7746,8 @@ func readOperationAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readOperationWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -8567,32 +7793,6 @@ func readOperationWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IOperation]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalOperation(
-	decoder *xml.Decoder,
-) (instance aastypes.IOperation,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IOperation "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readOperationWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -8654,11 +7854,12 @@ func readOperationVariableAsSequence(
 		var valueErr error
 		switch local {
 		case "value":
-			theValue, valueErr =  unmarshalSubmodelElement(
+			theValue, valueErr =  readSubmodelElementWithLookahead(
 				decoder,
+				current,
 			)
-			// unmarshalSubmodelElement stops at the end element,
-			// so we look ahead to the next element.
+			// readSubmodelElementWithLookahead stops at the end element,
+			// so we look ahead to the next element, just after the end element.
 			if valueErr == nil {
 				current, valueErr = readNext(decoder, current)
 			}
@@ -8725,7 +7926,8 @@ func readOperationVariableAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readOperationVariableWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -8771,32 +7973,6 @@ func readOperationVariableWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IOperationVariable]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalOperationVariable(
-	decoder *xml.Decoder,
-) (instance aastypes.IOperationVariable,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IOperationVariable "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readOperationVariableWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -9006,7 +8182,8 @@ func readCapabilityAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readCapabilityWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -9052,32 +8229,6 @@ func readCapabilityWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ICapability]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalCapability(
-	decoder *xml.Decoder,
-) (instance aastypes.ICapability,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ICapability "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readCapabilityWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -9295,7 +8446,8 @@ func readConceptDescriptionAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readConceptDescriptionWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -9341,32 +8493,6 @@ func readConceptDescriptionWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IConceptDescription]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalConceptDescription(
-	decoder *xml.Decoder,
-) (instance aastypes.IConceptDescription,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IConceptDescription "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readConceptDescriptionWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -9560,7 +8686,8 @@ func readReferenceAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readReferenceWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -9606,32 +8733,6 @@ func readReferenceWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IReference]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalReference(
-	decoder *xml.Decoder,
-) (instance aastypes.IReference,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IReference "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readReferenceWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -9777,7 +8878,8 @@ func readKeyAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readKeyWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -9823,32 +8925,6 @@ func readKeyWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IKey]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalKey(
-	decoder *xml.Decoder,
-) (instance aastypes.IKey,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IKey "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readKeyWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -9930,7 +9006,8 @@ func readTextAsDataTypeDefXSD(
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readAbstractLangStringWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -9991,32 +9068,6 @@ func readAbstractLangStringWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IAbstractLangString]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalAbstractLangString(
-	decoder *xml.Decoder,
-) (instance aastypes.IAbstractLangString,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IAbstractLangString "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readAbstractLangStringWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -10162,7 +9213,8 @@ func readLangStringNameTypeAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readLangStringNameTypeWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -10208,32 +9260,6 @@ func readLangStringNameTypeWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ILangStringNameType]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalLangStringNameType(
-	decoder *xml.Decoder,
-) (instance aastypes.ILangStringNameType,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ILangStringNameType "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readLangStringNameTypeWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -10379,7 +9405,8 @@ func readLangStringTextTypeAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readLangStringTextTypeWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -10425,32 +9452,6 @@ func readLangStringTextTypeWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ILangStringTextType]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalLangStringTextType(
-	decoder *xml.Decoder,
-) (instance aastypes.ILangStringTextType,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ILangStringTextType "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readLangStringTextTypeWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -10593,7 +9594,8 @@ func readEnvironmentAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readEnvironmentWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -10642,37 +9644,12 @@ func readEnvironmentWithLookahead(
 	return
 }
 
-// Unmarshal an instance of [aastypes.IEnvironment]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalEnvironment(
-	decoder *xml.Decoder,
-) (instance aastypes.IEnvironment,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IEnvironment "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readEnvironmentWithLookahead(
-		decoder,
-		current,
-	)
-	return
-}
-
 // De-serialize an instance of [aastypes.IDataSpecificationContent]
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readDataSpecificationContentWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -10717,32 +9694,6 @@ func readDataSpecificationContentWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IDataSpecificationContent]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalDataSpecificationContent(
-	decoder *xml.Decoder,
-) (instance aastypes.IDataSpecificationContent,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IDataSpecificationContent "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readDataSpecificationContentWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -10805,11 +9756,12 @@ func readEmbeddedDataSpecificationAsSequence(
 		var valueErr error
 		switch local {
 		case "dataSpecificationContent":
-			theDataSpecificationContent, valueErr =  unmarshalDataSpecificationContent(
+			theDataSpecificationContent, valueErr =  readDataSpecificationContentWithLookahead(
 				decoder,
+				current,
 			)
-			// unmarshalDataSpecificationContent stops at the end element,
-			// so we look ahead to the next element.
+			// readDataSpecificationContentWithLookahead stops at the end element,
+			// so we look ahead to the next element, just after the end element.
 			if valueErr == nil {
 				current, valueErr = readNext(decoder, current)
 			}
@@ -10885,7 +9837,8 @@ func readEmbeddedDataSpecificationAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readEmbeddedDataSpecificationWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -10931,32 +9884,6 @@ func readEmbeddedDataSpecificationWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IEmbeddedDataSpecification]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalEmbeddedDataSpecification(
-	decoder *xml.Decoder,
-) (instance aastypes.IEmbeddedDataSpecification,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IEmbeddedDataSpecification "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readEmbeddedDataSpecificationWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -11173,7 +10100,8 @@ func readLevelTypeAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readLevelTypeWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -11219,32 +10147,6 @@ func readLevelTypeWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ILevelType]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalLevelType(
-	decoder *xml.Decoder,
-) (instance aastypes.ILevelType,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ILevelType "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readLevelTypeWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -11390,7 +10292,8 @@ func readValueReferencePairAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readValueReferencePairWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -11436,32 +10339,6 @@ func readValueReferencePairWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IValueReferencePair]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalValueReferencePair(
-	decoder *xml.Decoder,
-) (instance aastypes.IValueReferencePair,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IValueReferencePair "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readValueReferencePairWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -11591,7 +10468,8 @@ func readValueListAsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readValueListWithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -11637,32 +10515,6 @@ func readValueListWithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IValueList]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalValueList(
-	decoder *xml.Decoder,
-) (instance aastypes.IValueList,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IValueList "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readValueListWithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -11808,7 +10660,8 @@ func readLangStringPreferredNameTypeIEC61360AsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readLangStringPreferredNameTypeIEC61360WithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -11854,32 +10707,6 @@ func readLangStringPreferredNameTypeIEC61360WithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ILangStringPreferredNameTypeIEC61360]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalLangStringPreferredNameTypeIEC61360(
-	decoder *xml.Decoder,
-) (instance aastypes.ILangStringPreferredNameTypeIEC61360,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ILangStringPreferredNameTypeIEC61360 "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readLangStringPreferredNameTypeIEC61360WithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -12025,7 +10852,8 @@ func readLangStringShortNameTypeIEC61360AsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readLangStringShortNameTypeIEC61360WithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -12071,32 +10899,6 @@ func readLangStringShortNameTypeIEC61360WithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ILangStringShortNameTypeIEC61360]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalLangStringShortNameTypeIEC61360(
-	decoder *xml.Decoder,
-) (instance aastypes.ILangStringShortNameTypeIEC61360,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ILangStringShortNameTypeIEC61360 "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readLangStringShortNameTypeIEC61360WithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -12242,7 +11044,8 @@ func readLangStringDefinitionTypeIEC61360AsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readLangStringDefinitionTypeIEC61360WithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -12288,32 +11091,6 @@ func readLangStringDefinitionTypeIEC61360WithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.ILangStringDefinitionTypeIEC61360]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalLangStringDefinitionTypeIEC61360(
-	decoder *xml.Decoder,
-) (instance aastypes.ILangStringDefinitionTypeIEC61360,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of ILangStringDefinitionTypeIEC61360 "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readLangStringDefinitionTypeIEC61360WithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
@@ -12567,7 +11344,8 @@ func readDataSpecificationIEC61360AsSequence(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func readDataSpecificationIEC61360WithLookahead(
 	decoder *xml.Decoder,
 	current xml.Token,
@@ -12613,32 +11391,6 @@ func readDataSpecificationIEC61360WithLookahead(
 	}
 
 	err = checkEndElement(current, local)
-	return
-}
-
-// Unmarshal an instance of [aastypes.IDataSpecificationIEC61360]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func unmarshalDataSpecificationIEC61360(
-	decoder *xml.Decoder,
-) (instance aastypes.IDataSpecificationIEC61360,
-	err error,
-) {
-	var current xml.Token
-	current, err = readNext(decoder, nil)
-	if _, isEOF := current.(eof); isEOF {
-		err = newDeserializationError(
-			"Expected an instance of IDataSpecificationIEC61360 "+
-				"serialized as an XML element, but reached the end of file.",
-		)
-		return
-	}
-
-	instance, err = readDataSpecificationIEC61360WithLookahead(
-		decoder,
-		current,
-	)
 	return
 }
 
