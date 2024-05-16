@@ -24,6 +24,7 @@ from aas_core_codegen.golang.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
 
 
@@ -37,7 +38,7 @@ def _generate_bool_from_jsonable() -> Stripped:
 // Parse `jsonable` as a boolean, or return an error.
 func boolFromJsonable(
 {I}jsonable interface{{}},
-) (result bool, err *DeserializationError) {{
+) (result bool, err error) {{
 {I}if jsonable == nil {{
 {II}err = newDeserializationError(
 {III}"Expected a boolean, but got null",
@@ -67,7 +68,7 @@ def _generate_int64_from_jsonable() -> Stripped:
 // Parse `jsonable` as a 64-bit integer, or return an error.
 func int64FromJsonable(
 {I}jsonable interface{{}},
-) (result int64, err *DeserializationError) {{
+) (result int64, err error) {{
 {I}if jsonable == nil {{
 {II}err = newDeserializationError(
 {III}"Expected an integer number, but got null",
@@ -133,7 +134,7 @@ def _generate_float64_from_jsonable() -> Stripped:
 // Parse `jsonable` as a 64-bit float, or return an error.
 func float64FromJsonable(
 {I}jsonable interface{{}},
-) (result float64, err *DeserializationError) {{
+) (result float64, err error) {{
 {I}if jsonable == nil {{
 {II}err = newDeserializationError(
 {III}"Expected a number, but got null",
@@ -165,9 +166,9 @@ def _generate_string_from_jsonable() -> Stripped:
 // Parse `jsonable` as a string, or return an error.
 func stringFromJsonable(
 {I}jsonable interface{{}},
-) (result string, error *DeserializationError) {{
+) (result string, err error) {{
 {I}if jsonable == nil {{
-{II}error = newDeserializationError(
+{II}err = newDeserializationError(
 {III}"Expected a string, but got null",
 {II})
 {II}return
@@ -178,7 +179,7 @@ func stringFromJsonable(
 {I}if ok {{
 {II}return
 {I}}} else {{
-{II}error = newDeserializationError(
+{II}err = newDeserializationError(
 {III}fmt.Sprintf("Expected a boolean, but got %T", jsonable),
 {II})
 {II}return
@@ -194,7 +195,7 @@ def _generate_bytes_from_jsonable() -> Stripped:
 // Parse `jsonable` as a byte array, or return an error.
 func bytesFromJsonable(
 {I}jsonable interface{{}},
-) (result []byte, err *DeserializationError) {{
+) (result []byte, err error) {{
 {I}if jsonable == nil {{
 {II}err = newDeserializationError(
 {III}"Expected a base64-encoded string, but got null",
@@ -250,7 +251,7 @@ def _generate_enumeration_from_jsonable(
 // or return an error.
 func {function_name}(
 {I}jsonable interface{{}},
-) (result aastypes.{enum_name}, err *DeserializationError) {{
+) (result aastypes.{enum_name}, err error) {{
 {I}if jsonable == nil {{
 {II}err = newDeserializationError(
 {III}"Expected a string representation of {enum_name}, " +
@@ -360,7 +361,7 @@ func {function_name}(
 {I}m map[string]interface{{}},
 ) (
 {I}result aastypes.{interface_name},
-{I}err *DeserializationError,
+{I}err error,
 ) {{
 {I}var modelTypeAny interface{{}}
 {I}var ok bool
@@ -452,7 +453,7 @@ func {function_name}(
 {I}jsonable interface{{}},
 ) (
 {I}result aastypes.{interface_name},
-{I}err *DeserializationError,
+{I}err error,
 ) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
@@ -579,11 +580,13 @@ parsed, err = {parse_function}(
 {I}v,
 )
 if err != nil {{
-{I}err.Path.PrependName(
-{II}&aasreporting.NameSegment{{
-{III}Name: {json_prop_literal},
-{II}}},
-{I})
+{I}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{II}deseriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {json_prop_literal},
+{III}}},
+{II})
+{I}}}
 {I}return
 }}
 {prop_var} = &parsed"""
@@ -601,11 +604,13 @@ if err != nil {{
 {I}v,
 )
 if err != nil {{
-{I}err.Path.PrependName(
-{II}&aasreporting.NameSegment{{
-{III}Name: {json_prop_literal},
-{II}}},
-{I})
+{I}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{II}deseriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {json_prop_literal},
+{III}}},
+{II})
+{I}}}
 {I}return
 }}"""
             )
@@ -636,18 +641,20 @@ if err != nil {{
                 f"""\
 jsonableArray, ok := v.([]interface{{}})
 if !ok {{
-{I}err = newDeserializationError(
+{I}deseriaErr := newDeserializationError(
 {II}fmt.Sprintf(
 {III}"Expected an array, but got %T",
 {III}v,
 {II}),
 {I})
 
-{I}err.Path.PrependName(
+{I}deseriaErr.Path.PrependName(
 {II}&aasreporting.NameSegment{{
 {III}Name: {json_prop_literal},
 {II}}},
 {I})
+
+{I}err = deseriaErr
 
 {I}return
 }}
@@ -662,17 +669,19 @@ for i, itemJsonable := range jsonableArray {{
 {II}itemJsonable,
 {I})
 {I}if err != nil {{
-{II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
-{IIII}Index: i,
-{III}}},
-{II})
+{II}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{III}deseriaErr.Path.PrependIndex(
+{IIII}&aasreporting.IndexSegment{{
+{IIIII}Index: i,
+{IIII}}},
+{III})
 
-{II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
-{IIII}Name: {json_prop_literal},
-{III}}},
-{II})
+{III}deseriaErr.Path.PrependName(
+{IIII}&aasreporting.NameSegment{{
+{IIIII}Name: {json_prop_literal},
+{IIII}}},
+{III})
+{II}}}
 
 {II}return
 {I}}}
@@ -927,7 +936,7 @@ func {function_name}(
 {I}m map[string]interface{{}},
 ) (
 {I}result aastypes.{interface_name},
-{I}err *DeserializationError,
+{I}err error,
 ) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
@@ -946,7 +955,7 @@ def _generate_int64_to_jsonable() -> Stripped:
 // Try to cast `that` to a float64, or return an error.
 func int64ToJsonable(
 {I}that int64,
-) (result float64, err *SerializationError) {{
+) (result float64, err error) {{
 {I}if that > 9007199254740991 || that < -9007199254740991 {{
 {II}err = newSerializationError(
 {III}fmt.Sprintf(
@@ -970,7 +979,7 @@ def _generate_bytes_to_jsonable() -> Stripped:
 // Encode `bytes` to a base64 string.
 func bytesToJsonable(
 {I}bytes []byte,
-) (result string, err *SerializationError) {{
+) (result string, err error) {{
 {I}if bytes == nil {{
 {II}err = newSerializationError(
 {III}"Expected an array of bytes, but got nil",
@@ -1005,7 +1014,7 @@ def _generate_enumeration_to_jsonable(
 // Serialize `that` to a string, or return an error.
 func {function_name}(
 {I}that aastypes.{enum_name},
-) (result string, err *SerializationError) {{
+) (result string, err error) {{
 {I}var ok bool
 {I}result, ok = aasstringification.{enum_to_str}(
 {II}that,
@@ -1239,17 +1248,19 @@ for i, v := range that.{getter_name}() {{
 {I}var jsonable interface{{}}
 {I}jsonable, err = {indent_but_first_line(serialize_expr, I)}
 {I}if err != nil {{
-{II}err.Path.PrependIndex(
-{III}&aasreporting.IndexSegment{{
-{IIII}Index: i,
-{III}}},
-{II})
+{II}if seriaErr, ok := err.(*SerializationError); ok {{
+{III}seriaErr.Path.PrependIndex(
+{IIII}&aasreporting.IndexSegment{{
+{IIIII}Index: i,
+{IIII}}},
+{III})
 
-{II}err.Path.PrependName(
-{III}&aasreporting.NameSegment{{
-{IIII}Name: {prop_literal},
-{III}}},
-{II})
+{III}seriaErr.Path.PrependName(
+{IIII}&aasreporting.NameSegment{{
+{IIIII}Name: {prop_literal},
+{IIII}}},
+{III})
+{II}}}
 
 {II}return
 {I}}}
@@ -1296,11 +1307,13 @@ result[{json_prop_literal}] = {prop_jsonable_var}"""
 var {prop_jsonable_var} interface{{}}
 {prop_jsonable_var}, err = {serialize_expr}
 if err != nil {{
-{I}err.Path.PrependName(
-{II}&aasreporting.NameSegment{{
-{III}Name: {prop_literal},
-{II}}},
-{I})
+{I}if seriaErr, ok := err.(*SerializationError); ok {{
+{II}seriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {prop_literal},
+{III}}},
+{II})
+{I}}}
 
 {I}return
 }}
@@ -1350,7 +1363,7 @@ if that.{getter_name}() != nil {{
 // [{to_jsonable}].
 func {function_name}(
 {I}that aastypes.{interface_name},
-) (result map[string]interface{{}}, err *SerializationError) {{
+) (result map[string]interface{{}}, err error) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
     )
@@ -1409,7 +1422,7 @@ switch that.{model_type_getter}() {{
 // or an error if some value could not be converted.
 func ToJsonable(
 {I}that aastypes.IClass,
-) (result map[string]interface{{}}, err *SerializationError) {{
+) (result map[string]interface{{}}, err error) {{
 {I}{indent_but_first_line(switch_statement, I)}
 {I}return
 }}"""
