@@ -32,6 +32,8 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     license="License :: OSI Approved :: MIT License",
     keywords="asset administration shell code generation industry 4.0 industrie i4.0",
@@ -49,7 +51,7 @@ setup(
             "pyinstaller>=4, <5",
             "twine",
             "jsonschema==3.2.0",
-            "xmlschema==1.10.0",
+            "xmlschema==3.3.1",
             "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@6d5411b#egg=aas-core-meta",
             "ssort==0.12.3",
         ]
