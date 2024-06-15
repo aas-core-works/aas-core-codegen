@@ -1,6 +1,23 @@
+﻿aas-core-meta@ git+https://github.com/aas-core-works/aas-core-meta@6d5411b#egg=aas-core-meta
+asttokens<3,>=2.0.8
 asttokens>=2.0.8,<3
-icontract>=2.5.2,<3
-sortedcontainers>=2.4.0,<3
+black==22.3.0
+coverage<5,>=4.5.1
+docutils<1,>=0.18.1
 docutils>=0.18.1,<1
-more-itertools>=8,<9
 greenery==4.1.0
+greenery==4.1.0
+icontract<3,>=2.5.2
+icontract>=2.5.2,<3
+jsonschema==3.2.0,<4.22.0
+more-itertools<9,>=8
+more-itertools>=8,<9
+mypy==1.9.0
+pydocstyle<3,>=2.1.1
+pygments<3,>=2
+pyinstaller<5.13.1,>=4
+pylint==3.1.0
+sortedcontainers<3,>=2.4.0
+sortedcontainers>=2.4.0,<3
+ssort==0.12.3
+xmlschema>=1.10.0
