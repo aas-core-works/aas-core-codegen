@@ -17,7 +17,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     # NOTE (mristin, 2022-04-08):
     # We need to disable warnings. Jsonschema package at the latest version (4.4.0) has
-    # a problem with JSON schema draft 2019-09 and crashes with an recursion error,
+    # a problem with JSON schema draft 2019-09 and crashes with a recursion error,
     # see: https://github.com/python-jsonschema/jsonschema/issues/847.
     #
     # We revert back to jsonschema 3.2.0, which can not handle 2019-09, but still seems
