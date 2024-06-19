@@ -99,6 +99,7 @@ from aas_core_codegen.intermediate._types import (
     ConstantSetOfEnumerationLiterals,
     Constant,
     TranspilableVerification,
+    type_annotations_equal,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -4038,10 +4039,14 @@ def _verify_all_non_optional_properties_are_initialized_in_the_constructor(
     return errors
 
 
-def _verify_orders_of_constructors_arguments_and_properties_match(
+def _verify_constructor_arguments_and_properties_match(
     symbol_table: SymbolTable,
 ) -> List[Error]:
-    """Verify the order between the constructor arguments and the properties."""
+    """
+    Verify that the constructor arguments and the properties match for all classes.
+
+    We check both the order and the types.
+    """
     errors = []  # type: List[Error]
     for cls in symbol_table.classes:
         args_without_default = []  # type: List[Identifier]
@@ -4097,6 +4102,37 @@ def _verify_orders_of_constructors_arguments_and_properties_match(
                     f"should be: {ordered_props!r}",
                 )
             )
+
+        assert set(cls.properties_by_name.keys()) == set(
+            cls.constructor.arguments_by_name.keys()
+        )
+        for prop in cls.properties:
+            assert prop.name in cls.constructor.arguments_by_name, (
+                f"Expected th at we already checked that properties and "
+                f"constructor arguments match, but the corresponding "
+                f"constructor argument is missing for the property: {prop.name!r}"
+            )
+
+            arg = cls.constructor.arguments_by_name[prop.name]
+
+            if not type_annotations_equal(prop.type_annotation, arg.type_annotation):
+                errors.append(
+                    Error(
+                        (
+                            cls.constructor.parsed.node
+                            if cls.constructor.parsed is not None
+                            else cls.parsed.node
+                        ),
+                        f"The constructor argument {arg.name!r} "
+                        f"and the property {prop.name!r} "
+                        f"for the class {cls.name!r} "
+                        f"mismatch in type. The argument is typed "
+                        f"as {arg.type_annotation} while the property is "
+                        f"typed as {prop.type_annotation}. "
+                        f"We expect the constructors and the properties to match "
+                        f"in type.",
+                    )
+                )
 
     return errors
 
@@ -4446,9 +4482,7 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     )
 
     errors.extend(
-        _verify_orders_of_constructors_arguments_and_properties_match(
-            symbol_table=symbol_table
-        )
+        _verify_constructor_arguments_and_properties_match(symbol_table=symbol_table)
     )
 
     errors.extend(
