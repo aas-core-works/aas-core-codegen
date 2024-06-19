@@ -2750,7 +2750,11 @@ def _verify_symbol_table(
                 "rename",
                 "require",
                 "rescue",
-                "result",
+                # NOTE (mristin, 2024-06-19):
+                # We exclude the keyword ``result`` from the checks as the AAS server
+                # API at version 3.0 already uses it for one of the object properties.
+                # We have to work around it in the code generator for Eiffel SDK.
+                # "result",
                 "retry",
                 "select",
                 "separate",
