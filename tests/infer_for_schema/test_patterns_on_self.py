@@ -61,7 +61,7 @@ class Test_expected(unittest.TestCase):
             @verification
             def matches_something(text: str) -> bool:
                 prefix = "something"
-                return match(f"{prefix}-[a-zA-Z]+", text) is not None
+                return match(f"^{prefix}-[a-zA-Z]+$", text) is not None
 
 
             @invariant(
@@ -106,7 +106,7 @@ class Test_expected(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]},
+                        pattern='^something-[a-zA-Z]+$')]},
                   set_of_primitives_by_property={},
                   set_of_enumeration_literals_by_property={})"""
             ),
@@ -118,11 +118,11 @@ class Test_expected(unittest.TestCase):
             """\
             @verification
             def matches_something(text: str) -> bool:
-                return match("something-[a-zA-Z]+", text) is not None
+                return match("^something-[a-zA-Z]+$", text) is not None
 
             @verification
             def matches_acme(text: str) -> bool:
-                return match(".*acme.*", text) is not None
+                return match("^.*acme.*$", text) is not None
 
 
             @invariant(
@@ -171,9 +171,9 @@ class Test_expected(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+'),
+                        pattern='^something-[a-zA-Z]+$'),
                       PatternConstraint(
-                        pattern='.*acme.*')]},
+                        pattern='^.*acme.*$')]},
                   set_of_primitives_by_property={},
                   set_of_enumeration_literals_by_property={})"""
             ),
@@ -185,11 +185,11 @@ class Test_expected(unittest.TestCase):
             """\
             @verification
             def matches_something(text: str) -> bool:
-                return match("something-[a-zA-Z]+", text) is not None
+                return match("^something-[a-zA-Z]+$", text) is not None
 
             @verification
             def matches_acme(text: str) -> bool:
-                return match(".*acme.*", text) is not None
+                return match("^.*acme.*$", text) is not None
 
             @invariant(
                 lambda self: matches_something(self),
@@ -244,9 +244,9 @@ class Test_expected(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+'),
+                        pattern='^something-[a-zA-Z]+$'),
                       PatternConstraint(
-                        pattern='.*acme.*')]},
+                        pattern='^.*acme.*$')]},
                   set_of_primitives_by_property={},
                   set_of_enumeration_literals_by_property={})"""
             ),
