@@ -24986,7 +24986,7 @@ void RecursiveVerificator::Execute() {
 
       case 1: {
         if (!(!verificator_->Done())) {
-          state_ = 2;
+          state_ = 3;
           continue;
         }
 
@@ -25001,13 +25001,18 @@ void RecursiveVerificator::Execute() {
         // No path is prepended as the error refers to the instance itself.
         ++index_;
 
+        state_ = 2;
+        return;
+      }
+
+      case 2: {
         verificator_->Next();
 
         state_ = 1;
         continue;
       }
 
-      case 2: {
+      case 3: {
         verificator_ = nullptr;
 
         {
@@ -25025,9 +25030,9 @@ void RecursiveVerificator::Execute() {
         }
       }
 
-      case 3: {
+      case 4: {
         if (!(*iterator_ != *iterator_end_)) {
-          state_ = 7;
+          state_ = 8;
           continue;
         }
 
@@ -25037,9 +25042,9 @@ void RecursiveVerificator::Execute() {
         verificator_->Start();
       }
 
-      case 4: {
+      case 5: {
         if (!(!verificator_->Done())) {
-          state_ = 6;
+          state_ = 7;
           continue;
         }
 
@@ -25060,34 +25065,34 @@ void RecursiveVerificator::Execute() {
 
         ++index_;
 
-        state_ = 5;
+        state_ = 6;
         return;
       }
 
-      case 5: {
+      case 6: {
         verificator_->Next();
+
+        state_ = 5;
+        continue;
+      }
+
+      case 7: {
+        verificator_ = nullptr;
+
+        ++(*iterator_);
 
         state_ = 4;
         continue;
       }
 
-      case 6: {
-        verificator_ = nullptr;
-
-        ++(*iterator_);
-
-        state_ = 3;
-        continue;
-      }
-
-      case 7: {
+      case 8: {
         iterator_.reset();
         iterator_end_.reset();
         done_ = true;
         index_ = -1;
 
         // We invalidate the state since we reached the end of the routine.
-        state_ = 8;
+        state_ = 9;
         return;
       }
 

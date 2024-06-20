@@ -656,7 +656,7 @@ bool operator!=(const Iterator& a, const Iterator& b) {{
 
 
 def _generate_non_recursive_verification() -> List[Stripped]:
-    """Generate the ``RecursiveVerification`` class."""
+    """Generate the ``NonRecursiveVerification`` class."""
     return [
         Stripped("// region NonRecursiveVerification"),
         Stripped(
@@ -1725,7 +1725,8 @@ error_ = common::make_unique<Error>(
 );
 // No path is prepended as the error refers to the instance itself.
 ++index_;"""
-                )
+                ),
+                yielding_flow.Yield(),
             ],
         ),
         yielding_flow.command_from_text(
