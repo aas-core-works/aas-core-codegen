@@ -124,7 +124,7 @@ def _undo_escaping_backslash_x_u_and_U_in_pattern(pattern: str) -> str:
     return "".join(parts)
 
 
-class _AnchorRemover(parse_retree.BaseVisitor):
+class _AnchorRemover(parse_retree.PassThroughVisitor):
     """
     Remove anchors from a regex in-place.
 

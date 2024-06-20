@@ -35,7 +35,7 @@ TermValueUnion = _types.TermValueUnion
 Visitor = _types.Visitor
 Transformer = _types.Transformer
 
-BaseVisitor = _visitor.BaseVisitor
+PassThroughVisitor = _visitor.PassThroughVisitor
 
 dump = _stringify.dump
 
