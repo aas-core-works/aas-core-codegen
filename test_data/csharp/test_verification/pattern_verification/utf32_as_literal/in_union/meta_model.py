@@ -1,6 +1,6 @@
 @verification
 def match_something(text: str) -> bool:
-    pattern = f"^\\U00010000|something$"
+    pattern = "^(\\U00010000|something)$"
     return match(pattern, text) is not None
 
 

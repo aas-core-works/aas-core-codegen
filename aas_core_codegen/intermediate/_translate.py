@@ -101,7 +101,10 @@ from aas_core_codegen.intermediate._types import (
     TranspilableVerification,
     type_annotations_equal,
 )
-from aas_core_codegen.parse import tree as parse_tree
+from aas_core_codegen.parse import (
+    retree as parse_retree,
+    tree as parse_tree,
+)
 
 # pylint: disable=unused-argument
 
@@ -4403,6 +4406,85 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
     return errors
 
 
+def _verify_patterns_anchored_at_start_and_end(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """
+    Check that the patterns are anchored at the start (``^``) and at the end (``$``).
+
+    We need to make sure that all pattern verification functions can be transpiled into
+    many kinds of regular expressions. Some regular expression engines support
+    only patterns anchored at both ends (*e.g.*, XSD and the transpilation of regular
+    expressions to instructions of a virtual machine). To ensure inter-operability,
+    we decide to fail-fast here to prevent that non-anchored patterns propagate
+    downstream, which we might probably detect only much later.
+    """
+    errors = []  # type: List[Error]
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, PatternVerification):
+            regex, error = parse_retree.parse([verification.pattern])
+            if error is not None:
+                regex_line, pointer_line = parse_retree.render_pointer(error.cursor)
+
+                errors.append(
+                    Error(
+                        verification.parsed.node,
+                        f"Failed to parse the pattern of "
+                        f"the pattern verification function:\n"
+                        f"{error.message}\n"
+                        f"{regex_line}\n"
+                        f"{pointer_line}",
+                    )
+                )
+                continue
+
+            assert regex is not None
+
+            if (
+                len(regex.union.uniates) == 0
+                or len(regex.union.uniates[0].concatenants) == 0
+            ):
+                errors.append(
+                    Error(
+                        verification.parsed.node,
+                        f"The pattern is empty. We expect only non-empty patterns "
+                        f"all anchored at the start (``^``) and at the end (``$``) "
+                        f"for inter-operability with different regex engines, *e.g.*, "
+                        f"XSD engines. The pattern in question inferred for "
+                        f"the verification function {verification.name!r} "
+                        f"was: {verification.pattern}",
+                    )
+                )
+                continue
+
+            first_term = regex.union.uniates[0].concatenants[0]
+            last_term = regex.union.uniates[0].concatenants[-1]
+
+            if (
+                len(regex.union.uniates) != 1
+                or not isinstance(first_term.value, parse_retree.Symbol)
+                or not (first_term.value.kind is parse_retree.SymbolKind.START)
+                or not isinstance(last_term.value, parse_retree.Symbol)
+                or not (last_term.value.kind is parse_retree.SymbolKind.END)
+            ):
+                errors.append(
+                    Error(
+                        verification.parsed.node,
+                        f"(mristin, 2024-05-31): We expect all the patterns to be "
+                        f"anchored at the start (``^``) and at the end (``$``) for "
+                        f"inter-operability with different regex engines, *e.g.*, XSD "
+                        f"engines. Please consider re-writing your pattern with "
+                        f"a prefix ``^.*``, if you want to match an arbitrary prefix, "
+                        f"and a suffix ``.*$``, if you want to match an arbitrary "
+                        f"suffix. The pattern in question inferred for "
+                        f"the verification function {verification.name!r} "
+                        f"was: {verification.pattern}",
+                    )
+                )
+
+    return errors
+
+
 def _assert_interfaces_defined_correctly(
     symbol_table: SymbolTable, ontology: _hierarchy.Ontology
 ) -> None:
@@ -4496,6 +4578,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_description_rendering_with_smoke(symbol_table=symbol_table))
 
     errors.extend(_verify_only_simple_type_patterns(symbol_table=symbol_table))
+
+    errors.extend(_verify_patterns_anchored_at_start_and_end(symbol_table=symbol_table))
 
     if len(errors) > 0:
         return errors
