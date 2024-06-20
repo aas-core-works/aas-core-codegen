@@ -65,7 +65,13 @@ def wstring_literal(text: str) -> Stripped:
         elif code_point < 32:
             # Non-printable ASCII characters
             escaped.append(f"\\x{ord(character):x}")
-        elif 255 < code_point < 65536:
+        elif code_point <= 127:
+            # ASCII
+            escaped.append(character)
+        elif 127 < code_point < 255:
+            # Above ASCII, but can be encoded as a single byte
+            escaped.append(f"\\x{ord(character):x}")
+        elif 255 <= code_point < 65536:
             # Above ASCII
             escaped.append(f"\\u{ord(character):04x}")
         elif code_point >= 65536:
@@ -79,6 +85,64 @@ def wstring_literal(text: str) -> Stripped:
     return Stripped('L"{}"'.format("".join(escaped)))
 
 
+@require(lambda character: len(character) == 1)
+def wchar_literal(character: str) -> Stripped:
+    """Generate a C++ wide character literal from the ``character``."""
+    code_point = ord(character)
+
+    escaped: str
+
+    if character == "\a":
+        escaped = "L'\\a'"
+    elif character == "\b":
+        escaped = "L'\\b'"
+    elif character == "\f":
+        escaped = "L'\\f'"
+    elif character == "\n":
+        escaped = "L'\\n'"
+    elif character == "\r":
+        escaped = "L'\\r'"
+    elif character == "\t":
+        escaped = "L'\\t'"
+    elif character == "\v":
+        escaped = "L'\\v'"
+    elif character == "'":
+        escaped = "L'\\''"
+    elif character == "\\":
+        escaped = "L'\\\\'"
+    elif code_point < 32:
+        # Non-printable ASCII characters
+        escaped = f"L'\\x{ord(character):x}'"
+    elif code_point <= 127:
+        # ASCII
+        escaped = f"L'{character}'"
+    elif 127 < code_point < 255:
+        # Above ASCII, but can be encoded as a single byte
+        escaped = f"L'\\x{ord(character):x}'"
+    elif 0xD800 <= code_point <= 0xDFFF:
+        # NOTE (mristin):
+        # These are the surrogate points and can not be represented as wide character
+        # literals directly as common compilers such as MSVC++ will complain.
+        #
+        # We have to fool the compiler at this point as we deliberately want to model
+        # the surrogate point.
+        escaped = f"static_cast<wchar_t>(0x{ord(character):04x})"
+
+    # NOTE (mristin):
+    # Mind the intersecting range for surrogate points just above if you ever convert
+    # this if-elif-else statement into a mapping or pattern matching.
+    elif 255 <= code_point < 65536:
+        # Above ASCII
+        escaped = f"L'\\u{ord(character):04x}'"
+    elif code_point >= 65536:
+        # Above Unicode Basic Multilingual Pane
+        escaped = f"L'\\U{ord(character):08x}'"
+    else:
+        raise AssertionError(f"Unexpected unhandled character: {character!r}")
+
+    return Stripped(escaped)
+
+
 # fmt: off
 # NOTE (mristin, 2023-09-24):
 # We use a pre-condition here to simplify the client code. The client must check
@@ -87,7 +151,7 @@ def wstring_literal(text: str) -> Stripped:
 @require(
     lambda text:
     all(
-        ord(character) <= 255
+        ord(character) <= 127
         for character in text
     ),
     "Only ASCII text can be converted to a C++ string literal, otherwise encoding "
@@ -124,7 +188,7 @@ def string_literal(text: str) -> Stripped:
         elif code_point < 32:
             # Non-printable ASCII characters
             escaped.append(f"\\x{ord(character):x}")
-        elif code_point <= 255:
+        elif code_point <= 127:
             escaped.append(character)
         else:
             # Above ASCII
@@ -159,14 +223,20 @@ def needs_escaping(text: str) -> bool:
         elif code_point < 32:
             # Non-printable ASCII characters
             return True
-        elif 255 < code_point < 65536:
+        elif code_point <= 127:
+            # ASCII
+            continue
+        elif 127 < code_point < 255:
+            # Above ASCII, but can be encoded as a single byte
+            return True
+        elif 255 <= code_point < 65536:
             # Above ASCII
             return True
         elif code_point >= 65536:
             # Above Unicode Binary Multilingual Pane
             return True
         else:
-            pass
+            raise AssertionError(f"Unexpected unhandled character: {character!r}")
 
     return False
 
@@ -286,6 +356,8 @@ CONSTANTS_NAMESPACE = Identifier("constants")
 VERIFICATION_NAMESPACE = Identifier("verification")
 JSONIZATION_NAMESPACE = Identifier("jsonization")
 XMLIZATION_NAMESPACE = Identifier("xmlization")
+REVM_NAMESPACE = Identifier("revm")
+PATTERN_NAMESPACE = Identifier("pattern")
 
 
 def generate_primitive_type(primitive_type: intermediate.PrimitiveType) -> Stripped:

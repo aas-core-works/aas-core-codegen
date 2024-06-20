@@ -1,0 +1,11 @@
+   # ^a?$
+   {
+     # a?
+     {
+       split 1, 2
+1:     char 'a'
+     }
+     # $
+2:   end
+     match
+   }

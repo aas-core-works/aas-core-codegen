@@ -1,0 +1,7 @@
+# ^[a-b]$
+{
+  set 'a-b'
+  # $
+  end
+  match
+}

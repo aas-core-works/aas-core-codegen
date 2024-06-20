@@ -3,11 +3,12 @@
 
 #include "aas_core/aas_3_0/common.hpp"
 #include "aas_core/aas_3_0/constants.hpp"
+#include "aas_core/aas_3_0/pattern.hpp"
+#include "aas_core/aas_3_0/revm.hpp"
 #include "aas_core/aas_3_0/verification.hpp"
 
 #pragma warning(push, 0)
 #include <map>
-#include <regex>
 #include <set>
 #pragma warning(pop)
 
@@ -91,138 +92,369 @@ std::unique_ptr<impl::IVerificator> AlwaysDoneVerificator::Clone() const {
 
 // region Verification functions
 
-std::wregex ConstructMatchesIdShort() {
-  std::wstring pattern = L"^[a-zA-Z][a-zA-Z0-9_]*$";
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesIdShort = ConstructMatchesIdShort();
-
 bool MatchesIdShort(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesIdShort
+  return revm::Match(
+    pattern::kMatchesIdShortProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesVersionType() {
-  std::wstring pattern = L"^(0|[1-9][0-9]*)$";
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesVersionType = ConstructMatchesVersionType();
 
 bool MatchesVersionType(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesVersionType
+  return revm::Match(
+    pattern::kMatchesVersionTypeProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesRevisionType() {
-  std::wstring pattern = L"^(0|[1-9][0-9]*)$";
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesRevisionType = ConstructMatchesRevisionType();
 
 bool MatchesRevisionType(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesRevisionType
+  return revm::Match(
+    pattern::kMatchesRevisionTypeProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsDateTimeUtc() {
-  std::wstring digit = L"[0-9]";
-  std::wstring year_frag = common::Concat(
-    L"-?(([1-9]",
-    digit,
-    digit,
-    digit,
-    L"+)|(0",
-    digit,
-    digit,
-    digit,
-    L"))"
-  );
-  std::wstring month_frag = L"((0[1-9])|(1[0-2]))";
-  std::wstring day_frag = common::Concat(
-    L"((0[1-9])|([12]",
-    digit,
-    L")|(3[01]))"
-  );
-  std::wstring hour_frag = common::Concat(
-    L"(([01]",
-    digit,
-    L")|(2[0-3]))"
-  );
-  std::wstring minute_frag = common::Concat(
-    L"[0-5]",
-    digit
-  );
-  std::wstring second_frag = common::Concat(
-    L"([0-5]",
-    digit,
-    L")(\\.",
-    digit,
-    L"+)?"
-  );
-  std::wstring end_of_day_frag = L"24:00:00(\\.0+)?";
-  std::wstring timezone_frag = L"(Z|\\+00:00|-00:00)";
-  std::wstring date_time_lexical_rep = common::Concat(
-    year_frag,
-    L"-",
-    month_frag,
-    L"-",
-    day_frag,
-    L"T((",
-    hour_frag,
-    L":",
-    minute_frag,
-    L":",
-    second_frag,
-    L")|",
-    end_of_day_frag,
-    L")",
-    timezone_frag
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    date_time_lexical_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsDateTimeUtc = ConstructMatchesXsDateTimeUtc();
 
 bool MatchesXsDateTimeUtc(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsDateTimeUtc
+  return revm::Match(
+    pattern::kMatchesXsDateTimeUtcProgram,
+    text
   );
 }
 
-const std::wregex kRegexDatePrefix(
-  L"^(-?[0-9]+)-(0[1-9]|1[0-2])-(0[0-9]|1[0-9]|2[0-9]|30|31)"
-);
+std::vector<
+  std::unique_ptr<revm::Instruction>
+> ConstructMatchesXsDatePrefixProgram() {
+  std::vector<std::unique_ptr<revm::Instruction> > program;
+  
+  {  // ^(-?[0-9]+)-(0[1-9]|1[0-2])-(0[0-9]|1[0-9]|2[0-9]|30|31).*$
+    {  // -?[0-9]+
+      {  // -?
+        program.emplace_back(
+          std::make_unique<revm::InstructionSplit>(1, 2)
+        );
+        // -
+        program.emplace_back(  // 1
+          std::make_unique<revm::InstructionChar>(L'-')
+        );
+      }  // -?
+      {  // [0-9]+
+        // [0-9]
+        program.emplace_back(  // 2
+          std::make_unique<revm::InstructionSet>(
+            std::vector<revm::Range>{
+              revm::Range(L'0', L'9')
+            }
+          )
+        );
+        program.emplace_back(
+          std::make_unique<revm::InstructionSplit>(2, 4)
+        );
+      }  // [0-9]+
+    }  // -?[0-9]+
+    // -
+    program.emplace_back(  // 4
+      std::make_unique<revm::InstructionChar>(L'-')
+    );
+    {  // 0[1-9]|1[0-2]
+      program.emplace_back(
+        std::make_unique<revm::InstructionSplit>(6, 9)
+      );
+      {  // 0[1-9]
+        // 0
+        program.emplace_back(  // 6
+          std::make_unique<revm::InstructionChar>(L'0')
+        );
+        // [1-9]
+        program.emplace_back(
+          std::make_unique<revm::InstructionSet>(
+            std::vector<revm::Range>{
+              revm::Range(L'1', L'9')
+            }
+          )
+        );
+      }  // 0[1-9]
+      program.emplace_back(
+        std::make_unique<revm::InstructionJump>(11)
+      );
+      {  // 1[0-2]
+        // 1
+        program.emplace_back(  // 9
+          std::make_unique<revm::InstructionChar>(L'1')
+        );
+        // [0-2]
+        program.emplace_back(
+          std::make_unique<revm::InstructionSet>(
+            std::vector<revm::Range>{
+              revm::Range(L'0', L'2')
+            }
+          )
+        );
+      }  // 1[0-2]
+    }  // 0[1-9]|1[0-2]
+    // -
+    program.emplace_back(  // 11
+      std::make_unique<revm::InstructionChar>(L'-')
+    );
+    {  // 0[0-9]|1[0-9]|2[0-9]|30|31
+      program.emplace_back(
+        std::make_unique<revm::InstructionSplit>(13, 16)
+      );
+      {  // 0[0-9]
+        // 0
+        program.emplace_back(  // 13
+          std::make_unique<revm::InstructionChar>(L'0')
+        );
+        // [0-9]
+        program.emplace_back(
+          std::make_unique<revm::InstructionSet>(
+            std::vector<revm::Range>{
+              revm::Range(L'0', L'9')
+            }
+          )
+        );
+      }  // 0[0-9]
+      program.emplace_back(
+        std::make_unique<revm::InstructionJump>(30)
+      );
+      program.emplace_back(  // 16
+        std::make_unique<revm::InstructionSplit>(17, 20)
+      );
+      {  // 1[0-9]
+        // 1
+        program.emplace_back(  // 17
+          std::make_unique<revm::InstructionChar>(L'1')
+        );
+        // [0-9]
+        program.emplace_back(
+          std::make_unique<revm::InstructionSet>(
+            std::vector<revm::Range>{
+              revm::Range(L'0', L'9')
+            }
+          )
+        );
+      }  // 1[0-9]
+      program.emplace_back(
+        std::make_unique<revm::InstructionJump>(30)
+      );
+      program.emplace_back(  // 20
+        std::make_unique<revm::InstructionSplit>(21, 24)
+      );
+      {  // 2[0-9]
+        // 2
+        program.emplace_back(  // 21
+          std::make_unique<revm::InstructionChar>(L'2')
+        );
+        // [0-9]
+        program.emplace_back(
+          std::make_unique<revm::InstructionSet>(
+            std::vector<revm::Range>{
+              revm::Range(L'0', L'9')
+            }
+          )
+        );
+      }  // 2[0-9]
+      program.emplace_back(
+        std::make_unique<revm::InstructionJump>(30)
+      );
+      program.emplace_back(  // 24
+        std::make_unique<revm::InstructionSplit>(25, 28)
+      );
+      {  // 30
+        // 3
+        program.emplace_back(  // 25
+          std::make_unique<revm::InstructionChar>(L'3')
+        );
+        // 0
+        program.emplace_back(
+          std::make_unique<revm::InstructionChar>(L'0')
+        );
+      }  // 30
+      program.emplace_back(
+        std::make_unique<revm::InstructionJump>(30)
+      );
+      {  // 31
+        // 3
+        program.emplace_back(  // 28
+          std::make_unique<revm::InstructionChar>(L'3')
+        );
+        // 1
+        program.emplace_back(
+          std::make_unique<revm::InstructionChar>(L'1')
+        );
+      }  // 31
+    }  // 0[0-9]|1[0-9]|2[0-9]|30|31
+    program.emplace_back(  // 30
+      std::make_unique<revm::InstructionMatch>()
+    );
+  }  // ^(-?[0-9]+)-(0[1-9]|1[0-2])-(0[0-9]|1[0-9]|2[0-9]|30|31).*$
+
+  return program;
+}
+
+const std::vector<
+  std::unique_ptr<revm::Instruction>
+> kMatchesXsDatePrefixProgram = ConstructMatchesXsDatePrefixProgram();
+
+bool MatchesXsDatePrefix(
+  const std::wstring& text
+) {
+  return revm::Match(
+    kMatchesXsDatePrefixProgram,
+    text
+  );
+}
+
+/**
+ * Represent a parsed date from a date string where we ignore the offset.
+ */
+struct MatchedDatePrefix {
+  std::wstring year;
+  std::wstring month;
+  std::wstring day;
+
+  MatchedDatePrefix(
+    std::wstring a_year,
+  	std::wstring a_month,
+  	std::wstring a_day
+  ) :
+    year(std::move(a_year)),
+    month(std::move(a_month)),
+    day(std::move(a_day)) {
+    // Intentionally empty.
+  }
+};  // MatchedDatePrefix
+
+/**
+ * Parse the date from the given text where the text is supposed to be an xs:date or
+ * an xs:dateTime.
+ */
+MatchedDatePrefix ParseXsDatePrefix(const std::wstring& text) {
+  size_t year_end = 0;
+  if (text.size() < 5) {
+    throw std::logic_error(
+      common::WstringToUtf8(
+        common::Concat(
+          L"Expected text to be prefixed with a valid xs:date, but it was not: ",
+          text
+	    )
+	  )
+	);
+  }
+
+  if (text[0] == L'-') {
+    ++year_end;
+  }
+
+  while (true) {
+    if (year_end >= text.size()) {
+      throw std::logic_error(
+        common::WstringToUtf8(
+          common::Concat(
+            L"Expected text to be prefixed with a valid xs:date, but it was not: ",
+            text
+	      )
+	    )
+	  );
+    }
+
+    if (std::isdigit(text[year_end])) {
+      ++year_end;
+    } else if (text[year_end] == '-') {
+      break;
+    } else {
+      throw std::logic_error(
+        common::WstringToUtf8(
+          common::Concat(
+            L"Expected text to be prefixed with a valid xs:date, but it was not. ",
+            L"We encountered an unexpected character while parsing the year: ",
+            std::wstring(text[year_end], 1),
+            L"; the text was: ",
+            text
+	      )
+	    )
+	  );
+    }
+  }
+
+  const std::wstring year_str = text.substr(0, year_end);
+
+  size_t month_end = year_end + 1;
+  while (true) {
+    if (month_end >= text.size()) {
+      throw std::logic_error(
+        common::WstringToUtf8(
+          common::Concat(
+            L"Expected text to be prefixed with a valid xs:date, but it was not: ",
+            text
+	      )
+	    )
+	  );
+    }
+
+    if (std::isdigit(text[month_end])) {
+      ++month_end;
+    } else if (text[month_end] == '-') {
+      break;
+    } else {
+      throw std::logic_error(
+        common::WstringToUtf8(
+          common::Concat(
+            L"Expected text to be prefixed with a valid xs:date, but it was not. ",
+			L"We encountered an unexpected character while parsing the month: ",
+            std::wstring(text[month_end], 1),
+            L"; the text was: ",
+            text
+	      )
+	    )
+	  );
+    }
+  }
+
+  std::wstring month_str = text.substr(year_end + 1, month_end - year_end - 1);
+
+  size_t day_end = month_end + 1;
+
+  while (true) {
+    if (day_end == text.size()) {
+      break;
+    }
+
+    if (std::isdigit(text[day_end])) {
+      ++day_end;
+    } else if(
+      text[day_end] == L'-'
+      || text[day_end] == L'+'
+      || text[day_end] == L'Z'
+      || text[day_end] == L'T'
+    ) {
+      // We encountered a valid suffix for xs:date offset or time in xs::dateTime.
+      break;
+    } else {
+      throw std::logic_error(
+        common::WstringToUtf8(
+          common::Concat(
+            L"Expected text to be prefixed with a valid xs:date, but it was not. ",
+            L"We encountered an unexpected character while parsing the day: ",
+            std::wstring(text[day_end], 1),
+            L"; the text was: ",
+            text
+	      )
+	    )
+	  );
+    }
+  }
+
+  std::wstring day_str = text.substr(month_end + 1, day_end - month_end - 1);
+
+  return MatchedDatePrefix(year_str, month_str, day_str);
+}
 
 /**
  * Determine the sign of the given year as text.
@@ -295,16 +527,13 @@ bool IsXsDateWithoutOffset(const std::wstring& text) {
   // We can not use date functions from the operation system as they do not
   // handle years BCE (*e.g.*, `-0003-01-02`).
 
-  std::wsmatch match;
-  const bool matched = std::regex_match(text, match, kRegexDatePrefix);
-
-  if (!matched) {
+  if (!MatchesXsDatePrefix(text)) {
     return false;
   }
 
   // NOTE (mristin):
   // We need to match the prefix as zone offsets are allowed in the dates. Optimally,
-  // we would re-use the pattern matching from `MatchesXsDate`, but this
+  // we would re-use the pattern matching from `MatchesXsDatePrefix`, but this
   // would make the code generation and constraint inference for schemas much more
   // difficult. Hence, we sacrifice the efficiency a bit for the clearer code & code
   // generation.
@@ -315,9 +544,9 @@ bool IsXsDateWithoutOffset(const std::wstring& text) {
   // we simply clip the year to the last four relevant digits for the computation of
   // leap years.
 
-  const std::wstring year_str = match[1].str();
+  const MatchedDatePrefix match = ParseXsDatePrefix(text);
 
-  const int era = DetermineEra(year_str);
+  const int era = DetermineEra(match.year);
 
   // NOTE (mristin):
   // We do not accept year zero, see the note at:
@@ -329,14 +558,14 @@ bool IsXsDateWithoutOffset(const std::wstring& text) {
   std::wstring last_four_year_digits;
 
   const size_t year_start = (era < 0) ? 1 : 0;
-  const size_t end = year_str.size();
+  const size_t end = match.year.size();
   size_t start = end - 4;
   if (start < year_start) {
     start = year_start;
   }
 
   const std::wstring at_most_last_four_year_digits(
-    year_str.substr(start, 4)
+    match.year.substr(start, 4)
   );
 
   int year_suffix = era * std::stoi(at_most_last_four_year_digits);
@@ -362,8 +591,8 @@ bool IsXsDateWithoutOffset(const std::wstring& text) {
     is_leap_year = false;
   }
 
-  const int month = std::stoi(match[2].str());
-  const int day = std::stoi(match[3].str());
+  const int month = std::stoi(match.month);
+  const int day = std::stoi(match.day);
 
   if (day <= 0) {
     return false;
@@ -414,334 +643,30 @@ bool IsXsDateTimeUtc(
   return IsXsDateWithoutOffset(date);
 }
 
-std::wregex ConstructMatchesMimeType() {
-  std::wstring tchar = L"[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
-  std::wstring token = common::Concat(
-    L"(",
-    tchar,
-    L")+"
-  );
-  std::wstring type = token;
-  std::wstring subtype = token;
-  std::wstring ows = L"[ \\t]*";
-  std::wstring obs_text = L"[\\x80-\\xff]";
-  std::wstring qd_text = common::Concat(
-    L"([\\t !#-\\[\\]-~]|",
-    obs_text,
-    L")"
-  );
-  std::wstring quoted_pair = common::Concat(
-    L"\\\\([\\t !-~]|",
-    obs_text,
-    L")"
-  );
-  std::wstring quoted_string = common::Concat(
-    L"\"(",
-    qd_text,
-    L"|",
-    quoted_pair,
-    L")*\""
-  );
-  std::wstring parameter = common::Concat(
-    token,
-    L"=(",
-    token,
-    L"|",
-    quoted_string,
-    L")"
-  );
-  std::wstring media_type = common::Concat(
-    L"^",
-    type,
-    L"/",
-    subtype,
-    L"(",
-    ows,
-    L";",
-    ows,
-    parameter,
-    L")*$"
-  );
-  return std::wregex(
-    media_type
-  );
-}
-
-const std::wregex kRegexMatchesMimeType = ConstructMatchesMimeType();
-
 bool MatchesMimeType(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesMimeType
+  return revm::Match(
+    pattern::kMatchesMimeTypeProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesRfc8089Path() {
-  std::wstring h16 = L"[0-9A-Fa-f]{1,4}";
-  std::wstring dec_octet = L"([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
-  std::wstring ipv4address = common::Concat(
-    dec_octet,
-    L"\\.",
-    dec_octet,
-    L"\\.",
-    dec_octet,
-    L"\\.",
-    dec_octet
-  );
-  std::wstring ls32 = common::Concat(
-    L"(",
-    h16,
-    L":",
-    h16,
-    L"|",
-    ipv4address,
-    L")"
-  );
-  std::wstring ipv6address = common::Concat(
-    L"((",
-    h16,
-    L":){6}",
-    ls32,
-    L"|::(",
-    h16,
-    L":){5}",
-    ls32,
-    L"|(",
-    h16,
-    L")?::(",
-    h16,
-    L":){4}",
-    ls32,
-    L"|((",
-    h16,
-    L":)?",
-    h16,
-    L")?::(",
-    h16,
-    L":){3}",
-    ls32,
-    L"|((",
-    h16,
-    L":){0,2}",
-    h16,
-    L")?::(",
-    h16,
-    L":){2}",
-    ls32,
-    L"|((",
-    h16,
-    L":){0,3}",
-    h16,
-    L")?::",
-    h16,
-    L":",
-    ls32,
-    L"|((",
-    h16,
-    L":){0,4}",
-    h16,
-    L")?::",
-    ls32,
-    L"|((",
-    h16,
-    L":){0,5}",
-    h16,
-    L")?::",
-    h16,
-    L"|((",
-    h16,
-    L":){0,6}",
-    h16,
-    L")?::)"
-  );
-  std::wstring unreserved = L"[a-zA-Z0-9\\-._~]";
-  std::wstring sub_delims = L"[!$&'()*+,;=]";
-  std::wstring ipvfuture = common::Concat(
-    L"[vV][0-9A-Fa-f]+\\.(",
-    unreserved,
-    L"|",
-    sub_delims,
-    L"|:)+"
-  );
-  std::wstring ip_literal = common::Concat(
-    L"\\[(",
-    ipv6address,
-    L"|",
-    ipvfuture,
-    L")\\]"
-  );
-  std::wstring pct_encoded = L"%[0-9A-Fa-f][0-9A-Fa-f]";
-  std::wstring reg_name = common::Concat(
-    L"(",
-    unreserved,
-    L"|",
-    pct_encoded,
-    L"|",
-    sub_delims,
-    L")*"
-  );
-  std::wstring host = common::Concat(
-    L"(",
-    ip_literal,
-    L"|",
-    ipv4address,
-    L"|",
-    reg_name,
-    L")"
-  );
-  std::wstring file_auth = common::Concat(
-    L"(localhost|",
-    host,
-    L")"
-  );
-  std::wstring pchar = common::Concat(
-    L"(",
-    unreserved,
-    L"|",
-    pct_encoded,
-    L"|",
-    sub_delims,
-    L"|[:@])"
-  );
-  std::wstring segment_nz = common::Concat(
-    L"(",
-    pchar,
-    L")+"
-  );
-  std::wstring segment = common::Concat(
-    L"(",
-    pchar,
-    L")*"
-  );
-  std::wstring path_absolute = common::Concat(
-    L"/(",
-    segment_nz,
-    L"(/",
-    segment,
-    L")*)?"
-  );
-  std::wstring auth_path = common::Concat(
-    L"(",
-    file_auth,
-    L")?",
-    path_absolute
-  );
-  std::wstring local_path = path_absolute;
-  std::wstring file_hier_part = common::Concat(
-    L"(//",
-    auth_path,
-    L"|",
-    local_path,
-    L")"
-  );
-  std::wstring file_scheme = L"file";
-  std::wstring file_uri = common::Concat(
-    file_scheme,
-    L":",
-    file_hier_part
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    file_uri,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesRfc8089Path = ConstructMatchesRfc8089Path();
 
 bool MatchesRfc8089Path(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesRfc8089Path
+  return revm::Match(
+    pattern::kMatchesRfc8089PathProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesBcp47() {
-  std::wstring alphanum = L"[a-zA-Z0-9]";
-  std::wstring singleton = L"[0-9A-WY-Za-wy-z]";
-  std::wstring extension = common::Concat(
-    singleton,
-    L"(-(",
-    alphanum,
-    L"){2,8})+"
-  );
-  std::wstring extlang = L"[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2}";
-  std::wstring irregular = L"(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)";
-  std::wstring regular = L"(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)";
-  std::wstring grandfathered = common::Concat(
-    L"(",
-    irregular,
-    L"|",
-    regular,
-    L")"
-  );
-  std::wstring language = common::Concat(
-    L"([a-zA-Z]{2,3}(-",
-    extlang,
-    L")?|[a-zA-Z]{4}|[a-zA-Z]{5,8})"
-  );
-  std::wstring script = L"[a-zA-Z]{4}";
-  std::wstring region = L"([a-zA-Z]{2}|[0-9]{3})";
-  std::wstring variant = common::Concat(
-    L"((",
-    alphanum,
-    L"){5,8}|[0-9](",
-    alphanum,
-    L"){3})"
-  );
-  std::wstring privateuse = common::Concat(
-    L"[xX](-(",
-    alphanum,
-    L"){1,8})+"
-  );
-  std::wstring langtag = common::Concat(
-    language,
-    L"(-",
-    script,
-    L")?(-",
-    region,
-    L")?(-",
-    variant,
-    L")*(-",
-    extension,
-    L")*(-",
-    privateuse,
-    L")?"
-  );
-  std::wstring language_tag = common::Concat(
-    L"(",
-    langtag,
-    L"|",
-    privateuse,
-    L"|",
-    grandfathered,
-    L")"
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    language_tag,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesBcp47 = ConstructMatchesBcp47();
 
 bool MatchesBcp47(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesBcp47
+  return revm::Match(
+    pattern::kMatchesBcp47Program,
+    text
   );
 }
 
@@ -764,849 +689,57 @@ bool QualifierTypesAreUnique(
   return true;
 }
 
-std::wregex ConstructMatchesXmlSerializableString() {
-  static_assert(
-    sizeof(wchar_t) == 2 || sizeof(wchar_t) == 4,
-    "Expected either 2 or 4 bytes for wchar_t, but got something else."
-  );
-
-  switch (sizeof(wchar_t)) {
-    case 2: {
-      std::wstring pattern = L"^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$";
-      return std::wregex(
-        pattern
-      );
-    }
-
-    case 4: {
-      std::wstring pattern = L"^[\\x09\\x0a\\x0d\\x20-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$";
-      return std::wregex(
-        pattern
-      );
-    }
-
-    default:
-      throw std::logic_error(
-        common::Concat(
-          "Unexpected size of wchar_t: ",
-          std::to_string(sizeof(wchar_t))
-        )
-      );
-  }
-}
-
-const std::wregex kRegexMatchesXmlSerializableString = ConstructMatchesXmlSerializableString();
-
 bool MatchesXmlSerializableString(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXmlSerializableString
+  return revm::Match(
+    pattern::kMatchesXmlSerializableStringProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsAnyUri() {
-  static_assert(
-    sizeof(wchar_t) == 2 || sizeof(wchar_t) == 4,
-    "Expected either 2 or 4 bytes for wchar_t, but got something else."
-  );
-
-  switch (sizeof(wchar_t)) {
-    case 2: {
-      std::wstring scheme = L"[a-zA-Z][a-zA-Z0-9+\\-.]*";
-      std::wstring ucschar = L"([\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\ud83e][\\udc00-\\udfff]|\\ud83f[\\udc00-\\udffd]|\\ud840[\\udc00-\\udfff]|[\\ud841-\\ud87e][\\udc00-\\udfff]|\\ud87f[\\udc00-\\udffd]|\\ud880[\\udc00-\\udfff]|[\\ud881-\\ud8be][\\udc00-\\udfff]|\\ud8bf[\\udc00-\\udffd]|\\ud8c0[\\udc00-\\udfff]|[\\ud8c1-\\ud8fe][\\udc00-\\udfff]|\\ud8ff[\\udc00-\\udffd]|\\ud900[\\udc00-\\udfff]|[\\ud901-\\ud93e][\\udc00-\\udfff]|\\ud93f[\\udc00-\\udffd]|\\ud940[\\udc00-\\udfff]|[\\ud941-\\ud97e][\\udc00-\\udfff]|\\ud97f[\\udc00-\\udffd]|\\ud980[\\udc00-\\udfff]|[\\ud981-\\ud9be][\\udc00-\\udfff]|\\ud9bf[\\udc00-\\udffd]|\\ud9c0[\\udc00-\\udfff]|[\\ud9c1-\\ud9fe][\\udc00-\\udfff]|\\ud9ff[\\udc00-\\udffd]|\\uda00[\\udc00-\\udfff]|[\\uda01-\\uda3e][\\udc00-\\udfff]|\\uda3f[\\udc00-\\udffd]|\\uda40[\\udc00-\\udfff]|[\\uda41-\\uda7e][\\udc00-\\udfff]|\\uda7f[\\udc00-\\udffd]|\\uda80[\\udc00-\\udfff]|[\\uda81-\\udabe][\\udc00-\\udfff]|\\udabf[\\udc00-\\udffd]|\\udac0[\\udc00-\\udfff]|[\\udac1-\\udafe][\\udc00-\\udfff]|\\udaff[\\udc00-\\udffd]|\\udb00[\\udc00-\\udfff]|[\\udb01-\\udb3e][\\udc00-\\udfff]|\\udb3f[\\udc00-\\udffd]|\\udb44[\\udc00-\\udfff]|[\\udb45-\\udb7e][\\udc00-\\udfff]|\\udb7f[\\udc00-\\udffd])";
-      std::wstring iunreserved = common::Concat(
-        L"([a-zA-Z0-9\\-._~]|",
-        ucschar,
-        L")"
-      );
-      std::wstring pct_encoded = L"%[0-9A-Fa-f][0-9A-Fa-f]";
-      std::wstring sub_delims = L"[!$&'()*+,;=]";
-      std::wstring iuserinfo = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L"|:)*"
-      );
-      std::wstring h16 = L"[0-9A-Fa-f]{1,4}";
-      std::wstring dec_octet = L"([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
-      std::wstring ipv4address = common::Concat(
-        dec_octet,
-        L"\\.",
-        dec_octet,
-        L"\\.",
-        dec_octet,
-        L"\\.",
-        dec_octet
-      );
-      std::wstring ls32 = common::Concat(
-        L"(",
-        h16,
-        L":",
-        h16,
-        L"|",
-        ipv4address,
-        L")"
-      );
-      std::wstring ipv6address = common::Concat(
-        L"((",
-        h16,
-        L":){6}",
-        ls32,
-        L"|::(",
-        h16,
-        L":){5}",
-        ls32,
-        L"|(",
-        h16,
-        L")?::(",
-        h16,
-        L":){4}",
-        ls32,
-        L"|((",
-        h16,
-        L":)?",
-        h16,
-        L")?::(",
-        h16,
-        L":){3}",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,2}",
-        h16,
-        L")?::(",
-        h16,
-        L":){2}",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,3}",
-        h16,
-        L")?::",
-        h16,
-        L":",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,4}",
-        h16,
-        L")?::",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,5}",
-        h16,
-        L")?::",
-        h16,
-        L"|((",
-        h16,
-        L":){0,6}",
-        h16,
-        L")?::)"
-      );
-      std::wstring unreserved = L"[a-zA-Z0-9\\-._~]";
-      std::wstring ipvfuture = common::Concat(
-        L"[vV][0-9A-Fa-f]+\\.(",
-        unreserved,
-        L"|",
-        sub_delims,
-        L"|:)+"
-      );
-      std::wstring ip_literal = common::Concat(
-        L"\\[(",
-        ipv6address,
-        L"|",
-        ipvfuture,
-        L")\\]"
-      );
-      std::wstring ireg_name = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L")*"
-      );
-      std::wstring ihost = common::Concat(
-        L"(",
-        ip_literal,
-        L"|",
-        ipv4address,
-        L"|",
-        ireg_name,
-        L")"
-      );
-      std::wstring port = L"[0-9]*";
-      std::wstring iauthority = common::Concat(
-        L"(",
-        iuserinfo,
-        L"@)?",
-        ihost,
-        L"(:",
-        port,
-        L")?"
-      );
-      std::wstring ipchar = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L"|[:@])"
-      );
-      std::wstring isegment = common::Concat(
-        L"(",
-        ipchar,
-        L")*"
-      );
-      std::wstring ipath_abempty = common::Concat(
-        L"(/",
-        isegment,
-        L")*"
-      );
-      std::wstring isegment_nz = common::Concat(
-        L"(",
-        ipchar,
-        L")+"
-      );
-      std::wstring ipath_absolute = common::Concat(
-        L"/(",
-        isegment_nz,
-        L"(/",
-        isegment,
-        L")*)?"
-      );
-      std::wstring ipath_rootless = common::Concat(
-        isegment_nz,
-        L"(/",
-        isegment,
-        L")*"
-      );
-      std::wstring ipath_empty = common::Concat(
-        L"(",
-        ipchar,
-        L"){0}"
-      );
-      std::wstring ihier_part = common::Concat(
-        L"(//",
-        iauthority,
-        ipath_abempty,
-        L"|",
-        ipath_absolute,
-        L"|",
-        ipath_rootless,
-        L"|",
-        ipath_empty,
-        L")"
-      );
-      std::wstring iprivate = L"([\\ue000-\\uf8ff]|\\udb80[\\udc00-\\udfff]|[\\udb81-\\udbbe][\\udc00-\\udfff]|\\udbbf[\\udc00-\\udffd]|\\udbc0[\\udc00-\\udfff]|[\\udbc1-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udffd])";
-      std::wstring iquery = common::Concat(
-        L"(",
-        ipchar,
-        L"|",
-        iprivate,
-        L"|[/?])*"
-      );
-      std::wstring ifragment = common::Concat(
-        L"(",
-        ipchar,
-        L"|[/?])*"
-      );
-      std::wstring isegment_nz_nc = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L"|@)+"
-      );
-      std::wstring ipath_noscheme = common::Concat(
-        isegment_nz_nc,
-        L"(/",
-        isegment,
-        L")*"
-      );
-      std::wstring irelative_part = common::Concat(
-        L"(//",
-        iauthority,
-        ipath_abempty,
-        L"|",
-        ipath_absolute,
-        L"|",
-        ipath_noscheme,
-        L"|",
-        ipath_empty,
-        L")"
-      );
-      std::wstring irelative_ref = common::Concat(
-        irelative_part,
-        L"(\\?",
-        iquery,
-        L")?(#",
-        ifragment,
-        L")?"
-      );
-      std::wstring iri = common::Concat(
-        scheme,
-        L":",
-        ihier_part,
-        L"(\\?",
-        iquery,
-        L")?(#",
-        ifragment,
-        L")?"
-      );
-      std::wstring iri_reference = common::Concat(
-        L"(",
-        iri,
-        L"|",
-        irelative_ref,
-        L")"
-      );
-      std::wstring pattern = common::Concat(
-        L"^",
-        iri_reference,
-        L"$"
-      );
-      return std::wregex(
-        pattern
-      );
-    }
-
-    case 4: {
-      std::wstring scheme = L"[a-zA-Z][a-zA-Z0-9+\\-.]*";
-      std::wstring ucschar = L"[\\xa0-\ud7ff\uf900-\ufdcf\ufdf0-\uffef\U00010000-\U0001fffd\U00020000-\U0002fffd\U00030000-\U0003fffd\U00040000-\U0004fffd\U00050000-\U0005fffd\U00060000-\U0006fffd\U00070000-\U0007fffd\U00080000-\U0008fffd\U00090000-\U0009fffd\U000a0000-\U000afffd\U000b0000-\U000bfffd\U000c0000-\U000cfffd\U000d0000-\U000dfffd\U000e1000-\U000efffd]";
-      std::wstring iunreserved = common::Concat(
-        L"([a-zA-Z0-9\\-._~]|",
-        ucschar,
-        L")"
-      );
-      std::wstring pct_encoded = L"%[0-9A-Fa-f][0-9A-Fa-f]";
-      std::wstring sub_delims = L"[!$&'()*+,;=]";
-      std::wstring iuserinfo = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L"|:)*"
-      );
-      std::wstring h16 = L"[0-9A-Fa-f]{1,4}";
-      std::wstring dec_octet = L"([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
-      std::wstring ipv4address = common::Concat(
-        dec_octet,
-        L"\\.",
-        dec_octet,
-        L"\\.",
-        dec_octet,
-        L"\\.",
-        dec_octet
-      );
-      std::wstring ls32 = common::Concat(
-        L"(",
-        h16,
-        L":",
-        h16,
-        L"|",
-        ipv4address,
-        L")"
-      );
-      std::wstring ipv6address = common::Concat(
-        L"((",
-        h16,
-        L":){6}",
-        ls32,
-        L"|::(",
-        h16,
-        L":){5}",
-        ls32,
-        L"|(",
-        h16,
-        L")?::(",
-        h16,
-        L":){4}",
-        ls32,
-        L"|((",
-        h16,
-        L":)?",
-        h16,
-        L")?::(",
-        h16,
-        L":){3}",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,2}",
-        h16,
-        L")?::(",
-        h16,
-        L":){2}",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,3}",
-        h16,
-        L")?::",
-        h16,
-        L":",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,4}",
-        h16,
-        L")?::",
-        ls32,
-        L"|((",
-        h16,
-        L":){0,5}",
-        h16,
-        L")?::",
-        h16,
-        L"|((",
-        h16,
-        L":){0,6}",
-        h16,
-        L")?::)"
-      );
-      std::wstring unreserved = L"[a-zA-Z0-9\\-._~]";
-      std::wstring ipvfuture = common::Concat(
-        L"[vV][0-9A-Fa-f]+\\.(",
-        unreserved,
-        L"|",
-        sub_delims,
-        L"|:)+"
-      );
-      std::wstring ip_literal = common::Concat(
-        L"\\[(",
-        ipv6address,
-        L"|",
-        ipvfuture,
-        L")\\]"
-      );
-      std::wstring ireg_name = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L")*"
-      );
-      std::wstring ihost = common::Concat(
-        L"(",
-        ip_literal,
-        L"|",
-        ipv4address,
-        L"|",
-        ireg_name,
-        L")"
-      );
-      std::wstring port = L"[0-9]*";
-      std::wstring iauthority = common::Concat(
-        L"(",
-        iuserinfo,
-        L"@)?",
-        ihost,
-        L"(:",
-        port,
-        L")?"
-      );
-      std::wstring ipchar = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L"|[:@])"
-      );
-      std::wstring isegment = common::Concat(
-        L"(",
-        ipchar,
-        L")*"
-      );
-      std::wstring ipath_abempty = common::Concat(
-        L"(/",
-        isegment,
-        L")*"
-      );
-      std::wstring isegment_nz = common::Concat(
-        L"(",
-        ipchar,
-        L")+"
-      );
-      std::wstring ipath_absolute = common::Concat(
-        L"/(",
-        isegment_nz,
-        L"(/",
-        isegment,
-        L")*)?"
-      );
-      std::wstring ipath_rootless = common::Concat(
-        isegment_nz,
-        L"(/",
-        isegment,
-        L")*"
-      );
-      std::wstring ipath_empty = common::Concat(
-        L"(",
-        ipchar,
-        L"){0}"
-      );
-      std::wstring ihier_part = common::Concat(
-        L"(//",
-        iauthority,
-        ipath_abempty,
-        L"|",
-        ipath_absolute,
-        L"|",
-        ipath_rootless,
-        L"|",
-        ipath_empty,
-        L")"
-      );
-      std::wstring iprivate = L"[\ue000-\uf8ff\U000f0000-\U000ffffd\U00100000-\U0010fffd]";
-      std::wstring iquery = common::Concat(
-        L"(",
-        ipchar,
-        L"|",
-        iprivate,
-        L"|[/?])*"
-      );
-      std::wstring ifragment = common::Concat(
-        L"(",
-        ipchar,
-        L"|[/?])*"
-      );
-      std::wstring isegment_nz_nc = common::Concat(
-        L"(",
-        iunreserved,
-        L"|",
-        pct_encoded,
-        L"|",
-        sub_delims,
-        L"|@)+"
-      );
-      std::wstring ipath_noscheme = common::Concat(
-        isegment_nz_nc,
-        L"(/",
-        isegment,
-        L")*"
-      );
-      std::wstring irelative_part = common::Concat(
-        L"(//",
-        iauthority,
-        ipath_abempty,
-        L"|",
-        ipath_absolute,
-        L"|",
-        ipath_noscheme,
-        L"|",
-        ipath_empty,
-        L")"
-      );
-      std::wstring irelative_ref = common::Concat(
-        irelative_part,
-        L"(\\?",
-        iquery,
-        L")?(#",
-        ifragment,
-        L")?"
-      );
-      std::wstring iri = common::Concat(
-        scheme,
-        L":",
-        ihier_part,
-        L"(\\?",
-        iquery,
-        L")?(#",
-        ifragment,
-        L")?"
-      );
-      std::wstring iri_reference = common::Concat(
-        L"(",
-        iri,
-        L"|",
-        irelative_ref,
-        L")"
-      );
-      std::wstring pattern = common::Concat(
-        L"^",
-        iri_reference,
-        L"$"
-      );
-      return std::wregex(
-        pattern
-      );
-    }
-
-    default:
-      throw std::logic_error(
-        common::Concat(
-          "Unexpected size of wchar_t: ",
-          std::to_string(sizeof(wchar_t))
-        )
-      );
-  }
-}
-
-const std::wregex kRegexMatchesXsAnyUri = ConstructMatchesXsAnyUri();
 
 bool MatchesXsAnyUri(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsAnyUri
+  return revm::Match(
+    pattern::kMatchesXsAnyUriProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsBase64Binary() {
-  std::wstring b04_char = L"[AQgw]";
-  std::wstring b04 = common::Concat(
-    b04_char,
-    L"\\x20?"
-  );
-  std::wstring b16_char = L"[AEIMQUYcgkosw048]";
-  std::wstring b16 = common::Concat(
-    b16_char,
-    L"\\x20?"
-  );
-  std::wstring b64_char = L"[A-Za-z0-9+/]";
-  std::wstring b64 = common::Concat(
-    b64_char,
-    L"\\x20?"
-  );
-  std::wstring b64quad = common::Concat(
-    L"(",
-    b64,
-    b64,
-    b64,
-    b64,
-    L")"
-  );
-  std::wstring b64_final_quad = common::Concat(
-    L"(",
-    b64,
-    b64,
-    b64,
-    b64_char,
-    L")"
-  );
-  std::wstring padded_8 = common::Concat(
-    b64,
-    b04,
-    L"= ?="
-  );
-  std::wstring padded_16 = common::Concat(
-    b64,
-    b64,
-    b16,
-    L"="
-  );
-  std::wstring b64final = common::Concat(
-    L"(",
-    b64_final_quad,
-    L"|",
-    padded_16,
-    L"|",
-    padded_8,
-    L")"
-  );
-  std::wstring base64_binary = common::Concat(
-    L"(",
-    b64quad,
-    L"*",
-    b64final,
-    L")?"
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    base64_binary,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsBase64Binary = ConstructMatchesXsBase64Binary();
 
 bool MatchesXsBase64Binary(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsBase64Binary
+  return revm::Match(
+    pattern::kMatchesXsBase64BinaryProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsBoolean() {
-  std::wstring pattern = L"^(true|false|1|0)$";
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsBoolean = ConstructMatchesXsBoolean();
 
 bool MatchesXsBoolean(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsBoolean
+  return revm::Match(
+    pattern::kMatchesXsBooleanProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsDate() {
-  std::wstring digit = L"[0-9]";
-  std::wstring year_frag = common::Concat(
-    L"-?(([1-9]",
-    digit,
-    digit,
-    digit,
-    L"+)|(0",
-    digit,
-    digit,
-    digit,
-    L"))"
-  );
-  std::wstring month_frag = L"((0[1-9])|(1[0-2]))";
-  std::wstring day_frag = common::Concat(
-    L"((0[1-9])|([12]",
-    digit,
-    L")|(3[01]))"
-  );
-  std::wstring minute_frag = common::Concat(
-    L"[0-5]",
-    digit
-  );
-  std::wstring timezone_frag = common::Concat(
-    L"(Z|(\\+|-)((0",
-    digit,
-    L"|1[0-3]):",
-    minute_frag,
-    L"|14:00))"
-  );
-  std::wstring date_lexical_rep = common::Concat(
-    year_frag,
-    L"-",
-    month_frag,
-    L"-",
-    day_frag,
-    timezone_frag,
-    L"?"
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    date_lexical_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsDate = ConstructMatchesXsDate();
 
 bool MatchesXsDate(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsDate
+  return revm::Match(
+    pattern::kMatchesXsDateProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsDateTime() {
-  std::wstring digit = L"[0-9]";
-  std::wstring year_frag = common::Concat(
-    L"-?(([1-9]",
-    digit,
-    digit,
-    digit,
-    L"+)|(0",
-    digit,
-    digit,
-    digit,
-    L"))"
-  );
-  std::wstring month_frag = L"((0[1-9])|(1[0-2]))";
-  std::wstring day_frag = common::Concat(
-    L"((0[1-9])|([12]",
-    digit,
-    L")|(3[01]))"
-  );
-  std::wstring hour_frag = common::Concat(
-    L"(([01]",
-    digit,
-    L")|(2[0-3]))"
-  );
-  std::wstring minute_frag = common::Concat(
-    L"[0-5]",
-    digit
-  );
-  std::wstring second_frag = common::Concat(
-    L"([0-5]",
-    digit,
-    L")(\\.",
-    digit,
-    L"+)?"
-  );
-  std::wstring end_of_day_frag = L"24:00:00(\\.0+)?";
-  std::wstring timezone_frag = common::Concat(
-    L"(Z|(\\+|-)((0",
-    digit,
-    L"|1[0-3]):",
-    minute_frag,
-    L"|14:00))"
-  );
-  std::wstring date_time_lexical_rep = common::Concat(
-    year_frag,
-    L"-",
-    month_frag,
-    L"-",
-    day_frag,
-    L"T((",
-    hour_frag,
-    L":",
-    minute_frag,
-    L":",
-    second_frag,
-    L")|",
-    end_of_day_frag,
-    L")",
-    timezone_frag,
-    L"?"
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    date_time_lexical_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsDateTime = ConstructMatchesXsDateTime();
 
 bool MatchesXsDateTime(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsDateTime
+  return revm::Match(
+    pattern::kMatchesXsDateTimeProgram,
+    text
   );
 }
 
@@ -1638,682 +771,243 @@ bool IsXsDateTime(
   return IsXsDateWithoutOffset(date);
 }
 
-std::wregex ConstructMatchesXsDecimal() {
-  std::wstring digit = L"[0-9]";
-  std::wstring unsigned_no_decimal_pt_numeral = common::Concat(
-    digit,
-    L"+"
-  );
-  std::wstring no_decimal_pt_numeral = common::Concat(
-    L"(\\+|-)?",
-    unsigned_no_decimal_pt_numeral
-  );
-  std::wstring frac_frag = common::Concat(
-    digit,
-    L"+"
-  );
-  std::wstring unsigned_decimal_pt_numeral = common::Concat(
-    L"(",
-    unsigned_no_decimal_pt_numeral,
-    L"\\.",
-    frac_frag,
-    L"|\\.",
-    frac_frag,
-    L")"
-  );
-  std::wstring decimal_pt_numeral = common::Concat(
-    L"(\\+|-)?",
-    unsigned_decimal_pt_numeral
-  );
-  std::wstring decimal_lexical_rep = common::Concat(
-    L"(",
-    decimal_pt_numeral,
-    L"|",
-    no_decimal_pt_numeral,
-    L")"
-  );
-  std::wstring pattern = common::Concat(
-    L"^",
-    decimal_lexical_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsDecimal = ConstructMatchesXsDecimal();
-
 bool MatchesXsDecimal(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsDecimal
+  return revm::Match(
+    pattern::kMatchesXsDecimalProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsDouble() {
-  std::wstring double_rep = L"((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)";
-  std::wstring pattern = common::Concat(
-    L"^",
-    double_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsDouble = ConstructMatchesXsDouble();
 
 bool MatchesXsDouble(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsDouble
+  return revm::Match(
+    pattern::kMatchesXsDoubleProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsDuration() {
-  std::wstring duration_rep = L"-?P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))";
-  std::wstring pattern = common::Concat(
-    L"^",
-    duration_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsDuration = ConstructMatchesXsDuration();
 
 bool MatchesXsDuration(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsDuration
+  return revm::Match(
+    pattern::kMatchesXsDurationProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsFloat() {
-  std::wstring float_rep = L"((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)";
-  std::wstring pattern = common::Concat(
-    L"^",
-    float_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsFloat = ConstructMatchesXsFloat();
 
 bool MatchesXsFloat(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsFloat
+  return revm::Match(
+    pattern::kMatchesXsFloatProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsGDay() {
-  std::wstring g_day_lexical_rep = L"---(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
-  std::wstring pattern = common::Concat(
-    L"^",
-    g_day_lexical_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsGDay = ConstructMatchesXsGDay();
 
 bool MatchesXsGDay(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsGDay
+  return revm::Match(
+    pattern::kMatchesXsGDayProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsGMonth() {
-  std::wstring g_month_lexical_rep = L"--(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
-  std::wstring pattern = common::Concat(
-    L"^",
-    g_month_lexical_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsGMonth = ConstructMatchesXsGMonth();
 
 bool MatchesXsGMonth(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsGMonth
+  return revm::Match(
+    pattern::kMatchesXsGMonthProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsGMonthDay() {
-  std::wstring g_month_day_rep = L"--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
-  std::wstring pattern = common::Concat(
-    L"^",
-    g_month_day_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsGMonthDay = ConstructMatchesXsGMonthDay();
 
 bool MatchesXsGMonthDay(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsGMonthDay
+  return revm::Match(
+    pattern::kMatchesXsGMonthDayProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsGYear() {
-  std::wstring g_year_rep = L"-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
-  std::wstring pattern = common::Concat(
-    L"^",
-    g_year_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsGYear = ConstructMatchesXsGYear();
 
 bool MatchesXsGYear(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsGYear
+  return revm::Match(
+    pattern::kMatchesXsGYearProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsGYearMonth() {
-  std::wstring g_year_month_rep = L"-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
-  std::wstring pattern = common::Concat(
-    L"^",
-    g_year_month_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsGYearMonth = ConstructMatchesXsGYearMonth();
 
 bool MatchesXsGYearMonth(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsGYearMonth
+  return revm::Match(
+    pattern::kMatchesXsGYearMonthProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsHexBinary() {
-  std::wstring hex_binary = L"([0-9a-fA-F]{2})*";
-  std::wstring pattern = common::Concat(
-    L"^",
-    hex_binary,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsHexBinary = ConstructMatchesXsHexBinary();
 
 bool MatchesXsHexBinary(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsHexBinary
+  return revm::Match(
+    pattern::kMatchesXsHexBinaryProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsTime() {
-  std::wstring time_rep = L"(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
-  std::wstring pattern = common::Concat(
-    L"^",
-    time_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsTime = ConstructMatchesXsTime();
 
 bool MatchesXsTime(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsTime
+  return revm::Match(
+    pattern::kMatchesXsTimeProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsInteger() {
-  std::wstring integer_rep = L"[-+]?[0-9]+";
-  std::wstring pattern = common::Concat(
-    L"^",
-    integer_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsInteger = ConstructMatchesXsInteger();
 
 bool MatchesXsInteger(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsInteger
+  return revm::Match(
+    pattern::kMatchesXsIntegerProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsLong() {
-  std::wstring long_rep = L"[-+]?0*[0-9]{1,20}";
-  std::wstring pattern = common::Concat(
-    L"^",
-    long_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsLong = ConstructMatchesXsLong();
 
 bool MatchesXsLong(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsLong
+  return revm::Match(
+    pattern::kMatchesXsLongProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsInt() {
-  std::wstring int_rep = L"[-+]?0*[0-9]{1,10}";
-  std::wstring pattern = common::Concat(
-    L"^",
-    int_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsInt = ConstructMatchesXsInt();
 
 bool MatchesXsInt(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsInt
+  return revm::Match(
+    pattern::kMatchesXsIntProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsShort() {
-  std::wstring short_rep = L"[-+]?0*[0-9]{1,5}";
-  std::wstring pattern = common::Concat(
-    L"^",
-    short_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsShort = ConstructMatchesXsShort();
 
 bool MatchesXsShort(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsShort
+  return revm::Match(
+    pattern::kMatchesXsShortProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsByte() {
-  std::wstring byte_rep = L"[-+]?0*[0-9]{1,3}";
-  std::wstring pattern = common::Concat(
-    L"^",
-    byte_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsByte = ConstructMatchesXsByte();
 
 bool MatchesXsByte(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsByte
+  return revm::Match(
+    pattern::kMatchesXsByteProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsNonNegativeInteger() {
-  std::wstring non_negative_integer_rep = L"(-0|\\+?[0-9]+)";
-  std::wstring pattern = common::Concat(
-    L"^",
-    non_negative_integer_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsNonNegativeInteger = ConstructMatchesXsNonNegativeInteger();
 
 bool MatchesXsNonNegativeInteger(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsNonNegativeInteger
+  return revm::Match(
+    pattern::kMatchesXsNonNegativeIntegerProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsPositiveInteger() {
-  std::wstring positive_integer_rep = L"\\+?0*[1-9][0-9]*";
-  std::wstring pattern = common::Concat(
-    L"^",
-    positive_integer_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsPositiveInteger = ConstructMatchesXsPositiveInteger();
 
 bool MatchesXsPositiveInteger(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsPositiveInteger
+  return revm::Match(
+    pattern::kMatchesXsPositiveIntegerProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsUnsignedLong() {
-  std::wstring unsigned_long_rep = L"(-0|\\+?0*[0-9]{1,20})";
-  std::wstring pattern = common::Concat(
-    L"^",
-    unsigned_long_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsUnsignedLong = ConstructMatchesXsUnsignedLong();
 
 bool MatchesXsUnsignedLong(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsUnsignedLong
+  return revm::Match(
+    pattern::kMatchesXsUnsignedLongProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsUnsignedInt() {
-  std::wstring unsigned_int_rep = L"(-0|\\+?0*[0-9]{1,10})";
-  std::wstring pattern = common::Concat(
-    L"^",
-    unsigned_int_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsUnsignedInt = ConstructMatchesXsUnsignedInt();
 
 bool MatchesXsUnsignedInt(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsUnsignedInt
+  return revm::Match(
+    pattern::kMatchesXsUnsignedIntProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsUnsignedShort() {
-  std::wstring unsigned_short_rep = L"(-0|\\+?0*[0-9]{1,5})";
-  std::wstring pattern = common::Concat(
-    L"^",
-    unsigned_short_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsUnsignedShort = ConstructMatchesXsUnsignedShort();
 
 bool MatchesXsUnsignedShort(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsUnsignedShort
+  return revm::Match(
+    pattern::kMatchesXsUnsignedShortProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsUnsignedByte() {
-  std::wstring unsigned_byte_rep = L"(-0|\\+?0*[0-9]{1,3})";
-  std::wstring pattern = common::Concat(
-    L"^",
-    unsigned_byte_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsUnsignedByte = ConstructMatchesXsUnsignedByte();
 
 bool MatchesXsUnsignedByte(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsUnsignedByte
+  return revm::Match(
+    pattern::kMatchesXsUnsignedByteProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsNonPositiveInteger() {
-  std::wstring non_positive_integer_rep = L"(\\+0|0|-[0-9]+)";
-  std::wstring pattern = common::Concat(
-    L"^",
-    non_positive_integer_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsNonPositiveInteger = ConstructMatchesXsNonPositiveInteger();
 
 bool MatchesXsNonPositiveInteger(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsNonPositiveInteger
+  return revm::Match(
+    pattern::kMatchesXsNonPositiveIntegerProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsNegativeInteger() {
-  std::wstring negative_integer_rep = L"(-0*[1-9][0-9]*)";
-  std::wstring pattern = common::Concat(
-    L"^",
-    negative_integer_rep,
-    L"$"
-  );
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexMatchesXsNegativeInteger = ConstructMatchesXsNegativeInteger();
 
 bool MatchesXsNegativeInteger(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsNegativeInteger
+  return revm::Match(
+    pattern::kMatchesXsNegativeIntegerProgram,
+    text
   );
 }
-
-std::wregex ConstructMatchesXsString() {
-  static_assert(
-    sizeof(wchar_t) == 2 || sizeof(wchar_t) == 4,
-    "Expected either 2 or 4 bytes for wchar_t, but got something else."
-  );
-
-  switch (sizeof(wchar_t)) {
-    case 2: {
-      std::wstring pattern = L"^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$";
-      return std::wregex(
-        pattern
-      );
-    }
-
-    case 4: {
-      std::wstring pattern = L"^[\\x09\\x0a\\x0d\\x20-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$";
-      return std::wregex(
-        pattern
-      );
-    }
-
-    default:
-      throw std::logic_error(
-        common::Concat(
-          "Unexpected size of wchar_t: ",
-          std::to_string(sizeof(wchar_t))
-        )
-      );
-  }
-}
-
-const std::wregex kRegexMatchesXsString = ConstructMatchesXsString();
 
 bool MatchesXsString(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexMatchesXsString
+  return revm::Match(
+    pattern::kMatchesXsStringProgram,
+    text
   );
 }
 
 bool IsXsDate(const std::wstring& text) {
-  std::wsmatch match;
-  const bool matched = std::regex_match(text, match, kRegexMatchesXsDate);
+  // NOTE (mristin):
+  // Optimally, we would re-use the parts of `MatchesXsDate` program and
+  // `IsXsDateWithoutOffset`, but this would make the implementation much more
+  // difficult to read and maintain. Hence, we opt here for simplicity of implementation
+  // to computational performance.
 
-  if (!matched) {
+  if (!MatchesXsDate(text)) {
     return false;
   }
 
-  size_t cursor = 0;
-  if (text[0] == L'-') {
-    cursor = 1;
-  }
-
-  while (std::isdigit(text[cursor])) {
-    ++cursor;
-  }
-
-  if (text[cursor] != L'-') {
-    throw std::logic_error(
-      common::Concat(
-        "Expected a dash after a year, but got the date text: ",
-        common::WstringToUtf8(text)
-      )
-    );
-  }
-  ++cursor;
-
-  while (std::isdigit(text[cursor])) {
-    ++cursor;
-  }
-
-  if (text[cursor] != L'-') {
-    throw std::logic_error(
-      common::Concat(
-        "Expected a dash after a month, but got the date text: ",
-        common::WstringToUtf8(text)
-      )
-    );
-  }
-  ++cursor;
-
-  while (std::isdigit(text[cursor])) {
-    ++cursor;
-  }
-
-  const std::wstring date_without_offset(
-    text.substr(0, cursor)
-  );
-
-  return IsXsDateWithoutOffset(date_without_offset);
+  return IsXsDateWithoutOffset(text);
 }
 
 bool IsXsDouble(const std::wstring& value) {
@@ -3588,21 +2282,12 @@ bool DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
   return true;
 }
 
-std::wregex ConstructIsBcp47ForEnglish() {
-  std::wstring pattern = L"^(en|EN)(-.*)?$";
-  return std::wregex(
-    pattern
-  );
-}
-
-const std::wregex kRegexIsBcp47ForEnglish = ConstructIsBcp47ForEnglish();
-
 bool IsBcp47ForEnglish(
   const std::wstring& text
 ) {
-  return std::regex_search(
-    text,
-    kRegexIsBcp47ForEnglish
+  return revm::Match(
+    pattern::kIsBcp47ForEnglishProgram,
+    text
   );
 }
 

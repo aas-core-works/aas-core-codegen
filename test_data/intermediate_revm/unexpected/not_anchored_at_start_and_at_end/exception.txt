@@ -1,0 +1,5 @@
+(mristin, 2024-05-31): We expect all the patterns which need to be transpiled to instructions of the RegEx virtual machine to be anchored at the start (``^``) and at the end (``$``). Please consider re-writing your pattern with putting a prefix ``^.*`` if you want to match an arbitrary prefix, and a suffix ``.*$`` if you want to match an arbitrary suffix. If you really need this feature, please contact the developers. The regular expression was: ab
+
+Expected the first term of the pattern to be a start anchor, but it is not. Got: a
+
+Expected the last term of the pattern to be an end anchor, but it is not. Got: b

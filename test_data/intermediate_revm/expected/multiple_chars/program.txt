@@ -1,0 +1,8 @@
+# ^ab$
+{
+  char 'a'
+  char 'b'
+  # $
+  end
+  match
+}
