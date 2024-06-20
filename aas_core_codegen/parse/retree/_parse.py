@@ -3,10 +3,11 @@ import collections.abc
 import io
 import math
 import re
-from typing import Tuple, Optional, List, Sequence, Union
+from typing import Tuple, Optional, List, Sequence, Union, MutableMapping
 
 from icontract import invariant, require, ensure, snapshot
 
+from aas_core_codegen.common import pairwise
 from aas_core_codegen.parse.retree._types import (
     Char,
     Range,
@@ -112,6 +113,10 @@ class Cursor:
         self._minor_cursor: Optional[int] = None
         if isinstance(self.pointed_value(), str):
             self._minor_cursor = 0
+
+    def copy(self) -> "Cursor":
+        """Make a deep copy of the cursor."""
+        return Cursor(values=self.values)
 
     @property
     def major_cursor(self) -> int:
@@ -617,6 +622,8 @@ def _parse_ranges_and_closing(
     if cursor.try_literal("-"):
         ranges.append(Range(start=Char("-"), end=None))
 
+    cursor_by_range = dict()  # type: MutableMapping[Range, Cursor]
+
     while True:
         if cursor.done():
             return None, Error(
@@ -625,10 +632,14 @@ def _parse_ranges_and_closing(
                 cursor,
             )
 
+        cursor_at_start = cursor.copy()
+
         # NOTE (mristin, 2022-06-08):
         # A suffix dash is also allowed and should be considered a single character.
         if cursor.try_literal("-]"):
-            ranges.append(Range(start=Char("-"), end=None))
+            the_range = Range(start=Char("-"), end=None)
+            cursor_by_range[the_range] = cursor_at_start
+            ranges.append(the_range)
             break
         elif cursor.try_literal("]"):
             break
@@ -656,7 +667,34 @@ def _parse_ranges_and_closing(
                     "Invalid character range, start is smaller than end", cursor
                 )
 
-            ranges.append(Range(start=start, end=end))
+            the_range = Range(start=start, end=end)
+            cursor_by_range[the_range] = cursor_at_start
+            ranges.append(the_range)
+
+    for this_range, next_range in pairwise(
+        sorted(ranges, key=lambda rng: ord(rng.start.character))
+    ):
+        this_end = this_range.end if this_range.end is not None else this_range.start
+
+        next_start = next_range.start
+
+        if ord(this_end.character) >= ord(next_start.character):
+            this_range_str = (
+                f"{this_range.start.character!r}"
+                if this_range.end is None
+                else f"{this_range.start.character!r}-{this_range.end.character!r}"
+            )
+
+            next_range_str = (
+                f"{next_range.start.character!r}"
+                if next_range.end is None
+                else f"{next_range.start.character!r}-{next_range.end.character!r}"
+            )
+
+            return None, Error(
+                f"The range {this_range_str} and the range {next_range_str} overlap",
+                cursor_by_range[this_range],
+            )
 
     return ranges, None
 
