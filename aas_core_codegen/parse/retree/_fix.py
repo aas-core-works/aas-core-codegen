@@ -9,7 +9,7 @@ from aas_core_codegen.parse.retree import (
 )
 
 
-class _FixForUTF16Regex(retree_visitor.BaseVisitor):
+class _FixForUTF16Regex(retree_visitor.PassThroughVisitor):
     """
     Modify the pattern in-place so that UTF-32 can be dealt by UTF-16-only regex engine.
 

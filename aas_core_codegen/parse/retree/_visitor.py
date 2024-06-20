@@ -15,7 +15,7 @@ from aas_core_codegen.parse.retree._types import (
 from aas_core_codegen.parse.tree import FormattedValue
 
 
-class BaseVisitor(Visitor):
+class PassThroughVisitor(Visitor):
     """Visit all the nodes recursively without any action."""
 
     def visit_regex(self, node: Regex) -> None:
