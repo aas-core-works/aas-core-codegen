@@ -30,7 +30,7 @@ namespace aas_3_0 {
  * https://swtch.com/~rsc/regexp/regexp2.html
  *
  * The ideas for additional instructions were taken from:
- * https://www.codeproject.com/Articles/5256833/Regex-as-a-Tiny-Threaded-Virtual-Machine  
+ * https://www.codeproject.com/Articles/5256833/Regex-as-a-Tiny-Threaded-Virtual-Machine
  * @{
  */
 namespace revm {
@@ -58,7 +58,7 @@ struct Instruction {
 };
 
 /**
- * Match a single character. 
+ * Match a single character.
  *
  * If the character on the String Pointer does not match the `character`, stop this
  * thread as it failed. Otherwise, move the String Pointer to the next character,

@@ -286,7 +286,7 @@ std::string to_string(const InstructionSplit& instruction) {
 }
 
 InstructionKind InstructionEnd::kind() const {
-  return InstructionKind::End; 
+  return InstructionKind::End;
 }
 
 std::string to_string(const InstructionEnd&) {
@@ -467,7 +467,7 @@ class ThreadList {
 
   /**
    * Pop the thread from the back, returning its program counter.
-   * 
+   *
    * The order of the threads is not guaranteed.
    */
   size_t Pop() {
