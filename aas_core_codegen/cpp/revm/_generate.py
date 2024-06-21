@@ -68,7 +68,7 @@ def generate_header(library_namespace: Stripped) -> str:
  * https://swtch.com/~rsc/regexp/regexp2.html
  *
  * The ideas for additional instructions were taken from:
- * https://www.codeproject.com/Articles/5256833/Regex-as-a-Tiny-Threaded-Virtual-Machine  
+ * https://www.codeproject.com/Articles/5256833/Regex-as-a-Tiny-Threaded-Virtual-Machine
  * @{{
  */
 namespace {cpp_common.REVM_NAMESPACE} {{
@@ -96,7 +96,7 @@ struct Instruction {{
 }};
 
 /**
- * Match a single character. 
+ * Match a single character.
  *
  * If the character on the String Pointer does not match the `character`, stop this
  * thread as it failed. Otherwise, move the String Pointer to the next character,
@@ -564,7 +564,7 @@ std::string to_string(const InstructionSplit& instruction) {{
 }}
 
 InstructionKind InstructionEnd::kind() const {{
-{I}return InstructionKind::End; 
+{I}return InstructionKind::End;
 }}
 
 std::string to_string(const InstructionEnd&) {{
@@ -745,7 +745,7 @@ class ThreadList {{
 
 {I}/**
 {I} * Pop the thread from the back, returning its program counter.
-{I} * 
+{I} *
 {I} * The order of the threads is not guaranteed.
 {I} */
 {I}size_t Pop() {{
