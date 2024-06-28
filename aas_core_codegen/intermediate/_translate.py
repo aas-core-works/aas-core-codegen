@@ -4051,7 +4051,34 @@ def _verify_constructor_arguments_and_properties_match(
     We check both the order and the types.
     """
     errors = []  # type: List[Error]
+
     for cls in symbol_table.classes:
+        if (
+            sum(1 for prop in cls.properties if prop.specified_for is cls) > 0
+            and cls.constructor.parsed is None
+        ):
+            errors.append(
+                Error(
+                    cls.parsed.node,
+                    f"No constructor has been specified for the class {cls.name!r}, "
+                    f"but there are class-specific properties.",
+                )
+            )
+            continue
+
+        arg_name_set = set(arg.name for arg in cls.constructor.arguments)
+        prop_name_set = set(prop.name for prop in cls.properties)
+        if arg_name_set != prop_name_set:
+            errors.append(
+                Error(
+                    cls.parsed.node,
+                    f"The properties and constructor arguments do not coincide. "
+                    f"The set of constructor arguments is: {sorted(arg_name_set)} "
+                    f"and the set of properties is: {set(prop_name_set)}",
+                )
+            )
+            continue
+
         args_without_default = []  # type: List[Identifier]
         args_without_default_set = set()  # type: Set[Identifier]
 
@@ -4105,6 +4132,10 @@ def _verify_constructor_arguments_and_properties_match(
                     f"should be: {ordered_props!r}",
                 )
             )
+            continue
+
+        if len(errors) > 0:
+            return errors
 
         assert set(cls.properties_by_name.keys()) == set(
             cls.constructor.arguments_by_name.keys()
@@ -4557,15 +4588,25 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
         )
     )
 
-    errors.extend(
+    errors_if_not_all_non_optional_properties_are_initialized_in_the_constructor = (
         _verify_all_non_optional_properties_are_initialized_in_the_constructor(
             symbol_table=symbol_table
         )
     )
-
     errors.extend(
-        _verify_constructor_arguments_and_properties_match(symbol_table=symbol_table)
+        errors_if_not_all_non_optional_properties_are_initialized_in_the_constructor
     )
+    if (
+        len(
+            errors_if_not_all_non_optional_properties_are_initialized_in_the_constructor
+        )
+        == 0
+    ):
+        errors.extend(
+            _verify_constructor_arguments_and_properties_match(
+                symbol_table=symbol_table
+            )
+        )
 
     errors.extend(
         _verify_all_references_to_arguments_occur_in_valid_context(
