@@ -16,6 +16,8 @@ from typing import (
     Mapping,
     MutableMapping,
     Dict,
+    Set,
+    Iterable,
 )
 
 import asttokens
@@ -96,7 +98,6 @@ def source_to_atok(
 
 
 class _ExpectedImportsVisitor(ast.NodeVisitor):
-
     _EXPECTED_NAME_FROM_MODULE = collections.OrderedDict(
         [
             ("match", "re"),
@@ -116,6 +117,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("non_mutating", "aas_core_meta.marker"),
         ]
     )
+
     # pylint: disable=missing-docstring
 
     def __init__(self) -> None:
@@ -3618,6 +3620,41 @@ def _verify_symbol_table(
     return SymbolTable(symbol_table), None
 
 
+Symbol = Union[
+    AbstractClass,
+    ConcreteClass,
+    Enumeration,
+    ConstantPrimitive,
+    ConstantSet,
+    UnderstoodMethod,
+    ImplementationSpecificMethod,
+]
+
+
+# fmt: off
+@ensure(
+    lambda result: not (result is not None) or (len(result) >= 1),
+    "Either null errors or at least one error"
+)
+# fmt: on
+def _verify_duplicate_names(
+    symbols: Iterable[Symbol],
+) -> Optional[List[Error]]:
+    """Determine the duplicate names in the given sequence of nameable instances."""
+    name_set = set()  # type: Set[Identifier]
+    errors = []  # type: List[Error]
+    for symbol in symbols:
+        if symbol.name in name_set:
+            errors.append(Error(symbol.node, f"Duplicate for {symbol.name!r}"))
+        else:
+            name_set.add(symbol.name)
+
+    if len(errors) > 0:
+        return errors
+
+    return None
+
+
 # noinspection PyTypeChecker,PyUnresolvedReferences
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -3846,6 +3883,18 @@ def _atok_to_symbol_table(
                 None,
                 "The XML namespace (given as assignment to ``__xml_namespace__``) "
                 "is missing",
+            )
+        )
+
+    duplicate_name_errors = _verify_duplicate_names(
+        itertools.chain(our_types, constants, verification_functions)
+    )
+    if duplicate_name_errors is not None:
+        underlying_errors.append(
+            Error(
+                None,
+                "One or more symbols in the meta-model have duplicate names",
+                duplicate_name_errors,
             )
         )
 
