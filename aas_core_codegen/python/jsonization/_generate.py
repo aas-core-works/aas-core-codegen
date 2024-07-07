@@ -706,6 +706,26 @@ if not isinstance(jsonable, collections.abc.Mapping):
         Stripped(f"setter = {setter_cls_name}()"),
     ]  # type: List[Stripped]
 
+    # NOTE (mristin):
+    # If the class has no concrete descendants, this function will be the sole entry
+    # point for the de-serialization. In that case, we have to explicitly check if
+    # the ``modelType`` is present — for cases where the serialization rules impose
+    # a model type for backwards compatibility even though it is redundant.
+    #
+    # If the class has concrete descendants, we can only publicly de-serialize it
+    # through a dispatching function, which will innately check for model type, so we
+    # do not have to repeat the check here.
+    if len(cls.concrete_descendants) == 0 and cls.serialization.with_model_type:
+        blocks.append(
+            Stripped(
+                f"""\
+if 'modelType' not in jsonable:
+{I}raise DeserializationException(
+{II}"Expected the property modelType, but found none"
+{I})"""
+            )
+        )
+
     # region Switch on property name
 
     map_name = python_naming.private_constant_name(
@@ -793,7 +813,7 @@ if setter.{prop_name} is None:
 
     writer = io.StringIO()
 
-    if len(cls._concrete_descendants) == 0:
+    if len(cls.concrete_descendants) == 0:
         function_name = python_naming.function_name(
             Identifier(f"{cls.name}_from_jsonable")
         )
