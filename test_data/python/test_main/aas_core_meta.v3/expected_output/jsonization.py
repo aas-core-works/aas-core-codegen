@@ -1443,6 +1443,11 @@ def asset_administration_shell_from_jsonable(
 
     setter = _SetterForAssetAdministrationShell()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_ASSET_ADMINISTRATION_SHELL.get(key)
@@ -2290,6 +2295,11 @@ def submodel_from_jsonable(
         )
 
     setter = _SetterForSubmodel()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -3190,6 +3200,11 @@ def submodel_element_list_from_jsonable(
 
     setter = _SetterForSubmodelElementList()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_SUBMODEL_ELEMENT_LIST.get(key)
@@ -3562,6 +3577,11 @@ def submodel_element_collection_from_jsonable(
         )
 
     setter = _SetterForSubmodelElementCollection()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -3968,6 +3988,11 @@ def property_from_jsonable(
 
     setter = _SetterForProperty()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_PROPERTY.get(key)
@@ -4353,6 +4378,11 @@ def multi_language_property_from_jsonable(
 
     setter = _SetterForMultiLanguageProperty()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_MULTI_LANGUAGE_PROPERTY.get(key)
@@ -4723,6 +4753,11 @@ def range_from_jsonable(
 
     setter = _SetterForRange()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_RANGE.get(key)
@@ -5070,6 +5105,11 @@ def reference_element_from_jsonable(
         )
 
     setter = _SetterForReferenceElement()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -5425,6 +5465,11 @@ def blob_from_jsonable(
         )
 
     setter = _SetterForBlob()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -5786,6 +5831,11 @@ def file_from_jsonable(
         )
 
     setter = _SetterForFile()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -6184,6 +6234,11 @@ def annotated_relationship_element_from_jsonable(
         )
 
     setter = _SetterForAnnotatedRelationshipElement()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -6625,6 +6680,11 @@ def entity_from_jsonable(
         )
 
     setter = _SetterForEntity()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -7375,6 +7435,11 @@ def basic_event_element_from_jsonable(
 
     setter = _SetterForBasicEventElement()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_BASIC_EVENT_ELEMENT.get(key)
@@ -7835,6 +7900,11 @@ def operation_from_jsonable(
 
     setter = _SetterForOperation()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_OPERATION.get(key)
@@ -8237,6 +8307,11 @@ def capability_from_jsonable(
 
     setter = _SetterForCapability()
 
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
+
     for key, jsonable_value in jsonable.items():
         setter_method = (
             _SETTER_MAP_FOR_CAPABILITY.get(key)
@@ -8539,6 +8614,11 @@ def concept_description_from_jsonable(
         )
 
     setter = _SetterForConceptDescription()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
@@ -10285,6 +10365,11 @@ def data_specification_iec_61360_from_jsonable(
         )
 
     setter = _SetterForDataSpecificationIEC61360()
+
+    if 'modelType' not in jsonable:
+        raise DeserializationException(
+            "Expected the property modelType, but found none"
+        )
 
     for key, jsonable_value in jsonable.items():
         setter_method = (
