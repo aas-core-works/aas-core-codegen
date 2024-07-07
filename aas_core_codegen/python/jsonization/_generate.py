@@ -716,12 +716,20 @@ if not isinstance(jsonable, collections.abc.Mapping):
     # through a dispatching function, which will innately check for model type, so we
     # do not have to repeat the check here.
     if len(cls.concrete_descendants) == 0 and cls.serialization.with_model_type:
+        expected_model_type = naming.json_model_type(cls.name)
         blocks.append(
             Stripped(
                 f"""\
-if 'modelType' not in jsonable:
+model_type = jsonable.get("modelType", None)
+if model_type is None:
 {I}raise DeserializationException(
 {II}"Expected the property modelType, but found none"
+{I})
+
+if model_type != {python_common.string_literal(expected_model_type)}:
+{I}raise DeserializationException(
+{II}f"Invalid modelType, expected '{expected_model_type}', "
+{II}f"but got: {{model_type!r}}"
 {I})"""
             )
         )
