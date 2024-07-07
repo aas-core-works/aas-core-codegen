@@ -1658,6 +1658,8 @@ namespace AasCore.Aas3_0
                 IReference? theDerivedFrom = null;
                 List<IReference>? theSubmodels = null;
 
+                string? modelType = null;
+
                 foreach (var keyValue in obj)
                 {
                     switch (keyValue.Key)
@@ -2082,7 +2084,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "AssetAdministrationShell")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'AssetAdministrationShell', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -2101,6 +2132,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"assetInformation\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -2697,6 +2735,8 @@ namespace AasCore.Aas3_0
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theSubmodelElements = null;
 
+                string? modelType = null;
+
                 foreach (var keyValue in obj)
                 {
                     switch (keyValue.Key)
@@ -3231,7 +3271,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Submodel")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Submodel', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -3243,6 +3312,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"id\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -3450,6 +3526,8 @@ namespace AasCore.Aas3_0
                 List<IReference>? theSupplementalSemanticIds = null;
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -3906,7 +3984,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "RelationshipElement")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'RelationshipElement', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -3925,6 +4032,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"second\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -4009,6 +4123,8 @@ namespace AasCore.Aas3_0
                 IReference? theSemanticIdListElement = null;
                 DataTypeDefXsd? theValueTypeListElement = null;
                 List<ISubmodelElement>? theValue = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -4568,7 +4684,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "SubmodelElementList")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'SubmodelElementList', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -4580,6 +4725,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"typeValueListElement\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -4631,6 +4783,8 @@ namespace AasCore.Aas3_0
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theValue = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -5094,7 +5248,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "SubmodelElementCollection")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'SubmodelElementCollection', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -5103,6 +5286,13 @@ namespace AasCore.Aas3_0
                 }
 
 
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return null;
+                }
 
                 return new Aas.SubmodelElementCollection(
                     theExtensions,
@@ -5220,6 +5410,8 @@ namespace AasCore.Aas3_0
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theValue = null;
                 IReference? theValueId = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -5700,7 +5892,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Property")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Property', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -5712,6 +5933,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"valueType\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -5762,6 +5990,8 @@ namespace AasCore.Aas3_0
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ILangStringTextType>? theValue = null;
                 IReference? theValueId = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -6249,7 +6479,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "MultiLanguageProperty")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'MultiLanguageProperty', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -6258,6 +6517,13 @@ namespace AasCore.Aas3_0
                 }
 
 
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return null;
+                }
 
                 return new Aas.MultiLanguageProperty(
                     theExtensions,
@@ -6304,6 +6570,8 @@ namespace AasCore.Aas3_0
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theMin = null;
                 string? theMax = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -6784,7 +7052,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Range")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Range', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -6796,6 +7093,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"valueType\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -6845,6 +7149,8 @@ namespace AasCore.Aas3_0
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 IReference? theValue = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -7277,7 +7583,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "ReferenceElement")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'ReferenceElement', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -7286,6 +7621,13 @@ namespace AasCore.Aas3_0
                 }
 
 
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return null;
+                }
 
                 return new Aas.ReferenceElement(
                     theExtensions,
@@ -7330,6 +7672,8 @@ namespace AasCore.Aas3_0
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 byte[]? theValue = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -7786,7 +8130,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Blob")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Blob', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -7798,6 +8171,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"contentType\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -7847,6 +8227,8 @@ namespace AasCore.Aas3_0
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theValue = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -8303,7 +8685,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "File")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'File', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -8315,6 +8726,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"contentType\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -8365,6 +8783,8 @@ namespace AasCore.Aas3_0
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<IDataElement>? theAnnotations = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -8876,7 +9296,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "AnnotatedRelationshipElement")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'AnnotatedRelationshipElement', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -8895,6 +9344,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"second\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -8949,6 +9405,8 @@ namespace AasCore.Aas3_0
                 List<ISubmodelElement>? theStatements = null;
                 string? theGlobalAssetId = null;
                 List<ISpecificAssetId>? theSpecificAssetIds = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -9515,7 +9973,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Entity")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Entity', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -9527,6 +10014,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"entityType\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -10000,6 +10494,8 @@ namespace AasCore.Aas3_0
                 string? theLastUpdate = null;
                 string? theMinInterval = null;
                 string? theMaxInterval = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -10600,7 +11096,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "BasicEventElement")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'BasicEventElement', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -10626,6 +11151,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"state\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -10686,6 +11218,8 @@ namespace AasCore.Aas3_0
                 List<IOperationVariable>? theInputVariables = null;
                 List<IOperationVariable>? theOutputVariables = null;
                 List<IOperationVariable>? theInoutputVariables = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -11259,7 +11793,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Operation")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Operation', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -11268,6 +11831,13 @@ namespace AasCore.Aas3_0
                 }
 
 
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return null;
+                }
 
                 return new Aas.Operation(
                     theExtensions,
@@ -11381,6 +11951,8 @@ namespace AasCore.Aas3_0
                 List<IReference>? theSupplementalSemanticIds = null;
                 List<IQualifier>? theQualifiers = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -11789,7 +12361,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "Capability")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'Capability', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -11798,6 +12399,13 @@ namespace AasCore.Aas3_0
                 }
 
 
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return null;
+                }
 
                 return new Aas.Capability(
                     theExtensions,
@@ -11839,6 +12447,8 @@ namespace AasCore.Aas3_0
                 IAdministrativeInformation? theAdministration = null;
                 List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<IReference>? theIsCaseOf = null;
+
+                string? modelType = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -12216,7 +12826,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "ConceptDescription")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'ConceptDescription', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -12228,6 +12867,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"id\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 
@@ -13988,6 +14634,8 @@ namespace AasCore.Aas3_0
                 string? theValue = null;
                 ILevelType? theLevelType = null;
 
+                string? modelType = null;
+
                 foreach (var keyValue in obj)
                 {
                     switch (keyValue.Key)
@@ -14374,7 +15022,36 @@ namespace AasCore.Aas3_0
                             break;
                         }
                         case "modelType":
-                            continue;
+                            {
+                                if (keyValue.Value == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a model type, but got null");
+                                    return null;
+                                }
+                                modelType = DeserializeImplementation.StringFrom(
+                                    keyValue.Value,
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+
+                                if (modelType != "DataSpecificationIec61360")
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected the model type 'DataSpecificationIec61360', " +
+                                        $"but got {modelType}");
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "modelType"));
+                                    return null;
+                                }
+                                break;
+                            }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
@@ -14386,6 +15063,13 @@ namespace AasCore.Aas3_0
                 {
                     error = new Reporting.Error(
                         "Required property \"preferredName\" is missing");
+                    return null;
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
                     return null;
                 }
 

@@ -23,6 +23,7 @@ from aas_core_codegen.csharp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
 
 
@@ -381,6 +382,9 @@ if (obj == null)
 
     blocks.append(Stripped(args_init_writer.getvalue()))
 
+    if cls.serialization.with_model_type:
+        blocks.append(Stripped("string? modelType = null;"))
+
     # endregion
 
     # region Switch on property name
@@ -419,11 +423,42 @@ case {csharp_common.string_literal(json_name)}:
         return None, errors
 
     if cls.serialization.with_model_type:
+        model_type = naming.json_model_type(cls.name)
+
         cases.append(
             Stripped(
-                """\
+                f"""\
 case "modelType":
-    continue;"""
+{I}{{
+{II}if (keyValue.Value == null)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected a model type, but got null");
+{III}return null;
+{II}}}
+{II}modelType = DeserializeImplementation.StringFrom(
+{III}keyValue.Value,
+{III}out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment(
+{IIIII}"modelType"));
+{III}return null;
+{II}}}
+
+{II}if (modelType != "{model_type}")
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected the model type '{model_type}', " +
+{IIII}$"but got {{modelType}}");
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment(
+{IIIII}"modelType"));
+{III}return null;
+{II}}}
+{II}break;
+{I}}}"""
             )
         )
 
@@ -481,6 +516,19 @@ if ({arg_var} == null)
         )
 
     blocks.append(Stripped(required_check_writer.getvalue()))
+
+    if cls.serialization.with_model_type:
+        blocks.append(
+            Stripped(
+                f"""\
+if (modelType == null)
+{{
+{I}error = new Reporting.Error(
+{II}"Required property \\"modelType\\" is missing");
+{I}return null;
+}}"""
+            )
+        )
 
     # endregion
 
