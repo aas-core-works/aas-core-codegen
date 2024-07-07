@@ -1443,9 +1443,16 @@ def asset_administration_shell_from_jsonable(
 
     setter = _SetterForAssetAdministrationShell()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'AssetAdministrationShell':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'AssetAdministrationShell', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -2296,9 +2303,16 @@ def submodel_from_jsonable(
 
     setter = _SetterForSubmodel()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Submodel':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Submodel', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -3200,9 +3214,16 @@ def submodel_element_list_from_jsonable(
 
     setter = _SetterForSubmodelElementList()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'SubmodelElementList':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'SubmodelElementList', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -3578,9 +3599,16 @@ def submodel_element_collection_from_jsonable(
 
     setter = _SetterForSubmodelElementCollection()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'SubmodelElementCollection':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'SubmodelElementCollection', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -3988,9 +4016,16 @@ def property_from_jsonable(
 
     setter = _SetterForProperty()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Property':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Property', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -4378,9 +4413,16 @@ def multi_language_property_from_jsonable(
 
     setter = _SetterForMultiLanguageProperty()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'MultiLanguageProperty':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'MultiLanguageProperty', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -4753,9 +4795,16 @@ def range_from_jsonable(
 
     setter = _SetterForRange()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Range':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Range', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -5106,9 +5155,16 @@ def reference_element_from_jsonable(
 
     setter = _SetterForReferenceElement()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'ReferenceElement':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'ReferenceElement', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -5466,9 +5522,16 @@ def blob_from_jsonable(
 
     setter = _SetterForBlob()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Blob':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Blob', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -5832,9 +5895,16 @@ def file_from_jsonable(
 
     setter = _SetterForFile()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'File':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'File', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -6235,9 +6305,16 @@ def annotated_relationship_element_from_jsonable(
 
     setter = _SetterForAnnotatedRelationshipElement()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'AnnotatedRelationshipElement':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'AnnotatedRelationshipElement', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -6681,9 +6758,16 @@ def entity_from_jsonable(
 
     setter = _SetterForEntity()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Entity':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Entity', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -7435,9 +7519,16 @@ def basic_event_element_from_jsonable(
 
     setter = _SetterForBasicEventElement()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'BasicEventElement':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'BasicEventElement', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -7900,9 +7991,16 @@ def operation_from_jsonable(
 
     setter = _SetterForOperation()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Operation':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Operation', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -8307,9 +8405,16 @@ def capability_from_jsonable(
 
     setter = _SetterForCapability()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'Capability':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'Capability', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -8615,9 +8720,16 @@ def concept_description_from_jsonable(
 
     setter = _SetterForConceptDescription()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'ConceptDescription':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'ConceptDescription', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
@@ -10366,9 +10478,16 @@ def data_specification_iec_61360_from_jsonable(
 
     setter = _SetterForDataSpecificationIEC61360()
 
-    if 'modelType' not in jsonable:
+    model_type = jsonable.get("modelType", None)
+    if model_type is None:
         raise DeserializationException(
             "Expected the property modelType, but found none"
+        )
+
+    if model_type != 'DataSpecificationIec61360':
+        raise DeserializationException(
+            f"Invalid modelType, expected 'DataSpecificationIec61360', "
+            f"but got: {model_type!r}"
         )
 
     for key, jsonable_value in jsonable.items():
