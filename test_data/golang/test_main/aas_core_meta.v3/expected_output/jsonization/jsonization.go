@@ -1275,6 +1275,8 @@ func assetAdministrationShellFromMapWithoutDispatch(
 	foundID := false
 	foundAssetInformation := false
 
+	var foundModelType bool
+
 	for k, v := range m {
 		switch k {
 		case "extensions":
@@ -1634,8 +1636,40 @@ func assetAdministrationShellFromMapWithoutDispatch(
 			theSubmodels = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "AssetAdministrationShell" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'AssetAdministrationShell', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -1658,6 +1692,13 @@ func assetAdministrationShellFromMapWithoutDispatch(
 	if !foundAssetInformation {
 		err = newDeserializationError(
 			"The required property 'assetInformation' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -2308,6 +2349,8 @@ func submodelFromMapWithoutDispatch(
 
 	foundID := false
 
+	var foundModelType bool
+
 	for k, v := range m {
 		switch k {
 		case "extensions":
@@ -2772,8 +2815,40 @@ func submodelFromMapWithoutDispatch(
 			theSubmodelElements = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Submodel" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Submodel', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -2789,6 +2864,13 @@ func submodelFromMapWithoutDispatch(
 	if !foundID {
 		err = newDeserializationError(
 			"The required property 'id' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -2927,6 +3009,8 @@ func relationshipElementFromMapWithoutDispatch(
 
 	foundFirst := false
 	foundSecond := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -3324,8 +3408,40 @@ func relationshipElementFromMapWithoutDispatch(
 			foundSecond = true
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "RelationshipElement" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'RelationshipElement', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -3348,6 +3464,13 @@ func relationshipElementFromMapWithoutDispatch(
 	if !foundSecond {
 		err = newDeserializationError(
 			"The required property 'second' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -3482,6 +3605,8 @@ func submodelElementListFromMapWithoutDispatch(
 	var theValue []aastypes.ISubmodelElement
 
 	foundTypeValueListElement := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -3964,8 +4089,40 @@ func submodelElementListFromMapWithoutDispatch(
 			theValue = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "SubmodelElementList" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'SubmodelElementList', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -3981,6 +4138,13 @@ func submodelElementListFromMapWithoutDispatch(
 	if !foundTypeValueListElement {
 		err = newDeserializationError(
 			"The required property 'typeValueListElement' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -4080,6 +4244,8 @@ func submodelElementCollectionFromMapWithoutDispatch(
 	var theQualifiers []aastypes.IQualifier
 	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
 	var theValue []aastypes.ISubmodelElement
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -4497,8 +4663,40 @@ func submodelElementCollectionFromMapWithoutDispatch(
 			theValue = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "SubmodelElementCollection" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'SubmodelElementCollection', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -4509,6 +4707,13 @@ func submodelElementCollectionFromMapWithoutDispatch(
 			)
 			return
 		}
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
+		)
+		return
 	}
 
 	result = aastypes.NewSubmodelElementCollection()
@@ -4630,6 +4835,8 @@ func propertyFromMapWithoutDispatch(
 	var theValueID aastypes.IReference
 
 	foundValueType := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -5043,8 +5250,40 @@ func propertyFromMapWithoutDispatch(
 			}
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Property" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Property', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -5060,6 +5299,13 @@ func propertyFromMapWithoutDispatch(
 	if !foundValueType {
 		err = newDeserializationError(
 			"The required property 'valueType' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -5154,6 +5400,8 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
 	var theValue []aastypes.ILangStringTextType
 	var theValueID aastypes.IReference
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -5586,8 +5834,40 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 			}
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "MultiLanguageProperty" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'MultiLanguageProperty', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -5598,6 +5878,13 @@ func multiLanguagePropertyFromMapWithoutDispatch(
 			)
 			return
 		}
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
+		)
+		return
 	}
 
 	result = aastypes.NewMultiLanguageProperty()
@@ -5691,6 +5978,8 @@ func rangeFromMapWithoutDispatch(
 	var theMax *string
 
 	foundValueType := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -6106,8 +6395,40 @@ func rangeFromMapWithoutDispatch(
 			theMax = &parsed
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Range" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Range', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -6123,6 +6444,13 @@ func rangeFromMapWithoutDispatch(
 	if !foundValueType {
 		err = newDeserializationError(
 			"The required property 'valueType' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -6216,6 +6544,8 @@ func referenceElementFromMapWithoutDispatch(
 	var theQualifiers []aastypes.IQualifier
 	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
 	var theValue aastypes.IReference
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -6596,8 +6926,40 @@ func referenceElementFromMapWithoutDispatch(
 			}
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "ReferenceElement" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'ReferenceElement', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -6608,6 +6970,13 @@ func referenceElementFromMapWithoutDispatch(
 			)
 			return
 		}
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
+		)
+		return
 	}
 
 	result = aastypes.NewReferenceElement()
@@ -6697,6 +7066,8 @@ func blobFromMapWithoutDispatch(
 	var theContentType string
 
 	foundContentType := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -7093,8 +7464,40 @@ func blobFromMapWithoutDispatch(
 			foundContentType = true
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Blob" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Blob', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -7110,6 +7513,13 @@ func blobFromMapWithoutDispatch(
 	if !foundContentType {
 		err = newDeserializationError(
 			"The required property 'contentType' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -7203,6 +7613,8 @@ func fileFromMapWithoutDispatch(
 	var theContentType string
 
 	foundContentType := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -7601,8 +8013,40 @@ func fileFromMapWithoutDispatch(
 			foundContentType = true
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "File" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'File', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -7618,6 +8062,13 @@ func fileFromMapWithoutDispatch(
 	if !foundContentType {
 		err = newDeserializationError(
 			"The required property 'contentType' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -7713,6 +8164,8 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 
 	foundFirst := false
 	foundSecond := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -8162,8 +8615,40 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 			theAnnotations = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "AnnotatedRelationshipElement" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'AnnotatedRelationshipElement', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -8186,6 +8671,13 @@ func annotatedRelationshipElementFromMapWithoutDispatch(
 	if !foundSecond {
 		err = newDeserializationError(
 			"The required property 'second' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -8282,6 +8774,8 @@ func entityFromMapWithoutDispatch(
 	var theSpecificAssetIDs []aastypes.ISpecificAssetID
 
 	foundEntityType := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -8784,8 +9278,40 @@ func entityFromMapWithoutDispatch(
 			theSpecificAssetIDs = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Entity" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Entity', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -8801,6 +9327,13 @@ func entityFromMapWithoutDispatch(
 	if !foundEntityType {
 		err = newDeserializationError(
 			"The required property 'entityType' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -9294,6 +9827,8 @@ func basicEventElementFromMapWithoutDispatch(
 	foundObserved := false
 	foundDirection := false
 	foundState := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -9790,8 +10325,40 @@ func basicEventElementFromMapWithoutDispatch(
 			theMaxInterval = &parsed
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "BasicEventElement" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'BasicEventElement', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -9821,6 +10388,13 @@ func basicEventElementFromMapWithoutDispatch(
 	if !foundState {
 		err = newDeserializationError(
 			"The required property 'state' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -9927,6 +10501,8 @@ func operationFromMapWithoutDispatch(
 	var theInputVariables []aastypes.IOperationVariable
 	var theOutputVariables []aastypes.IOperationVariable
 	var theInoutputVariables []aastypes.IOperationVariable
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -10448,8 +11024,40 @@ func operationFromMapWithoutDispatch(
 			theInoutputVariables = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Operation" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Operation', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -10460,6 +11068,13 @@ func operationFromMapWithoutDispatch(
 			)
 			return
 		}
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
+		)
+		return
 	}
 
 	result = aastypes.NewOperation()
@@ -10637,6 +11252,8 @@ func capabilityFromMapWithoutDispatch(
 	var theSupplementalSemanticIDs []aastypes.IReference
 	var theQualifiers []aastypes.IQualifier
 	var theEmbeddedDataSpecifications []aastypes.IEmbeddedDataSpecification
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -11002,8 +11619,40 @@ func capabilityFromMapWithoutDispatch(
 			theEmbeddedDataSpecifications = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "Capability" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'Capability', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -11014,6 +11663,13 @@ func capabilityFromMapWithoutDispatch(
 			)
 			return
 		}
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
+		)
+		return
 	}
 
 	result = aastypes.NewCapability()
@@ -11098,6 +11754,8 @@ func conceptDescriptionFromMapWithoutDispatch(
 	var theIsCaseOf []aastypes.IReference
 
 	foundID := false
+
+	var foundModelType bool
 
 	for k, v := range m {
 		switch k {
@@ -11427,8 +12085,40 @@ func conceptDescriptionFromMapWithoutDispatch(
 			theIsCaseOf = array
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "ConceptDescription" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'ConceptDescription', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -11444,6 +12134,13 @@ func conceptDescriptionFromMapWithoutDispatch(
 	if !foundID {
 		err = newDeserializationError(
 			"The required property 'id' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -13325,6 +14022,8 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 
 	foundPreferredName := false
 
+	var foundModelType bool
+
 	for k, v := range m {
 		switch k {
 		case "preferredName":
@@ -13632,8 +14331,40 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 			}
 
 		case "modelType":
-			// We ignore the model type as we intentionally dispatched
-			// to this function.
+			var modelType string
+			modelType, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "modelType",
+						},
+					)
+				}
+				return
+			}
+
+			if modelType != "DataSpecificationIec61360" {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected the model type 'DataSpecificationIec61360', but got %v",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "modelType",
+					},
+				)
+
+				err = deseriaErr
+				return
+			}
+
+			foundModelType = true
 
 		default:
 			err = newDeserializationError(
@@ -13649,6 +14380,13 @@ func dataSpecificationIEC61360FromMapWithoutDispatch(
 	if !foundPreferredName {
 		err = newDeserializationError(
 			"The required property 'preferredName' is missing",
+		)
+		return
+	}
+
+	if !foundModelType {
+		err = newDeserializationError(
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -13706,7 +14444,7 @@ func hasSemanticsFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -13787,7 +14525,7 @@ func hasExtensionsFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -13866,7 +14604,7 @@ func referableFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -13945,7 +14683,7 @@ func identifiableFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -13996,7 +14734,7 @@ func hasKindFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14043,7 +14781,7 @@ func hasDataSpecificationFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14124,7 +14862,7 @@ func qualifiableFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14199,7 +14937,7 @@ func submodelElementFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14272,7 +15010,7 @@ func relationshipElementFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14321,7 +15059,7 @@ func dataElementFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14378,7 +15116,7 @@ func eventElementFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14425,7 +15163,7 @@ func abstractLangStringFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
@@ -14480,7 +15218,7 @@ func dataSpecificationContentFromMap(
 	modelTypeAny, ok = m["modelType"];
 	if !ok {
 		err = newDeserializationError(
-			"Expected the property modelType, but got none",
+			"The required property modelType is missing",
 		)
 		return
 	}
