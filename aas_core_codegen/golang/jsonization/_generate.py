@@ -368,7 +368,7 @@ func {function_name}(
 {I}modelTypeAny, ok = m["modelType"];
 {I}if !ok {{
 {II}err = newDeserializationError(
-{III}"Expected the property modelType, but got none",
+{III}"The required property modelType is missing",
 {II})
 {II}return
 {I}}}
@@ -530,6 +530,16 @@ def _generate_deserialization_switch_statement(
     ``_generate_concrete_class_from_map_without_dispatch``, but we refactored it out
     since it was too much to read. Best if your read both functions in two vertical
     editor panes.
+
+    If the serialization requires model type, we also expect that the variable
+    ``foundModelType`` have been initialized as a ``bool`` in the preceding generated
+    code. The generated case block will parse and set it in case that the model type
+    is correctly specified. This will be performed even though the code might have
+    had to parse model type before for the dispatch. We decided to double-check to cover
+    the case where a dispatch is *unnecessary* (*e.g.*, the caller knows the expected
+    runtime type), but the model type might still be invalid in the input. Hence, when
+    the dispatch is *necessary*, the model type JSON property will be parsed twice,
+    which is a cost we currently find acceptable.
     """
     case_blocks = []  # type: List[Stripped]
 
@@ -715,12 +725,54 @@ case {json_prop_literal}:
         )
 
     if cls.serialization.with_model_type:
+        # NOTE (mristin):
+        # We explicitly check for the model type if the meta-model instructs us to.
+        #
+        # This is crucial for the fix of the problem discovered in:
+        # https://github.com/aas-core-works/aas-core3.0-python/issues/32
+        model_type = naming.json_model_type(cls.name)
+        model_type_case_body = Stripped(
+            f"""\
+var modelType string
+modelType, err = stringFromJsonable(
+{I}v,
+)
+if err != nil {{
+{I}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{II}deseriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: "modelType",
+{III}}},
+{II})
+{I}}}
+{I}return
+}}
+
+if modelType != "{model_type}" {{
+{I}deseriaErr := newDeserializationError(
+{II}fmt.Sprintf(
+{III}"Expected the model type '{model_type}', but got %v",
+{III}v,
+{II}),
+{I})
+
+{I}deseriaErr.Path.PrependName(
+{II}&aasreporting.NameSegment{{
+{III}Name: "modelType",
+{II}}},
+{I})
+
+{I}err = deseriaErr
+{I}return
+}}
+
+foundModelType = true"""
+        )
         case_blocks.append(
             Stripped(
                 f"""\
 case "modelType":
-{I}// We ignore the model type as we intentionally dispatched
-{I}// to this function."""
+{I}{indent_but_first_line(model_type_case_body, I)}"""
             )
         )
 
@@ -805,6 +857,14 @@ def _generate_concrete_class_from_map_without_dispatch(
 
     # endregion
 
+    # NOTE (mristin):
+    # We explicitly check for the model type if the meta-model instructs us to.
+    #
+    # This is crucial for the fix of the problem discovered in:
+    # https://github.com/aas-core-works/aas-core3.0-python/issues/32
+    if cls.serialization.with_model_type:
+        blocks.append(Stripped("var foundModelType bool"))
+
     # region Switch on property name
 
     switch_statement = _generate_deserialization_switch_statement(cls=cls)
@@ -845,6 +905,24 @@ if !{found_var} {{
         )
 
     # endregion
+
+    if cls.serialization.with_model_type:
+        # NOTE (mristin):
+        # We explicitly check for the model type if the meta-model instructs us to.
+        #
+        # This is crucial for the fix of the problem discovered in:
+        # https://github.com/aas-core-works/aas-core3.0-python/issues/32
+        blocks.append(
+            Stripped(
+                f"""\
+if !foundModelType {{
+{I}err = newDeserializationError(
+{II}"The required property modelType is missing",
+{I})
+{I}return
+}}"""
+            )
+        )
 
     constructing_statements = []  # type: List[Stripped]
 
