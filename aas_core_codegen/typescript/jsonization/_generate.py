@@ -357,7 +357,7 @@ export function {function_name}(
 {I}const modelType = jsonable["modelType"];
 {I}if (modelType === undefined) {{
 {II}return newDeserializationError<AasTypes.{interface_name}>(
-{III}"Expected the property modelType, but got none"
+{III}"The required property modelType is missing"
 {II});
 {I}}}
 
@@ -432,8 +432,10 @@ def _parse_function_for_atomic_value(
 
         else:
             assert_never(our_type)
+            raise AssertionError("Unexpected code path")
     else:
         assert_never(type_annotation)
+        raise AssertionError("Unexpected code path")
 
     return Stripped(function_name)
 
@@ -456,29 +458,29 @@ def _generate_setter(cls: intermediate.ConcreteClass) -> Stripped:
 
         blocks.append(Stripped(f"{prop_name}: {prop_type} = null;"))
 
-    blocks.append(
-        Stripped(
-            f"""\
-/**
- * Ignore `jsonable` and do not set anything.
- *
- * @param jsonable - to be ignored instead of set
- * @returns error, if any
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-ignore(jsonable: JsonValue): DeserializationError | null {{
-{I}// Intentionally empty.
-{I}return null;
-}}"""
+    if cls.serialization.with_model_type:
+        # NOTE (mristin):
+        # If the serialization requires a model type, we consequently parse and set it
+        # in the setter. The model type thus obtained is *not* used for any dispatch. We
+        # only use this value for verification to make sure that the model type
+        # of the instances is consistent with the expected value for its concrete
+        # class. This will be performed even though the code might have had to parse
+        # model type before for the dispatch. We decided to double-check to cover the
+        # case where a dispatch is *unnecessary* (*e.g.*, the caller knows the expected
+        # runtime type), but the model type might still be invalid in the input. Hence,
+        # when the dispatch is *necessary*, the model type JSON property will be parsed
+        # twice, which is a cost we currently find acceptable.
+        prop_name = typescript_naming.property_name(Identifier("model_type"))
+        blocks.append(
+            Stripped(
+                f"""\
+// Used only for verification, not for dispatch!
+{prop_name}: string | null = null;"""
+            )
         )
-    )
 
     for i, prop in enumerate(cls.properties):
         prop_name = typescript_naming.property_name(prop.name)
-
-        method_name = typescript_naming.method_name(
-            Identifier(f"set_{prop.name}_from_jsonable")
-        )
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
         if isinstance(
@@ -565,6 +567,10 @@ return null;"""
             assert_never(type_anno)
             raise AssertionError("Unexpected execution path")
 
+        method_name = typescript_naming.method_name(
+            Identifier(f"set_{prop.name}_from_jsonable")
+        )
+
         method_writer = io.StringIO()
         method_writer.write(
             f"""\
@@ -582,6 +588,39 @@ return null;"""
         )
 
         blocks.append(Stripped(method_writer.getvalue()))
+
+    if cls.serialization.with_model_type:
+        method_name = typescript_naming.method_name(
+            Identifier("set_model_type_from_jsonable")
+        )
+        prop_name = typescript_naming.property_name(Identifier("model_type"))
+
+        blocks.append(
+            Stripped(
+                f"""\
+/**
+ * Parse `jsonable` as the model type of the concrete instance.
+ *
+ * This is intended only for verification, and no dispatch is performed.
+ *
+ * @param jsonable - to be parsed
+ * @returns error, if any
+ */
+{method_name}(
+{I}jsonable: JsonValue
+): DeserializationError | null {{
+{I}const parsedOrError = stringFromJsonable(
+{II}jsonable
+{I});
+{I}if (parsedOrError.error !== null) {{
+{II}return parsedOrError.error;
+{I}}} else {{
+{II}this.{prop_name} = parsedOrError.mustValue();
+{II}return null;
+{I}}}
+}}"""
+            )
+        )
 
     cls_name = typescript_naming.class_name(cls.name)
     setter_cls_name = typescript_naming.class_name(Identifier(f"Setter_for_{cls.name}"))
@@ -655,6 +694,7 @@ const {map_name} =
 {II}[
 """
     )
+
     for identifier, expression in identifiers_expressions:
         writer.write(
             f"""\
@@ -665,12 +705,36 @@ const {map_name} =
 """
         )
 
+    if cls.serialization.with_model_type:
+        # NOTE (mristin):
+        # If the serialization requires a model type, we consequently parse and set it
+        # in the setter. The model type thus obtained is *not* used for any dispatch. We
+        # only use this value for verification to make sure that the model type
+        # of the instances is consistent with the expected value for its concrete
+        # class. This will be performed even though the code might have had to parse
+        # model type before for the dispatch. We decided to double-check to cover the
+        # case where a dispatch is *unnecessary* (*e.g.*, the caller knows the expected
+        # runtime type), but the model type might still be invalid in the input. Hence,
+        # when the dispatch is *necessary*, the model type JSON property will be parsed
+        # twice, which is a cost we currently find acceptable.
+        json_identifier = naming.json_property(Identifier("model_type"))
+        method_name = typescript_naming.method_name(
+            Identifier("set_model_type_from_jsonable")
+        )
+        expression = Stripped(f"{setter_cls_name}.prototype.{method_name}")
+
+        writer.write(
+            f"""\
+{III}[
+{IIII}// The model type here is used only for verification, not for dispatch.
+{IIII}{typescript_common.string_literal(json_identifier)},
+{IIII}{indent_but_first_line(expression, IIII)}
+{III}],
+"""
+        )
+
     writer.write(
         f"""\
-{III}[
-{IIII}"modelType",
-{IIII}{setter_cls_name}.prototype.ignore
-{III}]
 {II}]
 {I});"""
     )
@@ -796,6 +860,30 @@ if (setter.{prop_name} === null) {{
         blocks.append(Stripped("\n\n".join(required_checks)))
 
     # endregion
+
+    if cls.serialization.with_model_type:
+        model_type = naming.json_model_type(cls.name)
+        prop_name = typescript_naming.property_name(Identifier("model_type"))
+
+        blocks.append(
+            Stripped(
+                f"""\
+if (setter.{prop_name} === null) {{
+{I}return newDeserializationError<
+{II}AasTypes.{cls_name}
+{I}>(
+{II}"The required property 'modelType' is missing"
+{I});
+}} else if (setter.{prop_name} != "{model_type}") {{
+{I}return newDeserializationError<
+{II}AasTypes.{cls_name}
+{I}>(
+{II}"Expected model type '{model_type}', " +
+{II}`but got: ${{setter.{prop_name}}}`
+{I});
+}}"""
+            )
+        )
 
     # region Pass in arguments to the constructor
 
@@ -1041,6 +1129,7 @@ jsonable[{key_literal}] = {var_name};"""
 
         else:
             assert_never(type_anno)
+            raise AssertionError("Unexpected code path")
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             block = Stripped(
