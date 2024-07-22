@@ -3849,6 +3849,18 @@ std::pair<
     );
   }
 
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
   // endregion Check required properties
 
   // region Initialization
@@ -4528,6 +4540,58 @@ std::pair<
   }
 
   // endregion De-serialize submodels
+
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"AssetAdministrationShell") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'AssetAdministrationShell', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
 
   return std::make_pair(
     common::make_optional<
@@ -5480,6 +5544,18 @@ std::pair<
     );
   }
 
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
   // endregion Check required properties
 
   // region Initialization
@@ -6384,6 +6460,58 @@ std::pair<
 
   // endregion De-serialize submodelElements
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Submodel") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Submodel', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -6647,6 +6775,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property second is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -7393,6 +7533,58 @@ std::pair<
 
   // endregion De-serialize second
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"RelationshipElement") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'RelationshipElement', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -7573,6 +7765,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property typeValueListElement is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -8541,6 +8745,58 @@ std::pair<
 
   // endregion De-serialize value
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"SubmodelElementList") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'SubmodelElementList', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -8636,6 +8892,22 @@ std::pair<
       }
     }
   }
+
+  // region Check required properties
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
+  // endregion Check required properties
 
   // region Initialization
 
@@ -9412,6 +9684,58 @@ std::pair<
 
   // endregion De-serialize value
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"SubmodelElementCollection") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'SubmodelElementCollection', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -9613,6 +9937,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property valueType is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -10424,6 +10760,58 @@ std::pair<
 
   // endregion De-serialize valueId
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Property") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Property', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -10518,6 +10906,22 @@ std::pair<
       }
     }
   }
+
+  // region Check required properties
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
+  // endregion Check required properties
 
   // region Initialization
 
@@ -11330,6 +11734,58 @@ std::pair<
 
   // endregion De-serialize valueId
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"MultiLanguageProperty") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'MultiLanguageProperty', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -11435,6 +11891,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property valueType is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -12243,6 +12711,58 @@ std::pair<
 
   // endregion De-serialize max
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Range") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Range', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -12336,6 +12856,22 @@ std::pair<
       }
     }
   }
+
+  // region Check required properties
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
+  // endregion Check required properties
 
   // region Initialization
 
@@ -13051,6 +13587,58 @@ std::pair<
 
   // endregion De-serialize value
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"ReferenceElement") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'ReferenceElement', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -13154,6 +13742,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property contentType is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -13902,6 +14502,58 @@ std::pair<
 
   // endregion De-serialize contentType
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Blob") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Blob', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -14006,6 +14658,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property contentType is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -14752,6 +15416,58 @@ std::pair<
 
   // endregion De-serialize contentType
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"File") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'File', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -14869,6 +15585,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property second is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -15710,6 +16438,58 @@ std::pair<
 
   // endregion De-serialize annotations
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"AnnotatedRelationshipElement") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'AnnotatedRelationshipElement', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -15817,6 +16597,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property entityType is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -16786,6 +17578,58 @@ std::pair<
 
   // endregion De-serialize specificAssetIds
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Entity") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Entity', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -17373,6 +18217,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property state is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -18367,6 +19223,58 @@ std::pair<
 
   // endregion De-serialize maxInterval
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"BasicEventElement") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'BasicEventElement', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -18467,6 +19375,22 @@ std::pair<
       }
     }
   }
+
+  // region Check required properties
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
+  // endregion Check required properties
 
   // region Initialization
 
@@ -19433,6 +20357,58 @@ std::pair<
 
   // endregion De-serialize inoutputVariables
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Operation") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Operation', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -19646,6 +20622,22 @@ std::pair<
       }
     }
   }
+
+  // region Check required properties
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
+  // endregion Check required properties
 
   // region Initialization
 
@@ -20327,6 +21319,58 @@ std::pair<
 
   // endregion De-serialize embeddedDataSpecifications
 
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"Capability") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'Capability', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<T>
@@ -20427,6 +21471,18 @@ std::pair<
       common::nullopt,
       common::make_optional<DeserializationError>(
         L"The required property id is missing"
+      )
+    );
+  }
+
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
       )
     );
   }
@@ -21046,6 +22102,58 @@ std::pair<
   }
 
   // endregion De-serialize isCaseOf
+
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"ConceptDescription") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'ConceptDescription', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
 
   return std::make_pair(
     common::make_optional<
@@ -23759,6 +24867,18 @@ std::pair<
     );
   }
 
+  if (!json.contains("modelType")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property modelType is missing"
+      )
+    );
+  }
+
   // endregion Check required properties
 
   // region Initialization
@@ -24374,6 +25494,58 @@ std::pair<
   }
 
   // endregion De-serialize levelType
+
+  // region Check model type
+  // This check is intended only for verification, not for dispatch.
+
+  common::optional<
+    std::wstring
+  > model_type;
+
+  std::tie(
+    model_type,
+    error
+  ) = DeserializeWstring(
+    json["modelType"]
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"modelType"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  if (*model_type != L"DataSpecificationIec61360") {
+    std::wstring message = common::Concat(
+      L"Expected model type 'DataSpecificationIec61360', "
+      L"but got: ",
+      *model_type
+    );
+
+    error = common::make_optional<DeserializationError>(
+      message
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion Check model type
 
   return std::make_pair(
     common::make_optional<
