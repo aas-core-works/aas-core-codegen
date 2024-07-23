@@ -336,6 +336,9 @@ if (node == null || !node.isObject()) {{
 
     blocks.append(Stripped(args_init_writer.getvalue()))
 
+    if cls.serialization.with_model_type:
+        blocks.append(Stripped("String modelType = null;"))
+
     # endregion
 
     # region Switch on property name
@@ -350,7 +353,7 @@ if (node == null || !node.isObject()) {{
             json_name = naming.json_property(arg.name)
 
             # NOTE (empwilli, 2024-01-18):
-            # We put ``if (keyValue.Value != null)`` here instead of the outer loop
+            # We put ``if (currentNode.getValue() == null)`` here instead of the outer loop
             # since we want to detect the unexpected additional properties even
             # though their value can be set to null.
 
@@ -372,12 +375,36 @@ case {java_common.string_literal(json_name)}: {{
         return None, errors
 
     if cls.serialization.with_model_type:
+        cls_name = java_naming.class_name(cls.name)
+        model_type = naming.json_model_type(cls.name)
+
         cases.append(
             Stripped(
-                """\
-case "modelType": {
-    continue;
-}"""
+                f"""\
+case "modelType": {{
+{I}if (currentNode.getValue() == null) {{
+{II}final Reporting.Error error = new Reporting.Error(
+{III}"Expected a model type, but got null");
+{II}return Result.failure(error);
+{I}}}
+{I}final Result<? extends String> modelTypeResult =
+{II}DeserializeImplementation.tryStringFrom(currentNode.getValue());
+{I}if (modelTypeResult.isError()) {{
+{II}modelTypeResult.getError()
+{III}.prependSegment(new Reporting.NameSegment("modelType"));
+{II}return modelTypeResult.castTo({cls_name}.class);
+{I}}}
+{I}modelType = modelTypeResult.getResult();
+
+{I}if (!modelType.equals("{model_type}")) {{
+{II}final Reporting.Error error = new Reporting.Error(
+{III}"Expected the model type '{model_type}', " +
+{III}"but got '" + modelType + "'");
+{III}error.prependSegment(new Reporting.NameSegment("modelType"));
+{III}return Result.failure(error);
+{I}}}
+{I}break;
+}}"""
             )
         )
 
@@ -412,6 +439,18 @@ for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.ha
     # endregion
 
     # region Check required
+
+    if cls.serialization.with_model_type:
+        blocks.append(
+            Stripped(
+                f"""\
+if (modelType == null) {{
+{I}final Reporting.Error error = new Reporting.Error(
+{II}"Required property \\"modelType\\" is missing");
+{I}return Result.failure(error);
+}}"""
+            )
+        )
 
     required_check_writer = io.StringIO()
     for i, arg in enumerate(cls.constructor.arguments):
