@@ -507,7 +507,7 @@ public class Copying
         ) {
             return new EmbeddedDataSpecification(
                 that.getDataSpecificationContent(),
-                that.getDataSpecification().orElse(null));
+                that.getDataSpecification());
         }
 
         @Override
@@ -2513,7 +2513,7 @@ public class Copying
         ) {
             return new EmbeddedDataSpecification(
                 deep(that.getDataSpecificationContent()),
-                that.getDataSpecification().orElse(null)
+                deep(that.getDataSpecification())
             );
         }
 

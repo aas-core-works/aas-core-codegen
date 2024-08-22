@@ -13875,11 +13875,20 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
+                if (theDataSpecification == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"dataSpecification\" is missing");
+                    return null;
+                }
+
                 return new Aas.EmbeddedDataSpecification(
                     theDataSpecificationContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theDataSpecification);
+                    theDataSpecification
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"));
             }  // internal static EmbeddedDataSpecificationFrom
 
             /// <summary>
@@ -19140,11 +19149,8 @@ namespace AasCore.Aas3_0
                 result["dataSpecificationContent"] = Transform(
                     that.DataSpecificationContent);
 
-                if (that.DataSpecification != null)
-                {
-                    result["dataSpecification"] = Transform(
-                        that.DataSpecification);
-                }
+                result["dataSpecification"] = Transform(
+                    that.DataSpecification);
 
                 return result;
             }

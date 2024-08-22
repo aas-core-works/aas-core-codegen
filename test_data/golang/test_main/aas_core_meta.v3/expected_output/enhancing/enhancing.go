@@ -6207,14 +6207,12 @@ func wrapEmbeddedDataSpecification[E any](
 	)
 
 	theDataSpecification := that.DataSpecification()
-	if theDataSpecification != nil {
-		that.SetDataSpecification(
-			Wrap[E](
-				theDataSpecification,
-				factory,
-			).(aastypes.IReference),
-		)
-	}
+	that.SetDataSpecification(
+		Wrap[E](
+			theDataSpecification,
+			factory,
+		).(aastypes.IReference),
+	)
 
 	return
 }

@@ -814,18 +814,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConstrainedPrimitive Identifier',
-          parsed=...),
-        Invariant(
-          description='The value must represent a valid file URI scheme according to RFC 8089.',
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='matches_RFC_8089_path',
-              args=[
-                Name(
-                  identifier='self',
-                  original_node=...)],
-              original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Path_type',
           parsed=...)],
       invariant_id_set=...,
       description=DescriptionOfOurType(
@@ -25638,10 +25626,8 @@ SymbolTable(
           parsed=...),
         Property(
           name='data_specification',
-          type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Reference',
-              parsed=...),
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Reference',
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Reference to the data specification</paragraph>',
@@ -25663,14 +25649,10 @@ SymbolTable(
             parsed=...),
           Argument(
             name='data_specification',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
-                parsed=...),
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Reference',
               parsed=...),
-            default=DefaultPrimitive(
-              value=None,
-              parsed=...),
+            default=None,
             parsed=...)],
         returns=None,
         description=None,
@@ -27343,7 +27325,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
           parsed=...),
         Invariant(
-          description='Constraint AASc-002: preferred name shall be provided at least in English.',
+          description='Constraint AASc-3a-002: preferred name shall be provided at least in English.',
           body=textwrap.dedent("""\
             Any(
               generator=ForEach(

@@ -13131,6 +13131,7 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 	var theDataSpecification aastypes.IReference
 
 	foundDataSpecificationContent := false
+	foundDataSpecification := false
 
 	for k, v := range m {
 		switch k {
@@ -13164,6 +13165,7 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 				}
 				return
 			}
+			foundDataSpecification = true
 
 		default:
 			err = newDeserializationError(
@@ -13183,10 +13185,15 @@ func embeddedDataSpecificationFromMapWithoutDispatch(
 		return
 	}
 
+	if !foundDataSpecification {
+		err = newDeserializationError(
+			"The required property 'dataSpecification' is missing",
+		)
+		return
+	}
+
 	result = aastypes.NewEmbeddedDataSpecification(
 		theDataSpecificationContent,
-	)
-	result.SetDataSpecification(
 		theDataSpecification,
 	)
 
@@ -21216,24 +21223,22 @@ func embeddedDataSpecificationToMap(
 	}
 	result["dataSpecificationContent"] = jsonableDataSpecificationContent
 
-	if that.DataSpecification() != nil {
-		var jsonableDataSpecification interface{}
-		jsonableDataSpecification, err = ToJsonable(
-			that.DataSpecification(),
-		)
-		if err != nil {
-			if seriaErr, ok := err.(*SerializationError); ok {
-				seriaErr.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DataSpecification()",
-					},
-				)
-			}
-
-			return
+	var jsonableDataSpecification interface{}
+	jsonableDataSpecification, err = ToJsonable(
+		that.DataSpecification(),
+	)
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "DataSpecification()",
+				},
+			)
 		}
-		result["dataSpecification"] = jsonableDataSpecification
+
+		return
 	}
+	result["dataSpecification"] = jsonableDataSpecification
 
 	return
 }

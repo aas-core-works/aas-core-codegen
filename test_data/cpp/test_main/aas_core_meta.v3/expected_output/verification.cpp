@@ -5421,33 +5421,12 @@ void OfPathType::Execute() {
       }
 
       case 3: {
-        if (
-          MatchesRfc8089Path(
-            (*value_)
-          )
-        ) {
-          state_ = 4;
-          continue;
-        }
-
-        error_ = common::make_unique<Error>(
-          L"The value must represent a valid file URI scheme according "
-          L"to RFC 8089."
-        );
-        // No path is prepended as the error refers to the value itself.
-        ++index_;
-
-        state_ = 4;
-        return;
-      }
-
-      case 4: {
         done_ = true;
         error_ = nullptr;
         index_ = -1;
 
         // We invalidate the state since we reached the end of the routine.
-        state_ = 5;
+        state_ = 4;
         return;
       }
 
@@ -24262,7 +24241,7 @@ void OfDataSpecificationIec61360::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Constraint AASc-002: preferred name shall be provided at "
+          L"Constraint AASc-3a-002: preferred name shall be provided at "
           L"least in English."
         );
         // No path is prepended as the error refers to the instance itself.

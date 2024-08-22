@@ -5558,7 +5558,7 @@ class EmbeddedDataSpecification(Class):
     data_specification_content: 'DataSpecificationContent'
 
     #: Reference to the data specification
-    data_specification: Optional['Reference']
+    data_specification: 'Reference'
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -5570,8 +5570,7 @@ class EmbeddedDataSpecification(Class):
         """
         yield self.data_specification_content
 
-        if self.data_specification is not None:
-            yield self.data_specification
+        yield self.data_specification
 
     def descend(self) -> Iterator[Class]:
         """
@@ -5583,10 +5582,9 @@ class EmbeddedDataSpecification(Class):
 
         yield from self.data_specification_content.descend()
 
-        if self.data_specification is not None:
-            yield self.data_specification
+        yield self.data_specification
 
-            yield from self.data_specification.descend()
+        yield from self.data_specification.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -5621,7 +5619,7 @@ class EmbeddedDataSpecification(Class):
     def __init__(
             self,
             data_specification_content: 'DataSpecificationContent',
-            data_specification: Optional['Reference'] = None
+            data_specification: 'Reference'
     ) -> None:
         """Initialize with the given values."""
         self.data_specification_content = data_specification_content

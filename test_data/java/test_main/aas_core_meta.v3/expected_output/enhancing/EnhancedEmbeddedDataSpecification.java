@@ -40,7 +40,7 @@ public class EnhancedEmbeddedDataSpecification<EnhancementT>
   }
 
   @Override
-  public Optional<IReference> getDataSpecification() {
+  public IReference getDataSpecification() {
     return instance.getDataSpecification();
   }
 

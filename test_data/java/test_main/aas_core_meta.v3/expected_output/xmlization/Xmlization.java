@@ -13332,6 +13332,13 @@ public class Xmlization {
         return Result.failure(error);
       }
 
+      if (theDataSpecification == null) {
+        final Reporting.Error error = new Reporting.Error(
+          "The required property dataSpecification has not been given " +
+          "in the XML representation of an instance of class EmbeddedDataSpecification");
+        return Result.failure(error);
+      }
+
       return Result.success(new EmbeddedDataSpecification(
         theDataSpecificationContent,
         theDataSpecification));
@@ -21725,20 +21732,18 @@ public class Xmlization {
       }
 
       try {
-        if (that.getDataSpecification().isPresent()) {
-          writer.writeStartElement(
-            "dataSpecification");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getDataSpecification().get(),
-            writer);
-
-          writer.writeEndElement();
+        writer.writeStartElement(
+          "dataSpecification");
+        if (topLevel) {
+          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+          topLevel = false;
         }
+
+        this.referenceToSequence(
+          that.getDataSpecification(),
+          writer);
+
+        writer.writeEndElement();
       } catch (XMLStreamException exception) {
         throw new SerializeException("",exception.getMessage());
       }
