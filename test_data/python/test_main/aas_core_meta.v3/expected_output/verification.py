@@ -7904,15 +7904,14 @@ class _Transformer(
             )
             yield error
 
-        if that.data_specification is not None:
-            for error in self.transform(that.data_specification):
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'data_specification'
-                    )
+        for error in self.transform(that.data_specification):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'data_specification'
                 )
-                yield error
+            )
+            yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_level_type(
@@ -8148,7 +8147,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Constraint AASc-002: preferred name shall be provided at ' +
+                'Constraint AASc-3a-002: preferred name shall be provided at ' +
                 'least in English.'
             )
 
@@ -8584,12 +8583,6 @@ def verify_path_type(
     if not (len(that) <= 2000):
         yield Error(
             'Identifier shall have a maximum length of 2000 characters.'
-        )
-
-    if not matches_rfc_8089_path(that):
-        yield Error(
-            'The value must represent a valid file URI scheme according ' +
-            'to RFC 8089.'
         )
 
 

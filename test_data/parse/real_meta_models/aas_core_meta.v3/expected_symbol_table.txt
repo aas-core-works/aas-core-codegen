@@ -443,18 +443,7 @@ UnverifiedSymbolTable(
         'Identifier'],
       properties=[],
       methods=[],
-      invariants=[
-        Invariant(
-          description='The value must represent a valid file URI scheme according to RFC 8089.',
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='matches_RFC_8089_path',
-              args=[
-                Name(
-                  identifier='self',
-                  original_node=...)],
-              original_node=...)"""),
-          node=...)],
+      invariants=[],
       serialization=None,
       description=Description(
         document=...,
@@ -10843,12 +10832,8 @@ UnverifiedSymbolTable(
           node=...),
         Property(
           name='data_specification',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Reference',
-                node=...)],
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Reference',
             node=...),
           description=Description(
             document=...,
@@ -10873,15 +10858,10 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='data_specification',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Reference',
-                    node=...)],
+              type_annotation=AtomicTypeAnnotation(
+                identifier='Reference',
                 node=...),
-              default=Default(
-                node=...),
+              default=None,
               node=...)],
           returns=None,
           description=None,
@@ -12040,7 +12020,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASc-002: preferred name shall be provided at least in English.',
+          description='Constraint AASc-3a-002: preferred name shall be provided at least in English.',
           body=textwrap.dedent("""\
             Any(
               generator=ForEach(

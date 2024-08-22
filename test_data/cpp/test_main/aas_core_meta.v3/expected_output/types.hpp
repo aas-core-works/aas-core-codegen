@@ -2942,18 +2942,12 @@ class IEmbeddedDataSpecification
   ///@{
   /// \brief Reference to the data specification
 
-  virtual const common::optional<
-    std::shared_ptr<IReference>
-  >& data_specification() const = 0;
+  virtual const std::shared_ptr<IReference>& data_specification() const = 0;
 
-  virtual common::optional<
-    std::shared_ptr<IReference>
-  >& mutable_data_specification() = 0;
+  virtual std::shared_ptr<IReference>& mutable_data_specification() = 0;
 
   virtual void set_data_specification(
-    common::optional<
-      std::shared_ptr<IReference>
-    > value
+    std::shared_ptr<IReference> value
   ) = 0;
 
   ///@}
@@ -10275,11 +10269,9 @@ class Environment
 class EmbeddedDataSpecification
     : public IEmbeddedDataSpecification {
  public:
-  explicit EmbeddedDataSpecification(
+  EmbeddedDataSpecification(
     std::shared_ptr<IDataSpecificationContent> data_specification_content,
-    common::optional<
-      std::shared_ptr<IReference>
-    > data_specification = common::nullopt
+    std::shared_ptr<IReference> data_specification
   );
 
   ModelType model_type() const override;
@@ -10298,18 +10290,12 @@ class EmbeddedDataSpecification
 
   // region Get and set data_specification_
 
-  const common::optional<
-    std::shared_ptr<IReference>
-  >& data_specification() const override;
+  const std::shared_ptr<IReference>& data_specification() const override;
 
-  common::optional<
-    std::shared_ptr<IReference>
-  >& mutable_data_specification() override;
+  std::shared_ptr<IReference>& mutable_data_specification() override;
 
   void set_data_specification(
-    common::optional<
-      std::shared_ptr<IReference>
-    > value
+    std::shared_ptr<IReference> value
   ) override;
 
   // endregion
@@ -10319,9 +10305,7 @@ class EmbeddedDataSpecification
  private:
   std::shared_ptr<IDataSpecificationContent> data_specification_content_;
 
-  common::optional<
-    std::shared_ptr<IReference>
-  > data_specification_;
+  std::shared_ptr<IReference> data_specification_;
 };
 
 class LevelType

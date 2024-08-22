@@ -9714,6 +9714,7 @@ func readEmbeddedDataSpecificationAsSequence(
 	var theDataSpecification aastypes.IReference
 
 	foundDataSpecificationContent := false
+	foundDataSpecification := false
 
 	for {
 		current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
@@ -9772,6 +9773,7 @@ func readEmbeddedDataSpecificationAsSequence(
 				decoder,
 				current,
 			)
+			foundDataSpecification = true
 
 		default:
 			valueErr = newDeserializationError(
@@ -9824,10 +9826,15 @@ func readEmbeddedDataSpecificationAsSequence(
 		return
 	}
 
+	if !foundDataSpecification {
+		err = newDeserializationError(
+			"The required property 'dataSpecification' is missing",
+		)
+		return
+	}
+
 	instance = aastypes.NewEmbeddedDataSpecification(
 		theDataSpecificationContent,
-	)
-	instance.SetDataSpecification(
 		theDataSpecification,
 	)
 	return
@@ -21747,39 +21754,35 @@ func writeEmbeddedDataSpecificationAsSequence(
 
 	// region DataSpecification
 
-	theDataSpecification := that.DataSpecification()
-
-	if theDataSpecification != nil {
-		err = writeStartElement(
-			encoder,
-			"dataSpecification",
-			false,
-		)
-		if err != nil {
-			return
+	err = writeStartElement(
+		encoder,
+		"dataSpecification",
+		false,
+	)
+	if err != nil {
+		return
+	}
+	err = writeReferenceAsSequence(
+		encoder,
+		that.DataSpecification(),
+	)
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "DataSpecification()",
+				},
+			)
 		}
-		err = writeReferenceAsSequence(
-			encoder,
-			theDataSpecification,
-		)
-		if err != nil {
-			if seriaErr, ok := err.(*SerializationError); ok {
-				seriaErr.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "DataSpecification()",
-					},
-				)
-			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"dataSpecification",
-			false,
-		)
-		if err != nil {
-			return
-		}
+		return
+	}
+	err = writeEndElement(
+		encoder,
+		"dataSpecification",
+		false,
+	)
+	if err != nil {
+		return
 	}
 
 	err = encoder.Flush()

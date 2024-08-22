@@ -9579,6 +9579,11 @@ def embedded_data_specification_from_jsonable(
             "The required property 'dataSpecificationContent' is missing"
         )
 
+    if setter.data_specification is None:
+        raise DeserializationException(
+            "The required property 'dataSpecification' is missing"
+        )
+
     return aas_types.EmbeddedDataSpecification(
         setter.data_specification_content,
         setter.data_specification
@@ -13173,10 +13178,9 @@ class _Serializer(
             self.transform(that.data_specification_content)
         )
 
-        if that.data_specification is not None:
-            jsonable['dataSpecification'] = (
-                self.transform(that.data_specification)
-            )
+        jsonable['dataSpecification'] = (
+            self.transform(that.data_specification)
+        )
 
         return jsonable
 

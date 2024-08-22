@@ -11894,7 +11894,7 @@ namespace AasCore.Aas3_0
         /// <summary>
         /// Reference to the data specification
         /// </summary>
-        public IReference? DataSpecification { get; set; }
+        public IReference DataSpecification { get; set; }
     }
 
     /// <summary>
@@ -11910,7 +11910,7 @@ namespace AasCore.Aas3_0
         /// <summary>
         /// Reference to the data specification
         /// </summary>
-        public IReference? DataSpecification { get; set; }
+        public IReference DataSpecification { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -11920,10 +11920,7 @@ namespace AasCore.Aas3_0
         {
             yield return DataSpecificationContent;
 
-            if (DataSpecification != null)
-            {
-                yield return DataSpecification;
-            }
+            yield return DataSpecification;
         }
 
         /// <summary>
@@ -11939,15 +11936,12 @@ namespace AasCore.Aas3_0
                 yield return anItem;
             }
 
-            if (DataSpecification != null)
-            {
-                yield return DataSpecification;
+            yield return DataSpecification;
 
-                // Recurse
-                foreach (var anItem in DataSpecification.Descend())
-                {
-                    yield return anItem;
-                }
+            // Recurse
+            foreach (var anItem in DataSpecification.Descend())
+            {
+                yield return anItem;
             }
         }
 
@@ -11993,7 +11987,7 @@ namespace AasCore.Aas3_0
 
         public EmbeddedDataSpecification(
             IDataSpecificationContent dataSpecificationContent,
-            IReference? dataSpecification = null)
+            IReference dataSpecification)
         {
             DataSpecificationContent = dataSpecificationContent;
             DataSpecification = dataSpecification;

@@ -40,19 +40,15 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
    */
   private IReference dataSpecification;
 
-  public EmbeddedDataSpecification(IDataSpecificationContent dataSpecificationContent) {
-    this.dataSpecificationContent = Objects.requireNonNull(
-      dataSpecificationContent,
-      "Argument \"dataSpecificationContent\" must be non-null.");
-  }
-
   public EmbeddedDataSpecification(
     IDataSpecificationContent dataSpecificationContent,
     IReference dataSpecification) {
     this.dataSpecificationContent = Objects.requireNonNull(
       dataSpecificationContent,
       "Argument \"dataSpecificationContent\" must be non-null.");
-    this.dataSpecification = dataSpecification;
+    this.dataSpecification = Objects.requireNonNull(
+      dataSpecification,
+      "Argument \"dataSpecification\" must be non-null.");
   }
 
   @Override
@@ -68,13 +64,15 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
   }
 
   @Override
-  public Optional<IReference> getDataSpecification() {
-    return Optional.ofNullable(dataSpecification);
+  public IReference getDataSpecification() {
+    return dataSpecification;
   }
 
   @Override
   public void setDataSpecification(IReference dataSpecification) {
-    this.dataSpecification = dataSpecification;
+    this.dataSpecification = Objects.requireNonNull(
+      dataSpecification,
+      "Argument \"dataSpecification\" must be non-null.");
   }
 
   /**

@@ -7118,22 +7118,16 @@ class EnhancedEmbeddedDataSpecification
     instance_->set_data_specification_content(value);
   }
 
-  const common::optional<
-    std::shared_ptr<types::IReference>
-  >& data_specification() const override {
+  const std::shared_ptr<types::IReference>& data_specification() const override {
     return instance_->data_specification();
   }
 
-  common::optional<
-    std::shared_ptr<types::IReference>
-  >& mutable_data_specification() override {
+  std::shared_ptr<types::IReference>& mutable_data_specification() override {
     return instance_->mutable_data_specification();
   }
 
   void set_data_specification(
-    common::optional<
-      std::shared_ptr<types::IReference>
-    > value
+    std::shared_ptr<types::IReference> value
   ) override {
     instance_->set_data_specification(value);
   }
@@ -13537,26 +13531,12 @@ std::shared_ptr<types::IEmbeddedDataSpecification> WrapEmbeddedDataSpecification
     )
   );
 
-  if (that->data_specification().has_value()) {
-    const std::shared_ptr<types::IReference>& value(
-      that->data_specification().value()
-    );
-
-    std::shared_ptr<
-      types::IReference
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
-    that->set_data_specification(
-      common::make_optional(
-        std::move(wrapped)
-      )
-    );
-  }
+  that->set_data_specification(
+    Wrap<E>(
+      that->data_specification(),
+      factory
+    )
+  );
 
   std::shared_ptr<E> enh(
     factory(that)

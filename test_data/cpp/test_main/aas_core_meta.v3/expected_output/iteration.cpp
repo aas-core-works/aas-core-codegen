@@ -11313,15 +11313,10 @@ void IteratorOverEmbeddedDataSpecification::Execute() {
       }
 
       case 1: {
-        if (!(casted_->data_specification().has_value())) {
-          state_ = 2;
-          continue;
-        }
-
         property_ = Property::kDataSpecification;
         item_ = std::move(
           std::static_pointer_cast<types::IClass>(
-            *(casted_->data_specification())
+            casted_->data_specification()
           )
         );
         ++index_;

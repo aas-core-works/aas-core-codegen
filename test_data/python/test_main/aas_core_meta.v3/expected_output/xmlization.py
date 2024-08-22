@@ -24181,6 +24181,11 @@ def _read_embedded_data_specification_as_sequence(
             "The required property 'dataSpecificationContent' is missing"
         )
 
+    if reader_and_setter.data_specification is None:
+        raise DeserializationException(
+            "The required property 'dataSpecification' is missing"
+        )
+
     return aas_types.EmbeddedDataSpecification(
         reader_and_setter.data_specification_content,
         reader_and_setter.data_specification
@@ -30472,12 +30477,11 @@ class _Serializer(aas_types.AbstractVisitor):
         self.visit(that.data_specification_content)
         self._write_end_element('dataSpecificationContent')
 
-        if that.data_specification is not None:
-            self._write_start_element('dataSpecification')
-            self._write_reference_as_sequence(
-                that.data_specification
-            )
-            self._write_end_element('dataSpecification')
+        self._write_start_element('dataSpecification')
+        self._write_reference_as_sequence(
+            that.data_specification
+        )
+        self._write_end_element('dataSpecification')
 
     def visit_embedded_data_specification(
         self,

@@ -10978,6 +10978,12 @@ public class Jsonization {
           return Result.failure(error);
         }
 
+        if (theDataSpecification == null) {
+          final Reporting.Error error = new Reporting.Error(
+            "Required property \"dataSpecification\" is missing");
+          return Result.failure(error);
+        }
+
         return Result.success(new EmbeddedDataSpecification(
           theDataSpecificationContent,
           theDataSpecification));
@@ -15118,10 +15124,8 @@ public class Jsonization {
         result.set("dataSpecificationContent", transform(
           that.getDataSpecificationContent()));
 
-        if (that.getDataSpecification().isPresent()) {
-          result.set("dataSpecification", transform(
-            that.getDataSpecification().get()));
-        }
+        result.set("dataSpecification", transform(
+          that.getDataSpecification()));
 
         return result;
       }
