@@ -140,8 +140,11 @@ def _define_type(
         )
 
 
-def _fix_pattern_for_utf16(pattern: str) -> str:
-    """Fix the pattern for UTF-16-only regex engines."""
+# NOTE (mristin):
+# This function is made public so that we can use it in other schema generators such
+# as the SHACL generator.
+def fix_pattern_for_utf16(pattern: str) -> str:
+    """Parse the pattern and re-render it for UTF-16-only regex engines."""
     regex, error = parse_retree.parse([pattern])
     if error is not None:
         raise ValueError(
@@ -195,7 +198,7 @@ def _define_constraints_for_primitive_type(
         and len(pattern_constraints) > 0
     ):
         if len(pattern_constraints) == 1:
-            definition["pattern"] = _fix_pattern_for_utf16(
+            definition["pattern"] = fix_pattern_for_utf16(
                 pattern_constraints[0].pattern
             )
         else:
@@ -207,7 +210,7 @@ def _define_constraints_for_primitive_type(
                         [
                             (
                                 "pattern",
-                                _fix_pattern_for_utf16(pattern_constraint.pattern),
+                                fix_pattern_for_utf16(pattern_constraint.pattern),
                             )
                         ]
                     )
