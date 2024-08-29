@@ -4286,7 +4286,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(
-                        (that.Value != null)
+                        (that.TypeValueListElement != null)
                         && (
                             that.TypeValueListElement == AasSubmodelElements.Property
                             || that.TypeValueListElement == AasSubmodelElements.Range
@@ -4294,7 +4294,10 @@ namespace AasCore.Aas3_0
                     )
                     || (
                         (that.ValueTypeListElement != null)
-                        && Verification.PropertiesOrRangesHaveValueType(that.Value, that.ValueTypeListElement)
+                        && (
+                            (that.Value == null)
+                            || Verification.PropertiesOrRangesHaveValueType(that.Value, that.ValueTypeListElement)
+                        )
                     )))
                 {
                     yield return new Reporting.Error(

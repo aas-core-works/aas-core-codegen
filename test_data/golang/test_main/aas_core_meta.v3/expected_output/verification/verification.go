@@ -5250,14 +5250,15 @@ func VerifySubmodelElementList(
 	}
 
 	if !(
-		!((that.Value() != nil) &&
+		!((that.TypeValueListElement() != nil) &&
 		(that.TypeValueListElement() == aastypes.AASSubmodelElementsProperty ||
 		that.TypeValueListElement() == aastypes.AASSubmodelElementsRange)) ||
 		((that.ValueTypeListElement() != nil) &&
+		((that.Value() == nil) ||
 		PropertiesOrRangesHaveValueType(
 			that.Value(),
 			*that.ValueTypeListElement(),
-		))) {
+		)))) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASd-109: If type value list element is equal to " +
