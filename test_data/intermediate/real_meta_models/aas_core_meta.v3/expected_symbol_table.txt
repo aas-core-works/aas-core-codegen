@@ -9841,7 +9841,7 @@ SymbolTable(
                       instance=Name(
                         identifier='self',
                         original_node=...),
-                      name='value',
+                      name='type_value_list_element',
                       original_node=...),
                     original_node=...),
                   Or(
@@ -9888,20 +9888,31 @@ SymbolTable(
                       name='value_type_list_element',
                       original_node=...),
                     original_node=...),
-                  FunctionCall(
-                    name='properties_or_ranges_have_value_type',
-                    args=[
-                      Member(
-                        instance=Name(
-                          identifier='self',
+                  Or(
+                    values=[
+                      IsNone(
+                        value=Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='value',
                           original_node=...),
-                        name='value',
                         original_node=...),
-                      Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='value_type_list_element',
+                      FunctionCall(
+                        name='properties_or_ranges_have_value_type',
+                        args=[
+                          Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='value',
+                            original_node=...),
+                          Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='value_type_list_element',
+                            original_node=...)],
                         original_node=...)],
                     original_node=...)],
                 original_node=...),

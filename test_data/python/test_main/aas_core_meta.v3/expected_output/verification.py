@@ -3426,7 +3426,7 @@ class _Transformer(
         if not (
             not (
                 (
-                    (that.value is not None)
+                    (that.type_value_list_element is not None)
                     and (
                         (
                             that.type_value_list_element == aas_types.AASSubmodelElements.PROPERTY
@@ -3438,9 +3438,14 @@ class _Transformer(
             or (
                 (
                     (that.value_type_list_element is not None)
-                    and properties_or_ranges_have_value_type(
-                        that.value,
-                        that.value_type_list_element
+                    and (
+                        (
+                            (that.value is None)
+                            or properties_or_ranges_have_value_type(
+                                that.value,
+                                that.value_type_list_element
+                            )
+                        )
                     )
                 )
             )

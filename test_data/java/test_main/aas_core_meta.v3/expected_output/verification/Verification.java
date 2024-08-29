@@ -3795,7 +3795,7 @@ public class Verification {
 
       if (!(
         !(
-            (that.getValue().isPresent())
+            (that.getTypeValueListElement() != null)
             && (
                 that.getTypeValueListElement() == AasSubmodelElements.PROPERTY
                 || that.getTypeValueListElement() == AasSubmodelElements.RANGE
@@ -3803,9 +3803,12 @@ public class Verification {
         )
         || (
             (that.getValueTypeListElement().isPresent())
-            && propertiesOrRangesHaveValueType(
-                that.getValue().orElse(null),
-                that.getValueTypeListElement().orElse(null))
+            && (
+                (!that.getValue().isPresent())
+                || propertiesOrRangesHaveValueType(
+                    that.getValue().orElse(null),
+                    that.getValueTypeListElement().orElse(null))
+            )
         ))) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(

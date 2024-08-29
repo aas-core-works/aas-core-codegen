@@ -3988,7 +3988,7 @@ class Verifier
     if (!(
       !(
         (
-          (that.value !== null)
+          (that.typeValueListElement !== null)
           && (
             (
               that.typeValueListElement == AasTypes.AasSubmodelElements.Property
@@ -4000,9 +4000,14 @@ class Verifier
       || (
         (
           (that.valueTypeListElement !== null)
-          && propertiesOrRangesHaveValueType(
-            that.value,
-            that.valueTypeListElement
+          && (
+            (
+              (that.value === null)
+              || propertiesOrRangesHaveValueType(
+                that.value,
+                that.valueTypeListElement
+              )
+            )
           )
         )
       )
