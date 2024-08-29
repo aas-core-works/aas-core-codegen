@@ -7,6 +7,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations, infer_for_schema
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
+from aas_core_codegen.jsonschema import main as jsonschema_main
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
@@ -214,7 +215,23 @@ def _define_property_shape(
     # region Define patterns
 
     for pattern_constraint in pattern_constraints:
-        pattern_literal = rdf_shacl_common.string_literal(pattern_constraint.pattern)
+        # NOTE (mristin):
+        # We need to render the regular expression so that the pattern appears in
+        # the canonical form. The original pattern in the specification might be written
+        # in Python dialect, which does not translate directly to many Regex Engines.
+        #
+        # For example, repetition bounds can be given with 0 omitted (*e.g.*, ``{,4}``),
+        # while SHACL and Java need an explicit zero (``{0, 4}``). Our standard renderer
+        # puts an explicit zero.
+        #
+        # In addition, we render the pattern exactly as we do for JSON Schema since most
+        # SHACL validators in the wild run regex engines which understand the patterns
+        # for JSON Schema and work in UTF-16.
+        rendered_pattern = jsonschema_main.fix_pattern_for_utf16(
+            pattern_constraint.pattern
+        )
+
+        pattern_literal = rdf_shacl_common.string_literal(rendered_pattern)
 
         stmts.append(Stripped(f"sh:pattern {pattern_literal} ;"))
 

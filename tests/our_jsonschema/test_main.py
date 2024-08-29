@@ -157,33 +157,33 @@ class Test_against_recorded(unittest.TestCase):
 
 class Test_pattern_transpilation(unittest.TestCase):
     def test_unescaped_above_ascii_character_in_bmp(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16("\ud7ff")
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16("\ud7ff")
         self.assertEqual("\ud7ff", pattern)
 
     def test_escaped_above_ascii_character_in_bmp(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16("\\ud7ff")
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16("\\ud7ff")
         self.assertEqual("\\ud7ff", pattern)
 
     def test_unescaped_range_in_bmp(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16(
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16(
             "[\x20-\uD7FF]"
         )
         self.assertEqual("[\x20-\uD7FF]", pattern)
 
     def test_escaped_range_in_bmp(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16(
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16(
             "[\\x20-\\ud7ff]"
         )
         self.assertEqual("[\\x20-\\ud7ff]", pattern)
 
     def test_escaped_range_in_bmp_always_lowercase(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16(
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16(
             "[\\x20-\\uD7FF]"
         )
         self.assertEqual("[\\x20-\\ud7ff]", pattern)
 
     def test_unescaped_above_bmp(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16(
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16(
             "[\U00010000-\U0010FFFF]"
         )
         self.assertEqual(
@@ -193,7 +193,7 @@ class Test_pattern_transpilation(unittest.TestCase):
         )
 
     def test_escaped_above_bmp(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16(
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16(
             "[\\U00010000-\\U0010FFFF]"
         )
         self.assertEqual(
@@ -203,15 +203,15 @@ class Test_pattern_transpilation(unittest.TestCase):
         )
 
     def test_unescaped_special_ascii_characters(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16("[\t\n\r]")
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16("[\t\n\r]")
         self.assertEqual("[\\t\\n\\r]", pattern)
 
     def test_escaped_special_ascii_characters(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16("[\\t\\n\\r]")
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16("[\\t\\n\\r]")
         self.assertEqual("[\\t\\n\\r]", pattern)
 
     def test_on_XML_string_pattern(self) -> None:
-        pattern = aas_core_codegen.jsonschema.main._fix_pattern_for_utf16(
+        pattern = aas_core_codegen.jsonschema.main.fix_pattern_for_utf16(
             r"^[\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]*$"
         )
         self.assertEqual(
