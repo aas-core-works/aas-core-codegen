@@ -2,6 +2,7 @@
 
 import textwrap
 import unittest
+from typing import List
 
 import tests.common
 from aas_core_codegen import intermediate
@@ -50,6 +51,59 @@ class Test_with_smoke(unittest.TestCase):
                     assert (
                         len(inferrer.errors) == 0
                     ), tests.common.most_underlying_messages(inferrer.errors)
+
+    def expect_type_inference_to_fail(
+        self, source: str, expected_joined_message: str
+    ) -> None:
+        """Execute a smoke test and expect type inference to fail."""
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+
+        assert symbol_table is not None
+
+        base_environment = intermediate_type_inference.populate_base_environment(
+            symbol_table=symbol_table
+        )
+
+        type_inference_errors = []  # type: List[str]
+
+        for our_type in symbol_table.our_types:
+            if isinstance(
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            ):
+                environment = intermediate_type_inference.MutableEnvironment(
+                    parent=base_environment
+                )
+                environment.set(
+                    Identifier("self"),
+                    intermediate_type_inference.OurTypeAnnotation(our_type=our_type),
+                )
+
+                for invariant in our_type.invariants:
+                    canonicalizer = intermediate_type_inference.Canonicalizer()
+                    canonicalizer.transform(invariant.body)
+
+                    inferrer = intermediate_type_inference.Inferrer(
+                        symbol_table=symbol_table,
+                        environment=environment,
+                        representation_map=canonicalizer.representation_map,
+                    )
+
+                    inferrer.transform(invariant.body)
+                    if len(inferrer.errors) > 0:
+                        type_inference_errors.append(
+                            tests.common.most_underlying_messages(inferrer.errors)
+                        )
+
+            assert len(type_inference_errors) > 0, (
+                f"Expected one or more type inference errors, "
+                f"but got none on the source code:\n{source}"
+            )
+
+            joined_message = "\n".join(type_inference_errors)
+            self.assertEqual(expected_joined_message, joined_message, source)
 
     def test_enumeration_literal_as_member(self) -> None:
         source = textwrap.dedent(
@@ -164,6 +218,60 @@ class Test_with_smoke(unittest.TestCase):
         )
 
         Test_with_smoke.execute(source=source)
+
+    def test_is_none_fails_on_non_optional(self) -> None:
+        source = textwrap.dedent(
+            """\
+            @invariant(
+                lambda self:
+                self.something is None,
+                "Dummy invariant description"
+            )
+            class Some_class:
+                something: str
+
+                def __init__(self, something: str) -> None:
+                    self.something = something
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the value to be of an optional type "
+                "for a nullness check (``is None``), but got str"
+            ),
+        )
+
+    def test_is_not_none_fails_on_non_optional(self) -> None:
+        source = textwrap.dedent(
+            """\
+            @invariant(
+                lambda self:
+                self.something is not None,
+                "Dummy invariant description"
+            )
+            class Some_class:
+                something: str
+
+                def __init__(self, something: str) -> None:
+                    self.something = something
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the value to be of an optional type "
+                "for a non-nullness check (``is not None``), but got str"
+            ),
+        )
 
 
 if __name__ == "__main__":

@@ -1458,11 +1458,22 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def transform_is_none(
         self, node: parse_tree.IsNone
     ) -> Optional["TypeAnnotationUnion"]:
-        # Just recurse to fill ``type_map`` on ``value`` even though we know the type in
-        # advance
-        success = self.transform(node.value) is not None
+        value_type = self.transform(node.value)
 
-        if not success:
+        # NOTE (mristin):
+        # Something went wrong if we could not infer the type of the ``value``.
+        if value_type is None:
+            return None
+
+        if not isinstance(value_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.value.original_node,
+                    f"Expected the value to be of an optional type for "
+                    f"a nullness check (``is None``), "
+                    f"but got {value_type}",
+                )
+            )
             return None
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
@@ -1472,11 +1483,22 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def transform_is_not_none(
         self, node: parse_tree.IsNotNone
     ) -> Optional["TypeAnnotationUnion"]:
-        # Just recurse to fill ``type_map`` on ``value`` even though we know the type in
-        # advance
-        success = self.transform(node.value) is not None
+        value_type = self.transform(node.value)
 
-        if not success:
+        # NOTE (mristin):
+        # Something went wrong if we could not infer the type of the ``value``.
+        if value_type is None:
+            return None
+
+        if not isinstance(value_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.value.original_node,
+                    f"Expected the value to be of an optional type "
+                    f"for a non-nullness check (``is not None``), "
+                    f"but got {value_type}",
+                )
+            )
             return None
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
