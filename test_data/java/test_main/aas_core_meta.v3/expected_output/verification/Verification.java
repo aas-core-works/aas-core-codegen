@@ -3795,11 +3795,8 @@ public class Verification {
 
       if (!(
         !(
-            (that.getTypeValueListElement() != null)
-            && (
-                that.getTypeValueListElement() == AasSubmodelElements.PROPERTY
-                || that.getTypeValueListElement() == AasSubmodelElements.RANGE
-            )
+            that.getTypeValueListElement() == AasSubmodelElements.PROPERTY
+            || that.getTypeValueListElement() == AasSubmodelElements.RANGE
         )
         || (
             (that.getValueTypeListElement().isPresent())

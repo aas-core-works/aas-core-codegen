@@ -11551,13 +11551,8 @@ void OfSubmodelElementList::Execute() {
       case 15: {
         if (
           !((
-            (instance_->type_value_list_element().has_value())
-            && (
-              (
-                instance_->type_value_list_element() == types::AasSubmodelElements::kProperty
-                || instance_->type_value_list_element() == types::AasSubmodelElements::kRange
-              )
-            )
+            instance_->type_value_list_element() == types::AasSubmodelElements::kProperty
+            || instance_->type_value_list_element() == types::AasSubmodelElements::kRange
           ))
           || ((
             (instance_->value_type_list_element().has_value())

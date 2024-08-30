@@ -3988,13 +3988,8 @@ class Verifier
     if (!(
       !(
         (
-          (that.typeValueListElement !== null)
-          && (
-            (
-              that.typeValueListElement == AasTypes.AasSubmodelElements.Property
-              || that.typeValueListElement == AasTypes.AasSubmodelElements.Range
-            )
-          )
+          that.typeValueListElement == AasTypes.AasSubmodelElements.Property
+          || that.typeValueListElement == AasTypes.AasSubmodelElements.Range
         )
       )
       || (
