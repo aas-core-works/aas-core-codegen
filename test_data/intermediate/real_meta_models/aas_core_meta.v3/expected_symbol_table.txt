@@ -9834,48 +9834,37 @@ SymbolTable(
           description='Constraint AASd-109: If type value list element is equal to Property or Range value type list element shall be set and all first level child elements shall have the value type as specified in value type list element.',
           body=textwrap.dedent("""\
             Implication(
-              antecedent=And(
+              antecedent=Or(
                 values=[
-                  IsNotNone(
-                    value=Member(
+                  Comparison(
+                    left=Member(
                       instance=Name(
                         identifier='self',
                         original_node=...),
                       name='type_value_list_element',
                       original_node=...),
-                    original_node=...),
-                  Or(
-                    values=[
-                      Comparison(
-                        left=Member(
-                          instance=Name(
-                            identifier='self',
-                            original_node=...),
-                          name='type_value_list_element',
-                          original_node=...),
-                        op='EQ',
-                        right=Member(
-                          instance=Name(
-                            identifier='AAS_submodel_elements',
-                            original_node=...),
-                          name='Property',
-                          original_node=...),
+                    op='EQ',
+                    right=Member(
+                      instance=Name(
+                        identifier='AAS_submodel_elements',
                         original_node=...),
-                      Comparison(
-                        left=Member(
-                          instance=Name(
-                            identifier='self',
-                            original_node=...),
-                          name='type_value_list_element',
-                          original_node=...),
-                        op='EQ',
-                        right=Member(
-                          instance=Name(
-                            identifier='AAS_submodel_elements',
-                            original_node=...),
-                          name='Range',
-                          original_node=...),
-                        original_node=...)],
+                      name='Property',
+                      original_node=...),
+                    original_node=...),
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='type_value_list_element',
+                      original_node=...),
+                    op='EQ',
+                    right=Member(
+                      instance=Name(
+                        identifier='AAS_submodel_elements',
+                        original_node=...),
+                      name='Range',
+                      original_node=...),
                     original_node=...)],
                 original_node=...),
               consequent=And(

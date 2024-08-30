@@ -5250,9 +5250,8 @@ func VerifySubmodelElementList(
 	}
 
 	if !(
-		!((that.TypeValueListElement() != nil) &&
-		(that.TypeValueListElement() == aastypes.AASSubmodelElementsProperty ||
-		that.TypeValueListElement() == aastypes.AASSubmodelElementsRange)) ||
+		!(that.TypeValueListElement() == aastypes.AASSubmodelElementsProperty ||
+		that.TypeValueListElement() == aastypes.AASSubmodelElementsRange) ||
 		((that.ValueTypeListElement() != nil) &&
 		((that.Value() == nil) ||
 		PropertiesOrRangesHaveValueType(

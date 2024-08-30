@@ -4286,11 +4286,8 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(
-                        (that.TypeValueListElement != null)
-                        && (
-                            that.TypeValueListElement == AasSubmodelElements.Property
-                            || that.TypeValueListElement == AasSubmodelElements.Range
-                        )
+                        that.TypeValueListElement == AasSubmodelElements.Property
+                        || that.TypeValueListElement == AasSubmodelElements.Range
                     )
                     || (
                         (that.ValueTypeListElement != null)
