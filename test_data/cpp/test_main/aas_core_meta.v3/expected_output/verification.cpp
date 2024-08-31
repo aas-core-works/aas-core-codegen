@@ -11560,7 +11560,7 @@ void OfSubmodelElementList::Execute() {
               (
                 (!(instance_->value().has_value()))
                 || PropertiesOrRangesHaveValueType(
-                  instance_->value(),
+                  (*(instance_->value())),
                   (*(instance_->value_type_list_element()))
                 )
               )

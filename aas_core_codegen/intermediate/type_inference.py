@@ -724,6 +724,7 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_and(self, node: parse_tree.And) -> str:
         values = []  # type: List[str]
+
         for value_node in node.values:
             value = self.transform(value_node)
             if not _Canonicalizer._needs_no_brackets(value_node):
@@ -1611,20 +1612,34 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         success = True
 
-        for value_node in node.values:
-            value_type = self.transform(value_node)
-            if value_type is None:
-                return None
+        with contextlib.ExitStack() as exit_stack:
+            for value_node in node.values:
+                value_type = self.transform(value_node)
+                if value_type is None:
+                    return None
 
-            if isinstance(value_type, OptionalTypeAnnotation):
-                self.errors.append(
-                    Error(
-                        value_node.original_node,
-                        f"Expected the value to be a non-None, "
-                        f"but got: {value_type}",
+                if isinstance(value_type, OptionalTypeAnnotation):
+                    self.errors.append(
+                        Error(
+                            value_node.original_node,
+                            f"Expected the value to be a non-None, "
+                            f"but got: {value_type}",
+                        )
                     )
-                )
-                success = False
+                    success = False
+
+                if isinstance(value_node, parse_tree.IsNone):
+                    canonical_repr = self._representation_map[value_node.value]
+                    self._non_null.increment(canonical_repr)
+
+                    # fmt: off
+                    exit_stack.callback(
+                        lambda a_canonical_repr=canonical_repr:  # type: ignore
+                            self._non_null.decrement(
+                            a_canonical_repr
+                        )
+                    )
+                    # fmt: on
 
         if not success:
             return None
