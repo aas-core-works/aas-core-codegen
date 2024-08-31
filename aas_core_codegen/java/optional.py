@@ -1,6 +1,6 @@
 """This module provides an inferrer to resolve optional type information."""
 
-from typing import Final, List, MutableMapping, Optional, Union
+from typing import Final, List, MutableMapping, Optional, Union, Mapping
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -38,7 +38,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
     def __init__(
         self,
         environment: intermediate_type_inference.Environment,
-        type_map: MutableMapping[
+        type_map: Mapping[
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
     ) -> None:

@@ -11,7 +11,16 @@ be traced back to the parse stage.
 import abc
 import contextlib
 import enum
-from typing import Mapping, MutableMapping, Optional, List, Final, Union, get_args
+from typing import (
+    Mapping,
+    MutableMapping,
+    Optional,
+    List,
+    Final,
+    Union,
+    get_args,
+    Tuple,
+)
 
 from icontract import DBC, ensure, require
 
@@ -557,7 +566,7 @@ class MutableEnvironment(Environment):
         del self._mapping[identifier]
 
 
-class Canonicalizer(parse_tree.RestrictedTransformer[str]):
+class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
     """Represent the nodes as canonical strings so that they can be used in look-ups."""
 
     #: Track of the canonical representations
@@ -596,7 +605,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
     def transform_member(self, node: parse_tree.Member) -> str:
         instance_repr = self.transform(node.instance)
 
-        if Canonicalizer._needs_no_brackets(node.instance):
+        if _Canonicalizer._needs_no_brackets(node.instance):
             result = f"{instance_repr}.{node.name}"
         else:
             result = f"({instance_repr}).{node.name}"
@@ -608,7 +617,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         collection_repr = self.transform(node.collection)
         index_repr = self.transform(node.index)
 
-        if Canonicalizer._needs_no_brackets(node.collection):
+        if _Canonicalizer._needs_no_brackets(node.collection):
             result = f"{collection_repr}[{index_repr}]"
         else:
             result = f"({collection_repr})[{index_repr}]"
@@ -618,11 +627,11 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_comparison(self, node: parse_tree.Comparison) -> str:
         left = self.transform(node.left)
-        if not Canonicalizer._needs_no_brackets(node.left):
+        if not _Canonicalizer._needs_no_brackets(node.left):
             left = f"({left})"
 
         right = self.transform(node.right)
-        if not Canonicalizer._needs_no_brackets(node.right):
+        if not _Canonicalizer._needs_no_brackets(node.right):
             right = f"({right})"
 
         result = f"{left} {node.op.value} {right}"
@@ -631,11 +640,11 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_is_in(self, node: parse_tree.IsIn) -> str:
         member = self.transform(node.member)
-        if not Canonicalizer._needs_no_brackets(node.member):
+        if not _Canonicalizer._needs_no_brackets(node.member):
             member = f"({member})"
 
         container = self.transform(node.container)
-        if not Canonicalizer._needs_no_brackets(node.container):
+        if not _Canonicalizer._needs_no_brackets(node.container):
             container = f"({container})"
 
         result = f"{member} in {container}"
@@ -644,11 +653,11 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_implication(self, node: parse_tree.Implication) -> str:
         antecedent = self.transform(node.antecedent)
-        if not Canonicalizer._needs_no_brackets(node.antecedent):
+        if not _Canonicalizer._needs_no_brackets(node.antecedent):
             antecedent = f"({antecedent})"
 
         consequent = self.transform(node.consequent)
-        if not Canonicalizer._needs_no_brackets(node.consequent):
+        if not _Canonicalizer._needs_no_brackets(node.consequent):
             consequent = f"({consequent})"
 
         result = f"{antecedent} ⇒ {consequent}"
@@ -682,7 +691,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_is_none(self, node: parse_tree.IsNone) -> str:
         value = self.transform(node.value)
-        if not Canonicalizer._needs_no_brackets(node.value):
+        if not _Canonicalizer._needs_no_brackets(node.value):
             value = f"({value})"
 
         result = f"{value} is None"
@@ -691,7 +700,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_is_not_none(self, node: parse_tree.IsNotNone) -> str:
         value = self.transform(node.value)
-        if not Canonicalizer._needs_no_brackets(node.value):
+        if not _Canonicalizer._needs_no_brackets(node.value):
             value = f"({value})"
 
         result = f"{value} is not None"
@@ -706,7 +715,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
     def transform_not(self, node: parse_tree.Not) -> str:
         operand_repr = self.transform(node.operand)
 
-        if not Canonicalizer._needs_no_brackets(node):
+        if not _Canonicalizer._needs_no_brackets(node):
             operand_repr = f"({operand_repr})"
 
         result = f"not {operand_repr}"
@@ -717,7 +726,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         values = []  # type: List[str]
         for value_node in node.values:
             value = self.transform(value_node)
-            if not Canonicalizer._needs_no_brackets(value_node):
+            if not _Canonicalizer._needs_no_brackets(value_node):
                 value = f"({value})"
 
             values.append(value)
@@ -730,7 +739,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         values = []  # type: List[str]
         for value_node in node.values:
             value = self.transform(value_node)
-            if not Canonicalizer._needs_no_brackets(value_node):
+            if not _Canonicalizer._needs_no_brackets(value_node):
                 value = f"({value})"
 
             values.append(value)
@@ -741,11 +750,11 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def _transform_add_or_sub(self, node: Union[parse_tree.Add, parse_tree.Sub]) -> str:
         left_repr = self.transform(node.left)
-        if not Canonicalizer._needs_no_brackets(node.left):
+        if not _Canonicalizer._needs_no_brackets(node.left):
             left_repr = f"({left_repr})"
 
         right_repr = self.transform(node.right)
-        if not Canonicalizer._needs_no_brackets(node.right):
+        if not _Canonicalizer._needs_no_brackets(node.right):
             right_repr = f"({right_repr})"
 
         result: str
@@ -788,7 +797,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
     def transform_for_each(self, node: parse_tree.ForEach) -> str:
         variable = self.transform(node.variable)
         iteration = self.transform(node.iteration)
-        if not Canonicalizer._needs_no_brackets(node.iteration):
+        if not _Canonicalizer._needs_no_brackets(node.iteration):
             iteration = f"({iteration})"
 
         result = f"for {variable} in {iteration}"
@@ -808,7 +817,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         generator = self.transform(node.generator)
 
         condition = self.transform(node.condition)
-        if not Canonicalizer._needs_no_brackets(node.condition):
+        if not _Canonicalizer._needs_no_brackets(node.condition):
             condition = f"({condition})"
 
         result: str
@@ -831,7 +840,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
     def transform_assignment(self, node: parse_tree.Assignment) -> str:
         target = self.transform(node.target)
-        if not Canonicalizer._needs_no_brackets(node.target):
+        if not _Canonicalizer._needs_no_brackets(node.target):
             target = f"({target})"
 
         # NOTE (mristin, 2022-06-17):
@@ -927,7 +936,7 @@ TypeAnnotationUnion = Union[
 ]
 
 
-class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
+class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
     """
     Infer the types of the given parse tree.
 
@@ -944,13 +953,10 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
     def __init__(
         self,
-        symbol_table: _types.SymbolTable,
         environment: "Environment",
         representation_map: Mapping[parse_tree.Node, str],
     ) -> None:
         """Initialize with the given values."""
-        self._symbol_table = symbol_table
-
         # We need to create our own child environment so that we can introduce new
         # entries without affecting the variables from the outer scopes.
         self._environment = MutableEnvironment(parent=environment)
@@ -1688,7 +1694,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             self.errors.append(
                 Error(
                     node.left.original_node,
-                    f"{Inferrer._binary_operation_name_with_capital_the(node)} is "
+                    f"{_Inferrer._binary_operation_name_with_capital_the(node)} is "
                     f"only defined on integer and floating-point numbers, "
                     f"but got as a left operand: {left_type}",
                 )
@@ -1707,7 +1713,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             self.errors.append(
                 Error(
                     node.right.original_node,
-                    f"{Inferrer._binary_operation_name_with_capital_the(node)} is "
+                    f"{_Inferrer._binary_operation_name_with_capital_the(node)} is "
                     f"only defined on integer and floating-point numbers, "
                     f"but got as a right operand: {right_type}",
                 )
@@ -2120,6 +2126,92 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
             )
 
     return ImmutableEnvironment(mapping=mapping, parent=None)
+
+
+class InferenceOfFunction:
+    """Represent the result of type inference on a function body and arguments."""
+
+    #: Environment inferred after processing a body of statements including
+    #: the function arguments
+    environment_with_args: Final[Environment]
+
+    #: Map of body nodes to types
+    type_map: Final[Mapping[parse_tree.Node, "TypeAnnotationUnion"]]
+
+    def __init__(
+        self,
+        environment_with_args: Environment,
+        type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
+    ) -> None:
+        """Initialize with the given values."""
+        self.environment_with_args = environment_with_args
+        self.type_map = type_map
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def infer_for_verification(
+    verification: _types.TranspilableVerification, base_environment: Environment
+) -> Tuple[Optional[InferenceOfFunction], Optional[Error]]:
+    """Infer the types for the given function and map the body nodes to the types."""
+    canonicalizer = _Canonicalizer()
+    for node in verification.parsed.body:
+        _ = canonicalizer.transform(node)
+
+    environment = MutableEnvironment(parent=base_environment)
+
+    for arg in verification.arguments:
+        environment.set(
+            identifier=arg.name,
+            type_annotation=convert_type_annotation(arg.type_annotation),
+        )
+
+    type_inferrer = _Inferrer(
+        environment=environment,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    for node in verification.parsed.body:
+        _ = type_inferrer.transform(node)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer the types "
+            f"in the verification function {verification.name!r}",
+            type_inferrer.errors,
+        )
+
+    return (
+        InferenceOfFunction(
+            environment_with_args=environment, type_map=type_inferrer.type_map
+        ),
+        None,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def infer_for_invariant(
+    invariant: _types.Invariant, environment: Environment
+) -> Tuple[Optional[Mapping[parse_tree.Node, "TypeAnnotationUnion"]], Optional[Error]]:
+    """Infer the types of the nodes corresponding to the body of an invariant."""
+    canonicalizer = _Canonicalizer()
+    _ = canonicalizer.transform(invariant.body)
+
+    type_inferrer = _Inferrer(
+        environment=environment,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    _ = type_inferrer.transform(invariant.body)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            invariant.parsed.node,
+            "Failed to infer the types in the invariant",
+            type_inferrer.errors,
+        )
+
+    return type_inferrer.type_map, None
 
 
 assert_union_of_descendants_exhaustive(
