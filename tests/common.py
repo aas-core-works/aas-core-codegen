@@ -93,6 +93,29 @@ def translate_source_to_intermediate(
     return intermediate.translate(parsed_symbol_table=parsed_symbol_table, atok=atok)
 
 
+def must_translate_source_to_intermediate(
+    source: str,
+) -> intermediate.SymbolTable:
+    atok, parse_exception = parse.source_to_atok(source=source)
+    if parse_exception:
+        raise parse_exception  # pylint: disable=raising-bad-type
+
+    assert atok is not None
+
+    parsed_symbol_table, error = parse_atok(atok=atok)
+    assert error is None, f"{most_underlying_messages(error)}"
+    assert parsed_symbol_table is not None
+
+    symbol_table, error = intermediate.translate(
+        parsed_symbol_table=parsed_symbol_table, atok=atok
+    )
+    assert (
+        error is None
+    ), f"Unexpected error when parsing the source: {most_underlying_messages(error)}"
+    assert symbol_table is not None
+    return symbol_table
+
+
 #: If set, this environment variable indicates that the golden files should be
 #: re-recorded instead of checked against.
 RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (

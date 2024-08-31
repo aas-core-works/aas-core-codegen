@@ -1538,12 +1538,22 @@ std::unique_ptr<impl::IVerificator> {of_cls}::Clone() const {{
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verificator(
-    verificator_qualities: VerificatorQualities,
+    cls: intermediate.ConcreteClass,
     symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
+    base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """Generate the non-recursive verificator for the ``cls``."""
-    cls = verificator_qualities.cls
+    environment = intermediate_type_inference.MutableEnvironment(
+        parent=base_environment
+    )
+
+    assert environment.find(Identifier("self")) is None
+    environment.set(
+        identifier=Identifier("self"),
+        type_annotation=intermediate_type_inference.OurTypeAnnotation(our_type=cls),
+    )
+
+    verificator_qualities = VerificatorQualities(cls=cls)
 
     if verificator_qualities.is_noop:
         return (
@@ -3007,22 +3017,8 @@ def generate_implementation(
     )
 
     for cls in symbol_table.concrete_classes:
-        invariant_environment = intermediate_type_inference.MutableEnvironment(
-            parent=base_environment
-        )
-
-        assert invariant_environment.find(Identifier("self")) is None
-        invariant_environment.set(
-            identifier=Identifier("self"),
-            type_annotation=intermediate_type_inference.OurTypeAnnotation(our_type=cls),
-        )
-
-        verificator_qualities = VerificatorQualities(cls=cls)
-
         nrv_blocks, nrv_error = _generate_non_recursive_verificator(
-            verificator_qualities=verificator_qualities,
-            symbol_table=symbol_table,
-            environment=invariant_environment,
+            cls=cls, symbol_table=symbol_table, base_environment=base_environment
         )
         if nrv_error is not None:
             errors.append(nrv_error)

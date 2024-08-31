@@ -252,6 +252,28 @@ class Test_with_smoke(unittest.TestCase):
 
         Test_with_smoke.execute(source=source)
 
+    def test_non_nullness_in_disjunction_with_is_none(self) -> None:
+        source = textwrap.dedent(
+            """\
+            @invariant(
+                lambda self:
+                (self.some_property is None) or (self.some_property == "dummy"),
+                "Dummy description"
+            )
+            class Something:
+                some_property: Optional[str]
+
+                def __init__(self, some_property: Optional[str] = None) -> None:
+                    self.some_property = some_property
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        Test_with_smoke.execute(source=source)
+
     def test_is_none_fails_on_non_optional(self) -> None:
         source = textwrap.dedent(
             """\

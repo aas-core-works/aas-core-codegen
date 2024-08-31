@@ -635,6 +635,14 @@ common::{contains_function}(
         for arg_node in node.args:
             arg_type = self.type_map[arg_node]
 
+            # NOTE (mristin):
+            # This is a tough call to make. We decide that a value, for which we
+            # know that it might be null, will not be de-referenced. On the other
+            # hand, if the value is certainly not null, we de-reference it.
+            #
+            # The problem here is that the actual type of the argument in C++ changes
+            # depending on whether we check for its nullness before with an implication.
+
             arg: Optional[Stripped]
             if isinstance(arg_type, intermediate_type_inference.OptionalTypeAnnotation):
                 arg, error = self.transform(arg_node)
@@ -680,6 +688,13 @@ common::{contains_function}(
         for arg_node in node.args:
             arg_type = self.type_map[arg_node]
 
+            # NOTE (mristin):
+            # This is a tough call to make. We decide that a value, for which we
+            # know that it might be null, will not be de-referenced. On the other
+            # hand, if the value is certainly not null, we de-reference it.
+            #
+            # The problem here is that the actual type of the argument in C++ changes
+            # depending on whether we check for its nullness before with an implication.
             arg: Optional[Stripped]
             if isinstance(arg_type, intermediate_type_inference.OptionalTypeAnnotation):
                 arg, error = self.transform(arg_node)
