@@ -38,19 +38,35 @@ class Test_with_smoke(unittest.TestCase):
                 )
 
                 for invariant in our_type.invariants:
-                    canonicalizer = intermediate_type_inference.Canonicalizer()
-                    canonicalizer.transform(invariant.body)
-
-                    inferrer = intermediate_type_inference.Inferrer(
-                        symbol_table=symbol_table,
-                        environment=environment,
-                        representation_map=canonicalizer.representation_map,
+                    # fmt: off
+                    _, inference_error = (
+                        intermediate_type_inference.infer_for_invariant(
+                            invariant=invariant,
+                            environment=environment
+                        )
                     )
+                    # fmt: on
 
-                    inferrer.transform(invariant.body)
                     assert (
-                        len(inferrer.errors) == 0
-                    ), tests.common.most_underlying_messages(inferrer.errors)
+                        inference_error is None
+                    ), tests.common.most_underlying_messages([inference_error])
+
+        for verification in symbol_table.verification_functions:
+            if not isinstance(verification, intermediate.TranspilableVerification):
+                continue
+
+            # fmt: off
+            _, inference_error = (
+                intermediate_type_inference.infer_for_verification(
+                    verification=verification,
+                    base_environment=base_environment
+                )
+            )
+            # fmt: on
+
+            assert inference_error is None, tests.common.most_underlying_messages(
+                [inference_error]
+            )
 
     def expect_type_inference_to_fail(
         self, source: str, expected_joined_message: str
@@ -82,28 +98,45 @@ class Test_with_smoke(unittest.TestCase):
                 )
 
                 for invariant in our_type.invariants:
-                    canonicalizer = intermediate_type_inference.Canonicalizer()
-                    canonicalizer.transform(invariant.body)
-
-                    inferrer = intermediate_type_inference.Inferrer(
-                        symbol_table=symbol_table,
-                        environment=environment,
-                        representation_map=canonicalizer.representation_map,
+                    # fmt: off
+                    _, inference_error = (
+                        intermediate_type_inference.infer_for_invariant(
+                            invariant=invariant,
+                            environment=environment
+                        )
                     )
+                    # fmt: on
 
-                    inferrer.transform(invariant.body)
-                    if len(inferrer.errors) > 0:
+                    if inference_error is not None:
                         type_inference_errors.append(
-                            tests.common.most_underlying_messages(inferrer.errors)
+                            tests.common.most_underlying_messages([inference_error])
                         )
 
-            assert len(type_inference_errors) > 0, (
-                f"Expected one or more type inference errors, "
-                f"but got none on the source code:\n{source}"
-            )
+        for verification in symbol_table.verification_functions:
+            if not isinstance(verification, intermediate.TranspilableVerification):
+                continue
 
-            joined_message = "\n".join(type_inference_errors)
-            self.assertEqual(expected_joined_message, joined_message, source)
+            # fmt: off
+            _, inference_error = (
+                intermediate_type_inference.infer_for_verification(
+                    verification=verification,
+                    base_environment=base_environment
+                )
+            )
+            # fmt: on
+
+            if inference_error is not None:
+                type_inference_errors.append(
+                    tests.common.most_underlying_messages([inference_error])
+                )
+
+        assert len(type_inference_errors) > 0, (
+            f"Expected one or more type inference errors, "
+            f"but got none on the source code:\n{source}"
+        )
+
+        joined_message = "\n".join(type_inference_errors)
+        self.assertEqual(expected_joined_message, joined_message, source)
 
     def test_enumeration_literal_as_member(self) -> None:
         source = textwrap.dedent(
