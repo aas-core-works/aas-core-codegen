@@ -216,7 +216,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -341,7 +341,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "name"));
+                                return null;
                             }
 
                             theName = DeserializeImplementation.StringFrom(
@@ -365,7 +370,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -389,7 +400,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -444,7 +461,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueType"));
+                                return null;
                             }
 
                             theValueType = DeserializeImplementation.DataTypeDefXsdFrom(
@@ -468,7 +491,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -492,7 +521,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "refersTo"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayRefersTo = keyValue.Value as Nodes.JsonArray;
@@ -585,7 +620,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -690,7 +725,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -795,7 +830,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -888,7 +923,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -945,7 +980,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -1069,7 +1104,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -1124,7 +1165,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "version"));
+                                return null;
                             }
 
                             theVersion = DeserializeImplementation.StringFrom(
@@ -1148,7 +1195,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "revision"));
+                                return null;
                             }
 
                             theRevision = DeserializeImplementation.StringFrom(
@@ -1172,7 +1225,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "creator"));
+                                return null;
                             }
 
                             theCreator = DeserializeImplementation.ReferenceFrom(
@@ -1196,7 +1255,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "templateId"));
+                                return null;
                             }
 
                             theTemplateId = DeserializeImplementation.StringFrom(
@@ -1250,7 +1315,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -1397,7 +1462,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "type"));
+                                return null;
                             }
 
                             theType = DeserializeImplementation.StringFrom(
@@ -1421,7 +1491,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueType"));
+                                return null;
                             }
 
                             theValueType = DeserializeImplementation.DataTypeDefXsdFrom(
@@ -1445,7 +1520,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -1469,7 +1550,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -1524,7 +1611,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "kind"));
+                                return null;
                             }
 
                             theKind = DeserializeImplementation.QualifierKindFrom(
@@ -1548,7 +1641,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -1572,7 +1671,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueId"));
+                                return null;
                             }
 
                             theValueId = DeserializeImplementation.ReferenceFrom(
@@ -1668,7 +1773,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "id"));
+                                return null;
                             }
 
                             theId = DeserializeImplementation.StringFrom(
@@ -1692,7 +1802,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "assetInformation"));
+                                return null;
                             }
 
                             theAssetInformation = DeserializeImplementation.AssetInformationFrom(
@@ -1716,7 +1831,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -1771,7 +1892,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -1795,7 +1922,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -1819,7 +1952,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -1874,7 +2013,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -1929,7 +2074,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "administration"));
+                                return null;
                             }
 
                             theAdministration = DeserializeImplementation.AdministrativeInformationFrom(
@@ -1953,7 +2104,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -2008,7 +2165,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "derivedFrom"));
+                                return null;
                             }
 
                             theDerivedFrom = DeserializeImplementation.ReferenceFrom(
@@ -2032,7 +2195,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "submodels"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySubmodels = keyValue.Value as Nodes.JsonArray;
@@ -2193,7 +2362,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "assetKind"));
+                                return null;
                             }
 
                             theAssetKind = DeserializeImplementation.AssetKindFrom(
@@ -2217,7 +2391,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "globalAssetId"));
+                                return null;
                             }
 
                             theGlobalAssetId = DeserializeImplementation.StringFrom(
@@ -2241,7 +2421,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "specificAssetIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySpecificAssetIds = keyValue.Value as Nodes.JsonArray;
@@ -2296,7 +2482,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "assetType"));
+                                return null;
                             }
 
                             theAssetType = DeserializeImplementation.StringFrom(
@@ -2320,7 +2512,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "defaultThumbnail"));
+                                return null;
                             }
 
                             theDefaultThumbnail = DeserializeImplementation.ResourceFrom(
@@ -2394,7 +2592,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "path"));
+                                return null;
                             }
 
                             thePath = DeserializeImplementation.StringFrom(
@@ -2418,7 +2621,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "contentType"));
+                                return null;
                             }
 
                             theContentType = DeserializeImplementation.StringFrom(
@@ -2522,7 +2731,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "name"));
+                                return null;
                             }
 
                             theName = DeserializeImplementation.StringFrom(
@@ -2546,7 +2760,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -2570,7 +2789,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -2594,7 +2819,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -2649,7 +2880,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "externalSubjectId"));
+                                return null;
                             }
 
                             theExternalSubjectId = DeserializeImplementation.ReferenceFrom(
@@ -2745,7 +2982,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "id"));
+                                return null;
                             }
 
                             theId = DeserializeImplementation.StringFrom(
@@ -2769,7 +3011,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -2824,7 +3072,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -2848,7 +3102,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -2872,7 +3132,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -2927,7 +3193,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -2982,7 +3254,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "administration"));
+                                return null;
                             }
 
                             theAdministration = DeserializeImplementation.AdministrativeInformationFrom(
@@ -3006,7 +3284,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "kind"));
+                                return null;
                             }
 
                             theKind = DeserializeImplementation.ModellingKindFrom(
@@ -3030,7 +3314,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -3054,7 +3344,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -3109,7 +3405,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -3164,7 +3466,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -3219,7 +3527,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "submodelElements"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySubmodelElements = keyValue.Value as Nodes.JsonArray;
@@ -3357,7 +3671,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -3453,7 +3767,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -3537,7 +3851,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "first"));
+                                return null;
                             }
 
                             theFirst = DeserializeImplementation.ReferenceFrom(
@@ -3561,7 +3880,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "second"));
+                                return null;
                             }
 
                             theSecond = DeserializeImplementation.ReferenceFrom(
@@ -3585,7 +3909,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -3640,7 +3970,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -3664,7 +4000,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -3688,7 +4030,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -3743,7 +4091,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -3798,7 +4152,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -3822,7 +4182,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -3877,7 +4243,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -3932,7 +4304,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -4134,7 +4512,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "typeValueListElement"));
+                                return null;
                             }
 
                             theTypeValueListElement = DeserializeImplementation.AasSubmodelElementsFrom(
@@ -4158,7 +4541,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -4213,7 +4602,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -4237,7 +4632,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -4261,7 +4662,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -4316,7 +4723,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -4371,7 +4784,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -4395,7 +4814,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -4450,7 +4875,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -4505,7 +4936,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -4560,7 +4997,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "orderRelevant"));
+                                return null;
                             }
 
                             theOrderRelevant = DeserializeImplementation.BoolFrom(
@@ -4584,7 +5027,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticIdListElement"));
+                                return null;
                             }
 
                             theSemanticIdListElement = DeserializeImplementation.ReferenceFrom(
@@ -4608,7 +5057,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueTypeListElement"));
+                                return null;
                             }
 
                             theValueTypeListElement = DeserializeImplementation.DataTypeDefXsdFrom(
@@ -4632,7 +5087,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayValue = keyValue.Value as Nodes.JsonArray;
@@ -4794,7 +5255,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -4849,7 +5316,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -4873,7 +5346,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -4897,7 +5376,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -4952,7 +5437,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -5007,7 +5498,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -5031,7 +5528,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -5086,7 +5589,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -5141,7 +5650,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -5196,7 +5711,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayValue = keyValue.Value as Nodes.JsonArray;
@@ -5324,7 +5845,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -5421,7 +5942,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueType"));
+                                return null;
                             }
 
                             theValueType = DeserializeImplementation.DataTypeDefXsdFrom(
@@ -5445,7 +5971,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -5500,7 +6032,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -5524,7 +6062,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -5548,7 +6092,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -5603,7 +6153,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -5658,7 +6214,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -5682,7 +6244,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -5737,7 +6305,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -5792,7 +6366,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -5847,7 +6427,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -5871,7 +6457,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueId"));
+                                return null;
                             }
 
                             theValueId = DeserializeImplementation.ReferenceFrom(
@@ -6001,7 +6593,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -6056,7 +6654,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -6080,7 +6684,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -6104,7 +6714,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -6159,7 +6775,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -6214,7 +6836,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -6238,7 +6866,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -6293,7 +6927,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -6348,7 +6988,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -6403,7 +7049,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayValue = keyValue.Value as Nodes.JsonArray;
@@ -6458,7 +7110,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueId"));
+                                return null;
                             }
 
                             theValueId = DeserializeImplementation.ReferenceFrom(
@@ -6581,7 +7239,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueType"));
+                                return null;
                             }
 
                             theValueType = DeserializeImplementation.DataTypeDefXsdFrom(
@@ -6605,7 +7268,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -6660,7 +7329,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -6684,7 +7359,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -6708,7 +7389,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -6763,7 +7450,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -6818,7 +7511,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -6842,7 +7541,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -6897,7 +7602,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -6952,7 +7663,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -7007,7 +7724,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "min"));
+                                return null;
                             }
 
                             theMin = DeserializeImplementation.StringFrom(
@@ -7031,7 +7754,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "max"));
+                                return null;
                             }
 
                             theMax = DeserializeImplementation.StringFrom(
@@ -7160,7 +7889,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -7215,7 +7950,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -7239,7 +7980,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -7263,7 +8010,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -7318,7 +8071,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -7373,7 +8132,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -7397,7 +8162,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -7452,7 +8223,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -7507,7 +8284,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -7562,7 +8345,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.ReferenceFrom(
@@ -7683,7 +8472,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "contentType"));
+                                return null;
                             }
 
                             theContentType = DeserializeImplementation.StringFrom(
@@ -7707,7 +8501,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -7762,7 +8562,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -7786,7 +8592,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -7810,7 +8622,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -7865,7 +8683,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -7920,7 +8744,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -7944,7 +8774,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -7999,7 +8835,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -8054,7 +8896,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -8109,7 +8957,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.BytesFrom(
@@ -8238,7 +9092,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "contentType"));
+                                return null;
                             }
 
                             theContentType = DeserializeImplementation.StringFrom(
@@ -8262,7 +9121,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -8317,7 +9182,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -8341,7 +9212,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -8365,7 +9242,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -8420,7 +9303,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -8475,7 +9364,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -8499,7 +9394,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -8554,7 +9455,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -8609,7 +9516,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -8664,7 +9577,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -8794,7 +9713,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "first"));
+                                return null;
                             }
 
                             theFirst = DeserializeImplementation.ReferenceFrom(
@@ -8818,7 +9742,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "second"));
+                                return null;
                             }
 
                             theSecond = DeserializeImplementation.ReferenceFrom(
@@ -8842,7 +9771,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -8897,7 +9832,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -8921,7 +9862,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -8945,7 +9892,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -9000,7 +9953,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -9055,7 +10014,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -9079,7 +10044,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -9134,7 +10105,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -9189,7 +10166,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -9244,7 +10227,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "annotations"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayAnnotations = keyValue.Value as Nodes.JsonArray;
@@ -9416,7 +10405,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "entityType"));
+                                return null;
                             }
 
                             theEntityType = DeserializeImplementation.EntityTypeFrom(
@@ -9440,7 +10434,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -9495,7 +10495,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -9519,7 +10525,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -9543,7 +10555,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -9598,7 +10616,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -9653,7 +10677,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -9677,7 +10707,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -9732,7 +10768,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -9787,7 +10829,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -9842,7 +10890,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "statements"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayStatements = keyValue.Value as Nodes.JsonArray;
@@ -9897,7 +10951,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "globalAssetId"));
+                                return null;
                             }
 
                             theGlobalAssetId = DeserializeImplementation.StringFrom(
@@ -9921,7 +10981,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "specificAssetIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySpecificAssetIds = keyValue.Value as Nodes.JsonArray;
@@ -10168,7 +11234,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "source"));
+                                return null;
                             }
 
                             theSource = DeserializeImplementation.ReferenceFrom(
@@ -10192,7 +11263,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "observableReference"));
+                                return null;
                             }
 
                             theObservableReference = DeserializeImplementation.ReferenceFrom(
@@ -10216,7 +11292,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "timeStamp"));
+                                return null;
                             }
 
                             theTimeStamp = DeserializeImplementation.StringFrom(
@@ -10240,7 +11321,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "sourceSemanticId"));
+                                return null;
                             }
 
                             theSourceSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -10264,7 +11351,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "observableSemanticId"));
+                                return null;
                             }
 
                             theObservableSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -10288,7 +11381,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "topic"));
+                                return null;
                             }
 
                             theTopic = DeserializeImplementation.StringFrom(
@@ -10312,7 +11411,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "subjectId"));
+                                return null;
                             }
 
                             theSubjectId = DeserializeImplementation.ReferenceFrom(
@@ -10336,7 +11441,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "payload"));
+                                return null;
                             }
 
                             thePayload = DeserializeImplementation.BytesFrom(
@@ -10418,7 +11529,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -10505,7 +11616,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "observed"));
+                                return null;
                             }
 
                             theObserved = DeserializeImplementation.ReferenceFrom(
@@ -10529,7 +11645,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "direction"));
+                                return null;
                             }
 
                             theDirection = DeserializeImplementation.DirectionFrom(
@@ -10553,7 +11674,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "state"));
+                                return null;
                             }
 
                             theState = DeserializeImplementation.StateOfEventFrom(
@@ -10577,7 +11703,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -10632,7 +11764,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -10656,7 +11794,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -10680,7 +11824,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -10735,7 +11885,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -10790,7 +11946,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -10814,7 +11976,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -10869,7 +12037,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -10924,7 +12098,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -10979,7 +12159,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "messageTopic"));
+                                return null;
                             }
 
                             theMessageTopic = DeserializeImplementation.StringFrom(
@@ -11003,7 +12189,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "messageBroker"));
+                                return null;
                             }
 
                             theMessageBroker = DeserializeImplementation.ReferenceFrom(
@@ -11027,7 +12219,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "lastUpdate"));
+                                return null;
                             }
 
                             theLastUpdate = DeserializeImplementation.StringFrom(
@@ -11051,7 +12249,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "minInterval"));
+                                return null;
                             }
 
                             theMinInterval = DeserializeImplementation.StringFrom(
@@ -11075,7 +12279,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "maxInterval"));
+                                return null;
                             }
 
                             theMaxInterval = DeserializeImplementation.StringFrom(
@@ -11229,7 +12439,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -11284,7 +12500,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -11308,7 +12530,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -11332,7 +12560,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -11387,7 +12621,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -11442,7 +12682,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -11466,7 +12712,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -11521,7 +12773,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -11576,7 +12834,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -11631,7 +12895,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "inputVariables"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayInputVariables = keyValue.Value as Nodes.JsonArray;
@@ -11686,7 +12956,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "outputVariables"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayOutputVariables = keyValue.Value as Nodes.JsonArray;
@@ -11741,7 +13017,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "inoutputVariables"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayInoutputVariables = keyValue.Value as Nodes.JsonArray;
@@ -11883,7 +13165,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.ISubmodelElementFrom(
@@ -11962,7 +13249,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -12017,7 +13310,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -12041,7 +13340,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -12065,7 +13370,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -12120,7 +13431,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -12175,7 +13492,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "semanticId"));
+                                return null;
                             }
 
                             theSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -12199,7 +13522,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "supplementalSemanticIds"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySupplementalSemanticIds = keyValue.Value as Nodes.JsonArray;
@@ -12254,7 +13583,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "qualifiers"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayQualifiers = keyValue.Value as Nodes.JsonArray;
@@ -12309,7 +13644,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -12458,7 +13799,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "id"));
+                                return null;
                             }
 
                             theId = DeserializeImplementation.StringFrom(
@@ -12482,7 +13828,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "extensions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayExtensions = keyValue.Value as Nodes.JsonArray;
@@ -12537,7 +13889,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "category"));
+                                return null;
                             }
 
                             theCategory = DeserializeImplementation.StringFrom(
@@ -12561,7 +13919,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
                             }
 
                             theIdShort = DeserializeImplementation.StringFrom(
@@ -12585,7 +13949,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "displayName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
@@ -12640,7 +14010,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "description"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
@@ -12695,7 +14071,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "administration"));
+                                return null;
                             }
 
                             theAdministration = DeserializeImplementation.AdministrativeInformationFrom(
@@ -12719,7 +14101,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "embeddedDataSpecifications"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayEmbeddedDataSpecifications = keyValue.Value as Nodes.JsonArray;
@@ -12774,7 +14162,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "isCaseOf"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayIsCaseOf = keyValue.Value as Nodes.JsonArray;
@@ -12952,7 +14346,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "type"));
+                                return null;
                             }
 
                             theType = DeserializeImplementation.ReferenceTypesFrom(
@@ -12976,7 +14375,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "keys"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayKeys = keyValue.Value as Nodes.JsonArray;
@@ -13031,7 +14435,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "referredSemanticId"));
+                                return null;
                             }
 
                             theReferredSemanticId = DeserializeImplementation.ReferenceFrom(
@@ -13112,7 +14522,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "type"));
+                                return null;
                             }
 
                             theType = DeserializeImplementation.KeyTypesFrom(
@@ -13136,7 +14551,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -13263,7 +14683,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -13345,7 +14765,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "language"));
+                                return null;
                             }
 
                             theLanguage = DeserializeImplementation.StringFrom(
@@ -13369,7 +14794,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "text"));
+                                return null;
                             }
 
                             theText = DeserializeImplementation.StringFrom(
@@ -13449,7 +14879,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "language"));
+                                return null;
                             }
 
                             theLanguage = DeserializeImplementation.StringFrom(
@@ -13473,7 +14908,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "text"));
+                                return null;
                             }
 
                             theText = DeserializeImplementation.StringFrom(
@@ -13554,7 +14994,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "assetAdministrationShells"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayAssetAdministrationShells = keyValue.Value as Nodes.JsonArray;
@@ -13609,7 +15055,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "submodels"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arraySubmodels = keyValue.Value as Nodes.JsonArray;
@@ -13664,7 +15116,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "conceptDescriptions"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayConceptDescriptions = keyValue.Value as Nodes.JsonArray;
@@ -13747,7 +15205,7 @@ namespace AasCore.Aas3_0
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected Nodes.JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
@@ -13817,7 +15275,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "dataSpecificationContent"));
+                                return null;
                             }
 
                             theDataSpecificationContent = DeserializeImplementation.IDataSpecificationContentFrom(
@@ -13841,7 +15304,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "dataSpecification"));
+                                return null;
                             }
 
                             theDataSpecification = DeserializeImplementation.ReferenceFrom(
@@ -13953,7 +15421,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "min"));
+                                return null;
                             }
 
                             theMin = DeserializeImplementation.BoolFrom(
@@ -13977,7 +15450,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "nom"));
+                                return null;
                             }
 
                             theNom = DeserializeImplementation.BoolFrom(
@@ -14001,7 +15479,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "typ"));
+                                return null;
                             }
 
                             theTyp = DeserializeImplementation.BoolFrom(
@@ -14025,7 +15508,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "max"));
+                                return null;
                             }
 
                             theMax = DeserializeImplementation.BoolFrom(
@@ -14125,7 +15613,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -14149,7 +15642,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueId"));
+                                return null;
                             }
 
                             theValueId = DeserializeImplementation.ReferenceFrom(
@@ -14228,7 +15726,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueReferencePairs"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayValueReferencePairs = keyValue.Value as Nodes.JsonArray;
@@ -14329,7 +15832,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "language"));
+                                return null;
                             }
 
                             theLanguage = DeserializeImplementation.StringFrom(
@@ -14353,7 +15861,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "text"));
+                                return null;
                             }
 
                             theText = DeserializeImplementation.StringFrom(
@@ -14433,7 +15946,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "language"));
+                                return null;
                             }
 
                             theLanguage = DeserializeImplementation.StringFrom(
@@ -14457,7 +15975,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "text"));
+                                return null;
                             }
 
                             theText = DeserializeImplementation.StringFrom(
@@ -14537,7 +16060,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "language"));
+                                return null;
                             }
 
                             theLanguage = DeserializeImplementation.StringFrom(
@@ -14561,7 +16089,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "text"));
+                                return null;
                             }
 
                             theText = DeserializeImplementation.StringFrom(
@@ -14653,7 +16186,12 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "preferredName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayPreferredName = keyValue.Value as Nodes.JsonArray;
@@ -14708,7 +16246,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "shortName"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayShortName = keyValue.Value as Nodes.JsonArray;
@@ -14763,7 +16307,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "unit"));
+                                return null;
                             }
 
                             theUnit = DeserializeImplementation.StringFrom(
@@ -14787,7 +16337,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "unitId"));
+                                return null;
                             }
 
                             theUnitId = DeserializeImplementation.ReferenceFrom(
@@ -14811,7 +16367,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "sourceOfDefinition"));
+                                return null;
                             }
 
                             theSourceOfDefinition = DeserializeImplementation.StringFrom(
@@ -14835,7 +16397,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "symbol"));
+                                return null;
                             }
 
                             theSymbol = DeserializeImplementation.StringFrom(
@@ -14859,7 +16427,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "dataType"));
+                                return null;
                             }
 
                             theDataType = DeserializeImplementation.DataTypeIec61360From(
@@ -14883,7 +16457,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "definition"));
+                                return null;
                             }
 
                             Nodes.JsonArray? arrayDefinition = keyValue.Value as Nodes.JsonArray;
@@ -14938,7 +16518,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueFormat"));
+                                return null;
                             }
 
                             theValueFormat = DeserializeImplementation.StringFrom(
@@ -14962,7 +16548,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "valueList"));
+                                return null;
                             }
 
                             theValueList = DeserializeImplementation.ValueListFrom(
@@ -14986,7 +16578,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "value"));
+                                return null;
                             }
 
                             theValue = DeserializeImplementation.StringFrom(
@@ -15010,7 +16608,13 @@ namespace AasCore.Aas3_0
                         {
                             if (keyValue.Value == null)
                             {
-                                continue;
+                                error = new Reporting.Error(
+                                    "Expected optional property to be absent, " +
+                                    "but got null instead");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "levelType"));
+                                return null;
                             }
 
                             theLevelType = DeserializeImplementation.LevelTypeFrom(
