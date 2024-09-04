@@ -357,8 +357,6 @@ def generate(
 
 # Metadata
 <{xml_namespace}/> a owl:Ontology ;
-    owl:imports <http://datashapes.org/dash> ;
-    owl:imports sh: ;
     sh:declare [
         a sh:PrefixDeclaration ;
         sh:namespace "{xml_namespace}/"^^xs:anyURI ;
