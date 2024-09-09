@@ -301,7 +301,7 @@ aas:{shape_name} a sh:NodeShape ;
             Identifier(f"{inheritance.name}_shape")
         )
 
-        writer.write(f"\n{I}rdfs:subClassOf aas:{subclass_shape_name} ;")
+        writer.write(f"\n{I}sh:node aas:{subclass_shape_name} ;")
 
     if isinstance(cls, intermediate.AbstractClass):
         writer.write("\n")
