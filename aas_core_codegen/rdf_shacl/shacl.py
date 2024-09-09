@@ -335,7 +335,7 @@ sh:sparql [
 {I}sh:select """
 {II}SELECT ?this ?type
 {II}WHERE {{
-{III}?this rdf:type ?type .
+{III}?this <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .
 {III}FILTER (?type = aas:{cls_name})
 {II}}}
 {I}""" ;
