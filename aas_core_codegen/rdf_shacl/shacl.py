@@ -24,7 +24,8 @@ def _define_property_shape(
     xml_namespace: Stripped,
     our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
-    pattern_constraint: PatternConstraint
+    pattern_constraint: PatternConstraint,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the shape of a property ``prop`` of the intermediate ``cls``.
@@ -60,7 +61,14 @@ def _define_property_shape(
         type_annotation=type_anno, our_type_to_rdfs_range=our_type_to_rdfs_range
     )
 
-    cls_name = rdf_shacl_naming.class_name(cls.name)
+    # NOTE (mhrimaz):
+    # For Subclasses of Abstract Lang String, we don't need the concert class name in the
+    # property path as discussed in aas-core-codegen/issues/519
+    abstract_lang_string_cls = symbol_table.find_our_type(Identifier("Abstract_lang_string"))
+    if cls.is_subclass_of(abstract_lang_string_cls):
+        cls_name = rdf_shacl_naming.class_name(abstract_lang_string_cls.name)
+    else:
+        cls_name = rdf_shacl_naming.class_name(cls.name)
 
     stmts.append(Stripped(f"sh:path <{xml_namespace}/{cls_name}/{prop_name}> ;"))
 
@@ -260,6 +268,7 @@ def _define_for_class(
     our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     xml_namespace: Stripped,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition for the class ``cls``."""
     prop_blocks = []  # type: List[Stripped]
@@ -280,7 +289,8 @@ def _define_for_class(
                 xml_namespace=xml_namespace,
                 our_type_to_rdfs_range=our_type_to_rdfs_range,
                 constraints_by_property=constraints_by_property,
-                pattern_constraint=pattern_constraint
+                pattern_constraint=pattern_constraint,
+                symbol_table=symbol_table
             )
 
             if error is not None:
@@ -444,6 +454,7 @@ def generate(
                     our_type_to_rdfs_range=our_type_to_rdfs_range,
                     xml_namespace=xml_namespace,
                     constraints_by_property=constraints_by_class[our_type],
+                    symbol_table=symbol_table
                 )
 
                 if error is not None:
