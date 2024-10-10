@@ -4415,9 +4415,12 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
             type_anno = beneath_optional(prop.type_annotation)
             if isinstance(type_anno, ListTypeAnnotation):
                 if not (
-                    isinstance(type_anno.items, OurTypeAnnotation)
-                    and isinstance(
+                    isinstance(type_anno.items, PrimitiveTypeAnnotation)
+                    or (
+                        isinstance(type_anno.items, OurTypeAnnotation)
+                        and isinstance(
                         type_anno.items.our_type, (AbstractClass, ConcreteClass)
+                        )
                     )
                 ):
                     errors.append(
@@ -4425,7 +4428,7 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
                             prop.parsed.node,
                             f"We currently support only a limited set of "
                             f"type annotation patterns. At the moment, we handle "
-                            f"only lists of classes (both concrete or abstract), "
+                            f"only lists of classes (both concrete or abstract) or primitive types, "
                             f"but the property {prop.name!r} "
                             f"of the class {cls.name!r} "
                             f"has type: {prop.type_annotation}. "
