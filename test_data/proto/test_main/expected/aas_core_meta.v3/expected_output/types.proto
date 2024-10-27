@@ -3738,6 +3738,130 @@ message DataSpecificationIec61360 {
   optional LevelType level_type = 12;
 }
 
+message HasSemantics {
+  oneof value {
+    RelationshipElement relationship_element = 1;
+    AnnotatedRelationshipElement annotated_relationship_element = 2;
+    BasicEventElement basic_event_element = 3;
+    Blob blob = 4;
+    Capability capability = 5;
+    Entity entity = 6;
+    Extension extension = 7;
+    File file = 8;
+    MultiLanguageProperty multi_language_property = 9;
+    Operation operation = 10;
+    Property property = 11;
+    Qualifier qualifier = 12;
+    Range range = 13;
+    ReferenceElement reference_element = 14;
+    SpecificAssetId specific_asset_id = 15;
+    Submodel submodel = 16;
+    SubmodelElementCollection submodel_element_collection = 17;
+    SubmodelElementList submodel_element_list = 18;
+  }
+}
+
+message HasExtensions {
+  oneof value {
+    RelationshipElement relationship_element = 1;
+    AnnotatedRelationshipElement annotated_relationship_element = 2;
+    AssetAdministrationShell asset_administration_shell = 3;
+    BasicEventElement basic_event_element = 4;
+    Blob blob = 5;
+    Capability capability = 6;
+    ConceptDescription concept_description = 7;
+    Entity entity = 8;
+    File file = 9;
+    MultiLanguageProperty multi_language_property = 10;
+    Operation operation = 11;
+    Property property = 12;
+    Range range = 13;
+    ReferenceElement reference_element = 14;
+    Submodel submodel = 15;
+    SubmodelElementCollection submodel_element_collection = 16;
+    SubmodelElementList submodel_element_list = 17;
+  }
+}
+
+message Referable {
+  oneof value {
+    RelationshipElement relationship_element = 1;
+    AnnotatedRelationshipElement annotated_relationship_element = 2;
+    AssetAdministrationShell asset_administration_shell = 3;
+    BasicEventElement basic_event_element = 4;
+    Blob blob = 5;
+    Capability capability = 6;
+    ConceptDescription concept_description = 7;
+    Entity entity = 8;
+    File file = 9;
+    MultiLanguageProperty multi_language_property = 10;
+    Operation operation = 11;
+    Property property = 12;
+    Range range = 13;
+    ReferenceElement reference_element = 14;
+    Submodel submodel = 15;
+    SubmodelElementCollection submodel_element_collection = 16;
+    SubmodelElementList submodel_element_list = 17;
+  }
+}
+
+message Identifiable {
+  oneof value {
+    AssetAdministrationShell asset_administration_shell = 1;
+    ConceptDescription concept_description = 2;
+    Submodel submodel = 3;
+  }
+}
+
+message HasKind {
+  oneof value {
+    Submodel submodel = 1;
+  }
+}
+
+message HasDataSpecification {
+  oneof value {
+    AdministrativeInformation administrative_information = 1;
+    RelationshipElement relationship_element = 2;
+    AnnotatedRelationshipElement annotated_relationship_element = 3;
+    AssetAdministrationShell asset_administration_shell = 4;
+    BasicEventElement basic_event_element = 5;
+    Blob blob = 6;
+    Capability capability = 7;
+    ConceptDescription concept_description = 8;
+    Entity entity = 9;
+    File file = 10;
+    MultiLanguageProperty multi_language_property = 11;
+    Operation operation = 12;
+    Property property = 13;
+    Range range = 14;
+    ReferenceElement reference_element = 15;
+    Submodel submodel = 16;
+    SubmodelElementCollection submodel_element_collection = 17;
+    SubmodelElementList submodel_element_list = 18;
+  }
+}
+
+message Qualifiable {
+  oneof value {
+    RelationshipElement relationship_element = 1;
+    AnnotatedRelationshipElement annotated_relationship_element = 2;
+    BasicEventElement basic_event_element = 3;
+    Blob blob = 4;
+    Capability capability = 5;
+    Entity entity = 6;
+    File file = 7;
+    MultiLanguageProperty multi_language_property = 8;
+    Operation operation = 9;
+    Property property = 10;
+    Range range = 11;
+    ReferenceElement reference_element = 12;
+    Submodel submodel = 13;
+    SubmodelElementCollection submodel_element_collection = 14;
+    SubmodelElementList submodel_element_list = 15;
+  }
+}
+
 message SubmodelElement {
   oneof value {
     RelationshipElement relationship_element = 1;
@@ -3757,9 +3881,10 @@ message SubmodelElement {
   }
 }
 
-message DataSpecificationContent {
+message RelationshipElement_choice {
   oneof value {
-    DataSpecificationIec61360 data_specification_iec_61360 = 1;
+    RelationshipElement relationship_element = 1;
+    AnnotatedRelationshipElement annotated_relationship_element = 2;
   }
 }
 
@@ -3771,6 +3896,28 @@ message DataElement {
     Property property = 4;
     Range range = 5;
     ReferenceElement reference_element = 6;
+  }
+}
+
+message EventElement {
+  oneof value {
+    BasicEventElement basic_event_element = 1;
+  }
+}
+
+message AbstractLangString {
+  oneof value {
+    LangStringDefinitionTypeIec61360 lang_string_definition_type_iec_61360 = 1;
+    LangStringNameType lang_string_name_type = 2;
+    LangStringPreferredNameTypeIec61360 lang_string_preferred_name_type_iec_61360 = 3;
+    LangStringShortNameTypeIec61360 lang_string_short_name_type_iec_61360 = 4;
+    LangStringTextType lang_string_text_type = 5;
+  }
+}
+
+message DataSpecificationContent {
+  oneof value {
+    DataSpecificationIec61360 data_specification_iec_61360 = 1;
   }
 }
 

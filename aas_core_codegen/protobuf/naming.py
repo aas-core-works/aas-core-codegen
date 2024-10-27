@@ -2,6 +2,8 @@
 
 from typing import Union
 
+from icontract import ensure
+
 import aas_core_codegen.naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never
@@ -42,6 +44,10 @@ def enum_literal_name(identifier: Identifier) -> Identifier:
     return aas_core_codegen.naming.upper_snake_case(identifier)
 
 
+@ensure(
+    lambda result: "_" not in result,
+    "No underscode allowed so that we can attached our own suffixes such as ``_choice``",
+)
 def class_name(identifier: Identifier) -> Identifier:
     """
     Generate a ProtoBuf name for a class based on its meta-model ``identifier``.
