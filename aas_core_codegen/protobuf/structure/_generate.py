@@ -309,11 +309,7 @@ def _generate_class(
     required_choice_object = []  # type: List[intermediate.AbstractClass]
 
     # region Getters and setters
-    for i, prop in enumerate(
-        set(cls.properties).union(
-            set(cls.interface.properties if cls.interface is not None else [])
-        )
-    ):
+    for i, prop in enumerate(cls.properties):
         prop_type = proto_common.generate_type(type_annotation=prop.type_annotation)
 
         prop_name = proto_naming.property_name(prop.name)

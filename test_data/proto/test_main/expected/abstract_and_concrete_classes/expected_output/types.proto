@@ -9,15 +9,15 @@ package dummy;
 
 
 message SomethingConcrete {
-  string something_str = 1;
+  string some_str = 1;
 
-  string some_str = 2;
+  string something_str = 2;
 }
 
 message AnotherConcrete {
-  string another_str = 1;
+  string some_str = 1;
 
-  string some_str = 2;
+  string another_str = 2;
 }
 
 message Container {
