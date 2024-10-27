@@ -1,12 +1,12 @@
 """Provide common functions shared among different ProtoBuf code generation modules."""
 
 import re
-from typing import List, cast, Optional
+from typing import List, cast
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped, assert_never
+from aas_core_codegen.common import Stripped, assert_never, Identifier
 from aas_core_codegen.protobuf import naming as proto_naming
 
 
@@ -147,7 +147,7 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
                 # We have to add the suffix ``_choice`` since this field points
                 # to one of the concrete descendants of the class as well as
                 # the concrete class itself.
-                message_name += "_choice"
+                message_name = Identifier(message_name + "_choice")
 
             return Stripped(message_name)
 
