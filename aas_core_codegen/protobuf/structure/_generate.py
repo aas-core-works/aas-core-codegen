@@ -21,7 +21,6 @@ from aas_core_codegen.common import (
     Identifier,
     assert_never,
     Stripped,
-    indent_but_first_line,
 )
 from aas_core_codegen.protobuf import (
     common as proto_common,
@@ -527,7 +526,7 @@ syntax = "proto3";
 package {namespace};
 
 
-{I}{indent_but_first_line(code_blocks_joined, I)}"""
+{code_blocks_joined}"""
         ),
         proto_common.WARNING,
     ]  # type: List[Stripped]
