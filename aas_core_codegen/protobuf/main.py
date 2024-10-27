@@ -84,9 +84,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # region Structure
 
     code, errors = proto_structure.generate(
-        symbol_table=verified_ir_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
+        symbol_table=verified_ir_table, namespace=namespace
     )
 
     if errors is not None:
