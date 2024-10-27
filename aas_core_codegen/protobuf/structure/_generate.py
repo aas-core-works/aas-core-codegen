@@ -9,13 +9,11 @@ from typing import (
     Tuple,
     cast,
     Union,
-    Set,
 )
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen import specific_implementations
 from aas_core_codegen.common import (
     Error,
     Identifier,
@@ -403,7 +401,7 @@ def _generate_choice_class(cls: intermediate.ClassUnion) -> Stripped:
         # Protocol Buffers do not support inheritance, so we have to work around that
         # circumstance.
 
-        message_name = proto_naming.class_name(cls.name) + "_choice"
+        message_name = Identifier(proto_naming.class_name(cls.name) + "_choice")
 
     else:
         assert_never(cls)
@@ -439,8 +437,6 @@ def generate(
     code_blocks = []  # type: List[Stripped]
 
     errors = []  # type: List[Error]
-
-    required_choice_objects = set([])  # type: Set[intermediate.AbstractClass]
 
     for our_type in symbol_table.our_types:
         if not isinstance(
