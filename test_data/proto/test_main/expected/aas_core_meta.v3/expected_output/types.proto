@@ -13,13 +13,22 @@ package aas_core3;
 /// </summary>
 message Extension {
   /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 1;
+
+  /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
   /// It is called supplemental semantic ID of the element.
   /// </summary>
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 1;
+  repeated Reference supplemental_semantic_ids = 2;
 
   /// <summary>
   /// Name of the extension.
@@ -36,12 +45,7 @@ message Extension {
   ///   </li>
   /// </ul>
   /// </remarks>
-  string name = 2;
-
-  /// <summary>
-  /// Reference to an element the extension refers to.
-  /// </summary>
-  repeated Reference refers_to = 3;
+  string name = 3;
 
   /// <summary>
   /// Type of the value of the extension.
@@ -52,18 +56,14 @@ message Extension {
   optional DataTypeDefXsd value_type = 4;
 
   /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
   /// Value of the extension
   /// </summary>
-  optional string value = 6;
+  optional string value = 5;
+
+  /// <summary>
+  /// Reference to an element the extension refers to.
+  /// </summary>
+  repeated Reference refers_to = 6;
 }
 
 /// <summary>
@@ -109,14 +109,19 @@ message AdministrativeInformation {
   repeated EmbeddedDataSpecification embedded_data_specifications = 1;
 
   /// <summary>
+  /// Version of the element.
+  /// </summary>
+  optional string version = 2;
+
+  /// <summary>
   /// Revision of the element.
   /// </summary>
-  optional string revision = 2;
+  optional string revision = 3;
 
   /// <summary>
   /// The subject ID of the subject responsible for making the element.
   /// </summary>
-  optional Reference creator = 3;
+  optional Reference creator = 4;
 
   /// <summary>
   /// Identifier of the template that guided the creation of the element.
@@ -135,12 +140,7 @@ message AdministrativeInformation {
   /// the creation of submodel templates can be guided by another submodel template.
   /// </para>
   /// </remarks>
-  optional string template_id = 4;
-
-  /// <summary>
-  /// Version of the element.
-  /// </summary>
-  optional string version = 5;
+  optional string template_id = 5;
 }
 
 /// <summary>
@@ -203,18 +203,13 @@ enum QualifierKind {
 /// </remarks>
 message Qualifier {
   /// <summary>
-  /// The qualifier kind describes the kind of the qualifier that is applied to the
-  /// element.
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
   /// </summary>
   /// <remarks>
-  /// Default: <see cref="Aas.QualifierKind.CONCEPT_QUALIFIER" />
+  /// It is recommended to use a global reference.
   /// </remarks>
-  optional QualifierKind kind = 1;
-
-  /// <summary>
-  /// The qualifier value is the value of the qualifier.
-  /// </summary>
-  optional string value = 2;
+  optional Reference semantic_id = 1;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -223,7 +218,32 @@ message Qualifier {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 3;
+  repeated Reference supplemental_semantic_ids = 2;
+
+  /// <summary>
+  /// The qualifier kind describes the kind of the qualifier that is applied to the
+  /// element.
+  /// </summary>
+  /// <remarks>
+  /// Default: <see cref="Aas.QualifierKind.CONCEPT_QUALIFIER" />
+  /// </remarks>
+  optional QualifierKind kind = 3;
+
+  /// <summary>
+  /// The qualifier <em>type</em> describes the type of the qualifier that is applied to
+  /// the element.
+  /// </summary>
+  string type = 4;
+
+  /// <summary>
+  /// Data type of the qualifier value.
+  /// </summary>
+  DataTypeDefXsd value_type = 5;
+
+  /// <summary>
+  /// The qualifier value is the value of the qualifier.
+  /// </summary>
+  optional string value = 6;
 
   /// <summary>
   /// Reference to the global unique ID of a coded value.
@@ -231,27 +251,7 @@ message Qualifier {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  optional Reference value_id = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// Data type of the qualifier value.
-  /// </summary>
-  DataTypeDefXsd value_type = 6;
-
-  /// <summary>
-  /// The qualifier <em>type</em> describes the type of the qualifier that is applied to
-  /// the element.
-  /// </summary>
-  string type = 7;
+  optional Reference value_id = 7;
 }
 
 /// <summary>
@@ -259,45 +259,40 @@ message Qualifier {
 /// </summary>
 message AssetAdministrationShell {
   /// <summary>
-  /// Meta-information about the asset the AAS is representing.
-  /// </summary>
-  AssetInformation asset_information = 1;
-
-  /// <summary>
   /// An extension of the element.
   /// </summary>
-  repeated Extension extensions = 2;
+  repeated Extension extensions = 1;
 
   /// <summary>
-  /// The reference to the AAS the AAS was derived from.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
-  optional Reference derived_from = 3;
+  /// <remarks>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
+  /// </remarks>
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// References to submodels of the AAS.
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// A submodel is a description of an aspect of the asset the AAS is representing.
-  /// </para>
-  /// <para>
-  /// The asset of an AAS is typically described by one or more submodels.
-  /// </para>
-  /// <para>
-  /// Temporarily no submodel might be assigned to the AAS.
-  /// </para>
-  /// </remarks>
-  repeated Reference submodels = 5;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 6;
 
   /// <summary>
   /// Description or comments on the element.
@@ -317,26 +312,7 @@ message AssetAdministrationShell {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 7;
-
-  /// <summary>
-  /// The globally unique identification of the element.
-  /// </summary>
-  string id = 8;
-
-  /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
-  /// </summary>
-  /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
-  /// </remarks>
-  optional string category = 9;
+  repeated LangStringTextType description = 5;
 
   /// <summary>
   /// Administrative information of an identifiable element.
@@ -345,19 +321,43 @@ message AssetAdministrationShell {
   /// Some of the administrative information like the version number might need to
   /// be part of the identification.
   /// </remarks>
-  optional AdministrativeInformation administration = 10;
+  optional AdministrativeInformation administration = 6;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// The globally unique identification of the element.
+  /// </summary>
+  string id = 7;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 8;
+
+  /// <summary>
+  /// The reference to the AAS the AAS was derived from.
+  /// </summary>
+  optional Reference derived_from = 9;
+
+  /// <summary>
+  /// Meta-information about the asset the AAS is representing.
+  /// </summary>
+  AssetInformation asset_information = 10;
+
+  /// <summary>
+  /// References to submodels of the AAS.
   /// </summary>
   /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// <para>
+  /// A submodel is a description of an aspect of the asset the AAS is representing.
+  /// </para>
+  /// <para>
+  /// The asset of an AAS is typically described by one or more submodels.
+  /// </para>
+  /// <para>
+  /// Temporarily no submodel might be assigned to the AAS.
+  /// </para>
   /// </remarks>
-  optional string id_short = 11;
+  repeated Reference submodels = 11;
 }
 
 /// <summary>
@@ -413,6 +413,12 @@ message AssetAdministrationShell {
 /// </remarks>
 message AssetInformation {
   /// <summary>
+  /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.TYPE" /> or
+  /// <see cref="Aas.AssetKind.INSTANCE" />.
+  /// </summary>
+  AssetKind asset_kind = 1;
+
+  /// <summary>
   /// Global identifier of the asset the AAS is representing.
   /// </summary>
   /// <remarks>
@@ -426,27 +432,13 @@ message AssetInformation {
   /// This is a global reference.
   /// </para>
   /// </remarks>
-  optional string global_asset_id = 1;
-
-  /// <summary>
-  /// Thumbnail of the asset represented by the Asset Administration Shell.
-  /// </summary>
-  /// <remarks>
-  /// Used as default.
-  /// </remarks>
-  optional Resource default_thumbnail = 2;
+  optional string global_asset_id = 2;
 
   /// <summary>
   /// Additional domain-specific, typically proprietary identifier for the asset like
   /// e.g., serial number etc.
   /// </summary>
   repeated SpecificAssetId specific_asset_ids = 3;
-
-  /// <summary>
-  /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.TYPE" /> or
-  /// <see cref="Aas.AssetKind.INSTANCE" />.
-  /// </summary>
-  AssetKind asset_kind = 4;
 
   /// <summary>
   /// In case <see cref="Aas.AssetInformation.asset_kind" /> is applicable the <see cref="Aas.AssetInformation.asset_type" /> is the asset ID
@@ -458,7 +450,15 @@ message AssetInformation {
   /// which "Type" the asset is of. But it is also possible
   /// to have an <see cref="Aas.AssetInformation.asset_type" /> of an asset of kind "Type".
   /// </remarks>
-  optional string asset_type = 5;
+  optional string asset_type = 4;
+
+  /// <summary>
+  /// Thumbnail of the asset represented by the Asset Administration Shell.
+  /// </summary>
+  /// <remarks>
+  /// Used as default.
+  /// </remarks>
+  optional Resource default_thumbnail = 5;
 }
 
 /// <summary>
@@ -526,32 +526,32 @@ enum AssetKind {
 /// </remarks>
 message SpecificAssetId {
   /// <summary>
-  /// Identifier of a supplemental semantic definition of the element.
-  /// It is called supplemental semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  repeated Reference supplemental_semantic_ids = 1;
-
-  /// <summary>
   /// Identifier of the semantic definition of the element. It is called semantic ID
   /// of the element or also main semantic ID of the element.
   /// </summary>
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  optional Reference semantic_id = 2;
+  optional Reference semantic_id = 1;
 
   /// <summary>
-  /// The value of the specific asset identifier with the corresponding name.
+  /// Identifier of a supplemental semantic definition of the element.
+  /// It is called supplemental semantic ID of the element.
   /// </summary>
-  string value = 3;
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  repeated Reference supplemental_semantic_ids = 2;
 
   /// <summary>
   /// Name of the identifier
   /// </summary>
-  string name = 4;
+  string name = 3;
+
+  /// <summary>
+  /// The value of the specific asset identifier with the corresponding name.
+  /// </summary>
+  string value = 4;
 
   /// <summary>
   /// The (external) subject the key belongs to or has meaning to.
@@ -573,58 +573,40 @@ message SpecificAssetId {
 /// </remarks>
 message Submodel {
   /// <summary>
-  /// A submodel consists of zero or more submodel elements.
-  /// </summary>
-  repeated SubmodelElement submodel_elements = 1;
-
-  /// <summary>
   /// An extension of the element.
   /// </summary>
-  repeated Extension extensions = 2;
+  repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 3;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// Kind of the element: either type or instance.
-  /// </summary>
-  /// <remarks>
-  /// Default: <see cref="Aas.ModellingKind.INSTANCE" />
-  /// </remarks>
-  optional ModellingKind kind = 6;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 7;
 
   /// <summary>
   /// Description or comments on the element.
@@ -644,35 +626,7 @@ message Submodel {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 8;
-
-  /// <summary>
-  /// Identifier of a supplemental semantic definition of the element.
-  /// It is called supplemental semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  repeated Reference supplemental_semantic_ids = 9;
-
-  /// <summary>
-  /// The globally unique identification of the element.
-  /// </summary>
-  string id = 10;
-
-  /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
-  /// </summary>
-  /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
-  /// </remarks>
-  optional string category = 11;
+  repeated LangStringTextType description = 5;
 
   /// <summary>
   /// Administrative information of an identifiable element.
@@ -681,19 +635,65 @@ message Submodel {
   /// Some of the administrative information like the version number might need to
   /// be part of the identification.
   /// </remarks>
-  optional AdministrativeInformation administration = 12;
+  optional AdministrativeInformation administration = 6;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// The globally unique identification of the element.
+  /// </summary>
+  string id = 7;
+
+  /// <summary>
+  /// Kind of the element: either type or instance.
   /// </summary>
   /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// Default: <see cref="Aas.ModellingKind.INSTANCE" />
   /// </remarks>
-  optional string id_short = 13;
+  optional ModellingKind kind = 8;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 9;
+
+  /// <summary>
+  /// Identifier of a supplemental semantic definition of the element.
+  /// It is called supplemental semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  repeated Reference supplemental_semantic_ids = 10;
+
+  /// <summary>
+  /// Additional qualification of a qualifiable element.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
+  /// </remarks>
+  repeated Qualifier qualifiers = 11;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 12;
+
+  /// <summary>
+  /// A submodel consists of zero or more submodel elements.
+  /// </summary>
+  repeated SubmodelElement submodel_elements = 13;
 }
 
 /// <summary>
@@ -707,50 +707,35 @@ message RelationshipElement {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Reference to the first element in the relationship taking the role of the subject.
-  /// </summary>
-  Reference first = 5;
-
-  /// <summary>
-  /// Reference to the second element in the relationship taking the role of the object.
-  /// </summary>
-  Reference second = 6;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 7;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -770,7 +755,16 @@ message RelationshipElement {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 8;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -779,33 +773,39 @@ message RelationshipElement {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 9;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 10;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
   /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 11;
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Reference to the first element in the relationship taking the role of the subject.
+  /// </summary>
+  Reference first = 10;
+
+  /// <summary>
+  /// Reference to the second element in the relationship taking the role of the object.
+  /// </summary>
+  Reference second = 11;
 }
 
 /// <summary>
@@ -900,63 +900,40 @@ enum AasSubmodelElements {
 /// </remarks>
 message SubmodelElementList {
   /// <summary>
-  /// The value type of the submodel element contained in the list.
-  /// </summary>
-  optional DataTypeDefXsd value_type_list_element = 1;
-
-  /// <summary>
-  /// The submodel element type of the submodel elements contained in the list.
-  /// </summary>
-  AasSubmodelElements type_value_list_element = 2;
-
-  /// <summary>
   /// An extension of the element.
   /// </summary>
-  repeated Extension extensions = 3;
+  repeated Extension extensions = 1;
 
   /// <summary>
-  /// Submodel element contained in the list.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// The list is ordered.
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated SubmodelElement value = 4;
+  optional string category = 2;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
   /// </remarks>
-  repeated Qualifier qualifiers = 5;
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 6;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 7;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 8;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -976,7 +953,16 @@ message SubmodelElementList {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 9;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -985,7 +971,29 @@ message SubmodelElementList {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 10;
+  repeated Reference supplemental_semantic_ids = 7;
+
+  /// <summary>
+  /// Additional qualification of a qualifiable element.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
+  /// </remarks>
+  repeated Qualifier qualifiers = 8;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
 
   /// <summary>
   /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.order_relevant" /> = <c>False</c>
@@ -994,7 +1002,44 @@ message SubmodelElementList {
   /// <remarks>
   /// Default: <c>True</c>
   /// </remarks>
-  optional bool order_relevant = 11;
+  optional bool order_relevant = 10;
+
+  /// <summary>
+  /// Semantic ID the submodel elements contained in the list match to.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id_list_element = 11;
+
+  /// <summary>
+  /// The submodel element type of the submodel elements contained in the list.
+  /// </summary>
+  AasSubmodelElements type_value_list_element = 12;
+
+  /// <summary>
+  /// The value type of the submodel element contained in the list.
+  /// </summary>
+  optional DataTypeDefXsd value_type_list_element = 13;
+
+  /// <summary>
+  /// Submodel element contained in the list.
+  /// </summary>
+  /// <remarks>
+  /// The list is ordered.
+  /// </remarks>
+  repeated SubmodelElement value = 14;
+}
+
+/// <summary>
+/// A submodel element collection is a kind of struct, i.e. a a logical encapsulation
+/// of multiple named values. It has a fixed number of submodel elements.
+/// </summary>
+message SubmodelElementCollection {
+  /// <summary>
+  /// An extension of the element.
+  /// </summary>
+  repeated Extension extensions = 1;
 
   /// <summary>
   /// The category is a value that gives further meta information
@@ -1008,15 +1053,7 @@ message SubmodelElementList {
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
-  optional string category = 12;
-
-  /// <summary>
-  /// Semantic ID the submodel elements contained in the list match to.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id_list_element = 13;
+  optional string category = 2;
 
   /// <summary>
   /// In case of identifiables this attribute is a short name of the element.
@@ -1028,59 +1065,12 @@ message SubmodelElementList {
   /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
   /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
   /// </remarks>
-  optional string id_short = 14;
-}
-
-/// <summary>
-/// A submodel element collection is a kind of struct, i.e. a a logical encapsulation
-/// of multiple named values. It has a fixed number of submodel elements.
-/// </summary>
-message SubmodelElementCollection {
-  /// <summary>
-  /// Submodel element contained in the collection.
-  /// </summary>
-  repeated SubmodelElement value = 1;
-
-  /// <summary>
-  /// An extension of the element.
-  /// </summary>
-  repeated Extension extensions = 2;
-
-  /// <summary>
-  /// Additional qualification of a qualifiable element.
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
-  /// </remarks>
-  repeated Qualifier qualifiers = 3;
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 6;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1100,7 +1090,16 @@ message SubmodelElementCollection {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 7;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1109,33 +1108,34 @@ message SubmodelElementCollection {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 8;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 9;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
   /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 10;
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Submodel element contained in the collection.
+  /// </summary>
+  repeated SubmodelElement value = 10;
 }
 
 /// <summary>
@@ -1161,45 +1161,35 @@ message Property {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 5;
-
-  /// <summary>
-  /// Data type of the value
-  /// </summary>
-  DataTypeDefXsd value_type = 6;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1219,7 +1209,16 @@ message Property {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 7;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1228,38 +1227,39 @@ message Property {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 8;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 9;
+  repeated Qualifier qualifiers = 8;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Data type of the value
+  /// </summary>
+  DataTypeDefXsd value_type = 10;
 
   /// <summary>
   /// The value of the property instance.
   /// </summary>
-  optional string value = 10;
-
-  /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
-  /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 11;
+  optional string value = 11;
 
   /// <summary>
   /// Reference to the global unique ID of a coded value.
@@ -1288,58 +1288,40 @@ message Property {
 /// </remarks>
 message MultiLanguageProperty {
   /// <summary>
-  /// Reference to the global unique ID of a coded value.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference value_id = 1;
-
-  /// <summary>
   /// An extension of the element.
   /// </summary>
-  repeated Extension extensions = 2;
+  repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 3;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// The value of the property instance.
-  /// </summary>
-  repeated LangStringTextType value = 6;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 7;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1359,7 +1341,16 @@ message MultiLanguageProperty {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 8;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1368,33 +1359,42 @@ message MultiLanguageProperty {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 9;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 10;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// The value of the property instance.
+  /// </summary>
+  repeated LangStringTextType value = 10;
+
+  /// <summary>
+  /// Reference to the global unique ID of a coded value.
   /// </summary>
   /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// It is recommended to use a global reference.
   /// </remarks>
-  optional string id_short = 11;
+  optional Reference value_id = 11;
 }
 
 /// <summary>
@@ -1407,61 +1407,35 @@ message Range {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
 
   /// <summary>
-  /// Data type of the min und max
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
   /// </summary>
-  DataTypeDefXsd value_type = 3;
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// The minimum value of the range.
-  /// </summary>
-  /// <remarks>
-  /// If the min value is missing, then the value is assumed to be negative infinite.
-  /// </remarks>
-  optional string min = 6;
-
-  /// <summary>
-  /// The maximum value of the range.
-  /// </summary>
-  /// <remarks>
-  /// If the max value is missing, then the value is assumed to be positive infinite.
-  /// </remarks>
-  optional string max = 7;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 8;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1481,7 +1455,16 @@ message Range {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 9;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1490,33 +1473,50 @@ message Range {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 10;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 11;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Data type of the min und max
+  /// </summary>
+  DataTypeDefXsd value_type = 10;
+
+  /// <summary>
+  /// The minimum value of the range.
   /// </summary>
   /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// If the min value is missing, then the value is assumed to be negative infinite.
   /// </remarks>
-  optional string id_short = 12;
+  optional string min = 11;
+
+  /// <summary>
+  /// The maximum value of the range.
+  /// </summary>
+  /// <remarks>
+  /// If the max value is missing, then the value is assumed to be positive infinite.
+  /// </remarks>
+  optional string max = 12;
 }
 
 /// <summary>
@@ -1531,47 +1531,35 @@ message ReferenceElement {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Global reference to an external object or entity or a logical reference to
-  /// another element within the same or another AAS (i.e. a model reference to
-  /// a Referable).
-  /// </summary>
-  optional Reference value = 5;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 6;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1591,7 +1579,16 @@ message ReferenceElement {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 7;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1600,33 +1597,36 @@ message ReferenceElement {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 8;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 9;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
   /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 10;
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Global reference to an external object or entity or a logical reference to
+  /// another element within the same or another AAS (i.e. a model reference to
+  /// a Referable).
+  /// </summary>
+  optional Reference value = 10;
 }
 
 /// <summary>
@@ -1640,40 +1640,35 @@ message Blob {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 5;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1693,7 +1688,16 @@ message Blob {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 6;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1705,18 +1709,35 @@ message Blob {
   repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 8;
+  repeated Qualifier qualifiers = 8;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
+  /// </summary>
+  /// <remarks>
+  /// In contrast to the file property the file content is stored directly as value
+  /// in the <see cref="Aas.Blob" /> data element.
+  /// </remarks>
+  optional bytes value = 10;
 
   /// <summary>
   /// Content type of the content of the <see cref="Aas.Blob" />.
@@ -1733,7 +1754,34 @@ message Blob {
   /// The allowed values are defined as in RFC2046.
   /// </para>
   /// </remarks>
-  string content_type = 9;
+  string content_type = 11;
+}
+
+/// <summary>
+/// A File is a data element that represents an address to a file (a locator).
+/// </summary>
+/// <remarks>
+/// The value is an URI that can represent an absolute or relative path.
+/// </remarks>
+message File {
+  /// <summary>
+  /// An extension of the element.
+  /// </summary>
+  repeated Extension extensions = 1;
+
+  /// <summary>
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
+  /// </summary>
+  /// <remarks>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
+  /// </remarks>
+  optional string category = 2;
 
   /// <summary>
   /// In case of identifiables this attribute is a short name of the element.
@@ -1745,73 +1793,12 @@ message Blob {
   /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
   /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
   /// </remarks>
-  optional string id_short = 10;
-
-  /// <summary>
-  /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
-  /// </summary>
-  /// <remarks>
-  /// In contrast to the file property the file content is stored directly as value
-  /// in the <see cref="Aas.Blob" /> data element.
-  /// </remarks>
-  optional bytes value = 11;
-}
-
-/// <summary>
-/// A File is a data element that represents an address to a file (a locator).
-/// </summary>
-/// <remarks>
-/// The value is an URI that can represent an absolute or relative path.
-/// </remarks>
-message File {
-  /// <summary>
-  /// Content type of the content of the file.
-  /// </summary>
-  /// <remarks>
-  /// The content type states which file extensions the file can have.
-  /// </remarks>
-  string content_type = 1;
-
-  /// <summary>
-  /// An extension of the element.
-  /// </summary>
-  repeated Extension extensions = 2;
-
-  /// <summary>
-  /// Additional qualification of a qualifiable element.
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
-  /// </remarks>
-  repeated Qualifier qualifiers = 3;
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 6;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1831,7 +1818,16 @@ message File {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 7;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1840,33 +1836,29 @@ message File {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 8;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 9;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
   /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 10;
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
 
   /// <summary>
   /// Path and name of the referenced file (with file extension).
@@ -1874,7 +1866,15 @@ message File {
   /// <remarks>
   /// The path can be absolute or relative.
   /// </remarks>
-  optional string value = 11;
+  optional string value = 10;
+
+  /// <summary>
+  /// Content type of the content of the file.
+  /// </summary>
+  /// <remarks>
+  /// The content type states which file extensions the file can have.
+  /// </remarks>
+  string content_type = 11;
 }
 
 /// <summary>
@@ -1888,50 +1888,35 @@ message AnnotatedRelationshipElement {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Reference to the first element in the relationship taking the role of the subject.
-  /// </summary>
-  Reference first = 5;
-
-  /// <summary>
-  /// Reference to the second element in the relationship taking the role of the object.
-  /// </summary>
-  Reference second = 6;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 7;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -1951,7 +1936,16 @@ message AnnotatedRelationshipElement {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 8;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -1960,33 +1954,39 @@ message AnnotatedRelationshipElement {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 9;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 10;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
   /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 11;
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Reference to the first element in the relationship taking the role of the subject.
+  /// </summary>
+  Reference first = 10;
+
+  /// <summary>
+  /// Reference to the second element in the relationship taking the role of the object.
+  /// </summary>
+  Reference second = 11;
 
   /// <summary>
   /// A data element that represents an annotation that holds for the relationship
@@ -2018,59 +2018,35 @@ message Entity {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Describes whether the entity is a co-managed entity or a self-managed entity.
-  /// </summary>
-  EntityType entity_type = 5;
-
-  /// <summary>
-  /// Describes statements applicable to the entity by a set of submodel elements,
-  /// typically with a qualified value.
-  /// </summary>
-  repeated SubmodelElement statements = 6;
-
-  /// <summary>
-  /// Global identifier of the asset the entity is representing.
-  /// </summary>
-  /// <remarks>
-  /// This is a global reference.
-  /// </remarks>
-  optional string global_asset_id = 7;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 8;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -2090,7 +2066,16 @@ message Entity {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 9;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -2099,39 +2084,54 @@ message Entity {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 10;
+  repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 11;
+  repeated Qualifier qualifiers = 8;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Describes statements applicable to the entity by a set of submodel elements,
+  /// typically with a qualified value.
+  /// </summary>
+  repeated SubmodelElement statements = 10;
+
+  /// <summary>
+  /// Describes whether the entity is a co-managed entity or a self-managed entity.
+  /// </summary>
+  EntityType entity_type = 11;
+
+  /// <summary>
+  /// Global identifier of the asset the entity is representing.
+  /// </summary>
+  /// <remarks>
+  /// This is a global reference.
+  /// </remarks>
+  optional string global_asset_id = 12;
 
   /// <summary>
   /// Reference to a specific asset ID representing a supplementary identifier
   /// of the asset represented by the Asset Administration Shell.
   /// </summary>
-  repeated SpecificAssetId specific_asset_ids = 12;
-
-  /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
-  /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 13;
+  repeated SpecificAssetId specific_asset_ids = 13;
 }
 
 /// <summary>
@@ -2208,13 +2208,11 @@ enum StateOfEvent {
 /// </remarks>
 message EventPayload {
   /// <summary>
-  /// Reference to the referable, which defines the scope of the event.
+  /// Reference to the source event element, including identification of
+  /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
+  /// <see cref="Aas.SubmodelElement" />'s.
   /// </summary>
-  /// <remarks>
-  /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
-  /// <see cref="Aas.SubmodelElement" />.
-  /// </remarks>
-  Reference observable_reference = 1;
+  Reference source = 1;
 
   /// <summary>
   /// <see cref="Aas.HasSemantics.semantic_id" /> of the source event element, if available
@@ -2225,24 +2223,28 @@ message EventPayload {
   optional Reference source_semantic_id = 2;
 
   /// <summary>
+  /// Reference to the referable, which defines the scope of the event.
+  /// </summary>
+  /// <remarks>
+  /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
+  /// <see cref="Aas.SubmodelElement" />.
+  /// </remarks>
+  Reference observable_reference = 3;
+
+  /// <summary>
   /// <see cref="Aas.HasSemantics.semantic_id" /> of the referable which defines the scope of
   /// the event, if available.
   /// </summary>
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  optional Reference observable_semantic_id = 3;
+  optional Reference observable_semantic_id = 4;
 
   /// <summary>
   /// Information for the outer message infrastructure for scheduling the event to
   /// the respective communication channel.
   /// </summary>
-  optional string topic = 4;
-
-  /// <summary>
-  /// Timestamp in UTC, when this event was triggered.
-  /// </summary>
-  string time_stamp = 5;
+  optional string topic = 5;
 
   /// <summary>
   /// Subject, who/which initiated the creation.
@@ -2253,16 +2255,14 @@ message EventPayload {
   optional Reference subject_id = 6;
 
   /// <summary>
-  /// Event specific payload.
+  /// Timestamp in UTC, when this event was triggered.
   /// </summary>
-  optional bytes payload = 7;
+  string time_stamp = 7;
 
   /// <summary>
-  /// Reference to the source event element, including identification of
-  /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
-  /// <see cref="Aas.SubmodelElement" />'s.
+  /// Event specific payload.
   /// </summary>
-  Reference source = 8;
+  optional bytes payload = 8;
 }
 
 /// <summary>
@@ -2274,70 +2274,23 @@ message EventPayload {
 /// </remarks>
 message BasicEventElement {
   /// <summary>
-  /// Direction of event.
+  /// An extension of the element.
+  /// </summary>
+  repeated Extension extensions = 1;
+
+  /// <summary>
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// Can be <c>{ Input, Output }</c>.
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  Direction direction = 1;
-
-  /// <summary>
-  /// Information for the outer message infrastructure for scheduling the event to the
-  /// respective communication channel.
-  /// </summary>
-  optional string message_topic = 2;
-
-  /// <summary>
-  /// Additional qualification of a qualifiable element.
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
-  /// </remarks>
-  repeated Qualifier qualifiers = 3;
-
-  /// <summary>
-  /// Display name. Can be provided in several languages.
-  /// </summary>
-  repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// Timestamp in UTC, when the last event was received (input direction) or sent
-  /// (output direction).
-  /// </summary>
-  optional string last_update = 6;
-
-  /// <summary>
-  /// For input direction: not applicable.
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// For output direction: maximum interval in time, the respective Referable shall send
-  /// an update of the status of the event, even if no other trigger condition for
-  /// the event was not met.
-  /// </para>
-  /// <para>
-  /// Might be not specified, that is, there is no maximum interval
-  /// </para>
-  /// </remarks>
-  optional string max_interval = 7;
+  optional string category = 2;
 
   /// <summary>
   /// In case of identifiables this attribute is a short name of the element.
@@ -2349,49 +2302,12 @@ message BasicEventElement {
   /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
   /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
   /// </remarks>
-  optional string id_short = 8;
+  optional string id_short = 3;
 
   /// <summary>
-  /// State of event.
+  /// Display name. Can be provided in several languages.
   /// </summary>
-  /// <remarks>
-  /// Can be <c>{ On, Off }</c>.
-  /// </remarks>
-  StateOfEvent state = 9;
-
-  /// <summary>
-  /// Reference to the <see cref="Aas.Referable" />, which defines the scope of the event.
-  /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
-  /// <see cref="Aas.SubmodelElement" />.
-  /// </summary>
-  /// <remarks>
-  /// Reference to a referable, e.g., a data element or
-  /// a submodel, that is being observed.
-  /// </remarks>
-  Reference observed = 10;
-
-  /// <summary>
-  /// An extension of the element.
-  /// </summary>
-  repeated Extension extensions = 11;
-
-  /// <summary>
-  /// Information, which outer message infrastructure shall handle messages for
-  /// the <see cref="Aas.EventElement" />. Refers to a <see cref="Aas.Submodel" />,
-  /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
-  /// <see cref="Aas.Entity" />, which contains <see cref="Aas.DataElement" />'s describing
-  /// the proprietary specification for the message broker.
-  /// </summary>
-  /// <remarks>
-  /// For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
-  /// proprietary specification could be standardized by having respective Submodels.
-  /// </remarks>
-  optional Reference message_broker = 12;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 13;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -2411,7 +2327,16 @@ message BasicEventElement {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 14;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -2420,7 +2345,81 @@ message BasicEventElement {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 15;
+  repeated Reference supplemental_semantic_ids = 7;
+
+  /// <summary>
+  /// Additional qualification of a qualifiable element.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
+  /// </remarks>
+  repeated Qualifier qualifiers = 8;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Reference to the <see cref="Aas.Referable" />, which defines the scope of the event.
+  /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
+  /// <see cref="Aas.SubmodelElement" />.
+  /// </summary>
+  /// <remarks>
+  /// Reference to a referable, e.g., a data element or
+  /// a submodel, that is being observed.
+  /// </remarks>
+  Reference observed = 10;
+
+  /// <summary>
+  /// Direction of event.
+  /// </summary>
+  /// <remarks>
+  /// Can be <c>{ Input, Output }</c>.
+  /// </remarks>
+  Direction direction = 11;
+
+  /// <summary>
+  /// State of event.
+  /// </summary>
+  /// <remarks>
+  /// Can be <c>{ On, Off }</c>.
+  /// </remarks>
+  StateOfEvent state = 12;
+
+  /// <summary>
+  /// Information for the outer message infrastructure for scheduling the event to the
+  /// respective communication channel.
+  /// </summary>
+  optional string message_topic = 13;
+
+  /// <summary>
+  /// Information, which outer message infrastructure shall handle messages for
+  /// the <see cref="Aas.EventElement" />. Refers to a <see cref="Aas.Submodel" />,
+  /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
+  /// <see cref="Aas.Entity" />, which contains <see cref="Aas.DataElement" />'s describing
+  /// the proprietary specification for the message broker.
+  /// </summary>
+  /// <remarks>
+  /// For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
+  /// proprietary specification could be standardized by having respective Submodels.
+  /// </remarks>
+  optional Reference message_broker = 14;
+
+  /// <summary>
+  /// Timestamp in UTC, when the last event was received (input direction) or sent
+  /// (output direction).
+  /// </summary>
+  optional string last_update = 15;
 
   /// <summary>
   /// For input direction, reports on the maximum frequency, the software entity behind
@@ -2438,18 +2437,19 @@ message BasicEventElement {
   optional string min_interval = 16;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// For input direction: not applicable.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// For output direction: maximum interval in time, the respective Referable shall send
+  /// an update of the status of the event, even if no other trigger condition for
+  /// the event was not met.
+  /// </para>
+  /// <para>
+  /// Might be not specified, that is, there is no maximum interval
+  /// </para>
   /// </remarks>
-  optional string category = 17;
+  optional string max_interval = 17;
 }
 
 /// <summary>
@@ -2476,50 +2476,35 @@ message Operation {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Parameter that is input and output of the operation.
-  /// </summary>
-  repeated OperationVariable inoutput_variables = 2;
-
-  /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 3;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
   repeated LangStringNameType display_name = 4;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 5;
-
-  /// <summary>
-  /// Input parameter of the operation.
-  /// </summary>
-  repeated OperationVariable input_variables = 6;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 7;
 
   /// <summary>
   /// Description or comments on the element.
@@ -2539,7 +2524,16 @@ message Operation {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 8;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -2548,38 +2542,44 @@ message Operation {
   /// <remarks>
   /// It is recommended to use a global reference.
   /// </remarks>
-  repeated Reference supplemental_semantic_ids = 9;
+  repeated Reference supplemental_semantic_ids = 7;
+
+  /// <summary>
+  /// Additional qualification of a qualifiable element.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
+  /// </remarks>
+  repeated Qualifier qualifiers = 8;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
+
+  /// <summary>
+  /// Input parameter of the operation.
+  /// </summary>
+  repeated OperationVariable input_variables = 10;
 
   /// <summary>
   /// Output parameter of the operation.
   /// </summary>
-  repeated OperationVariable output_variables = 10;
+  repeated OperationVariable output_variables = 11;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Parameter that is input and output of the operation.
   /// </summary>
-  /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
-  /// </remarks>
-  optional string category = 11;
-
-  /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
-  /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 12;
+  repeated OperationVariable inoutput_variables = 12;
 }
 
 /// <summary>
@@ -2608,40 +2608,35 @@ message Capability {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Additional qualification of a qualifiable element.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// Constraints:
-  /// </para>
-  /// <ul>
-  ///   <li>
-  ///     Constraint AASd-021:
-  ///     Every qualifiable can only have one qualifier with the same
-  ///     <see cref="Aas.Qualifier.type" />.
-  ///   </li>
-  /// </ul>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Qualifier qualifiers = 2;
+  optional string category = 2;
+
+  /// <summary>
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
+  /// </summary>
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
 
   /// <summary>
   /// Display name. Can be provided in several languages.
   /// </summary>
-  repeated LangStringNameType display_name = 3;
-
-  /// <summary>
-  /// Identifier of the semantic definition of the element. It is called semantic ID
-  /// of the element or also main semantic ID of the element.
-  /// </summary>
-  /// <remarks>
-  /// It is recommended to use a global reference.
-  /// </remarks>
-  optional Reference semantic_id = 4;
-
-  /// <summary>
-  /// Embedded data specification.
-  /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 5;
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -2661,7 +2656,16 @@ message Capability {
   /// provided.
   /// </para>
   /// </remarks>
-  repeated LangStringTextType description = 6;
+  repeated LangStringTextType description = 5;
+
+  /// <summary>
+  /// Identifier of the semantic definition of the element. It is called semantic ID
+  /// of the element or also main semantic ID of the element.
+  /// </summary>
+  /// <remarks>
+  /// It is recommended to use a global reference.
+  /// </remarks>
+  optional Reference semantic_id = 6;
 
   /// <summary>
   /// Identifier of a supplemental semantic definition of the element.
@@ -2673,30 +2677,26 @@ message Capability {
   repeated Reference supplemental_semantic_ids = 7;
 
   /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
+  /// Additional qualification of a qualifiable element.
   /// </summary>
   /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
+  /// <para>
+  /// Constraints:
+  /// </para>
+  /// <ul>
+  ///   <li>
+  ///     Constraint AASd-021:
+  ///     Every qualifiable can only have one qualifier with the same
+  ///     <see cref="Aas.Qualifier.type" />.
+  ///   </li>
+  /// </ul>
   /// </remarks>
-  optional string category = 8;
+  repeated Qualifier qualifiers = 8;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// Embedded data specification.
   /// </summary>
-  /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
-  /// </remarks>
-  optional string id_short = 9;
+  repeated EmbeddedDataSpecification embedded_data_specifications = 9;
 }
 
 /// <summary>
@@ -2795,28 +2795,35 @@ message ConceptDescription {
   repeated Extension extensions = 1;
 
   /// <summary>
-  /// Display name. Can be provided in several languages.
-  /// </summary>
-  repeated LangStringNameType display_name = 2;
-
-  /// <summary>
-  /// Reference to an external definition the concept is compatible to or was derived
-  /// from.
+  /// The category is a value that gives further meta information
+  /// w.r.t. to the class of the element.
+  /// It affects the expected existence of attributes and the applicability of
+  /// constraints.
   /// </summary>
   /// <remarks>
-  /// <para>
-  /// It is recommended to use a global reference.
-  /// </para>
-  /// <para>
-  /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360
-  /// </para>
+  /// The category is not identical to the semantic definition
+  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// the element is a measurement value whereas the semantic definition of
+  /// the element would denote that it is the measured temperature.
   /// </remarks>
-  repeated Reference is_case_of = 3;
+  optional string category = 2;
 
   /// <summary>
-  /// Embedded data specification.
+  /// In case of identifiables this attribute is a short name of the element.
+  /// In case of referable this ID is an identifying string of the element within
+  /// its name space.
   /// </summary>
-  repeated EmbeddedDataSpecification embedded_data_specifications = 4;
+  /// <remarks>
+  /// In case the element is a property and the property has a semantic definition
+  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// </remarks>
+  optional string id_short = 3;
+
+  /// <summary>
+  /// Display name. Can be provided in several languages.
+  /// </summary>
+  repeated LangStringNameType display_name = 4;
 
   /// <summary>
   /// Description or comments on the element.
@@ -2839,44 +2846,37 @@ message ConceptDescription {
   repeated LangStringTextType description = 5;
 
   /// <summary>
-  /// The globally unique identification of the element.
-  /// </summary>
-  string id = 6;
-
-  /// <summary>
-  /// The category is a value that gives further meta information
-  /// w.r.t. to the class of the element.
-  /// It affects the expected existence of attributes and the applicability of
-  /// constraints.
-  /// </summary>
-  /// <remarks>
-  /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
-  /// the element is a measurement value whereas the semantic definition of
-  /// the element would denote that it is the measured temperature.
-  /// </remarks>
-  optional string category = 7;
-
-  /// <summary>
   /// Administrative information of an identifiable element.
   /// </summary>
   /// <remarks>
   /// Some of the administrative information like the version number might need to
   /// be part of the identification.
   /// </remarks>
-  optional AdministrativeInformation administration = 8;
+  optional AdministrativeInformation administration = 6;
 
   /// <summary>
-  /// In case of identifiables this attribute is a short name of the element.
-  /// In case of referable this ID is an identifying string of the element within
-  /// its name space.
+  /// The globally unique identification of the element.
+  /// </summary>
+  string id = 7;
+
+  /// <summary>
+  /// Embedded data specification.
+  /// </summary>
+  repeated EmbeddedDataSpecification embedded_data_specifications = 8;
+
+  /// <summary>
+  /// Reference to an external definition the concept is compatible to or was derived
+  /// from.
   /// </summary>
   /// <remarks>
-  /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// <para>
+  /// It is recommended to use a global reference.
+  /// </para>
+  /// <para>
+  /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360
+  /// </para>
   /// </remarks>
-  optional string id_short = 9;
+  repeated Reference is_case_of = 9;
 }
 
 /// <summary>
@@ -2994,6 +2994,14 @@ enum ReferenceTypes {
 /// </remarks>
 message Reference {
   /// <summary>
+  /// Type of the reference.
+  /// </summary>
+  /// <remarks>
+  /// Denotes, whether reference is an external reference or a model reference.
+  /// </remarks>
+  ReferenceTypes type = 1;
+
+  /// <summary>
   /// <see cref="Aas.HasSemantics.semantic_id" /> of the referenced model element
   /// (<see cref="Aas.Reference.type" /> = <see cref="Aas.ReferenceTypes.MODEL_REFERENCE" />).
   /// </summary>
@@ -3005,31 +3013,18 @@ message Reference {
   /// It is recommended to use a external reference.
   /// </para>
   /// </remarks>
-  optional Reference referred_semantic_id = 1;
+  optional Reference referred_semantic_id = 2;
 
   /// <summary>
   /// Unique references in their name space.
   /// </summary>
-  repeated Key keys = 2;
-
-  /// <summary>
-  /// Type of the reference.
-  /// </summary>
-  /// <remarks>
-  /// Denotes, whether reference is an external reference or a model reference.
-  /// </remarks>
-  ReferenceTypes type = 3;
+  repeated Key keys = 3;
 }
 
 /// <summary>
 /// A key is a reference to an element by its ID.
 /// </summary>
 message Key {
-  /// <summary>
-  /// The key value, for example an IRDI or an URI
-  /// </summary>
-  string value = 1;
-
   /// <summary>
   /// Denotes which kind of entity is referenced.
   /// </summary>
@@ -3048,7 +3043,12 @@ message Key {
   /// The name of the model element is explicitly listed.
   /// </para>
   /// </remarks>
-  KeyTypes type = 2;
+  KeyTypes type = 1;
+
+  /// <summary>
+  /// The key value, for example an IRDI or an URI
+  /// </summary>
+  string value = 2;
 }
 
 /// <summary>
@@ -3227,14 +3227,14 @@ enum DataTypeDefXsd {
 /// </summary>
 message LangStringNameType {
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
-  /// </summary>
-  string text = 1;
-
-  /// <summary>
   /// Language tag conforming to BCP 47
   /// </summary>
-  string language = 2;
+  string language = 1;
+
+  /// <summary>
+  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// </summary>
+  string text = 2;
 }
 
 /// <summary>
@@ -3242,14 +3242,14 @@ message LangStringNameType {
 /// </summary>
 message LangStringTextType {
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
-  /// </summary>
-  string text = 1;
-
-  /// <summary>
   /// Language tag conforming to BCP 47
   /// </summary>
-  string language = 2;
+  string language = 1;
+
+  /// <summary>
+  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// </summary>
+  string text = 2;
 }
 
 /// <summary>
@@ -3262,14 +3262,14 @@ message LangStringTextType {
 /// </remarks>
 message Environment {
   /// <summary>
-  /// Submodel
-  /// </summary>
-  repeated Submodel submodels = 1;
-
-  /// <summary>
   /// Asset administration shell
   /// </summary>
-  repeated AssetAdministrationShell asset_administration_shells = 2;
+  repeated AssetAdministrationShell asset_administration_shells = 1;
+
+  /// <summary>
+  /// Submodel
+  /// </summary>
+  repeated Submodel submodels = 2;
 
   /// <summary>
   /// Concept description
@@ -3282,14 +3282,14 @@ message Environment {
 /// </summary>
 message EmbeddedDataSpecification {
   /// <summary>
-  /// Reference to the data specification
-  /// </summary>
-  Reference data_specification = 1;
-
-  /// <summary>
   /// Actual content of the data specification
   /// </summary>
-  DataSpecificationContent data_specification_content = 2;
+  DataSpecificationContent data_specification_content = 1;
+
+  /// <summary>
+  /// Reference to the data specification
+  /// </summary>
+  Reference data_specification = 2;
 }
 
 enum DataTypeIec61360 {
@@ -3554,14 +3554,14 @@ message ValueList {
 /// </remarks>
 message LangStringPreferredNameTypeIec61360 {
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
-  /// </summary>
-  string text = 1;
-
-  /// <summary>
   /// Language tag conforming to BCP 47
   /// </summary>
-  string language = 2;
+  string language = 1;
+
+  /// <summary>
+  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// </summary>
+  string text = 2;
 }
 
 /// <summary>
@@ -3569,14 +3569,14 @@ message LangStringPreferredNameTypeIec61360 {
 /// </summary>
 message LangStringShortNameTypeIec61360 {
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
-  /// </summary>
-  string text = 1;
-
-  /// <summary>
   /// Language tag conforming to BCP 47
   /// </summary>
-  string language = 2;
+  string language = 1;
+
+  /// <summary>
+  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// </summary>
+  string text = 2;
 }
 
 /// <summary>
@@ -3584,14 +3584,14 @@ message LangStringShortNameTypeIec61360 {
 /// </summary>
 message LangStringDefinitionTypeIec61360 {
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
-  /// </summary>
-  string text = 1;
-
-  /// <summary>
   /// Language tag conforming to BCP 47
   /// </summary>
-  string language = 2;
+  string language = 1;
+
+  /// <summary>
+  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// </summary>
+  string text = 2;
 }
 
 /// <summary>
@@ -3652,63 +3652,6 @@ message LangStringDefinitionTypeIec61360 {
 /// </remarks>
 message DataSpecificationIec61360 {
   /// <summary>
-  /// Short name
-  /// </summary>
-  repeated LangStringShortNameTypeIec61360 short_name = 1;
-
-  /// <summary>
-  /// Definition in different languages
-  /// </summary>
-  repeated LangStringDefinitionTypeIec61360 definition = 2;
-
-  /// <summary>
-  /// Unit
-  /// </summary>
-  optional string unit = 3;
-
-  /// <summary>
-  /// Value Format
-  /// </summary>
-  /// <remarks>
-  /// The value format is based on ISO 13584-42 and IEC 61360-2.
-  /// </remarks>
-  optional string value_format = 4;
-
-  /// <summary>
-  /// Unique unit id
-  /// </summary>
-  /// <remarks>
-  /// <para>
-  /// <see cref="Aas.DataSpecificationIec61360.unit" /> and <see cref="Aas.DataSpecificationIec61360.unit_id" /> need to be consistent if both attributes
-  /// are set
-  /// </para>
-  /// <para>
-  /// It is recommended to use an external reference ID.
-  /// </para>
-  /// </remarks>
-  optional Reference unit_id = 5;
-
-  /// <summary>
-  /// List of allowed values
-  /// </summary>
-  optional ValueList value_list = 6;
-
-  /// <summary>
-  /// Source of definition
-  /// </summary>
-  optional string source_of_definition = 7;
-
-  /// <summary>
-  /// Value
-  /// </summary>
-  optional string value = 8;
-
-  /// <summary>
-  /// Symbol
-  /// </summary>
-  optional string symbol = 9;
-
-  /// <summary>
   /// Preferred name
   /// </summary>
   /// <remarks>
@@ -3725,12 +3668,69 @@ message DataSpecificationIec61360 {
   ///   </li>
   /// </ul>
   /// </remarks>
-  repeated LangStringPreferredNameTypeIec61360 preferred_name = 10;
+  repeated LangStringPreferredNameTypeIec61360 preferred_name = 1;
+
+  /// <summary>
+  /// Short name
+  /// </summary>
+  repeated LangStringShortNameTypeIec61360 short_name = 2;
+
+  /// <summary>
+  /// Unit
+  /// </summary>
+  optional string unit = 3;
+
+  /// <summary>
+  /// Unique unit id
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <see cref="Aas.DataSpecificationIec61360.unit" /> and <see cref="Aas.DataSpecificationIec61360.unit_id" /> need to be consistent if both attributes
+  /// are set
+  /// </para>
+  /// <para>
+  /// It is recommended to use an external reference ID.
+  /// </para>
+  /// </remarks>
+  optional Reference unit_id = 4;
+
+  /// <summary>
+  /// Source of definition
+  /// </summary>
+  optional string source_of_definition = 5;
+
+  /// <summary>
+  /// Symbol
+  /// </summary>
+  optional string symbol = 6;
 
   /// <summary>
   /// Data Type
   /// </summary>
-  optional DataTypeIec61360 data_type = 11;
+  optional DataTypeIec61360 data_type = 7;
+
+  /// <summary>
+  /// Definition in different languages
+  /// </summary>
+  repeated LangStringDefinitionTypeIec61360 definition = 8;
+
+  /// <summary>
+  /// Value Format
+  /// </summary>
+  /// <remarks>
+  /// The value format is based on ISO 13584-42 and IEC 61360-2.
+  /// </remarks>
+  optional string value_format = 9;
+
+  /// <summary>
+  /// List of allowed values
+  /// </summary>
+  optional ValueList value_list = 10;
+
+  /// <summary>
+  /// Value
+  /// </summary>
+  optional string value = 11;
 
   /// <summary>
   /// Set of levels.
