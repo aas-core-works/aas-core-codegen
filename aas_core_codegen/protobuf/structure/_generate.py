@@ -392,20 +392,7 @@ def _generate_choice_class(cls: intermediate.ClassUnion) -> Stripped:
         subtype_name = proto_naming.property_name(subtype.name)
         fields.append(Stripped(f"{subtype_type} {subtype_name} = {j + 1};"))
 
-    if isinstance(cls, intermediate.AbstractClass):
-        message_name = proto_naming.class_name(cls.name)
-    elif isinstance(cls, intermediate.ConcreteClass):
-        # NOTE (mristin):
-        # We have to append the ``_choice`` suffix for concrete classes with descendants
-        # to distinguish between the concrete classes and one-of choice classes.
-        # Protocol Buffers do not support inheritance, so we have to work around that
-        # circumstance.
-
-        message_name = Identifier(proto_naming.class_name(cls.name) + "_choice")
-
-    else:
-        assert_never(cls)
-        raise AssertionError("Unexpected execution path")
+    message_name = Identifier(proto_naming.class_name(cls.name) + "_choice")
 
     fields_joined = "\n".join(fields)
 
