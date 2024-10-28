@@ -140,10 +140,11 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
         elif isinstance(our_type, intermediate.Class):
             message_name = proto_naming.class_name(our_type.name)
             if len(our_type.concrete_descendants) > 0:
-                # NOTE (mristin):
-                # We have to add the suffix ``_choice`` since this field points
-                # to one of the concrete descendants of the class as well as
-                # the concrete class itself.
+                # NOTE (TomGneuss):
+                # add the suffix "_choice" to the type name because this type
+                # (either abstract or concrete) has concrete subtypes.
+                # Thus, a choice-object (with that suffix) will be generated and must
+                # be used here.
                 message_name = Identifier(message_name + "_choice")
 
             return Stripped(message_name)
