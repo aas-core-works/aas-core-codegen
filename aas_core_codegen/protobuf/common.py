@@ -141,7 +141,7 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
             message_name = proto_naming.class_name(our_type.name)
             if len(our_type.concrete_descendants) > 0:
                 # NOTE (TomGneuss):
-                # add the suffix "_choice" to the type name because this type
+                # We add the suffix "_choice" to the type name because this type
                 # (either abstract or concrete) has concrete subtypes.
                 # Thus, a choice-object (with that suffix) will be generated and must
                 # be used here.
