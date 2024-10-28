@@ -402,19 +402,23 @@ def _generate_check_start_element() -> Stripped:
 func checkStartElement(
 {I}current xml.StartElement,
 ) (err error) {{
-{I}var unexpectedAttr []xml.Attr
+{I}const xmlnsLen = len("xmlns")
+
+{I}unexpectedAttr := 0
 {I}for _, attr := range current.Attr {{
-{II}if attr.Name.Space == "" && attr.Name.Local == "xmlns" {{
+{II}if (attr.Name.Space == "" && attr.Name.Local == "xmlns") ||
+{III}attr.Name.Space == "xmlns" {{
 {III}continue
 {II}}}
-{II}unexpectedAttr = append(unexpectedAttr, attr)
+
+{II}unexpectedAttr++
 {I}}}
-{I}if len(unexpectedAttr) != 0 {{
-{II} err = newDeserializationError(
+{I}if unexpectedAttr != 0 {{
+{II}err = newDeserializationError(
 {III}fmt.Sprintf(
 {IIII}"Expected no attributes except 'xmlns' in the start element, "+
-{IIII}"but got %d in the start element %s",
-{IIII}len(unexpectedAttr), current.Name.Local,
+{IIIII}"but got %d in the start element %s",
+{IIII}unexpectedAttr, current.Name.Local,
 {III}),
 {II})
 {II}return
@@ -814,18 +818,19 @@ value, current, valueErr = {read_function}(
                     )
 
                 else:
-                    unmarshal_function = golang_naming.private_function_name(
-                        Identifier(f"unmarshal_{type_anno.our_type.name}")
+                    read_with_lookahead_function = golang_naming.private_function_name(
+                        Identifier(f"read_{type_anno.our_type.name}_with_lookahead")
                     )
 
                     case_body_blocks.append(
                         Stripped(
                             f"""\
-{prop_var}, valueErr =  {unmarshal_function}(
+{prop_var}, valueErr =  {read_with_lookahead_function}(
 {I}decoder,
+{I}current,
 )
-// {unmarshal_function} stops at the end element,
-// so we look ahead to the next element.
+// {read_with_lookahead_function} stops at the end element,
+// so we look ahead to the next element, just after the end element.
 if valueErr == nil {{
 {I}current, valueErr = readNext(decoder, current)
 }}"""
@@ -1150,7 +1155,8 @@ def _generate_read_with_lookahead_without_dispatch(
 // as an XML element where the start element is expected to have been already
 // read as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func {function_name}(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
@@ -1279,7 +1285,8 @@ switch local {{
 // as an XML element where the start element is expected to have been already read
 // as `current` token.
 //
-// The de-serialization stops by consuming the final end element.
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
 func {function_name}(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
@@ -1311,46 +1318,6 @@ func {function_name}(
 {I}}}
 
 {I}err = checkEndElement(current, local)
-{I}return
-}}"""
-    )
-
-
-def _generate_unmarshal_for(cls: intermediate.ClassUnion) -> Stripped:
-    interface_name = golang_naming.interface_name(cls.name)
-    function_name = golang_naming.private_function_name(
-        Identifier(f"unmarshal_{cls.name}")
-    )
-
-    read_with_lookahead = golang_naming.private_function_name(
-        Identifier(f"read_{cls.name}_with_lookahead")
-    )
-
-    return Stripped(
-        f"""\
-// Unmarshal an instance of [aastypes.{interface_name}]
-// serialized as an XML element.
-//
-// The XML element must live in the [Namespace] space.
-func {function_name}(
-{I}decoder *xml.Decoder,
-) (instance aastypes.{interface_name},
-{I}err error,
-) {{
-{I}var current xml.Token
-{I}current, err = readNext(decoder, nil)
-{I}if _, isEOF := current.(eof); isEOF {{
-{II}err = newDeserializationError(
-{III}"Expected an instance of {interface_name} "+
-{IIII}"serialized as an XML element, but reached the end of file.",
-{II})
-{II}return
-{I}}}
-
-{I}instance, err = {read_with_lookahead}(
-{II}decoder,
-{II}current,
-{I})
 {I}return
 }}"""
     )
@@ -2430,8 +2397,6 @@ const Namespace = {namespace_literal}"""
         elif isinstance(our_type, intermediate.AbstractClass):
             blocks.append(_generate_read_with_lookahead_with_dispatch(cls=our_type))
 
-            blocks.append(_generate_unmarshal_for(cls=our_type))
-
         elif isinstance(our_type, intermediate.ConcreteClass):
             if our_type.is_implementation_specific:
                 implementation_key = specific_implementations.ImplementationKey(
@@ -2458,8 +2423,6 @@ const Namespace = {namespace_literal}"""
                 blocks.append(
                     _generate_read_with_lookahead_without_dispatch(cls=our_type)
                 )
-
-            blocks.append(_generate_unmarshal_for(cls=our_type))
         else:
             assert_never(our_type)
 

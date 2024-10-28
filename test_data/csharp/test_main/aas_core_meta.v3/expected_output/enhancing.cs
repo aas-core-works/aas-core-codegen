@@ -3719,7 +3719,7 @@ namespace AasCore.Aas3_0
                 set => _instance.DataSpecificationContent = value;
             }
 
-            public IReference? DataSpecification
+            public IReference DataSpecification
             {
                 get => _instance.DataSpecification;
                 set => _instance.DataSpecification = value;
@@ -7660,19 +7660,16 @@ namespace AasCore.Aas3_0
                 );
                 that.DataSpecificationContent = castedDataSpecificationContent;
 
-                if (that.DataSpecification != null)
-                {
-                    var transformedDataSpecification = Transform(
-                        that.DataSpecification
-                    );
-                    var castedDataSpecification = (
-                        transformedDataSpecification as Aas.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedDataSpecification}"
-                    );
-                    that.DataSpecification = castedDataSpecification;
-                }
+                var transformedDataSpecification = Transform(
+                    that.DataSpecification
+                );
+                var castedDataSpecification = (
+                    transformedDataSpecification as Aas.IReference
+                ) ?? throw new System.InvalidOperationException(
+                    "Expected the transformed value to be a IReference, " +
+                    $"but got: {transformedDataSpecification}"
+                );
+                that.DataSpecification = castedDataSpecification;
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)

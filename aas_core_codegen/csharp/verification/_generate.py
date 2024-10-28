@@ -82,7 +82,7 @@ class _PatternVerificationTranspiler(
         """
         Initialize with the given values.
 
-        The ``initialized_variables`` are shared between different statement
+        The ``defined_variables`` are shared between different statement
         transpilations. It is also mutated when assignments are transpiled. We need to
         keep track of variables so that we know when we have to define them, and when
         we can simply assign them a value, if they have been already defined.
@@ -427,41 +427,23 @@ def _transpile_transpilable_verification(
     environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile a verification function."""
-    canonicalizer = intermediate_type_inference.Canonicalizer()
-    for node in verification.parsed.body:
-        _ = canonicalizer.transform(node)
-
-    environment_with_args = intermediate_type_inference.MutableEnvironment(
-        parent=environment
-    )
-    for arg in verification.arguments:
-        environment_with_args.set(
-            identifier=arg.name,
-            type_annotation=intermediate_type_inference.convert_type_annotation(
-                arg.type_annotation
-            ),
+    # fmt: off
+    type_inference, error = (
+        intermediate_type_inference.infer_for_verification(
+            verification=verification,
+            base_environment=environment
         )
-
-    type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table,
-        environment=environment_with_args,
-        representation_map=canonicalizer.representation_map,
     )
+    # fmt: on
 
-    for node in verification.parsed.body:
-        _ = type_inferrer.transform(node)
+    if error is not None:
+        return None, error
 
-    if len(type_inferrer.errors):
-        return None, Error(
-            verification.parsed.node,
-            f"Failed to infer the types "
-            f"in the verification function {verification.name!r}",
-            type_inferrer.errors,
-        )
+    assert type_inference is not None
 
     transpiler = _TranspilableVerificationTranspiler(
-        type_map=type_inferrer.type_map,
-        environment=environment_with_args,
+        type_map=type_inference.type_map,
+        environment=type_inference.environment_with_args,
         symbol_table=symbol_table,
         verification=verification,
     )
@@ -598,35 +580,22 @@ def _transpile_invariant(
     environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
-    # NOTE (mristin, 2021-10-24):
-    # We manually transpile the invariant from our custom syntax without additional
-    # semantic analysis in the :py:mod:`aas_core_codegen.intermediate` layer.
-    #
-    # While this might seem repetitive ("unDRY"), we are still not sure about
-    # the appropriate abstraction. After we implement the code generation for a couple
-    # of languages, we hope to have a much better understanding about the necessary
-    # abstractions.
-
-    canonicalizer = intermediate_type_inference.Canonicalizer()
-    _ = canonicalizer.transform(invariant.body)
-
-    type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table,
-        environment=environment,
-        representation_map=canonicalizer.representation_map,
-    )
-
-    _ = type_inferrer.transform(invariant.body)
-
-    if len(type_inferrer.errors):
-        return None, Error(
-            invariant.parsed.node,
-            "Failed to infer the types in the invariant",
-            type_inferrer.errors,
+    # fmt: off
+    type_map, inference_error = (
+        intermediate_type_inference.infer_for_invariant(
+            invariant=invariant,
+            environment=environment
         )
+    )
+    # fmt: on
+
+    if inference_error is not None:
+        return None, inference_error
+
+    assert type_map is not None
 
     transpiler = _InvariantTranspiler(
-        type_map=type_inferrer.type_map,
+        type_map=type_map,
         environment=environment,
         symbol_table=symbol_table,
     )

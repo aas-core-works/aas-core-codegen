@@ -5250,14 +5250,14 @@ func VerifySubmodelElementList(
 	}
 
 	if !(
-		!((that.Value() != nil) &&
-		(that.TypeValueListElement() == aastypes.AASSubmodelElementsProperty ||
-		that.TypeValueListElement() == aastypes.AASSubmodelElementsRange)) ||
+		!(that.TypeValueListElement() == aastypes.AASSubmodelElementsProperty ||
+		that.TypeValueListElement() == aastypes.AASSubmodelElementsRange) ||
 		((that.ValueTypeListElement() != nil) &&
+		((that.Value() == nil) ||
 		PropertiesOrRangesHaveValueType(
 			that.Value(),
 			*that.ValueTypeListElement(),
-		))) {
+		)))) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASd-109: If type value list element is equal to " +
@@ -12351,7 +12351,16 @@ func VerifyEmbeddedDataSpecification(
 		}
 	}
 
-	if that.DataSpecification() != nil {
+	if that.DataSpecification() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: DataSpecification",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
 		abort = Verify(
 			that.DataSpecification(),
 			func(err *VerificationError) bool {
@@ -12793,7 +12802,7 @@ func VerifyDataSpecificationIEC61360(
 		)) {
 		abort = onError(
 			newVerificationError(
-				"Constraint AASc-002: preferred name shall be provided at " +
+				"Constraint AASc-3a-002: preferred name shall be provided at " +
 				"least in English.",
 			),
 		)
@@ -13655,18 +13664,6 @@ func VerifyPathType(
 		abort = onError(
 			newVerificationError(
 				"Identifier shall have a maximum length of 2000 characters.",),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if !MatchesRFC8089Path(that) {
-		abort = onError(
-			newVerificationError(
-				"The value must represent a valid file URI scheme according " +
-				"to RFC 8089.",
-			),
 		)
 		if abort {
 			return

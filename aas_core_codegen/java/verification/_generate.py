@@ -4,7 +4,6 @@ import textwrap
 from typing import (
     List,
     Mapping,
-    MutableMapping,
     Optional,
     Sequence,
     Set,
@@ -27,6 +26,9 @@ from aas_core_codegen.common import (
     Stripped,
     wrap_text_into_lines,
 )
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+)
 from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
@@ -42,10 +44,8 @@ from aas_core_codegen.java.common import (
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
 )
-from aas_core_codegen.intermediate import (
-    type_inference as intermediate_type_inference,
-)
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
+
 
 # region Verify
 
@@ -113,13 +113,7 @@ class _PatternVerificationTranspiler(
 ):
     """Transpile a statement of a pattern verification into Java."""
 
-    def __init__(
-        self,
-        defined_variables: Set[Identifier],
-        type_map: MutableMapping[
-            parse_tree.Node, "intermediate_type_inference.TypeAnnotationUnion"
-        ],
-    ) -> None:
+    def __init__(self, defined_variables: Set[Identifier]) -> None:
         """
         Initialize with the given values.
 
@@ -129,7 +123,6 @@ class _PatternVerificationTranspiler(
         we can simply assign them a value, if they have been already defined.
         """
         self.defined_variables = defined_variables
-        self.type_map = type_map
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_joined_str_values(
@@ -246,59 +239,20 @@ class _PatternVerificationTranspiler(
         else:
             self.defined_variables.add(node.target.identifier)
 
-            stmt_type = self.type_map.get(node.value)
+            # NOTE (mristin):
+            # We assume here that we checked in the parse stage that all the variables
+            # used in a pattern verification function are actually typed as strings.
 
-            assert stmt_type is not None
-
-            type_anno, error = java_transpilation.generate_type(stmt_type)
-            if error is not None:
-                return None, error
-            assert type_anno is not None
-
-            return Stripped(f"{type_anno} {variable} = {code};"), None
+            return Stripped(f"String {variable} = {code};"), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_pattern_verification(
     verification: intermediate.PatternVerification,
-    symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
     package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verification function that checks the regular expressions."""
     # We assume that we performed all the checks at the intermediate stage.
-    canonicalizer = intermediate_type_inference.Canonicalizer()
-    for node in verification.parsed.body:
-        _ = canonicalizer.transform(node)
-
-    environment_with_args = intermediate_type_inference.MutableEnvironment(
-        parent=environment
-    )
-    for arg in verification.arguments:
-        environment_with_args.set(
-            identifier=arg.name,
-            type_annotation=intermediate_type_inference.convert_type_annotation(
-                arg.type_annotation
-            ),
-        )
-
-    type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table,
-        environment=environment_with_args,
-        representation_map=canonicalizer.representation_map,
-    )
-
-    for node in verification.parsed.body:
-        if isinstance(node, parse_tree.Assignment):
-            _ = type_inferrer.transform(node)
-
-    if len(type_inferrer.errors):
-        return None, Error(
-            verification.parsed.node,
-            f"Failed to infer the types "
-            f"in the verification function {verification.name!r}",
-            type_inferrer.errors,
-        )
 
     construct_name = java_naming.private_method_name(
         Identifier(f"construct_{verification.name}")
@@ -316,10 +270,7 @@ private static Pattern {construct_name}() {{
     )
 
     defined_variables = set()  # type: Set[Identifier]
-    transpiler = _PatternVerificationTranspiler(
-        defined_variables=defined_variables,
-        type_map=type_inferrer.type_map,
-    )
+    transpiler = _PatternVerificationTranspiler(defined_variables=defined_variables)
 
     for i, stmt in enumerate(verification.parsed.body):
         if i == len(verification.parsed.body) - 1:
@@ -495,41 +446,23 @@ def _transpile_transpilable_verification(
 
     The ``package`` defines the root Java package.
     """
-    canonicalizer = intermediate_type_inference.Canonicalizer()
-    for node in verification.parsed.body:
-        _ = canonicalizer.transform(node)
-
-    environment_with_args = intermediate_type_inference.MutableEnvironment(
-        parent=environment
-    )
-    for arg in verification.arguments:
-        environment_with_args.set(
-            identifier=arg.name,
-            type_annotation=intermediate_type_inference.convert_type_annotation(
-                arg.type_annotation
-            ),
+    # fmt: off
+    type_inference, error = (
+        intermediate_type_inference.infer_for_verification(
+            verification=verification,
+            base_environment=environment
         )
-
-    type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table,
-        environment=environment_with_args,
-        representation_map=canonicalizer.representation_map,
     )
+    # fmt: on
 
-    for node in verification.parsed.body:
-        _ = type_inferrer.transform(node)
+    if error is not None:
+        return None, error
 
-    if len(type_inferrer.errors):
-        return None, Error(
-            verification.parsed.node,
-            f"Failed to infer the types "
-            f"in the verification function {verification.name!r}",
-            type_inferrer.errors,
-        )
+    assert type_inference is not None
 
     optional_inferrer = java_optional.OptionalInferrer(
-        environment=environment_with_args,
-        type_map=type_inferrer.type_map,
+        environment=type_inference.environment_with_args,
+        type_map=type_inference.type_map,
     )
 
     for node in verification.parsed.body:
@@ -544,9 +477,9 @@ def _transpile_transpilable_verification(
         )
 
     transpiler = _TranspilableVerificationTranspiler(
-        type_map=type_inferrer.type_map,
+        type_map=type_inference.type_map,
         is_optional_map=optional_inferrer.is_optional_map,
-        environment=environment_with_args,
+        environment=type_inference.environment_with_args,
         symbol_table=symbol_table,
         verification=verification,
     )
@@ -751,36 +684,23 @@ def _transpile_invariant(
     environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
-    # NOTE (empwilli, 2024-01-22):
-    # We manually transpile the invariant from our custom syntax without additional
-    # semantic analysis in the :py:mod:`aas_core_codegen.intermediate` layer.
-    #
-    # While this might seem repetitive ("unDRY"), we are still not sure about
-    # the appropriate abstraction. After we implement the code generation for a couple
-    # of languages, we hope to have a much better understanding about the necessary
-    # abstractions.
-
-    canonicalizer = intermediate_type_inference.Canonicalizer()
-    _ = canonicalizer.transform(invariant.body)
-
-    type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table,
-        environment=environment,
-        representation_map=canonicalizer.representation_map,
-    )
-
-    _ = type_inferrer.transform(invariant.body)
-
-    if len(type_inferrer.errors):
-        return None, Error(
-            invariant.parsed.node,
-            "Failed to infer the types in the invariant",
-            type_inferrer.errors,
+    # fmt: off
+    type_map, inference_error = (
+        intermediate_type_inference.infer_for_invariant(
+            invariant=invariant,
+            environment=environment
         )
+    )
+    # fmt: on
+
+    if inference_error is not None:
+        return None, inference_error
+
+    assert type_map is not None
 
     optional_inferrer = java_optional.OptionalInferrer(
         environment=environment,
-        type_map=type_inferrer.type_map,
+        type_map=type_map,
     )
 
     _ = optional_inferrer.transform(invariant.body)
@@ -793,7 +713,7 @@ def _transpile_invariant(
         )
 
     transpiler = _InvariantTranspiler(
-        type_map=type_inferrer.type_map,
+        type_map=type_map,
         is_optional_map=optional_inferrer.is_optional_map,
         environment=environment,
         symbol_table=symbol_table,
@@ -1352,8 +1272,6 @@ def generate(
         elif isinstance(verification, intermediate.PatternVerification):
             implementation, error = _transpile_pattern_verification(
                 verification=verification,
-                symbol_table=symbol_table,
-                environment=base_environment,
                 package=package,
             )
 

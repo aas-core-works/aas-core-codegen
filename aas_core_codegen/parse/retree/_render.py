@@ -22,57 +22,50 @@ from aas_core_codegen.parse.retree._types import (
 )
 from aas_core_codegen.parse.tree import FormattedValue
 
-_ESCAPING_IN_CHARACTER_LITERALS = {
-    "\t": "\\t",
-    "\n": "\\n",
-    "\r": "\\r",
-    "\f": "\\f",
-    "\v": "\\v",
-    ".": "\\.",
-    "^": "\\^",
-    "$": "\\$",
-    "{": "\\{",
-    "}": "\\}",
-    "[": "\\[",
-    "]": "\\]",
-    "(": "\\(",
-    ")": "\\)",
-    "?": "\\?",
-    "*": "\\*",
-    "+": "\\+",
-    "\\": "\\\\",
-}
-
-_ESCAPING_IN_RANGE = {
-    "\t": "\\t",
-    "\n": "\\n",
-    "\r": "\\r",
-    "\f": "\\f",
-    "\v": "\\v",
-    "[": "\\[",
-    "]": "\\]",
-    "\\": "\\\\",
-    "-": "\\-",
-}
-
-
-# fmt: off
-
 
 class Renderer(Transformer[List[Union[str, FormattedValue]]]):
     """Render the regular expression back into a joined string."""
 
+    _ESCAPING_IN_CHARACTER_LITERALS = {
+        "\t": "\\t",
+        "\n": "\\n",
+        "\r": "\\r",
+        "\f": "\\f",
+        "\v": "\\v",
+        ".": "\\.",
+        "^": "\\^",
+        "$": "\\$",
+        "{": "\\{",
+        "}": "\\}",
+        "[": "\\[",
+        "]": "\\]",
+        "(": "\\(",
+        ")": "\\)",
+        "?": "\\?",
+        "*": "\\*",
+        "+": "\\+",
+        "\\": "\\\\",
+    }
+
+    _ESCAPING_IN_RANGE = {
+        "\t": "\\t",
+        "\n": "\\n",
+        "\r": "\\r",
+        "\f": "\\f",
+        "\v": "\\v",
+        "[": "\\[",
+        "]": "\\]",
+        "\\": "\\\\",
+        "-": "\\-",
+    }
+
     @require(
-        lambda escaping:
-        all(
-            len(key) == 1
-            for key in escaping
-        ),
-        "The ``escaping`` works only on characters, not on arbitrary text"
+        lambda escaping: all(len(key) == 1 for key in escaping),
+        "The ``escaping`` works only on characters, not on arbitrary text",
     )
     # fmt: on
     def char_to_str_and_escape_or_encode_if_necessary(
-            self, node: Char, escaping: Mapping[str, str]
+        self, node: Char, escaping: Mapping[str, str]
     ) -> List[Union[str, FormattedValue]]:
         """Convert the ``node`` to a string, and escape and/or encode appropriately."""
         if not node.explicitly_encoded:
@@ -137,7 +130,7 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
         elif isinstance(node.value, Char):
             output.extend(
                 self.char_to_str_and_escape_or_encode_if_necessary(
-                    node=node.value, escaping=_ESCAPING_IN_CHARACTER_LITERALS
+                    node=node.value, escaping=Renderer._ESCAPING_IN_CHARACTER_LITERALS
                 )
             )
         else:
@@ -227,7 +220,7 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
             else:
                 output.extend(
                     self.char_to_str_and_escape_or_encode_if_necessary(
-                        node=a_range.start, escaping=_ESCAPING_IN_RANGE
+                        node=a_range.start, escaping=Renderer._ESCAPING_IN_RANGE
                     )
                 )
 
@@ -236,7 +229,7 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
 
                     output.extend(
                         self.char_to_str_and_escape_or_encode_if_necessary(
-                            node=a_range.end, escaping=_ESCAPING_IN_RANGE
+                            node=a_range.end, escaping=Renderer._ESCAPING_IN_RANGE
                         )
                     )
 

@@ -321,7 +321,7 @@ export function hasSemanticsFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IHasSemantics>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -357,18 +357,6 @@ class SetterForExtension {
   value: string | null = null;
 
   refersTo: Array<AasTypes.Reference> | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link semanticId}.
@@ -677,7 +665,7 @@ export function hasExtensionsFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IHasExtensions>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -729,7 +717,7 @@ export function referableFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IReferable>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -781,7 +769,7 @@ export function identifiableFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IIdentifiable>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -863,7 +851,7 @@ export function hasKindFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IHasKind>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -915,7 +903,7 @@ export function hasDataSpecificationFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IHasDataSpecification>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -949,18 +937,6 @@ class SetterForAdministrativeInformation {
   creator: AasTypes.Reference | null = null;
 
   templateId: string | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link embeddedDataSpecifications}.
@@ -1205,7 +1181,7 @@ export function qualifiableFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IQualifiable>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -1273,18 +1249,6 @@ class SetterForQualifier {
   value: string | null = null;
 
   valueId: AasTypes.Reference | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link semanticId}.
@@ -1582,17 +1546,8 @@ class SetterForAssetAdministrationShell {
 
   submodels: Array<AasTypes.Reference> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -1988,6 +1943,28 @@ class SetterForAssetAdministrationShell {
     this.submodels = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -2066,6 +2043,21 @@ export function assetAdministrationShellFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.AssetAdministrationShell
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "AssetAdministrationShell") {
+    return newDeserializationError<
+      AasTypes.AssetAdministrationShell
+    >(
+      "Expected model type 'AssetAdministrationShell', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.AssetAdministrationShell,
     DeserializationError
@@ -2101,18 +2093,6 @@ class SetterForAssetInformation {
   assetType: string | null = null;
 
   defaultThumbnail: AasTypes.Resource | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link assetKind}.
@@ -2343,18 +2323,6 @@ class SetterForResource {
   contentType: string | null = null;
 
   /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
-
-  /**
    * Parse `jsonable` as the value of {@link path}.
    *
    * @param jsonable - to be parsed
@@ -2519,18 +2487,6 @@ class SetterForSpecificAssetId {
   value: string | null = null;
 
   externalSubjectId: AasTypes.Reference | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link semanticId}.
@@ -2790,17 +2746,8 @@ class SetterForSubmodel {
 
   submodelElements: Array<AasTypes.ISubmodelElement> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -3306,6 +3253,28 @@ class SetterForSubmodel {
     this.submodelElements = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -3376,6 +3345,21 @@ export function submodelFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Submodel
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Submodel") {
+    return newDeserializationError<
+      AasTypes.Submodel
+    >(
+      "Expected model type 'Submodel', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Submodel,
     DeserializationError
@@ -3431,7 +3415,7 @@ export function submodelElementFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.ISubmodelElement>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -3483,7 +3467,7 @@ export function relationshipElementFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IRelationshipElement>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -3530,17 +3514,8 @@ class SetterForRelationshipElement {
 
   second: AasTypes.Reference | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -3971,6 +3946,28 @@ class SetterForRelationshipElement {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -4053,6 +4050,21 @@ function relationshipElementFromJsonableWithoutDispatch(
       AasTypes.RelationshipElement
     >(
       "The required property 'second' is missing"
+    );
+  }
+
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.RelationshipElement
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "RelationshipElement") {
+    return newDeserializationError<
+      AasTypes.RelationshipElement
+    >(
+      "Expected model type 'RelationshipElement', " +
+      `but got: ${setter.modelType}`
     );
   }
 
@@ -4140,17 +4152,8 @@ class SetterForSubmodelElementList {
 
   value: Array<AasTypes.ISubmodelElement> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -4676,6 +4679,28 @@ class SetterForSubmodelElementList {
     this.value = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -4746,6 +4771,21 @@ export function submodelElementListFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.SubmodelElementList
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "SubmodelElementList") {
+    return newDeserializationError<
+      AasTypes.SubmodelElementList
+    >(
+      "Expected model type 'SubmodelElementList', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.SubmodelElementList,
     DeserializationError
@@ -4795,17 +4835,8 @@ class SetterForSubmodelElementCollection {
 
   value: Array<AasTypes.ISubmodelElement> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -5251,6 +5282,28 @@ class SetterForSubmodelElementCollection {
     this.value = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -5313,6 +5366,21 @@ export function submodelElementCollectionFromJsonable(
     }
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.SubmodelElementCollection
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "SubmodelElementCollection") {
+    return newDeserializationError<
+      AasTypes.SubmodelElementCollection
+    >(
+      "Expected model type 'SubmodelElementCollection', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.SubmodelElementCollection,
     DeserializationError
@@ -5365,7 +5433,7 @@ export function dataElementFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IDataElement>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -5414,17 +5482,8 @@ class SetterForProperty {
 
   valueId: AasTypes.Reference | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -5875,6 +5934,28 @@ class SetterForProperty {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -5945,6 +6026,21 @@ export function propertyFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Property
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Property") {
+    return newDeserializationError<
+      AasTypes.Property
+    >(
+      "Expected model type 'Property', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Property,
     DeserializationError
@@ -5994,17 +6090,8 @@ class SetterForMultiLanguageProperty {
 
   valueId: AasTypes.Reference | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -6470,6 +6557,28 @@ class SetterForMultiLanguageProperty {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -6532,6 +6641,21 @@ export function multiLanguagePropertyFromJsonable(
     }
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.MultiLanguageProperty
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "MultiLanguageProperty") {
+    return newDeserializationError<
+      AasTypes.MultiLanguageProperty
+    >(
+      "Expected model type 'MultiLanguageProperty', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.MultiLanguageProperty,
     DeserializationError
@@ -6582,17 +6706,8 @@ class SetterForRange {
 
   max: string | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -7043,6 +7158,28 @@ class SetterForRange {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -7113,6 +7250,21 @@ export function rangeFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Range
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Range") {
+    return newDeserializationError<
+      AasTypes.Range
+    >(
+      "Expected model type 'Range', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Range,
     DeserializationError
@@ -7160,17 +7312,8 @@ class SetterForReferenceElement {
 
   value: AasTypes.Reference | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -7581,6 +7724,28 @@ class SetterForReferenceElement {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -7643,6 +7808,21 @@ export function referenceElementFromJsonable(
     }
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.ReferenceElement
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "ReferenceElement") {
+    return newDeserializationError<
+      AasTypes.ReferenceElement
+    >(
+      "Expected model type 'ReferenceElement', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.ReferenceElement,
     DeserializationError
@@ -7690,17 +7870,8 @@ class SetterForBlob {
 
   contentType: string | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -8131,6 +8302,28 @@ class SetterForBlob {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -8201,6 +8394,21 @@ export function blobFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Blob
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Blob") {
+    return newDeserializationError<
+      AasTypes.Blob
+    >(
+      "Expected model type 'Blob', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Blob,
     DeserializationError
@@ -8249,17 +8457,8 @@ class SetterForFile {
 
   contentType: string | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -8690,6 +8889,28 @@ class SetterForFile {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -8760,6 +8981,21 @@ export function fileFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.File
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "File") {
+    return newDeserializationError<
+      AasTypes.File
+    >(
+      "Expected model type 'File', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.File,
     DeserializationError
@@ -8810,17 +9046,8 @@ class SetterForAnnotatedRelationshipElement {
 
   annotations: Array<AasTypes.IDataElement> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -9306,6 +9533,28 @@ class SetterForAnnotatedRelationshipElement {
     this.annotations = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -9384,6 +9633,21 @@ export function annotatedRelationshipElementFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.AnnotatedRelationshipElement
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "AnnotatedRelationshipElement") {
+    return newDeserializationError<
+      AasTypes.AnnotatedRelationshipElement
+    >(
+      "Expected model type 'AnnotatedRelationshipElement', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.AnnotatedRelationshipElement,
     DeserializationError
@@ -9437,17 +9701,8 @@ class SetterForEntity {
 
   specificAssetIds: Array<AasTypes.SpecificAssetId> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -9988,6 +10243,28 @@ class SetterForEntity {
     this.specificAssetIds = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -10055,6 +10332,21 @@ export function entityFromJsonable(
       AasTypes.Entity
     >(
       "The required property 'entityType' is missing"
+    );
+  }
+
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Entity
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Entity") {
+    return newDeserializationError<
+      AasTypes.Entity
+    >(
+      "Expected model type 'Entity', " +
+      `but got: ${setter.modelType}`
     );
   }
 
@@ -10191,18 +10483,6 @@ class SetterForEventPayload {
   timeStamp: string | null = null;
 
   payload: Uint8Array | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link source}.
@@ -10499,7 +10779,7 @@ export function eventElementFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IEventElement>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -10558,17 +10838,8 @@ class SetterForBasicEventElement {
 
   maxInterval: string | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -11119,6 +11390,28 @@ class SetterForBasicEventElement {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -11205,6 +11498,21 @@ export function basicEventElementFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.BasicEventElement
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "BasicEventElement") {
+    return newDeserializationError<
+      AasTypes.BasicEventElement
+    >(
+      "Expected model type 'BasicEventElement', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.BasicEventElement,
     DeserializationError
@@ -11261,17 +11569,8 @@ class SetterForOperation {
 
   inoutputVariables: Array<AasTypes.OperationVariable> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -11827,6 +12126,28 @@ class SetterForOperation {
     this.inoutputVariables = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -11889,6 +12210,21 @@ export function operationFromJsonable(
     }
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Operation
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Operation") {
+    return newDeserializationError<
+      AasTypes.Operation
+    >(
+      "Expected model type 'Operation', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Operation,
     DeserializationError
@@ -11917,18 +12253,6 @@ export function operationFromJsonable(
  */
 class SetterForOperationVariable {
   value: AasTypes.ISubmodelElement | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link value}.
@@ -12053,17 +12377,8 @@ class SetterForCapability {
 
   embeddedDataSpecifications: Array<AasTypes.EmbeddedDataSpecification> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -12454,6 +12769,28 @@ class SetterForCapability {
     this.embeddedDataSpecifications = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -12516,6 +12853,21 @@ export function capabilityFromJsonable(
     }
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.Capability
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "Capability") {
+    return newDeserializationError<
+      AasTypes.Capability
+    >(
+      "Expected model type 'Capability', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Capability,
     DeserializationError
@@ -12558,17 +12910,8 @@ class SetterForConceptDescription {
 
   isCaseOf: Array<AasTypes.Reference> | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link extensions}.
@@ -12924,6 +13267,28 @@ class SetterForConceptDescription {
     this.isCaseOf = items;
     return null;
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -12994,6 +13359,21 @@ export function conceptDescriptionFromJsonable(
     );
   }
 
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.ConceptDescription
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "ConceptDescription") {
+    return newDeserializationError<
+      AasTypes.ConceptDescription
+    >(
+      "Expected model type 'ConceptDescription', " +
+      `but got: ${setter.modelType}`
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.ConceptDescription,
     DeserializationError
@@ -13053,18 +13433,6 @@ class SetterForReference {
   referredSemanticId: AasTypes.Reference | null = null;
 
   keys: Array<AasTypes.Key> | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link type}.
@@ -13259,18 +13627,6 @@ class SetterForKey {
   type: AasTypes.KeyTypes | null = null;
 
   value: string | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link type}.
@@ -13493,7 +13849,7 @@ export function abstractLangStringFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IAbstractLangString>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -13521,18 +13877,6 @@ class SetterForLangStringNameType {
   language: string | null = null;
 
   text: string | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link language}.
@@ -13673,18 +14017,6 @@ class SetterForLangStringTextType {
   text: string | null = null;
 
   /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
-
-  /**
    * Parse `jsonable` as the value of {@link language}.
    *
    * @param jsonable - to be parsed
@@ -13823,18 +14155,6 @@ class SetterForEnvironment {
   submodels: Array<AasTypes.Submodel> | null = null;
 
   conceptDescriptions: Array<AasTypes.ConceptDescription> | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link assetAdministrationShells}.
@@ -14107,7 +14427,7 @@ export function dataSpecificationContentFromJsonable(
   const modelType = jsonable["modelType"];
   if (modelType === undefined) {
     return newDeserializationError<AasTypes.IDataSpecificationContent>(
-      "Expected the property modelType, but got none"
+      "The required property modelType is missing"
     );
   }
 
@@ -14135,18 +14455,6 @@ class SetterForEmbeddedDataSpecification {
   dataSpecificationContent: AasTypes.IDataSpecificationContent | null = null;
 
   dataSpecification: AasTypes.Reference | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link dataSpecificationContent}.
@@ -14257,6 +14565,14 @@ export function embeddedDataSpecificationFromJsonable(
     );
   }
 
+  if (setter.dataSpecification === null) {
+    return newDeserializationError<
+      AasTypes.EmbeddedDataSpecification
+    >(
+      "The required property 'dataSpecification' is missing"
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.EmbeddedDataSpecification,
     DeserializationError
@@ -14311,18 +14627,6 @@ class SetterForLevelType {
   typ: boolean | null = null;
 
   max: boolean | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link min}.
@@ -14521,18 +14825,6 @@ class SetterForValueReferencePair {
   valueId: AasTypes.Reference | null = null;
 
   /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
-
-  /**
    * Parse `jsonable` as the value of {@link value}.
    *
    * @param jsonable - to be parsed
@@ -14667,18 +14959,6 @@ export function valueReferencePairFromJsonable(
  */
 class SetterForValueList {
   valueReferencePairs: Array<AasTypes.ValueReferencePair> | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link valueReferencePairs}.
@@ -14825,18 +15105,6 @@ class SetterForLangStringPreferredNameTypeIec61360 {
   text: string | null = null;
 
   /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
-
-  /**
    * Parse `jsonable` as the value of {@link language}.
    *
    * @param jsonable - to be parsed
@@ -14975,18 +15243,6 @@ class SetterForLangStringShortNameTypeIec61360 {
   text: string | null = null;
 
   /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
-
-  /**
    * Parse `jsonable` as the value of {@link language}.
    *
    * @param jsonable - to be parsed
@@ -15123,18 +15379,6 @@ class SetterForLangStringDefinitionTypeIec61360 {
   language: string | null = null;
 
   text: string | null = null;
-
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
 
   /**
    * Parse `jsonable` as the value of {@link language}.
@@ -15294,17 +15538,8 @@ class SetterForDataSpecificationIec61360 {
 
   levelType: AasTypes.LevelType | null = null;
 
-  /**
-   * Ignore `jsonable` and do not set anything.
-   *
-   * @param jsonable - to be ignored instead of set
-   * @returns error, if any
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ignore(jsonable: JsonValue): DeserializationError | null {
-    // Intentionally empty.
-    return null;
-  }
+  // Used only for verification, not for dispatch!
+  modelType: string | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link preferredName}.
@@ -15650,6 +15885,28 @@ class SetterForDataSpecificationIec61360 {
       return null;
     }
   }
+
+  /**
+   * Parse `jsonable` as the model type of the concrete instance.
+   *
+   * This is intended only for verification, and no dispatch is performed.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setModelTypeFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = stringFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.modelType = parsedOrError.mustValue();
+      return null;
+    }
+  }
 }
 
 /**
@@ -15717,6 +15974,21 @@ export function dataSpecificationIec61360FromJsonable(
       AasTypes.DataSpecificationIec61360
     >(
       "The required property 'preferredName' is missing"
+    );
+  }
+
+  if (setter.modelType === null) {
+    return newDeserializationError<
+      AasTypes.DataSpecificationIec61360
+    >(
+      "The required property 'modelType' is missing"
+    );
+  } else if (setter.modelType != "DataSpecificationIec61360") {
+    return newDeserializationError<
+      AasTypes.DataSpecificationIec61360
+    >(
+      "Expected model type 'DataSpecificationIec61360', " +
+      `but got: ${setter.modelType}`
     );
   }
 
@@ -15858,10 +16130,6 @@ const SETTER_MAP_FOR_EXTENSION =
         "refersTo",
         SetterForExtension.prototype.setRefersToFromJsonable
       ],
-      [
-        "modelType",
-        SetterForExtension.prototype.ignore
-      ]
     ]
   );
 
@@ -16177,10 +16445,6 @@ const SETTER_MAP_FOR_ADMINISTRATIVE_INFORMATION =
         "templateId",
         SetterForAdministrativeInformation.prototype.setTemplateIdFromJsonable
       ],
-      [
-        "modelType",
-        SetterForAdministrativeInformation.prototype.ignore
-      ]
     ]
   );
 
@@ -16292,10 +16556,6 @@ const SETTER_MAP_FOR_QUALIFIER =
         "valueId",
         SetterForQualifier.prototype.setValueIdFromJsonable
       ],
-      [
-        "modelType",
-        SetterForQualifier.prototype.ignore
-      ]
     ]
   );
 
@@ -16352,9 +16612,10 @@ const SETTER_MAP_FOR_ASSET_ADMINISTRATION_SHELL =
         SetterForAssetAdministrationShell.prototype.setSubmodelsFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForAssetAdministrationShell.prototype.ignore
-      ]
+        SetterForAssetAdministrationShell.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -16386,10 +16647,6 @@ const SETTER_MAP_FOR_ASSET_INFORMATION =
         "defaultThumbnail",
         SetterForAssetInformation.prototype.setDefaultThumbnailFromJsonable
       ],
-      [
-        "modelType",
-        SetterForAssetInformation.prototype.ignore
-      ]
     ]
   );
 
@@ -16409,10 +16666,6 @@ const SETTER_MAP_FOR_RESOURCE =
         "contentType",
         SetterForResource.prototype.setContentTypeFromJsonable
       ],
-      [
-        "modelType",
-        SetterForResource.prototype.ignore
-      ]
     ]
   );
 
@@ -16444,10 +16697,6 @@ const SETTER_MAP_FOR_SPECIFIC_ASSET_ID =
         "externalSubjectId",
         SetterForSpecificAssetId.prototype.setExternalSubjectIdFromJsonable
       ],
-      [
-        "modelType",
-        SetterForSpecificAssetId.prototype.ignore
-      ]
     ]
   );
 
@@ -16512,9 +16761,10 @@ const SETTER_MAP_FOR_SUBMODEL =
         SetterForSubmodel.prototype.setSubmodelElementsFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForSubmodel.prototype.ignore
-      ]
+        SetterForSubmodel.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -16659,9 +16909,10 @@ const SETTER_MAP_FOR_RELATIONSHIP_ELEMENT =
         SetterForRelationshipElement.prototype.setSecondFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForRelationshipElement.prototype.ignore
-      ]
+        SetterForRelationshipElement.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -16730,9 +16981,10 @@ const SETTER_MAP_FOR_SUBMODEL_ELEMENT_LIST =
         SetterForSubmodelElementList.prototype.setValueFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForSubmodelElementList.prototype.ignore
-      ]
+        SetterForSubmodelElementList.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -16785,9 +17037,10 @@ const SETTER_MAP_FOR_SUBMODEL_ELEMENT_COLLECTION =
         SetterForSubmodelElementCollection.prototype.setValueFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForSubmodelElementCollection.prototype.ignore
-      ]
+        SetterForSubmodelElementCollection.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -16884,9 +17137,10 @@ const SETTER_MAP_FOR_PROPERTY =
         SetterForProperty.prototype.setValueIdFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForProperty.prototype.ignore
-      ]
+        SetterForProperty.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -16943,9 +17197,10 @@ const SETTER_MAP_FOR_MULTI_LANGUAGE_PROPERTY =
         SetterForMultiLanguageProperty.prototype.setValueIdFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForMultiLanguageProperty.prototype.ignore
-      ]
+        SetterForMultiLanguageProperty.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17006,9 +17261,10 @@ const SETTER_MAP_FOR_RANGE =
         SetterForRange.prototype.setMaxFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForRange.prototype.ignore
-      ]
+        SetterForRange.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17061,9 +17317,10 @@ const SETTER_MAP_FOR_REFERENCE_ELEMENT =
         SetterForReferenceElement.prototype.setValueFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForReferenceElement.prototype.ignore
-      ]
+        SetterForReferenceElement.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17120,9 +17377,10 @@ const SETTER_MAP_FOR_BLOB =
         SetterForBlob.prototype.setContentTypeFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForBlob.prototype.ignore
-      ]
+        SetterForBlob.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17179,9 +17437,10 @@ const SETTER_MAP_FOR_FILE =
         SetterForFile.prototype.setContentTypeFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForFile.prototype.ignore
-      ]
+        SetterForFile.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17242,9 +17501,10 @@ const SETTER_MAP_FOR_ANNOTATED_RELATIONSHIP_ELEMENT =
         SetterForAnnotatedRelationshipElement.prototype.setAnnotationsFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForAnnotatedRelationshipElement.prototype.ignore
-      ]
+        SetterForAnnotatedRelationshipElement.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17309,9 +17569,10 @@ const SETTER_MAP_FOR_ENTITY =
         SetterForEntity.prototype.setSpecificAssetIdsFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForEntity.prototype.ignore
-      ]
+        SetterForEntity.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17355,10 +17616,6 @@ const SETTER_MAP_FOR_EVENT_PAYLOAD =
         "payload",
         SetterForEventPayload.prototype.setPayloadFromJsonable
       ],
-      [
-        "modelType",
-        SetterForEventPayload.prototype.ignore
-      ]
     ]
   );
 
@@ -17455,9 +17712,10 @@ const SETTER_MAP_FOR_BASIC_EVENT_ELEMENT =
         SetterForBasicEventElement.prototype.setMaxIntervalFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForBasicEventElement.prototype.ignore
-      ]
+        SetterForBasicEventElement.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17518,9 +17776,10 @@ const SETTER_MAP_FOR_OPERATION =
         SetterForOperation.prototype.setInoutputVariablesFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForOperation.prototype.ignore
-      ]
+        SetterForOperation.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17536,10 +17795,6 @@ const SETTER_MAP_FOR_OPERATION_VARIABLE =
         "value",
         SetterForOperationVariable.prototype.setValueFromJsonable
       ],
-      [
-        "modelType",
-        SetterForOperationVariable.prototype.ignore
-      ]
     ]
   );
 
@@ -17588,9 +17843,10 @@ const SETTER_MAP_FOR_CAPABILITY =
         SetterForCapability.prototype.setEmbeddedDataSpecificationsFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForCapability.prototype.ignore
-      ]
+        SetterForCapability.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17639,9 +17895,10 @@ const SETTER_MAP_FOR_CONCEPT_DESCRIPTION =
         SetterForConceptDescription.prototype.setIsCaseOfFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForConceptDescription.prototype.ignore
-      ]
+        SetterForConceptDescription.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -17665,10 +17922,6 @@ const SETTER_MAP_FOR_REFERENCE =
         "keys",
         SetterForReference.prototype.setKeysFromJsonable
       ],
-      [
-        "modelType",
-        SetterForReference.prototype.ignore
-      ]
     ]
   );
 
@@ -17688,10 +17941,6 @@ const SETTER_MAP_FOR_KEY =
         "value",
         SetterForKey.prototype.setValueFromJsonable
       ],
-      [
-        "modelType",
-        SetterForKey.prototype.ignore
-      ]
     ]
   );
 
@@ -17743,10 +17992,6 @@ const SETTER_MAP_FOR_LANG_STRING_NAME_TYPE =
         "text",
         SetterForLangStringNameType.prototype.setTextFromJsonable
       ],
-      [
-        "modelType",
-        SetterForLangStringNameType.prototype.ignore
-      ]
     ]
   );
 
@@ -17766,10 +18011,6 @@ const SETTER_MAP_FOR_LANG_STRING_TEXT_TYPE =
         "text",
         SetterForLangStringTextType.prototype.setTextFromJsonable
       ],
-      [
-        "modelType",
-        SetterForLangStringTextType.prototype.ignore
-      ]
     ]
   );
 
@@ -17793,10 +18034,6 @@ const SETTER_MAP_FOR_ENVIRONMENT =
         "conceptDescriptions",
         SetterForEnvironment.prototype.setConceptDescriptionsFromJsonable
       ],
-      [
-        "modelType",
-        SetterForEnvironment.prototype.ignore
-      ]
     ]
   );
 
@@ -17832,10 +18069,6 @@ const SETTER_MAP_FOR_EMBEDDED_DATA_SPECIFICATION =
         "dataSpecification",
         SetterForEmbeddedDataSpecification.prototype.setDataSpecificationFromJsonable
       ],
-      [
-        "modelType",
-        SetterForEmbeddedDataSpecification.prototype.ignore
-      ]
     ]
   );
 
@@ -17863,10 +18096,6 @@ const SETTER_MAP_FOR_LEVEL_TYPE =
         "max",
         SetterForLevelType.prototype.setMaxFromJsonable
       ],
-      [
-        "modelType",
-        SetterForLevelType.prototype.ignore
-      ]
     ]
   );
 
@@ -17886,10 +18115,6 @@ const SETTER_MAP_FOR_VALUE_REFERENCE_PAIR =
         "valueId",
         SetterForValueReferencePair.prototype.setValueIdFromJsonable
       ],
-      [
-        "modelType",
-        SetterForValueReferencePair.prototype.ignore
-      ]
     ]
   );
 
@@ -17905,10 +18130,6 @@ const SETTER_MAP_FOR_VALUE_LIST =
         "valueReferencePairs",
         SetterForValueList.prototype.setValueReferencePairsFromJsonable
       ],
-      [
-        "modelType",
-        SetterForValueList.prototype.ignore
-      ]
     ]
   );
 
@@ -17928,10 +18149,6 @@ const SETTER_MAP_FOR_LANG_STRING_PREFERRED_NAME_TYPE_IEC_61360 =
         "text",
         SetterForLangStringPreferredNameTypeIec61360.prototype.setTextFromJsonable
       ],
-      [
-        "modelType",
-        SetterForLangStringPreferredNameTypeIec61360.prototype.ignore
-      ]
     ]
   );
 
@@ -17951,10 +18168,6 @@ const SETTER_MAP_FOR_LANG_STRING_SHORT_NAME_TYPE_IEC_61360 =
         "text",
         SetterForLangStringShortNameTypeIec61360.prototype.setTextFromJsonable
       ],
-      [
-        "modelType",
-        SetterForLangStringShortNameTypeIec61360.prototype.ignore
-      ]
     ]
   );
 
@@ -17974,10 +18187,6 @@ const SETTER_MAP_FOR_LANG_STRING_DEFINITION_TYPE_IEC_61360 =
         "text",
         SetterForLangStringDefinitionTypeIec61360.prototype.setTextFromJsonable
       ],
-      [
-        "modelType",
-        SetterForLangStringDefinitionTypeIec61360.prototype.ignore
-      ]
     ]
   );
 
@@ -18038,9 +18247,10 @@ const SETTER_MAP_FOR_DATA_SPECIFICATION_IEC_61360 =
         SetterForDataSpecificationIec61360.prototype.setLevelTypeFromJsonable
       ],
       [
+        // The model type here is used only for verification, not for dispatch.
         "modelType",
-        SetterForDataSpecificationIec61360.prototype.ignore
-      ]
+        SetterForDataSpecificationIec61360.prototype.setModelTypeFromJsonable
+      ],
     ]
   );
 
@@ -20323,10 +20533,8 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     jsonable["dataSpecificationContent"] =
       this.transform(that.dataSpecificationContent);
 
-    if (that.dataSpecification !== null) {
-      jsonable["dataSpecification"] =
-        this.transform(that.dataSpecification);
-    }
+    jsonable["dataSpecification"] =
+      this.transform(that.dataSpecification);
 
     return jsonable;
   }

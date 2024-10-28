@@ -1,0 +1,9 @@
+# ^0x[A-Fa-f0-9]$
+{
+  char '0'
+  char 'x'
+  set '0-9A-Fa-f'
+  # $
+  end
+  match
+}

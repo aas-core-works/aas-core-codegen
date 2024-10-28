@@ -471,7 +471,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
             @verification
             def verify_something(text: str) -> bool:
                 """Verify something."""
-                return match(r'.*', text) is not None
+                return match(r'^.*$', text) is not None
 
             __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"

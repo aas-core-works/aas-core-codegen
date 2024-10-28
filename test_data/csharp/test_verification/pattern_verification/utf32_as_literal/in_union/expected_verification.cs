@@ -22,7 +22,7 @@ namespace dummyNamespace
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchSomething()
         {
-            var pattern = "^\\ud800\\udc00|something$";
+            var pattern = "^(\\ud800\\udc00|something)$";
 
             return new Regex(pattern);
         }

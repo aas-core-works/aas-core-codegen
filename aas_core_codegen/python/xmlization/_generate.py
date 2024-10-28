@@ -528,6 +528,277 @@ def {function_name}(
     )
 
 
+def _generate_read_from_iterparse(
+    aas_module: python_common.QualifiedModuleName,
+) -> Stripped:
+    """Generate the general read function to parse an instance from iterparse."""
+    function_name = "from_iterparse"
+
+    return Stripped(
+        f"""\
+def {function_name}(
+{I}iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Class:
+{I}\"\"\"
+{I}Read an instance from the :paramref:`iterator`.
+
+{I}The type of the instance is determined by the very first start element.
+
+{I}Example usage:
+
+{I}.. code-block::
+
+{I}    import pathlib
+{I}    import xml.etree.ElementTree as ET
+
+{I}    import {aas_module}.xmlization as aas_xmlization
+
+{I}    path = pathlib.Path(...)
+{I}    with path.open("rt") as fid:
+{I}        iterator = ET.iterparse(
+{I}            source=fid,
+{I}            events=['start', 'end']
+{I}        )
+{I}        instance = aas_xmlization.{function_name}(
+{I}            iterator
+{I}        )
+
+{I}    # Do something with the ``instance``
+
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return:
+{II}Instance of :py:class:`.types.Class` read from the :paramref:`iterator`
+{I}\"\"\"
+{I}next_event_element = next(iterator, None)
+{I}if next_event_element is None:
+{II}raise DeserializationException(
+{III}# fmt: off
+{III}"Expected the start element of an instance, "
+{III}"but got the end-of-input"
+{III}# fmt: on
+{II})
+
+{I}next_event, next_element = next_event_element
+{I}if next_event != 'start':
+{II}raise DeserializationException(
+{III}f"Expected the start element of an instance, "
+{III}f"but got event {{next_event!r}} and element {{next_element.tag!r}}"
+{II})
+
+{I}try:
+{II}return _read_as_element(
+{III}next_element,
+{III}iterator
+{II})
+{I}except DeserializationException as exception:
+{II}exception.path._prepend(ElementSegment(next_element))
+{II}raise exception"""
+    )
+
+
+def _generate_read_from_stream(
+    aas_module: python_common.QualifiedModuleName,
+) -> Stripped:
+    """Generate the general read function to parse an instance from a text stream."""
+    function_name = python_naming.function_name(Identifier("from_stream"))
+
+    return Stripped(
+        f"""\
+def {function_name}(
+{I}stream: TextIO,
+{I}has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Class:
+{I}\"\"\"
+{I}Read an instance from the :paramref:`stream`.
+
+{I}The type of the instance is determined by the very first start element.
+
+{I}Example usage:
+
+{I}.. code-block::
+
+{I}    import {aas_module}.xmlization as aas_xmlization
+
+{I}    with open_some_stream_over_network(...) as stream:
+{I}        instance = aas_xmlization.{function_name}(
+{I}            stream
+{I}        )
+
+{I}    # Do something with the ``instance``
+
+{I}:param stream:
+{II}representing an instance in XML
+{I}:param has_iterparse:
+{II}Module containing ``iterparse`` function.
+
+{II}Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+{II}library. If you have to deal with malicious input, consider using
+{II}a library such as `defusedxml.ElementTree`_.
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return:
+{II}Instance read from :paramref:`stream`
+{I}\"\"\"
+{I}iterator = has_iterparse.iterparse(
+{II}stream,
+{II}['start', 'end']
+{I})
+{I}return from_iterparse(
+{II}_with_elements_cleared_after_yield(iterator)
+{I})"""
+    )
+
+
+def _generate_read_from_file(aas_module: python_common.QualifiedModuleName) -> Stripped:
+    """Generate the general read function to parse an instance from a file."""
+    function_name = python_naming.function_name(Identifier("from_file"))
+
+    return Stripped(
+        f"""\
+def {function_name}(
+{I}path: PathLike,
+{I}has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Class:
+{I}\"\"\"
+{I}Read an instance from the file at the :paramref:`path`.
+
+{I}Example usage:
+
+{I}.. code-block::
+
+{I}    import pathlib
+{I}    import {aas_module}.xmlization as aas_xmlization
+
+{I}    path = pathlib.Path(...)
+{I}    instance = aas_xmlization.{function_name}(
+{I}        path
+{I}    )
+
+{I}    # Do something with the ``instance``
+
+{I}:param path:
+{II}to the file representing an instance in XML
+{I}:param has_iterparse:
+{II}Module containing ``iterparse`` function.
+
+{II}Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+{II}library. If you have to deal with malicious input, consider using
+{II}a library such as `defusedxml.ElementTree`_.
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return:
+{II}Instance read from the file at :paramref:`path`
+{I}\"\"\"
+{I}with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+{II}iterator = has_iterparse.iterparse(
+{III}fid,
+{III}['start', 'end']
+{II})
+{II}return from_iterparse(
+{III}_with_elements_cleared_after_yield(iterator)
+{II})"""
+    )
+
+
+def _generate_read_from_str(aas_module: python_common.QualifiedModuleName) -> Stripped:
+    """Generate the general read function to parse an instance from a string."""
+    function_name = python_naming.function_name(Identifier("from_str"))
+
+    return Stripped(
+        f"""\
+def {function_name}(
+{I}text: str,
+{I}has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Class:
+{I}\"\"\"
+{I}Read an instance from the :paramref:`text`.
+
+{I}Example usage:
+
+{I}.. code-block::
+
+{I}    import pathlib
+{I}    import {aas_module}.xmlization as aas_xmlization
+
+{I}    text = "<...>...</...>"
+{I}    instance = aas_xmlization.{function_name}(
+{I}        text
+{I}    )
+
+{I}    # Do something with the ``instance``
+
+{I}:param text:
+{II}representing an instance in XML
+{I}:param has_iterparse:
+{II}Module containing ``iterparse`` function.
+
+{II}Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+{II}library. If you have to deal with malicious input, consider using
+{II}a library such as `defusedxml.ElementTree`_.
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return:
+{II}Instance read from :paramref:`text`
+{I}\"\"\"
+{I}iterator = has_iterparse.iterparse(
+{II}io.StringIO(text),
+{II}['start', 'end']
+{I})
+{I}return from_iterparse(
+{II}_with_elements_cleared_after_yield(iterator)
+{I})"""
+    )
+
+
+def _generate_general_read_as_element(
+    symbol_table: intermediate.SymbolTable,
+) -> Stripped:
+    """Generate the general read function to dispatch on concrete classes."""
+    dispatch_map = python_naming.private_constant_name(Identifier("general_dispatch"))
+
+    body = Stripped(
+        f"""\
+tag_wo_ns = _parse_element_tag(element)
+read_as_sequence = {dispatch_map}.get(
+{I}tag_wo_ns,
+{I}None
+)
+
+if read_as_sequence is None:
+{I}raise DeserializationException(
+{II}f"Expected the element tag to be a valid model type "
+{II}f"of a concrete instance, "
+{II}f"but got tag {{tag_wo_ns!r}}"
+{I})
+
+return read_as_sequence(
+{I}element,
+{I}iterator
+)"""
+    )
+
+    return Stripped(
+        f"""\
+def _read_as_element(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Class:
+{I}\"\"\"
+{I}Read an instance from :paramref:`iterator`, including the end element.
+
+{I}:param element: start element
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return: parsed instance
+{I}\"\"\"
+{I}{indent_but_first_line(body, I)}"""
+    )
+
+
 _READ_FUNCTION_BY_PRIMITIVE_TYPE = {
     intermediate.PrimitiveType.BOOL: "_read_bool_from_element_text",
     intermediate.PrimitiveType.INT: "_read_int_from_element_text",
@@ -1058,6 +1329,54 @@ def _generate_dispatch_map_for_class(
 
         xml_name_literal = python_common.string_literal(
             naming.xml_class_name(dispatch_class.name)
+        )
+
+        mapping_writer.write(
+            f"""\
+{I}{xml_name_literal}: {read_as_sequence_name},
+"""
+        )
+
+    mapping_writer.write("}")
+
+    return Stripped(mapping_writer.getvalue())
+
+
+def _generate_general_dispatch_map(symbol_table: intermediate.SymbolTable) -> Stripped:
+    """Generate the general mapping model type 🠒 read-as-sequence function."""
+    mapping_name = python_naming.private_constant_name(Identifier("general_dispatch"))
+
+    mapping_writer = io.StringIO()
+
+    mapping_writer.write(
+        """\
+#: Dispatch XML class names to read-as-sequence functions
+#: corresponding to the concrete classes
+"""
+    )
+
+    mapping_writer.write(
+        f"""\
+{mapping_name}: Mapping[
+{I}str,
+{I}Callable[
+{II}[
+{III}Element,
+{III}Iterator[Tuple[str, Element]]
+{II}],
+{II}aas_types.Class
+{I}]
+] = {{
+"""
+    )
+
+    for concrete_cls in symbol_table.concrete_classes:
+        read_as_sequence_name = python_naming.private_function_name(
+            Identifier(f"read_{concrete_cls.name}_as_sequence")
+        )
+
+        xml_name_literal = python_common.string_literal(
+            naming.xml_class_name(concrete_cls.name)
         )
 
         mapping_writer.write(
@@ -2200,6 +2519,15 @@ def _with_elements_cleared_after_yield(
 
     blocks.extend(
         [
+            _generate_read_from_iterparse(aas_module=aas_module),
+            _generate_read_from_stream(aas_module=aas_module),
+            _generate_read_from_file(aas_module=aas_module),
+            _generate_read_from_str(aas_module=aas_module),
+        ]
+    )
+
+    blocks.extend(
+        [
             Stripped(
                 """\
 # NOTE (mristin, 2022-10-08):
@@ -2595,6 +2923,8 @@ def _read_bytes_from_element_text(
         else:
             assert_never(our_type)
 
+    blocks.append(_generate_general_read_as_element(symbol_table=symbol_table))
+
     for cls in symbol_table.classes:
         if isinstance(cls, intermediate.AbstractClass):
             blocks.append(_generate_dispatch_map_for_class(cls=cls))
@@ -2607,6 +2937,8 @@ def _read_bytes_from_element_text(
 
         else:
             assert_never(cls)
+
+    blocks.append(_generate_general_dispatch_map(symbol_table=symbol_table))
 
     blocks.append(Stripped("# endregion"))
 

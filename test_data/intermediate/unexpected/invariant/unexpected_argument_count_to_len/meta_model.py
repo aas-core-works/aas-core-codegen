@@ -12,7 +12,7 @@ class Item:
 class Something:
     some_property: List[Item]
 
-    def __init__(self, some_property: Item) -> None:
+    def __init__(self, some_property: List[Item]) -> None:
         self.some_property = some_property
 
 

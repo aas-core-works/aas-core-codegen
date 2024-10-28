@@ -79,6 +79,11 @@ def json_property(identifier: Identifier) -> Identifier:
 @ensure(
     lambda result: "_" not in result
 ) # This post-condition avoids naming conflicts with prefixing in the JSON schema.
+@ensure(
+    lambda result: '"' not in result and "'" not in result and '\\' not in result
+    # This post-condition simplifies a lot of generator code since we can simply in-line
+    # the model type in strings.
+)
 # fmt: on
 def json_model_type(identifier: Identifier) -> Identifier:
     """

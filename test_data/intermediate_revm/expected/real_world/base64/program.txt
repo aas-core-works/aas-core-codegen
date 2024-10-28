@@ -1,0 +1,118 @@
+    # ^(([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?)*(([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/])|[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[AEIMQUYcgkosw048]\x20?=|[A-Za-z0-9+/]\x20?[AQgw]\x20?= ?=))?$
+    {
+      # (([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?)*(([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/])|[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[AEIMQUYcgkosw048]\x20?=|[A-Za-z0-9+/]\x20?[AQgw]\x20?= ?=))?
+      {
+        split 1, 49
+        # ([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?)*(([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/])|[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[AEIMQUYcgkosw048]\x20?=|[A-Za-z0-9+/]\x20?[AQgw]\x20?= ?=)
+        {
+          # ([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?)*
+          {
+01:         split 2, 15
+            # [A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?
+            {
+02:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 4, 5
+04:             char ' '
+              }
+05:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 7, 8
+07:             char ' '
+              }
+08:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 10, 11
+10:             char ' '
+              }
+11:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 13, 14
+13:             char ' '
+              }
+            }
+14:         jump 1
+          }
+          # ([A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/])|[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[AEIMQUYcgkosw048]\x20?=|[A-Za-z0-9+/]\x20?[AQgw]\x20?= ?=
+          {
+15:         split 16, 27
+            # [A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[A-Za-z0-9+/]
+            {
+16:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 18, 19
+18:             char ' '
+              }
+19:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 21, 22
+21:             char ' '
+              }
+22:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 24, 25
+24:             char ' '
+              }
+25:           set '+/0-9A-Za-z'
+            }
+            jump 49
+27:         split 28, 39
+            # [A-Za-z0-9+/]\x20?[A-Za-z0-9+/]\x20?[AEIMQUYcgkosw048]\x20?=
+            {
+28:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 30, 31
+30:             char ' '
+              }
+31:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 33, 34
+33:             char ' '
+              }
+34:           set '048AEIMQUYcgkosw'
+              # \x20?
+              {
+                split 36, 37
+36:             char ' '
+              }
+37:           char '='
+            }
+            jump 49
+            # [A-Za-z0-9+/]\x20?[AQgw]\x20?= ?=
+            {
+39:           set '+/0-9A-Za-z'
+              # \x20?
+              {
+                split 41, 42
+41:             char ' '
+              }
+42:           set 'AQgw'
+              # \x20?
+              {
+                split 44, 45
+44:             char ' '
+              }
+45:           char '='
+              #  ?
+              {
+                split 47, 48
+47:             char ' '
+              }
+48:           char '='
+            }
+          }
+        }
+      }
+      # $
+49:   end
+      match
+    }

@@ -23,6 +23,7 @@ from aas_core_codegen.csharp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
 
 
@@ -84,7 +85,7 @@ var obj = node as Nodes.JsonObject;
 if (obj == null)
 {{
 {I}error = new Reporting.Error(
-{II}"Expected Nodes.JsonObject, but got {{node.GetType()}}");
+{II}$"Expected Nodes.JsonObject, but got {{node.GetType()}}");
 {I}return null;
 }}"""
         ),
@@ -335,6 +336,42 @@ foreach (Nodes.JsonNode? item in {array_var})
     else:
         assert_never(arg.type_annotation)
 
+    # NOTE (mristin):
+    # We need to add a prologue to the parsing body to explicitly check for null
+    # values as the null values are not allowed for optional properties by
+    # specification.
+    if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+        parse_block = Stripped(
+            f"""\
+if (keyValue.Value == null)
+{{
+{I}error = new Reporting.Error(
+{II}"Expected optional property to be absent, " +
+{II}"but got null instead");
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
+}}
+
+{parse_block}"""
+        )
+    else:
+        parse_block = Stripped(
+            f"""\
+if (keyValue.Value == null)
+{{
+{I}error = new Reporting.Error(
+{II}"Unexpected null for a required property");
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
+}}
+
+{parse_block}"""
+        )
+
     return parse_block, None
 
 
@@ -381,6 +418,9 @@ if (obj == null)
 
     blocks.append(Stripped(args_init_writer.getvalue()))
 
+    if cls.serialization.with_model_type:
+        blocks.append(Stripped("string? modelType = null;"))
+
     # endregion
 
     # region Switch on property name
@@ -394,21 +434,11 @@ if (obj == null)
             assert case_body is not None
             json_name = naming.json_property(arg.name)
 
-            # NOTE (mristin, 2022-07-23):
-            # We put ``if (keyValue.Value != null)`` here instead of the outer loop
-            # since we want to detect the unexpected additional properties even
-            # though their value can be set to null.
-
             cases.append(
                 Stripped(
                     f"""\
 case {csharp_common.string_literal(json_name)}:
 {{
-{I}if (keyValue.Value == null)
-{I}{{
-{II}continue;
-{I}}}
-
 {I}{indent_but_first_line(case_body, I)}
 {I}break;
 }}"""
@@ -419,11 +449,42 @@ case {csharp_common.string_literal(json_name)}:
         return None, errors
 
     if cls.serialization.with_model_type:
+        model_type = naming.json_model_type(cls.name)
+
         cases.append(
             Stripped(
-                """\
+                f"""\
 case "modelType":
-    continue;"""
+{I}{{
+{II}if (keyValue.Value == null)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected a model type, but got null");
+{III}return null;
+{II}}}
+{II}modelType = DeserializeImplementation.StringFrom(
+{III}keyValue.Value,
+{III}out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment(
+{IIIII}"modelType"));
+{III}return null;
+{II}}}
+
+{II}if (modelType != "{model_type}")
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected the model type '{model_type}', " +
+{IIII}$"but got {{modelType}}");
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment(
+{IIIII}"modelType"));
+{III}return null;
+{II}}}
+{II}break;
+{I}}}"""
             )
         )
 
@@ -481,6 +542,19 @@ if ({arg_var} == null)
         )
 
     blocks.append(Stripped(required_check_writer.getvalue()))
+
+    if cls.serialization.with_model_type:
+        blocks.append(
+            Stripped(
+                f"""\
+if (modelType == null)
+{{
+{I}error = new Reporting.Error(
+{II}"Required property \\"modelType\\" is missing");
+{I}return null;
+}}"""
+            )
+        )
 
     # endregion
 

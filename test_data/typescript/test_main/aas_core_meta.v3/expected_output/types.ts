@@ -9941,7 +9941,7 @@ export class EmbeddedDataSpecification extends Class {
   /**
    * Reference to the data specification
    */
-  dataSpecification: Reference | null;
+  dataSpecification: Reference;
 
   /**
    * Iterate over the instances referenced from this instance.
@@ -9953,9 +9953,7 @@ export class EmbeddedDataSpecification extends Class {
   *descendOnce(): IterableIterator<Class> {
     yield this.dataSpecificationContent;
 
-    if (this.dataSpecification !== null) {
-      yield this.dataSpecification;
-    }
+    yield this.dataSpecification;
   }
 
   /**
@@ -9968,11 +9966,9 @@ export class EmbeddedDataSpecification extends Class {
 
     yield * this.dataSpecificationContent.descend();
 
-    if (this.dataSpecification !== null) {
-      yield this.dataSpecification;
+    yield this.dataSpecification;
 
-      yield * this.dataSpecification.descend();
-    }
+    yield * this.dataSpecification.descend();
   }
 
   /**
@@ -10029,7 +10025,7 @@ export class EmbeddedDataSpecification extends Class {
 
   constructor(
     dataSpecificationContent: IDataSpecificationContent,
-    dataSpecification: Reference | null = null
+    dataSpecification: Reference
   ) {
     super();
     this.dataSpecificationContent = dataSpecificationContent;

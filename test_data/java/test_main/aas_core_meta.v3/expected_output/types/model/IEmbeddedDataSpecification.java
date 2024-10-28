@@ -26,7 +26,7 @@ public interface IEmbeddedDataSpecification extends IClass {
   /**
    * Reference to the data specification
    */
-  Optional<IReference> getDataSpecification();
+  IReference getDataSpecification();
 
   void setDataSpecification(IReference dataSpecification);
 }

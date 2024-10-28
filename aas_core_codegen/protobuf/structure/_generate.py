@@ -9,13 +9,11 @@ from typing import (
     Tuple,
     cast,
     Union,
-    Set,
 )
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen import specific_implementations
 from aas_core_codegen.common import (
     Error,
     Identifier,
@@ -302,21 +300,14 @@ def _generate_enum(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
-) -> Tuple[Optional[Stripped], Optional[Error], List[intermediate.AbstractClass],]:
+) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate ProtoBuf code for the given concrete class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
-    required_choice_object = []  # type: List[intermediate.AbstractClass]
-
     # region Getters and setters
-    for i, prop in enumerate(
-        set(cls.properties).union(
-            set(cls.interface.properties if cls.interface is not None else [])
-        )
-    ):
+    for i, prop in enumerate(cls.properties):
         prop_type = proto_common.generate_type(type_annotation=prop.type_annotation)
-
         prop_name = proto_naming.property_name(prop.name)
 
         prop_blocks = []  # type: List[Stripped]
@@ -335,57 +326,13 @@ def _generate_class(
                         f"for the property {prop.name!r}",
                         prop_comment_errors,
                     ),
-                    [],
                 )
 
             assert prop_comment is not None
 
             prop_blocks.append(prop_comment)
 
-        # lists of our types where our types are abstract/interfaces
-        if (
-            isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
-            and isinstance(prop.type_annotation.items, intermediate.OurTypeAnnotation)
-            and isinstance(
-                prop.type_annotation.items.our_type,
-                (intermediate.Interface, intermediate.AbstractClass),
-            )
-        ):
-            # -> must create a new message (choice object) since "oneof"
-            # and "repeated" do not go together
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
-            required_choice_object.append(prop.type_annotation.items.our_type)
-
-        # optional lists of our types where our types are abstract/interfaces
-        elif (
-            isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-            and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation)
-            and isinstance(
-                prop.type_annotation.value.items, intermediate.OurTypeAnnotation
-            )
-            and isinstance(
-                prop.type_annotation.value.items.our_type,
-                (intermediate.Interface, intermediate.AbstractClass),
-            )
-        ):
-            # -> same as the case before
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
-            required_choice_object.append(prop.type_annotation.value.items.our_type)
-
-        # our types where our types are abstract/interfaces
-        elif isinstance(
-            prop.type_annotation, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            prop.type_annotation.our_type,
-            (intermediate.Interface, intermediate.AbstractClass),
-        ):
-            # -> must use "oneof"
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
-            required_choice_object.append(prop.type_annotation.our_type)
-
-        else:
-            # just a normal property with type
-            prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
+        prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
 
         blocks.append(Stripped("\n".join(prop_blocks)))
 
@@ -407,7 +354,6 @@ def _generate_class(
                     "Failed to generate the comment description",
                     comment_errors,
                 ),
-                [],
             )
 
         assert comment is not None
@@ -425,19 +371,52 @@ def _generate_class(
 
     writer.write("\n}")
 
-    return Stripped(writer.getvalue()), None, required_choice_object
+    return Stripped(writer.getvalue()), None
 
 
-def _generate_choice_class(cls: intermediate.AbstractClass) -> str:
-    msg_header = f"message {proto_naming.class_name(cls.name)} {{\n"
-    msg_body = f"{I}oneof value {{\n"
+@require(
+    lambda cls: len(cls.concrete_descendants) > 0,
+    "No choice possible if no concrete descendants",
+)
+def _generate_choice_class(cls: intermediate.ClassUnion) -> Stripped:
+    fields = []  # type: List[Stripped]
 
-    for j, subtype in enumerate(cls.concrete_descendants):
+    concrete_classes = []
+    if isinstance(cls, intermediate.ConcreteClass):
+        concrete_classes.append(cls)
+
+    concrete_classes.extend(cls.concrete_descendants)
+
+    for j, subtype in enumerate(concrete_classes):
         subtype_type = proto_naming.class_name(subtype.name)
         subtype_name = proto_naming.property_name(subtype.name)
-        msg_body += f"{II}{subtype_type} {subtype_name} = {j + 1};\n"
+        fields.append(Stripped(f"{subtype_type} {subtype_name} = {j + 1};"))
 
-    return msg_header + msg_body + f"{I}}}\n}}"
+    if isinstance(cls, intermediate.AbstractClass):
+        message_name = proto_naming.class_name(cls.name)
+    elif isinstance(cls, intermediate.ConcreteClass):
+        # NOTE (mristin):
+        # We have to append the ``_choice`` suffix for concrete classes with descendants
+        # to distinguish between the concrete classes and one-of choice classes.
+        # Protocol Buffers do not support inheritance, so we have to work around that
+        # circumstance.
+
+        message_name = Identifier(proto_naming.class_name(cls.name) + "_choice")
+
+    else:
+        assert_never(cls)
+        raise AssertionError("Unexpected execution path")
+
+    fields_joined = "\n".join(fields)
+
+    return Stripped(
+        f"""\
+message {message_name} {{
+{I}oneof value {{
+{II}{indent_but_first_line(fields_joined, II)}
+{I}}}
+}}"""
+    )
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -449,7 +428,6 @@ def _generate_choice_class(cls: intermediate.AbstractClass) -> str:
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
     namespace: proto_common.NamespaceIdentifier,
-    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the ProtoBuf code of the structures based on the symbol table.
@@ -460,20 +438,15 @@ def generate(
 
     errors = []  # type: List[Error]
 
-    required_choice_objects = set([])  # type: Set[intermediate.AbstractClass]
-
     for our_type in symbol_table.our_types:
         if not isinstance(
             our_type,
-            (
-                intermediate.Enumeration,
-                intermediate.ConcreteClass,
-            ),
+            (intermediate.Enumeration, intermediate.ConcreteClass),
         ):
             continue
 
         if isinstance(our_type, intermediate.ConcreteClass):
-            code, error, choice_obj = _generate_class(cls=our_type)
+            code, error = _generate_class(cls=our_type)
             if error is not None:
                 errors.append(
                     Error(
@@ -487,7 +460,6 @@ def generate(
 
             assert code is not None
             code_blocks.append(code)
-            required_choice_objects = required_choice_objects.union(set(choice_obj))
 
         elif isinstance(our_type, intermediate.Enumeration):
             code, error = _generate_enum(enum=our_type)
@@ -508,10 +480,9 @@ def generate(
         else:
             assert_never(our_type)
 
-    # generate the necessary classes for choice (i.e. a class for every property that
-    # was like "repeated <interface>")
-    for cls in required_choice_objects:
-        code_blocks.append(Stripped(_generate_choice_class(cls)))
+    for cls in symbol_table.classes:
+        if len(cls.concrete_descendants) > 0:
+            code_blocks.append(_generate_choice_class(cls))
 
     if len(errors) > 0:
         return None, errors
@@ -527,7 +498,7 @@ syntax = "proto3";
 package {namespace};
 
 
-{I}{indent_but_first_line(code_blocks_joined, I)}"""
+{code_blocks_joined}"""
         ),
         proto_common.WARNING,
     ]  # type: List[Stripped]

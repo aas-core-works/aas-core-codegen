@@ -1,12 +1,12 @@
 """Provide common functions shared among different ProtoBuf code generation modules."""
 
 import re
-from typing import List, cast, Optional
+from typing import List, cast
 
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped, assert_never
+from aas_core_codegen.common import Stripped, assert_never, Identifier
 from aas_core_codegen.protobuf import naming as proto_naming
 
 
@@ -119,23 +119,12 @@ def _assert_all_primitive_types_are_mapped() -> None:
 _assert_all_primitive_types_are_mapped()
 
 
-# fmt: off
-@require(
-    lambda our_type_qualifier:
-    not (our_type_qualifier is not None)
-    or not our_type_qualifier.endswith('.')
-)
-# fmt: on
-def generate_type(
-    type_annotation: intermediate.TypeAnnotationUnion,
-    our_type_qualifier: Optional[Stripped] = None,
-) -> Stripped:
+def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped:
     """
     Generate the ProtoBuf type for the given type annotation.
 
     ``our_type_prefix`` is appended to all our types, if specified.
     """
-    our_type_prefix = "" if our_type_qualifier is None else f"{our_type_qualifier}."
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
 
@@ -143,30 +132,36 @@ def generate_type(
         our_type = type_annotation.our_type
 
         if isinstance(our_type, intermediate.Enumeration):
-            return Stripped(
-                our_type_prefix + proto_naming.enum_name(type_annotation.our_type.name)
-            )
+            return Stripped(proto_naming.enum_name(type_annotation.our_type.name))
 
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             return PRIMITIVE_TYPE_MAP[our_type.constrainee]
 
         elif isinstance(our_type, intermediate.Class):
-            return Stripped(our_type_prefix + proto_naming.class_name(our_type.name))
+            message_name = proto_naming.class_name(our_type.name)
+            if (
+                isinstance(our_type, intermediate.ConcreteClass)
+                and len(our_type.concrete_descendants) > 0
+            ):
+                # NOTE (mristin):
+                # We have to add the suffix ``_choice`` since this field points
+                # to one of the concrete descendants of the class as well as
+                # the concrete class itself.
+                message_name = Identifier(message_name + "_choice")
+
+            return Stripped(message_name)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        item_type = generate_type(
-            type_annotation=type_annotation.items, our_type_qualifier=our_type_qualifier
-        )
+        item_type = generate_type(type_annotation=type_annotation.items)
 
         return Stripped(f"repeated {item_type}")
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        value = generate_type(
-            type_annotation=type_annotation.value, our_type_qualifier=our_type_qualifier
-        )
+        value = generate_type(type_annotation=type_annotation.value)
 
-        # careful: do not generate "optional" keyword for list-type elements since otherwise we get invalid
-        # constructs like "optional repeated <type> <name>"
+        # NOTE (TomGneuss):
+        # Careful: do not generate "optional" keyword for list-type elements since
+        # otherwise we get invalid constructs like "optional repeated <type> <name>".
         if isinstance(type_annotation.value, intermediate.ListTypeAnnotation):
             return Stripped(f"{value}")
         else:

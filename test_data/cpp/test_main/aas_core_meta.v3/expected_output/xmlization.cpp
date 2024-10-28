@@ -31507,9 +31507,7 @@ std::pair<
 
   common::optional<std::shared_ptr<types::IDataSpecificationContent> > the_data_specification_content;
 
-  common::optional<
-    std::shared_ptr<types::IReference>
-  > the_data_specification;
+  common::optional<std::shared_ptr<types::IReference> > the_data_specification;
 
   // endregion Initialization
 
@@ -31694,6 +31692,14 @@ std::pair<
     );
   }
 
+  if (!the_data_specification.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property dataSpecification is missing"
+    );
+  }
+
   // endregion Check required properties
 
   return std::make_pair(
@@ -31705,7 +31711,7 @@ std::pair<
       // upcast.
       new types::EmbeddedDataSpecification(
         std::move(*the_data_specification_content),
-        std::move(the_data_specification)
+        std::move(*the_data_specification)
       )
     ),
     common::nullopt
@@ -53775,46 +53781,41 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
     return error;
   }
 
-  const auto& maybe_data_specification(
+  const std::shared_ptr<types::IReference>& the_data_specification(
     that.data_specification()
   );
-  if (maybe_data_specification.has_value()) {
-    const std::shared_ptr<types::IReference>& the_data_specification(
-      *maybe_data_specification
+  writer.StartElement(
+    "dataSpecification"
+  );
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+  error = SerializeReferenceAsSequence(
+    *the_data_specification,
+    writer
+  );
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kDataSpecification
+      )
     );
-    writer.StartElement(
-      "dataSpecification"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
-      *the_data_specification,
-      writer
-    );
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDataSpecification
-        )
-      );
 
-      return error;
-    }
-    writer.StopElement(
-      "dataSpecification"
+    return error;
+  }
+  writer.StopElement(
+    "dataSpecification"
+  );
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kDataSpecification
+      )
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
 
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDataSpecification
-        )
-      );
-
-      return error;
-    }
+    return error;
   }
 
   writer.Finish();

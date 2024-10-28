@@ -20,6 +20,7 @@ Error = _parse.Error
 Cursor = _parse.Cursor
 render_pointer = _parse.render_pointer
 
+Node = _types.Node
 Char = _types.Char
 Range = _types.Range
 Concatenation = _types.Concatenation
@@ -35,7 +36,7 @@ TermValueUnion = _types.TermValueUnion
 Visitor = _types.Visitor
 Transformer = _types.Transformer
 
-BaseVisitor = _visitor.BaseVisitor
+PassThroughVisitor = _visitor.PassThroughVisitor
 
 dump = _stringify.dump
 

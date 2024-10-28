@@ -10177,6 +10177,197 @@ def data_specification_iec_61360_from_str(
     )
 
 
+def from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Class:
+    """
+    Read an instance from the :paramref:`iterator`.
+
+    The type of the instance is determined by the very first start element.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import aas_core3.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Class` read from the :paramref:`iterator`
+    """
+    next_event_element = next(iterator, None)
+    if next_event_element is None:
+        raise DeserializationException(
+            # fmt: off
+            "Expected the start element of an instance, "
+            "but got the end-of-input"
+            # fmt: on
+        )
+
+    next_event, next_element = next_event_element
+    if next_event != 'start':
+        raise DeserializationException(
+            f"Expected the start element of an instance, "
+            f"but got event {next_event!r} and element {next_element.tag!r}"
+        )
+
+    try:
+        return _read_as_element(
+            next_element,
+            iterator
+        )
+    except DeserializationException as exception:
+        exception.path._prepend(ElementSegment(next_element))
+        raise exception
+
+
+def from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Class:
+    """
+    Read an instance from the :paramref:`stream`.
+
+    The type of the instance is determined by the very first start element.
+
+    Example usage:
+
+    .. code-block::
+
+        import aas_core3.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance read from :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Class:
+    """
+    Read an instance from the file at the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import aas_core3.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance read from the file at :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Class:
+    """
+    Read an instance from the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import aas_core3.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance read from :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
 # NOTE (mristin, 2022-10-08):
 # Directly using the iterator turned out to result in very complex function
 # designs. The design became much simpler as soon as we considered one look-ahead
@@ -24181,6 +24372,11 @@ def _read_embedded_data_specification_as_sequence(
             "The required property 'dataSpecificationContent' is missing"
         )
 
+    if reader_and_setter.data_specification is None:
+        raise DeserializationException(
+            "The required property 'dataSpecification' is missing"
+        )
+
     return aas_types.EmbeddedDataSpecification(
         reader_and_setter.data_specification_content,
         reader_and_setter.data_specification
@@ -25761,6 +25957,40 @@ def _read_data_specification_iec_61360_as_element(
     )
 
 
+def _read_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Class:
+    """
+    Read an instance from :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    tag_wo_ns = _parse_element_tag(element)
+    read_as_sequence = _GENERAL_DISPATCH.get(
+        tag_wo_ns,
+        None
+    )
+
+    if read_as_sequence is None:
+        raise DeserializationException(
+            f"Expected the element tag to be a valid model type "
+            f"of a concrete instance, "
+            f"but got tag {tag_wo_ns!r}"
+        )
+
+    return read_as_sequence(
+        element,
+        iterator
+    )
+
+
 #: Dispatch XML class names to read-as-sequence functions
 #: corresponding to concrete descendants of HasSemantics
 _DISPATCH_FOR_HAS_SEMANTICS: Mapping[
@@ -27231,6 +27461,59 @@ _READ_AND_SET_DISPATCH_FOR_DATA_SPECIFICATION_IEC_61360: Mapping[
         _ReaderAndSetterForDataSpecificationIEC61360.read_and_set_value,
     'levelType':
         _ReaderAndSetterForDataSpecificationIEC61360.read_and_set_level_type,
+}
+
+
+#: Dispatch XML class names to read-as-sequence functions
+#: corresponding to the concrete classes
+_GENERAL_DISPATCH: Mapping[
+    str,
+    Callable[
+        [
+            Element,
+            Iterator[Tuple[str, Element]]
+        ],
+        aas_types.Class
+    ]
+] = {
+    'extension': _read_extension_as_sequence,
+    'administrativeInformation': _read_administrative_information_as_sequence,
+    'qualifier': _read_qualifier_as_sequence,
+    'assetAdministrationShell': _read_asset_administration_shell_as_sequence,
+    'assetInformation': _read_asset_information_as_sequence,
+    'resource': _read_resource_as_sequence,
+    'specificAssetId': _read_specific_asset_id_as_sequence,
+    'submodel': _read_submodel_as_sequence,
+    'relationshipElement': _read_relationship_element_as_sequence,
+    'submodelElementList': _read_submodel_element_list_as_sequence,
+    'submodelElementCollection': _read_submodel_element_collection_as_sequence,
+    'property': _read_property_as_sequence,
+    'multiLanguageProperty': _read_multi_language_property_as_sequence,
+    'range': _read_range_as_sequence,
+    'referenceElement': _read_reference_element_as_sequence,
+    'blob': _read_blob_as_sequence,
+    'file': _read_file_as_sequence,
+    'annotatedRelationshipElement': _read_annotated_relationship_element_as_sequence,
+    'entity': _read_entity_as_sequence,
+    'eventPayload': _read_event_payload_as_sequence,
+    'basicEventElement': _read_basic_event_element_as_sequence,
+    'operation': _read_operation_as_sequence,
+    'operationVariable': _read_operation_variable_as_sequence,
+    'capability': _read_capability_as_sequence,
+    'conceptDescription': _read_concept_description_as_sequence,
+    'reference': _read_reference_as_sequence,
+    'key': _read_key_as_sequence,
+    'langStringNameType': _read_lang_string_name_type_as_sequence,
+    'langStringTextType': _read_lang_string_text_type_as_sequence,
+    'environment': _read_environment_as_sequence,
+    'embeddedDataSpecification': _read_embedded_data_specification_as_sequence,
+    'levelType': _read_level_type_as_sequence,
+    'valueReferencePair': _read_value_reference_pair_as_sequence,
+    'valueList': _read_value_list_as_sequence,
+    'langStringPreferredNameTypeIec61360': _read_lang_string_preferred_name_type_iec_61360_as_sequence,
+    'langStringShortNameTypeIec61360': _read_lang_string_short_name_type_iec_61360_as_sequence,
+    'langStringDefinitionTypeIec61360': _read_lang_string_definition_type_iec_61360_as_sequence,
+    'dataSpecificationIec61360': _read_data_specification_iec_61360_as_sequence,
 }
 
 
@@ -30472,12 +30755,11 @@ class _Serializer(aas_types.AbstractVisitor):
         self.visit(that.data_specification_content)
         self._write_end_element('dataSpecificationContent')
 
-        if that.data_specification is not None:
-            self._write_start_element('dataSpecification')
-            self._write_reference_as_sequence(
-                that.data_specification
-            )
-            self._write_end_element('dataSpecification')
+        self._write_start_element('dataSpecification')
+        self._write_reference_as_sequence(
+            that.data_specification
+        )
+        self._write_end_element('dataSpecification')
 
     def visit_embedded_data_specification(
         self,

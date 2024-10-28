@@ -185,6 +185,63 @@ def {function_name}(
     )
 
 
+def _generate_is_array_like() -> Stripped:
+    """Generate the function to check that the jsonable is an array-like object."""
+    return Stripped(
+        f'''\
+def _try_to_cast_to_array_like(
+{I}jsonable: Jsonable
+) -> Optional[Iterable[Any]]:
+{I}"""
+{I}Try to cast the ``jsonable`` to something like a JSON array.
+
+{I}In particular, we explicitly check that the ``jsonable`` is not a mapping, as we
+{I}do not want to mistake dictionaries (*i.e.* de-serialized JSON objects) for lists.
+
+{I}>>> assert _try_to_cast_to_array_like(True) is None
+
+{I}>>> assert _try_to_cast_to_array_like(0) is None
+
+{I}>>> assert _try_to_cast_to_array_like(2.2) is None
+
+{I}>>> assert _try_to_cast_to_array_like("hello") is None
+
+{I}>>> assert _try_to_cast_to_array_like(b"hello") is None
+
+{I}>>> _try_to_cast_to_array_like([1, 2])
+{I}[1, 2]
+
+{I}>>> assert _try_to_cast_to_array_like({{"a": 3}}) is None
+
+{I}>>> assert _try_to_cast_to_array_like(collections.OrderedDict()) is None
+
+{I}>>> _try_to_cast_to_array_like(range(1, 2))
+{I}range(1, 2)
+
+{I}>>> _try_to_cast_to_array_like((1, 2))
+{I}(1, 2)
+
+{I}>>> assert _try_to_cast_to_array_like({{1, 2, 3}}) is None
+{I}"""
+{I}if (
+{II}
+{II}not isinstance(jsonable, (str, bytearray, bytes))
+{II}and hasattr(jsonable, "__iter__")
+{II}and not hasattr(jsonable, "keys")
+{II}# NOTE (mristin):
+{II}# There is no easy way to check for sets as opposed to sequence except
+{II}# for checking for direct inheritance. A sequence also inherits from
+{II}# a collection, so both sequences and sets provide ``__contains__`` method.
+{II}#
+{II}# See: https://docs.python.org/3/library/collections.abc.html
+{II}and not isinstance(jsonable, collections.abc.Set)
+{I}):
+{II}return cast(Iterable[Any], jsonable)
+
+{I}return None'''
+    )
+
+
 def _generate_dispatch_map_for_abstract_class(
     cls: intermediate.AbstractClass,
 ) -> Stripped:
@@ -466,15 +523,16 @@ self.{prop_name} = {function_name}(
 
             body = Stripped(
                 f"""\
-if not isinstance(jsonable, collections.abc.Iterable):
+array_like = _try_to_cast_to_array_like(jsonable)
+if array_like is None:
 {I}raise DeserializationException(
-{II}f"Expected an iterable, but got: {{type(jsonable)}}"
+{II}f"Expected something array-like, but got: {{type(jsonable)}}"
 {I})
 
 items: List[
 {I}{items_type}
 ] = []
-for i, jsonable_item in enumerate(jsonable):
+for i, jsonable_item in enumerate(array_like):
 {I}try:
 {II}item = {parse_function}(
 {III}jsonable_item
@@ -482,7 +540,7 @@ for i, jsonable_item in enumerate(jsonable):
 {I}except DeserializationException as exception:
 {II}exception.path._prepend(
 {III}IndexSegment(
-{IIII}jsonable,
+{IIII}array_like,
 {IIII}i
 {III})
 {II})
@@ -648,6 +706,34 @@ if not isinstance(jsonable, collections.abc.Mapping):
         Stripped(f"setter = {setter_cls_name}()"),
     ]  # type: List[Stripped]
 
+    # NOTE (mristin):
+    # If the class has no concrete descendants, this function will be the sole entry
+    # point for the de-serialization. In that case, we have to explicitly check if
+    # the ``modelType`` is present — for cases where the serialization rules impose
+    # a model type for backwards compatibility even though it is redundant.
+    #
+    # If the class has concrete descendants, we can only publicly de-serialize it
+    # through a dispatching function, which will innately check for model type, so we
+    # do not have to repeat the check here.
+    if len(cls.concrete_descendants) == 0 and cls.serialization.with_model_type:
+        expected_model_type = naming.json_model_type(cls.name)
+        blocks.append(
+            Stripped(
+                f"""\
+model_type = jsonable.get("modelType", None)
+if model_type is None:
+{I}raise DeserializationException(
+{II}"Expected the property modelType, but found none"
+{I})
+
+if model_type != {python_common.string_literal(expected_model_type)}:
+{I}raise DeserializationException(
+{II}f"Invalid modelType, expected '{expected_model_type}', "
+{II}f"but got: {{model_type!r}}"
+{I})"""
+            )
+        )
+
     # region Switch on property name
 
     map_name = python_naming.private_constant_name(
@@ -735,7 +821,7 @@ if setter.{prop_name} is None:
 
     writer = io.StringIO()
 
-    if len(cls._concrete_descendants) == 0:
+    if len(cls.concrete_descendants) == 0:
         function_name = python_naming.function_name(
             Identifier(f"{cls.name}_from_jsonable")
         )
@@ -1047,6 +1133,7 @@ import base64
 import collections.abc
 import sys
 from typing import (
+{I}cast,
 {I}Any,
 {I}Callable,
 {I}Iterable,
@@ -1205,6 +1292,7 @@ MutableJsonable = Union[
         _generate_float_from_jsonable(),
         _generate_str_from_jsonable(),
         _generate_bytes_from_jsonable(),
+        _generate_is_array_like(),
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]

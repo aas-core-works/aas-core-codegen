@@ -1,0 +1,11 @@
+   # ^a+$
+   {
+     # a+
+     {
+0:     char 'a'
+       split 0, 2
+     }
+     # $
+2:   end
+     match
+   }

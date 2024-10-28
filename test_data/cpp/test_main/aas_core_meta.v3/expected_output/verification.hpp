@@ -6,6 +6,7 @@
 
 #include "aas_core/aas_3_0/common.hpp"
 #include "aas_core/aas_3_0/iteration.hpp"
+#include "aas_core/aas_3_0/pattern.hpp"
 #include "aas_core/aas_3_0/types.hpp"
 
 #pragma warning(push, 0)

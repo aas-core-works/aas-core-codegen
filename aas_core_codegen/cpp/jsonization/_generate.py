@@ -1438,16 +1438,19 @@ return std::make_pair(
             )
         )
     else:
-        required_properties = [
-            prop
+        names_of_required_properties = [
+            prop.name
             for prop in cls.properties
             if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
         ]
 
-        if len(required_properties) > 0:
+        if cls.serialization.with_model_type:
+            names_of_required_properties.append(Identifier("model_type"))
+
+        if len(names_of_required_properties) > 0:
             blocks.append(Stripped("// region Check required properties"))
-            for prop in required_properties:
-                json_prop_name = naming.json_property(prop.name)
+            for prop_name in names_of_required_properties:
+                json_prop_name = naming.json_property(prop_name)
                 json_prop_name_literal = cpp_common.string_literal(json_prop_name)
                 blocks.append(
                     Stripped(
@@ -1465,6 +1468,7 @@ if (!json.contains({json_prop_name_literal})) {{
 }}"""
                     )
                 )
+
             blocks.append(Stripped("// endregion Check required properties"))
 
         # region Initialization
@@ -1514,6 +1518,84 @@ common::optional<
 
             blocks.append(Stripped(f"// endregion De-serialize {json_prop_name}"))
         # endregion
+
+        if cls.serialization.with_model_type:
+            # NOTE (mristin):
+            # If the serialization requires a model type, we consequently check for it
+            # here. The model type thus obtained is *not* used for any dispatch. We only
+            # use this value for verification to make sure that the model type
+            # of the instances is consistent with the expected value for its concrete
+            # class. This will be performed even though the code might have had to parse
+            # model type before for the dispatch. We decided to double-check to cover
+            # the case where a dispatch is *unnecessary* (*e.g.*, the caller knows the
+            # expected runtime type), but the model type might still be invalid in the
+            # input. Hence, when the dispatch is *necessary*, the model type JSON
+            # property will be parsed twice, which is a cost we currently find
+            # acceptable.
+
+            blocks.append(
+                Stripped(
+                    """\
+// region Check model type
+// This check is intended only for verification, not for dispatch."""
+                )
+            )
+
+            model_type = naming.json_model_type(cls.name)
+
+            blocks.append(
+                Stripped(
+                    f"""\
+common::optional<
+{I}std::wstring
+> model_type;
+
+std::tie(
+{I}model_type,
+{I}error
+) = DeserializeWstring(
+{I}json["modelType"]
+);
+
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<PropertySegment>(
+{III}L"modelType"
+{II})
+{I});
+
+{I}return std::make_pair<
+{II}common::optional<std::shared_ptr<{ok_type}> >,
+{II}common::optional<DeserializationError>
+{I}>(
+{II}common::nullopt,
+{II}std::move(error)
+{I});
+}}
+
+if (*model_type != L"{model_type}") {{
+{I}std::wstring message = common::Concat(
+{II}L"Expected model type '{model_type}', "
+{II}L"but got: ",
+{II}*model_type
+{I});
+
+{I}error = common::make_optional<DeserializationError>(
+{II}message
+{I});
+
+{I}return std::make_pair<
+{II}common::optional<std::shared_ptr<{ok_type}> >,
+{II}common::optional<DeserializationError>
+{I}>(
+{II}common::nullopt,
+{II}std::move(error)
+{I});
+}}"""
+                )
+            )
+
+            blocks.append(Stripped("// endregion Check model type"))
 
         # region Pass arguments to the constructor
         property_names = [prop.name for prop in cls.properties]

@@ -3095,18 +3095,10 @@ void PassThroughVisitor::VisitEmbeddedDataSpecification(
     that->mutable_data_specification_content()
   );
 
-  // region mutable_data_specification
-  const common::optional<
-    std::shared_ptr<types::IReference>
-  >& maybe_data_specification(
+  // mutable_data_specification
+  Visit(
     that->mutable_data_specification()
   );
-  if (maybe_data_specification.has_value()) {
-    Visit(
-      maybe_data_specification.value()
-    );
-  }
-  // endregion
 }
 
 void PassThroughVisitor::VisitLevelType(

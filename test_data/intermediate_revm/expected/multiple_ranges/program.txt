@@ -1,0 +1,7 @@
+# ^[A-Fa-f0-9]$
+{
+  set '0-9A-Fa-f'
+  # $
+  end
+  match
+}

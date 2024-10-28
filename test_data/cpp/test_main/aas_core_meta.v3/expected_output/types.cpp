@@ -6912,9 +6912,7 @@ void Environment::set_concept_descriptions(
 
 EmbeddedDataSpecification::EmbeddedDataSpecification(
   std::shared_ptr<IDataSpecificationContent> data_specification_content,
-  common::optional<
-    std::shared_ptr<IReference>
-  > data_specification
+  std::shared_ptr<IReference> data_specification
 ) {
   data_specification_content_ = std::move(data_specification_content);
 
@@ -6939,22 +6937,16 @@ void EmbeddedDataSpecification::set_data_specification_content(
   data_specification_content_ = value;
 }
 
-const common::optional<
-  std::shared_ptr<IReference>
->& EmbeddedDataSpecification::data_specification() const {
+const std::shared_ptr<IReference>& EmbeddedDataSpecification::data_specification() const {
   return data_specification_;
 }
 
-common::optional<
-  std::shared_ptr<IReference>
->& EmbeddedDataSpecification::mutable_data_specification() {
+std::shared_ptr<IReference>& EmbeddedDataSpecification::mutable_data_specification() {
   return data_specification_;
 }
 
 void EmbeddedDataSpecification::set_data_specification(
-  common::optional<
-    std::shared_ptr<IReference>
-  > value
+  std::shared_ptr<IReference> value
 ) {
   data_specification_ = value;
 }

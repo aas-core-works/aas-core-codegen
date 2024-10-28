@@ -138,7 +138,7 @@ Call the generator with the appropriate target:
 .. code-block::
 
     usage: aas-core-codegen [-h] --model_path MODEL_PATH --snippets_dir
-                            SNIPPETS_DIR --output_dir OUTPUT_DIR --target                          
+                            SNIPPETS_DIR --output_dir OUTPUT_DIR --target
                             {csharp,cpp,golang,java,jsonschema,python,typescript,rdf_shacl,xsd,jsonld_context,protobuf}
                             [--version]
 

@@ -17133,11 +17133,21 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
+                if (theDataSpecification == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property DataSpecification has not been given " +
+                        "in the XML representation of an instance of class EmbeddedDataSpecification");
+                    return null;
+                }
+
                 return new Aas.EmbeddedDataSpecification(
                     theDataSpecificationContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theDataSpecification);
+                    theDataSpecification
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"));
             }  // internal static Aas.EmbeddedDataSpecification? EmbeddedDataSpecificationFromSequence
 
             /// <summary>
@@ -25822,18 +25832,15 @@ namespace AasCore.Aas3_0
 
                 writer.WriteEndElement();
 
-                if (that.DataSpecification != null)
-                {
-                    writer.WriteStartElement(
-                        "dataSpecification",
-                        NS);
+                writer.WriteStartElement(
+                    "dataSpecification",
+                    NS);
 
-                    this.ReferenceToSequence(
-                        that.DataSpecification,
-                        writer);
+                this.ReferenceToSequence(
+                    that.DataSpecification,
+                    writer);
 
-                    writer.WriteEndElement();
-                }
+                writer.WriteEndElement();
             }  // private void EmbeddedDataSpecificationToSequence
 
             public override void VisitEmbeddedDataSpecification(
