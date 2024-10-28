@@ -3289,7 +3289,7 @@ message EmbeddedDataSpecification {
   /// <summary>
   /// Reference to the data specification
   /// </summary>
-  optional Reference data_specification = 2;
+  Reference data_specification = 2;
 }
 
 enum DataTypeIec61360 {
