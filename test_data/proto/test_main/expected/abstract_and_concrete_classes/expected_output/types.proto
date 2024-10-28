@@ -24,7 +24,7 @@ message Container {
   SomethingAbstract_choice something_abstract = 1;
 }
 
-message SomethingAbstract_choice {k
+message SomethingAbstract_choice {
   oneof value {
     AnotherConcrete another_concrete = 1;
     SomethingConcrete something_concrete = 2;
