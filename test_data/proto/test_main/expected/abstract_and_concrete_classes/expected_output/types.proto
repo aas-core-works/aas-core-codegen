@@ -21,10 +21,10 @@ message AnotherConcrete {
 }
 
 message Container {
-  SomethingAbstract something_abstract = 1;
+  SomethingAbstract_choice something_abstract = 1;
 }
 
-message SomethingAbstract {
+message SomethingAbstract_choice {k
   oneof value {
     AnotherConcrete another_concrete = 1;
     SomethingConcrete something_concrete = 2;

@@ -693,7 +693,7 @@ message Submodel {
   /// <summary>
   /// A submodel consists of zero or more submodel elements.
   /// </summary>
-  repeated SubmodelElement submodel_elements = 13;
+  repeated SubmodelElement_choice submodel_elements = 13;
 }
 
 /// <summary>
@@ -1028,7 +1028,7 @@ message SubmodelElementList {
   /// <remarks>
   /// The list is ordered.
   /// </remarks>
-  repeated SubmodelElement value = 14;
+  repeated SubmodelElement_choice value = 14;
 }
 
 /// <summary>
@@ -1135,7 +1135,7 @@ message SubmodelElementCollection {
   /// <summary>
   /// Submodel element contained in the collection.
   /// </summary>
-  repeated SubmodelElement value = 10;
+  repeated SubmodelElement_choice value = 10;
 }
 
 /// <summary>
@@ -1992,7 +1992,7 @@ message AnnotatedRelationshipElement {
   /// A data element that represents an annotation that holds for the relationship
   /// between the two elements
   /// </summary>
-  repeated DataElement annotations = 12;
+  repeated DataElement_choice annotations = 12;
 }
 
 /// <summary>
@@ -2112,7 +2112,7 @@ message Entity {
   /// Describes statements applicable to the entity by a set of submodel elements,
   /// typically with a qualified value.
   /// </summary>
-  repeated SubmodelElement statements = 10;
+  repeated SubmodelElement_choice statements = 10;
 
   /// <summary>
   /// Describes whether the entity is a co-managed entity or a self-managed entity.
@@ -2590,7 +2590,7 @@ message OperationVariable {
   /// <summary>
   /// Describes an argument or result of an operation via a submodel element
   /// </summary>
-  SubmodelElement value = 1;
+  SubmodelElement_choice value = 1;
 }
 
 /// <summary>
@@ -3284,12 +3284,12 @@ message EmbeddedDataSpecification {
   /// <summary>
   /// Actual content of the data specification
   /// </summary>
-  DataSpecificationContent data_specification_content = 1;
+  DataSpecificationContent_choice data_specification_content = 1;
 
   /// <summary>
   /// Reference to the data specification
   /// </summary>
-  Reference data_specification = 2;
+  optional Reference data_specification = 2;
 }
 
 enum DataTypeIec61360 {
@@ -3738,7 +3738,7 @@ message DataSpecificationIec61360 {
   optional LevelType level_type = 12;
 }
 
-message HasSemantics {
+message HasSemantics_choice {
   oneof value {
     RelationshipElement relationship_element = 1;
     AnnotatedRelationshipElement annotated_relationship_element = 2;
@@ -3761,7 +3761,7 @@ message HasSemantics {
   }
 }
 
-message HasExtensions {
+message HasExtensions_choice {
   oneof value {
     RelationshipElement relationship_element = 1;
     AnnotatedRelationshipElement annotated_relationship_element = 2;
@@ -3783,7 +3783,7 @@ message HasExtensions {
   }
 }
 
-message Referable {
+message Referable_choice {
   oneof value {
     RelationshipElement relationship_element = 1;
     AnnotatedRelationshipElement annotated_relationship_element = 2;
@@ -3805,7 +3805,7 @@ message Referable {
   }
 }
 
-message Identifiable {
+message Identifiable_choice {
   oneof value {
     AssetAdministrationShell asset_administration_shell = 1;
     ConceptDescription concept_description = 2;
@@ -3813,13 +3813,13 @@ message Identifiable {
   }
 }
 
-message HasKind {
+message HasKind_choice {
   oneof value {
     Submodel submodel = 1;
   }
 }
 
-message HasDataSpecification {
+message HasDataSpecification_choice {
   oneof value {
     AdministrativeInformation administrative_information = 1;
     RelationshipElement relationship_element = 2;
@@ -3842,7 +3842,7 @@ message HasDataSpecification {
   }
 }
 
-message Qualifiable {
+message Qualifiable_choice {
   oneof value {
     RelationshipElement relationship_element = 1;
     AnnotatedRelationshipElement annotated_relationship_element = 2;
@@ -3862,7 +3862,7 @@ message Qualifiable {
   }
 }
 
-message SubmodelElement {
+message SubmodelElement_choice {
   oneof value {
     RelationshipElement relationship_element = 1;
     AnnotatedRelationshipElement annotated_relationship_element = 2;
@@ -3888,7 +3888,7 @@ message RelationshipElement_choice {
   }
 }
 
-message DataElement {
+message DataElement_choice {
   oneof value {
     Blob blob = 1;
     File file = 2;
@@ -3899,13 +3899,13 @@ message DataElement {
   }
 }
 
-message EventElement {
+message EventElement_choice {
   oneof value {
     BasicEventElement basic_event_element = 1;
   }
 }
 
-message AbstractLangString {
+message AbstractLangString_choice {
   oneof value {
     LangStringDefinitionTypeIec61360 lang_string_definition_type_iec_61360 = 1;
     LangStringNameType lang_string_name_type = 2;
@@ -3915,7 +3915,7 @@ message AbstractLangString {
   }
 }
 
-message DataSpecificationContent {
+message DataSpecificationContent_choice {
   oneof value {
     DataSpecificationIec61360 data_specification_iec_61360 = 1;
   }

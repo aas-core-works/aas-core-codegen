@@ -139,10 +139,7 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
 
         elif isinstance(our_type, intermediate.Class):
             message_name = proto_naming.class_name(our_type.name)
-            if (
-                isinstance(our_type, intermediate.ConcreteClass)
-                and len(our_type.concrete_descendants) > 0
-            ):
+            if len(our_type.concrete_descendants) > 0:
                 # NOTE (mristin):
                 # We have to add the suffix ``_choice`` since this field points
                 # to one of the concrete descendants of the class as well as
