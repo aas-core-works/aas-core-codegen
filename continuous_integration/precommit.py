@@ -118,7 +118,7 @@ def main() -> int:
         # We exclude the snippets and the expected output from the formatting as
         # this causes too many unpredictable results and thus makes the generator
         # harder to debug.
-        exclude = ["test_data/python/test_main/aas_core_meta.v3"]
+        exclude = ["test_data/python", "test_data/python_protobuf"]
 
         if overwrite:
             exit_code = call_and_report(
