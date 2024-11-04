@@ -4437,6 +4437,54 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
     return errors
 
 
+def _verify_invariant_descriptions_unique(symbol_table: SymbolTable) -> List[Error]:
+    """Check that no two invariants share the same description."""
+    errors = []  # type: List[Error]
+    for something_with_invariants in itertools.chain(
+        symbol_table.classes, symbol_table.constrained_primitives
+    ):
+        description_map = dict()  # type: MutableMapping[str, Invariant]
+
+        for invariant in something_with_invariants.invariants:
+            conflicting_invariant = description_map.get(invariant.description, None)
+            if conflicting_invariant is not None:
+                what: str
+                if isinstance(something_with_invariants, Class):
+                    what = "class"
+                elif isinstance(something_with_invariants, ConstrainedPrimitive):
+                    what = "constrained primitive"
+                else:
+                    assert_never(something_with_invariants)
+                    raise AssertionError("Unexpected execution path")
+
+                if conflicting_invariant.specified_for is invariant.specified_for:
+                    errors.append(
+                        Error(
+                            invariant.parsed.node,
+                            f"The invariants' descriptions need to be unique, "
+                            f"but they conflict "
+                            f"in the {what} {invariant.specified_for.name!r} "
+                            f"for the description: {invariant.description!r}",
+                        )
+                    )
+                else:
+                    errors.append(
+                        Error(
+                            invariant.parsed.node,
+                            f"The invariants' descriptions need to be unique, "
+                            f"but an invariant from "
+                            f"the {what} {invariant.specified_for.name!r} "
+                            f"and from "
+                            f"the {what} {conflicting_invariant.specified_for.name!r} "
+                            f"conflict for the description: {invariant.description!r}",
+                        )
+                    )
+            else:
+                description_map[invariant.description] = invariant
+
+    return errors
+
+
 def _verify_patterns_anchored_at_start_and_end(
     symbol_table: SymbolTable,
 ) -> List[Error]:
@@ -4621,6 +4669,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_only_simple_type_patterns(symbol_table=symbol_table))
 
     errors.extend(_verify_patterns_anchored_at_start_and_end(symbol_table=symbol_table))
+
+    errors.extend(_verify_invariant_descriptions_unique(symbol_table=symbol_table))
 
     if len(errors) > 0:
         return errors

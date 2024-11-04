@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UANodeSet
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd"
+        xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    >
+    <NamespaceUris>
+        <Uri>https://admin-shell.io/aas/3/0</Uri>
+    </NamespaceUris>
+    <Models>
+        <Model ModelUri="https://admin-shell.io/aas/3/0" Version="3.0.0"
+               PublicationDate="2024-11-11T00:00:00Z">
+            <RequiredModel
+                    ModelUri="http://opcfoundation.org/UA/"
+                    PublicationDate="2021-09-15T00:00:00Z" Version="1.04.10"
+            />
+        </Model>
+    </Models>
+</UANodeSet>
