@@ -16958,8 +16958,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                IDataSpecificationContent? theDataSpecificationContent = null;
                 IReference? theDataSpecification = null;
+                IDataSpecificationContent? theDataSpecificationContent = null;
 
                 if (!isEmptySequence)
                 {
@@ -17005,6 +17005,20 @@ namespace AasCore.Aas3_0
 
                         switch (elementName)
                         {
+                            case "dataSpecification":
+                            {
+                                theDataSpecification = ReferenceFromSequence(
+                                    reader, isEmptyProperty, out error);
+
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "dataSpecification"));
+                                    return null;
+                                }
+                                break;
+                            }
                             case "dataSpecificationContent":
                             {
                                 if (isEmptyProperty)
@@ -17054,20 +17068,6 @@ namespace AasCore.Aas3_0
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
                                             "dataSpecificationContent"));
-                                    return null;
-                                }
-                                break;
-                            }
-                            case "dataSpecification":
-                            {
-                                theDataSpecification = ReferenceFromSequence(
-                                    reader, isEmptyProperty, out error);
-
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "dataSpecification"));
                                     return null;
                                 }
                                 break;
@@ -17125,14 +17125,6 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (theDataSpecificationContent == null)
-                {
-                    error = new Reporting.Error(
-                        "The required property DataSpecificationContent has not been given " +
-                        "in the XML representation of an instance of class EmbeddedDataSpecification");
-                    return null;
-                }
-
                 if (theDataSpecification == null)
                 {
                     error = new Reporting.Error(
@@ -17141,11 +17133,19 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
+                if (theDataSpecificationContent == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property DataSpecificationContent has not been given " +
+                        "in the XML representation of an instance of class EmbeddedDataSpecification");
+                    return null;
+                }
+
                 return new Aas.EmbeddedDataSpecification(
-                    theDataSpecificationContent
+                    theDataSpecification
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theDataSpecification
+                    theDataSpecificationContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
             }  // internal static Aas.EmbeddedDataSpecification? EmbeddedDataSpecificationFromSequence
@@ -25823,21 +25823,21 @@ namespace AasCore.Aas3_0
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
-                    "dataSpecificationContent",
-                    NS);
-
-                this.Visit(
-                    that.DataSpecificationContent,
-                    writer);
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
                     "dataSpecification",
                     NS);
 
                 this.ReferenceToSequence(
                     that.DataSpecification,
+                    writer);
+
+                writer.WriteEndElement();
+
+                writer.WriteStartElement(
+                    "dataSpecificationContent",
+                    NS);
+
+                this.Visit(
+                    that.DataSpecificationContent,
                     writer);
 
                 writer.WriteEndElement();

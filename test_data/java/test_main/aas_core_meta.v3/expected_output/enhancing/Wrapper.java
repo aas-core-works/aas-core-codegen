@@ -3105,17 +3105,6 @@ class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    IDataSpecificationContent dataSpecificationContent = that.getDataSpecificationContent();
-    IClass transformedDataSpecificationContent = transform(dataSpecificationContent);
-    if (!(transformedDataSpecificationContent instanceof IDataSpecificationContent)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IDataSpecificationContent " +
-        ", but got: " + transformedDataSpecificationContent
-      );
-    }
-    IDataSpecificationContent castedDataSpecificationContent = (IDataSpecificationContent) transformedDataSpecificationContent;
-    that.setDataSpecificationContent(castedDataSpecificationContent);
-
     IReference dataSpecification = that.getDataSpecification();
     IClass transformedDataSpecification = transform(dataSpecification);
     if (!(transformedDataSpecification instanceof IReference)) {
@@ -3126,6 +3115,17 @@ class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     }
     IReference castedDataSpecification = (IReference) transformedDataSpecification;
     that.setDataSpecification(castedDataSpecification);
+
+    IDataSpecificationContent dataSpecificationContent = that.getDataSpecificationContent();
+    IClass transformedDataSpecificationContent = transform(dataSpecificationContent);
+    if (!(transformedDataSpecificationContent instanceof IDataSpecificationContent)) {
+      throw new UnsupportedOperationException(
+        "Expected the transformed value to be a IDataSpecificationContent " +
+        ", but got: " + transformedDataSpecificationContent
+      );
+    }
+    IDataSpecificationContent castedDataSpecificationContent = (IDataSpecificationContent) transformedDataSpecificationContent;
+    that.setDataSpecificationContent(castedDataSpecificationContent);
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()

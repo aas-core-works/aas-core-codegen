@@ -9280,24 +9280,24 @@ class Verifier
   ): IterableIterator<VerificationError> {
     if (context === true) {
       for (const error of this.transformWithContext(
-          that.dataSpecificationContent, context)
-      ) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "dataSpecificationContent"
-          )
-        );
-        yield error;
-      }
-
-      for (const error of this.transformWithContext(
           that.dataSpecification, context)
       ) {
         error.path.prepend(
           new PropertySegment(
             that,
             "dataSpecification"
+          )
+        );
+        yield error;
+      }
+
+      for (const error of this.transformWithContext(
+          that.dataSpecificationContent, context)
+      ) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "dataSpecificationContent"
           )
         );
         yield error;

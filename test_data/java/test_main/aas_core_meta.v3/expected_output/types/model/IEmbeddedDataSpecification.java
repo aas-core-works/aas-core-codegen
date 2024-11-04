@@ -17,18 +17,18 @@ import java.util.Optional;
  */
 public interface IEmbeddedDataSpecification extends IClass {
   /**
-   * Actual content of the data specification
-   */
-  IDataSpecificationContent getDataSpecificationContent();
-
-  void setDataSpecificationContent(IDataSpecificationContent dataSpecificationContent);
-
-  /**
    * Reference to the data specification
    */
   IReference getDataSpecification();
 
   void setDataSpecification(IReference dataSpecification);
+
+  /**
+   * Actual content of the data specification
+   */
+  IDataSpecificationContent getDataSpecificationContent();
+
+  void setDataSpecificationContent(IDataSpecificationContent dataSpecificationContent);
 }
 
 /*

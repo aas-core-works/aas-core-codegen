@@ -11887,14 +11887,14 @@ namespace AasCore.Aas3_0
     public interface IEmbeddedDataSpecification : IClass
     {
         /// <summary>
-        /// Actual content of the data specification
-        /// </summary>
-        public IDataSpecificationContent DataSpecificationContent { get; set; }
-
-        /// <summary>
         /// Reference to the data specification
         /// </summary>
         public IReference DataSpecification { get; set; }
+
+        /// <summary>
+        /// Actual content of the data specification
+        /// </summary>
+        public IDataSpecificationContent DataSpecificationContent { get; set; }
     }
 
     /// <summary>
@@ -11903,14 +11903,14 @@ namespace AasCore.Aas3_0
     public class EmbeddedDataSpecification : IEmbeddedDataSpecification
     {
         /// <summary>
-        /// Actual content of the data specification
-        /// </summary>
-        public IDataSpecificationContent DataSpecificationContent { get; set; }
-
-        /// <summary>
         /// Reference to the data specification
         /// </summary>
         public IReference DataSpecification { get; set; }
+
+        /// <summary>
+        /// Actual content of the data specification
+        /// </summary>
+        public IDataSpecificationContent DataSpecificationContent { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -11918,9 +11918,9 @@ namespace AasCore.Aas3_0
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            yield return DataSpecificationContent;
-
             yield return DataSpecification;
+
+            yield return DataSpecificationContent;
         }
 
         /// <summary>
@@ -11928,18 +11928,18 @@ namespace AasCore.Aas3_0
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            yield return DataSpecificationContent;
-
-            // Recurse
-            foreach (var anItem in DataSpecificationContent.Descend())
-            {
-                yield return anItem;
-            }
-
             yield return DataSpecification;
 
             // Recurse
             foreach (var anItem in DataSpecification.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return DataSpecificationContent;
+
+            // Recurse
+            foreach (var anItem in DataSpecificationContent.Descend())
             {
                 yield return anItem;
             }
@@ -11986,11 +11986,11 @@ namespace AasCore.Aas3_0
         }
 
         public EmbeddedDataSpecification(
-            IDataSpecificationContent dataSpecificationContent,
-            IReference dataSpecification)
+            IReference dataSpecification,
+            IDataSpecificationContent dataSpecificationContent)
         {
-            DataSpecificationContent = dataSpecificationContent;
             DataSpecification = dataSpecification;
+            DataSpecificationContent = dataSpecificationContent;
         }
     }
 

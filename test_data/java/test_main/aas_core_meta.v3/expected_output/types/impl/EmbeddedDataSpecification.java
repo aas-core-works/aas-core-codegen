@@ -31,33 +31,21 @@ import java.util.Objects;
  */
 public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
   /**
-   * Actual content of the data specification
-   */
-  private IDataSpecificationContent dataSpecificationContent;
-
-  /**
    * Reference to the data specification
    */
   private IReference dataSpecification;
 
+  /**
+   * Actual content of the data specification
+   */
+  private IDataSpecificationContent dataSpecificationContent;
+
   public EmbeddedDataSpecification(
-    IDataSpecificationContent dataSpecificationContent,
-    IReference dataSpecification) {
-    this.dataSpecificationContent = Objects.requireNonNull(
-      dataSpecificationContent,
-      "Argument \"dataSpecificationContent\" must be non-null.");
+    IReference dataSpecification,
+    IDataSpecificationContent dataSpecificationContent) {
     this.dataSpecification = Objects.requireNonNull(
       dataSpecification,
       "Argument \"dataSpecification\" must be non-null.");
-  }
-
-  @Override
-  public IDataSpecificationContent getDataSpecificationContent() {
-    return dataSpecificationContent;
-  }
-
-  @Override
-  public void setDataSpecificationContent(IDataSpecificationContent dataSpecificationContent) {
     this.dataSpecificationContent = Objects.requireNonNull(
       dataSpecificationContent,
       "Argument \"dataSpecificationContent\" must be non-null.");
@@ -73,6 +61,18 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     this.dataSpecification = Objects.requireNonNull(
       dataSpecification,
       "Argument \"dataSpecification\" must be non-null.");
+  }
+
+  @Override
+  public IDataSpecificationContent getDataSpecificationContent() {
+    return dataSpecificationContent;
+  }
+
+  @Override
+  public void setDataSpecificationContent(IDataSpecificationContent dataSpecificationContent) {
+    this.dataSpecificationContent = Objects.requireNonNull(
+      dataSpecificationContent,
+      "Argument \"dataSpecificationContent\" must be non-null.");
   }
 
   /**
@@ -152,14 +152,14 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     private Stream<IClass> stream() {
       Stream<IClass> memberStream = Stream.empty();
 
-      if (dataSpecificationContent != null) {
-        memberStream = Stream.concat(memberStream,
-          Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecificationContent));
-      }
-
       if (dataSpecification != null) {
         memberStream = Stream.concat(memberStream,
           Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecification));
+      }
+
+      if (dataSpecificationContent != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecificationContent));
       }
 
       return memberStream;
@@ -191,16 +191,16 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     private Stream<IClass> stream() {
       Stream<IClass> memberStream = Stream.empty();
 
-      if (dataSpecificationContent != null) {
-        memberStream = Stream.concat(memberStream,
-          Stream.concat(Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecificationContent),
-            StreamSupport.stream(EmbeddedDataSpecification.this.dataSpecificationContent.descend().spliterator(), false)));
-      }
-
       if (dataSpecification != null) {
         memberStream = Stream.concat(memberStream,
           Stream.concat(Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecification),
             StreamSupport.stream(EmbeddedDataSpecification.this.dataSpecification.descend().spliterator(), false)));
+      }
+
+      if (dataSpecificationContent != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.concat(Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecificationContent),
+            StreamSupport.stream(EmbeddedDataSpecification.this.dataSpecificationContent.descend().spliterator(), false)));
       }
 
       return memberStream;

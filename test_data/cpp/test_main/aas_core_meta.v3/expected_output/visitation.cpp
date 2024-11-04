@@ -3090,14 +3090,14 @@ void PassThroughVisitor::VisitEnvironment(
 void PassThroughVisitor::VisitEmbeddedDataSpecification(
   const std::shared_ptr<types::IEmbeddedDataSpecification>& that
 ) {
-  // mutable_data_specification_content
-  Visit(
-    that->mutable_data_specification_content()
-  );
-
   // mutable_data_specification
   Visit(
     that->mutable_data_specification()
+  );
+
+  // mutable_data_specification_content
+  Visit(
+    that->mutable_data_specification_content()
   );
 }
 

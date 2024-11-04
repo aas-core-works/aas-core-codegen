@@ -3901,11 +3901,11 @@ def embedded_data_specification_from_pb(
 
     """
     return types.EmbeddedDataSpecification(
-        data_specification_content=data_specification_content_from_pb_choice(
-            that.data_specification_content
-        ),
         data_specification=reference_from_pb(
             that.data_specification
+        ),
+        data_specification_content=data_specification_content_from_pb_choice(
+            that.data_specification_content
         )
     )
 
@@ -9846,17 +9846,17 @@ def embedded_data_specification_to_pb(
         # Do something with some_bytes. For example, transfer them
         # over the wire.
     """
-    data_specification_content_to_pb_choice(
-        that.data_specification_content,
-        target.data_specification_content
-    )
-
     # We clear so that the field is set even if all the properties are None.
     target.data_specification.Clear()
 
     reference_to_pb(
         that.data_specification,
         target.data_specification
+    )
+
+    data_specification_content_to_pb_choice(
+        that.data_specification_content,
+        target.data_specification_content
     )
 
 

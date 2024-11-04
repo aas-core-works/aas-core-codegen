@@ -502,8 +502,8 @@ namespace AasCore.Aas3_0
             )
             {
                 return new Aas.EmbeddedDataSpecification(
-                    that.DataSpecificationContent,
-                    that.DataSpecification);
+                    that.DataSpecification,
+                    that.DataSpecificationContent);
             }
 
             public override Aas.IClass TransformLevelType(
@@ -2456,8 +2456,8 @@ namespace AasCore.Aas3_0
             )
             {
                 return new Aas.EmbeddedDataSpecification(
-                    Deep(that.DataSpecificationContent),
-                    Deep(that.DataSpecification)
+                    Deep(that.DataSpecification),
+                    Deep(that.DataSpecificationContent)
                 );
             }
 

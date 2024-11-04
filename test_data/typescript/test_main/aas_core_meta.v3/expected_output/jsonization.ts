@@ -14452,29 +14452,9 @@ export function dataSpecificationContentFromJsonable(
  * of {@link types!EmbeddedDataSpecification}.
  */
 class SetterForEmbeddedDataSpecification {
-  dataSpecificationContent: AasTypes.IDataSpecificationContent | null = null;
-
   dataSpecification: AasTypes.Reference | null = null;
 
-  /**
-   * Parse `jsonable` as the value of {@link dataSpecificationContent}.
-   *
-   * @param jsonable - to be parsed
-   * @returns error, if any
-   */
-  setDataSpecificationContentFromJsonable(
-    jsonable: JsonValue
-  ): DeserializationError | null {
-    const parsedOrError = dataSpecificationContentFromJsonable(
-      jsonable
-    );
-    if (parsedOrError.error !== null) {
-      return parsedOrError.error;
-    } else {
-      this.dataSpecificationContent = parsedOrError.mustValue();
-      return null;
-    }
-  }
+  dataSpecificationContent: AasTypes.IDataSpecificationContent | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link dataSpecification}.
@@ -14492,6 +14472,26 @@ class SetterForEmbeddedDataSpecification {
       return parsedOrError.error;
     } else {
       this.dataSpecification = parsedOrError.mustValue();
+      return null;
+    }
+  }
+
+  /**
+   * Parse `jsonable` as the value of {@link dataSpecificationContent}.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setDataSpecificationContentFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = dataSpecificationContentFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.dataSpecificationContent = parsedOrError.mustValue();
       return null;
     }
   }
@@ -14557,14 +14557,6 @@ export function embeddedDataSpecificationFromJsonable(
     }
   }
 
-  if (setter.dataSpecificationContent === null) {
-    return newDeserializationError<
-      AasTypes.EmbeddedDataSpecification
-    >(
-      "The required property 'dataSpecificationContent' is missing"
-    );
-  }
-
   if (setter.dataSpecification === null) {
     return newDeserializationError<
       AasTypes.EmbeddedDataSpecification
@@ -14573,13 +14565,21 @@ export function embeddedDataSpecificationFromJsonable(
     );
   }
 
+  if (setter.dataSpecificationContent === null) {
+    return newDeserializationError<
+      AasTypes.EmbeddedDataSpecification
+    >(
+      "The required property 'dataSpecificationContent' is missing"
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.EmbeddedDataSpecification,
     DeserializationError
   >(
     new AasTypes.EmbeddedDataSpecification(
-      setter.dataSpecificationContent,
-      setter.dataSpecification
+      setter.dataSpecification,
+      setter.dataSpecificationContent
     ),
     null
   );
@@ -18062,12 +18062,12 @@ const SETTER_MAP_FOR_EMBEDDED_DATA_SPECIFICATION =
   >(
     [
       [
-        "dataSpecificationContent",
-        SetterForEmbeddedDataSpecification.prototype.setDataSpecificationContentFromJsonable
-      ],
-      [
         "dataSpecification",
         SetterForEmbeddedDataSpecification.prototype.setDataSpecificationFromJsonable
+      ],
+      [
+        "dataSpecificationContent",
+        SetterForEmbeddedDataSpecification.prototype.setDataSpecificationContentFromJsonable
       ],
     ]
   );
@@ -20530,11 +20530,11 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
   ): JsonObject {
     const jsonable: JsonObject = {};
 
-    jsonable["dataSpecificationContent"] =
-      this.transform(that.dataSpecificationContent);
-
     jsonable["dataSpecification"] =
       this.transform(that.dataSpecification);
+
+    jsonable["dataSpecificationContent"] =
+      this.transform(that.dataSpecificationContent);
 
     return jsonable;
   }
