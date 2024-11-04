@@ -15264,42 +15264,13 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                IDataSpecificationContent? theDataSpecificationContent = null;
                 IReference? theDataSpecification = null;
+                IDataSpecificationContent? theDataSpecificationContent = null;
 
                 foreach (var keyValue in obj)
                 {
                     switch (keyValue.Key)
                     {
-                        case "dataSpecificationContent":
-                        {
-                            if (keyValue.Value == null)
-                            {
-                                error = new Reporting.Error(
-                                    "Unexpected null for a required property");
-                                error.PrependSegment(
-                                    new Reporting.NameSegment(
-                                        "dataSpecificationContent"));
-                                return null;
-                            }
-
-                            theDataSpecificationContent = DeserializeImplementation.IDataSpecificationContentFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
-                            {
-                                error.PrependSegment(
-                                    new Reporting.NameSegment(
-                                        "dataSpecificationContent"));
-                                return null;
-                            }
-                            if (theDataSpecificationContent == null)
-                            {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDataSpecificationContent null when error is also null");
-                            }
-                            break;
-                        }
                         case "dataSpecification":
                         {
                             if (keyValue.Value == null)
@@ -15329,18 +15300,40 @@ namespace AasCore.Aas3_0
                             }
                             break;
                         }
+                        case "dataSpecificationContent":
+                        {
+                            if (keyValue.Value == null)
+                            {
+                                error = new Reporting.Error(
+                                    "Unexpected null for a required property");
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "dataSpecificationContent"));
+                                return null;
+                            }
+
+                            theDataSpecificationContent = DeserializeImplementation.IDataSpecificationContentFrom(
+                                keyValue.Value,
+                                out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "dataSpecificationContent"));
+                                return null;
+                            }
+                            if (theDataSpecificationContent == null)
+                            {
+                                throw new System.InvalidOperationException(
+                                    "Unexpected theDataSpecificationContent null when error is also null");
+                            }
+                            break;
+                        }
                         default:
                             error = new Reporting.Error(
                                 $"Unexpected property: {keyValue.Key}");
                             return null;
                     }
-                }
-
-                if (theDataSpecificationContent == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"dataSpecificationContent\" is missing");
-                    return null;
                 }
 
                 if (theDataSpecification == null)
@@ -15350,11 +15343,18 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
+                if (theDataSpecificationContent == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"dataSpecificationContent\" is missing");
+                    return null;
+                }
+
                 return new Aas.EmbeddedDataSpecification(
-                    theDataSpecificationContent
+                    theDataSpecification
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theDataSpecification
+                    theDataSpecificationContent
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
             }  // internal static EmbeddedDataSpecificationFrom
@@ -20750,11 +20750,11 @@ namespace AasCore.Aas3_0
             {
                 var result = new Nodes.JsonObject();
 
-                result["dataSpecificationContent"] = Transform(
-                    that.DataSpecificationContent);
-
                 result["dataSpecification"] = Transform(
                     that.DataSpecification);
+
+                result["dataSpecificationContent"] = Transform(
+                    that.DataSpecificationContent);
 
                 return result;
             }

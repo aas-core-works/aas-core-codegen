@@ -30,16 +30,6 @@ public class EnhancedEmbeddedDataSpecification<EnhancementT>
   }
 
   @Override
-  public IDataSpecificationContent getDataSpecificationContent() {
-    return instance.getDataSpecificationContent();
-  }
-
-  @Override
-  public void setDataSpecificationContent(IDataSpecificationContent dataSpecificationContent) {
-    instance.setDataSpecificationContent(dataSpecificationContent);
-  }
-
-  @Override
   public IReference getDataSpecification() {
     return instance.getDataSpecification();
   }
@@ -47,6 +37,16 @@ public class EnhancedEmbeddedDataSpecification<EnhancementT>
   @Override
   public void setDataSpecification(IReference dataSpecification) {
     instance.setDataSpecification(dataSpecification);
+  }
+
+  @Override
+  public IDataSpecificationContent getDataSpecificationContent() {
+    return instance.getDataSpecificationContent();
+  }
+
+  @Override
+  public void setDataSpecificationContent(IDataSpecificationContent dataSpecificationContent) {
+    instance.setDataSpecificationContent(dataSpecificationContent);
   }
 
   public Iterable<IClass> descendOnce() {

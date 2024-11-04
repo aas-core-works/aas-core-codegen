@@ -2927,19 +2927,6 @@ class IEmbeddedDataSpecification
     : virtual public IClass {
  public:
   ///@{
-  /// \brief Actual content of the data specification
-
-  virtual const std::shared_ptr<IDataSpecificationContent>& data_specification_content() const = 0;
-
-  virtual std::shared_ptr<IDataSpecificationContent>& mutable_data_specification_content() = 0;
-
-  virtual void set_data_specification_content(
-    std::shared_ptr<IDataSpecificationContent> value
-  ) = 0;
-
-  ///@}
-
-  ///@{
   /// \brief Reference to the data specification
 
   virtual const std::shared_ptr<IReference>& data_specification() const = 0;
@@ -2948,6 +2935,19 @@ class IEmbeddedDataSpecification
 
   virtual void set_data_specification(
     std::shared_ptr<IReference> value
+  ) = 0;
+
+  ///@}
+
+  ///@{
+  /// \brief Actual content of the data specification
+
+  virtual const std::shared_ptr<IDataSpecificationContent>& data_specification_content() const = 0;
+
+  virtual std::shared_ptr<IDataSpecificationContent>& mutable_data_specification_content() = 0;
+
+  virtual void set_data_specification_content(
+    std::shared_ptr<IDataSpecificationContent> value
   ) = 0;
 
   ///@}
@@ -10270,23 +10270,11 @@ class EmbeddedDataSpecification
     : public IEmbeddedDataSpecification {
  public:
   EmbeddedDataSpecification(
-    std::shared_ptr<IDataSpecificationContent> data_specification_content,
-    std::shared_ptr<IReference> data_specification
+    std::shared_ptr<IReference> data_specification,
+    std::shared_ptr<IDataSpecificationContent> data_specification_content
   );
 
   ModelType model_type() const override;
-
-  // region Get and set data_specification_content_
-
-  const std::shared_ptr<IDataSpecificationContent>& data_specification_content() const override;
-
-  std::shared_ptr<IDataSpecificationContent>& mutable_data_specification_content() override;
-
-  void set_data_specification_content(
-    std::shared_ptr<IDataSpecificationContent> value
-  ) override;
-
-  // endregion
 
   // region Get and set data_specification_
 
@@ -10300,12 +10288,24 @@ class EmbeddedDataSpecification
 
   // endregion
 
+  // region Get and set data_specification_content_
+
+  const std::shared_ptr<IDataSpecificationContent>& data_specification_content() const override;
+
+  std::shared_ptr<IDataSpecificationContent>& mutable_data_specification_content() override;
+
+  void set_data_specification_content(
+    std::shared_ptr<IDataSpecificationContent> value
+  ) override;
+
+  // endregion
+
   ~EmbeddedDataSpecification() override = default;
 
  private:
-  std::shared_ptr<IDataSpecificationContent> data_specification_content_;
-
   std::shared_ptr<IReference> data_specification_;
+
+  std::shared_ptr<IDataSpecificationContent> data_specification_content_;
 };
 
 class LevelType

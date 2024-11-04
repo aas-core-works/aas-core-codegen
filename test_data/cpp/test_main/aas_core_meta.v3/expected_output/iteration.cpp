@@ -11300,10 +11300,10 @@ void IteratorOverEmbeddedDataSpecification::Execute() {
         index_ = -1;
         done_ = false;
 
-        property_ = Property::kDataSpecificationContent;
+        property_ = Property::kDataSpecification;
         item_ = std::move(
           std::static_pointer_cast<types::IClass>(
-            casted_->data_specification_content()
+            casted_->data_specification()
           )
         );
         ++index_;
@@ -11313,10 +11313,10 @@ void IteratorOverEmbeddedDataSpecification::Execute() {
       }
 
       case 1: {
-        property_ = Property::kDataSpecification;
+        property_ = Property::kDataSpecificationContent;
         item_ = std::move(
           std::static_pointer_cast<types::IClass>(
-            casted_->data_specification()
+            casted_->data_specification_content()
           )
         );
         ++index_;

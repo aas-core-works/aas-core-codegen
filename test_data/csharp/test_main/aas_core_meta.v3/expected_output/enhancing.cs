@@ -3713,16 +3713,16 @@ namespace AasCore.Aas3_0
                 _instance = instance;
             }
 
-            public IDataSpecificationContent DataSpecificationContent
-            {
-                get => _instance.DataSpecificationContent;
-                set => _instance.DataSpecificationContent = value;
-            }
-
             public IReference DataSpecification
             {
                 get => _instance.DataSpecification;
                 set => _instance.DataSpecification = value;
+            }
+
+            public IDataSpecificationContent DataSpecificationContent
+            {
+                get => _instance.DataSpecificationContent;
+                set => _instance.DataSpecificationContent = value;
             }
 
             public IEnumerable<Aas.IClass> DescendOnce()
@@ -7649,17 +7649,6 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                var transformedDataSpecificationContent = Transform(
-                    that.DataSpecificationContent
-                );
-                var castedDataSpecificationContent = (
-                    transformedDataSpecificationContent as Aas.IDataSpecificationContent
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IDataSpecificationContent, " +
-                    $"but got: {transformedDataSpecificationContent}"
-                );
-                that.DataSpecificationContent = castedDataSpecificationContent;
-
                 var transformedDataSpecification = Transform(
                     that.DataSpecification
                 );
@@ -7670,6 +7659,17 @@ namespace AasCore.Aas3_0
                     $"but got: {transformedDataSpecification}"
                 );
                 that.DataSpecification = castedDataSpecification;
+
+                var transformedDataSpecificationContent = Transform(
+                    that.DataSpecificationContent
+                );
+                var castedDataSpecificationContent = (
+                    transformedDataSpecificationContent as Aas.IDataSpecificationContent
+                ) ?? throw new System.InvalidOperationException(
+                    "Expected the transformed value to be a IDataSpecificationContent, " +
+                    $"but got: {transformedDataSpecificationContent}"
+                );
+                that.DataSpecificationContent = castedDataSpecificationContent;
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)

@@ -6911,30 +6911,16 @@ void Environment::set_concept_descriptions(
 // region EmbeddedDataSpecification
 
 EmbeddedDataSpecification::EmbeddedDataSpecification(
-  std::shared_ptr<IDataSpecificationContent> data_specification_content,
-  std::shared_ptr<IReference> data_specification
+  std::shared_ptr<IReference> data_specification,
+  std::shared_ptr<IDataSpecificationContent> data_specification_content
 ) {
-  data_specification_content_ = std::move(data_specification_content);
-
   data_specification_ = std::move(data_specification);
+
+  data_specification_content_ = std::move(data_specification_content);
 }
 
 ModelType EmbeddedDataSpecification::model_type() const {
   return ModelType::kEmbeddedDataSpecification;
-}
-
-const std::shared_ptr<IDataSpecificationContent>& EmbeddedDataSpecification::data_specification_content() const {
-  return data_specification_content_;
-}
-
-std::shared_ptr<IDataSpecificationContent>& EmbeddedDataSpecification::mutable_data_specification_content() {
-  return data_specification_content_;
-}
-
-void EmbeddedDataSpecification::set_data_specification_content(
-  std::shared_ptr<IDataSpecificationContent> value
-) {
-  data_specification_content_ = value;
 }
 
 const std::shared_ptr<IReference>& EmbeddedDataSpecification::data_specification() const {
@@ -6949,6 +6935,20 @@ void EmbeddedDataSpecification::set_data_specification(
   std::shared_ptr<IReference> value
 ) {
   data_specification_ = value;
+}
+
+const std::shared_ptr<IDataSpecificationContent>& EmbeddedDataSpecification::data_specification_content() const {
+  return data_specification_content_;
+}
+
+std::shared_ptr<IDataSpecificationContent>& EmbeddedDataSpecification::mutable_data_specification_content() {
+  return data_specification_content_;
+}
+
+void EmbeddedDataSpecification::set_data_specification_content(
+  std::shared_ptr<IDataSpecificationContent> value
+) {
+  data_specification_content_ = value;
 }
 
 // endregion EmbeddedDataSpecification

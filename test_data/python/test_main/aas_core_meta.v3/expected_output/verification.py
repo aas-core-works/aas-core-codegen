@@ -7895,20 +7895,20 @@ class _Transformer(
             self,
             that: aas_types.EmbeddedDataSpecification
     ) -> Iterator[Error]:
-        for error in self.transform(that.data_specification_content):
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'data_specification_content'
-                )
-            )
-            yield error
-
         for error in self.transform(that.data_specification):
             error.path._prepend(
                 PropertySegment(
                     that,
                     'data_specification'
+                )
+            )
+            yield error
+
+        for error in self.transform(that.data_specification_content):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'data_specification_content'
                 )
             )
             yield error
