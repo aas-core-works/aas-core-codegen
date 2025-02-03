@@ -4419,7 +4419,7 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
                     or (
                         isinstance(type_anno.items, OurTypeAnnotation)
                         and isinstance(
-                        type_anno.items.our_type, (AbstractClass, ConcreteClass)
+                            type_anno.items.our_type, (AbstractClass, ConcreteClass)
                         )
                     )
                 ):
