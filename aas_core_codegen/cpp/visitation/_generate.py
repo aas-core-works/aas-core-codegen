@@ -341,11 +341,13 @@ Visit(
         else:
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        assert (
+            isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+            or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+            and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            )
         ), (
             f"NOTE (mristin, 2023-03-29): We expect only lists of classes "
             f"at the moment, but you specified {type_anno}. "

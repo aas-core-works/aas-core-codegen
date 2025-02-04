@@ -741,6 +741,18 @@ assert all(
     for primitive_type in intermediate.PrimitiveType
 )
 
+_PRIMITIVE_TYPE_TO_NATIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "bool",
+    intermediate.PrimitiveType.INT: "int64_t",
+    intermediate.PrimitiveType.FLOAT: "double",
+    intermediate.PrimitiveType.STR: "std::wstring",
+    intermediate.PrimitiveType.BYTEARRAY: "std::vector<std::uint8_t>",
+}
+assert all(
+    primitive_type in _PRIMITIVE_TYPE_TO_NATIVE_TYPE
+    for primitive_type in intermediate.PrimitiveType
+)
+
 
 def _generate_get_model_type() -> Stripped:
     """Generate the getter of the model type from JSON object for dispatches."""
@@ -1158,20 +1170,27 @@ def _generate_deserialize_list_property(
     """
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.ListTypeAnnotation)
-    assert isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    assert (
+        isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+        or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+        and isinstance(
+            type_anno.items.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        )
     ), (
         f"NOTE (mristin, 2023-11-10): We expect only lists of classes "
         f"at the moment, but you specified {type_anno}. "
         f"Please contact the developers if you need this feature."
     )
 
-    cls = type_anno.items.our_type
-
-    interface_name = cpp_naming.interface_name(cls.name)
-
-    deserialize_function = _determine_deserialize_function_to_call(cls=cls)
+    if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+        primitive_type = intermediate.try_primitive_type(type_anno.items)
+        interface_name = _PRIMITIVE_TYPE_TO_NATIVE_TYPE[primitive_type]
+        deserialize_function = _PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]
+    else:
+        cls = type_anno.items.our_type
+        interface_name = f"types::{cpp_naming.interface_name(cls.name)}"
+        deserialize_function = _determine_deserialize_function_to_call(cls=cls)
 
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
     json_prop_name = naming.json_property(prop.name)
@@ -1211,7 +1230,7 @@ if (!{var_json}.is_array()) {{
 
 {var_name} = common::make_optional<
 {I}std::vector<
-{II}std::shared_ptr<types::{interface_name}>
+{II}std::shared_ptr<{interface_name}>
 {I}>
 >();
 
@@ -1224,7 +1243,7 @@ for (
 {I}: {var_json}
 ) {{
 {I}common::optional<
-{II}std::shared_ptr<types::{interface_name}>
+{II}std::shared_ptr<{interface_name}>
 {I}> deserialized;
 
 {I}std::tie(
@@ -1300,11 +1319,13 @@ def _generate_deserialize_property(
         else:
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        assert (
+            isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+            or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+            and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            )
         ), (
             f"NOTE (mristin, 2023-11-10): We expect only lists of classes "
             f"at the moment, but you specified {type_anno}. "
@@ -2192,11 +2213,13 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
         else:
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        assert (
+            isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+            or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+            and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            )
         ), (
             f"NOTE (mristin, 2023-11-21): We expect only lists of classes "
             f"at the moment, but you specified {type_anno}. "
