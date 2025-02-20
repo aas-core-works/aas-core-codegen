@@ -9,10 +9,6 @@ import * as AasTypes from "./types";
 
 const MODEL_TYPE_FROM_STRING = new Map<string, AasTypes.ModelType>([
   [
-    "Foo",
-    AasTypes.ModelType.Foo
-  ],
-  [
     "ListOfPrimitives",
     AasTypes.ModelType.ListOfPrimitives
   ]
@@ -32,10 +28,6 @@ export function modelTypeFromString(
 }
 
 const MODEL_TYPE_TO_STRING = new Map<AasTypes.ModelType, string>([
-  [
-    AasTypes.ModelType.Foo,
-    "Foo"
-  ],
   [
     AasTypes.ModelType.ListOfPrimitives,
     "ListOfPrimitives"

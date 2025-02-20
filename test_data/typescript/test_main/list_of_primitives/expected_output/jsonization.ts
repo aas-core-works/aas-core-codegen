@@ -291,83 +291,6 @@ function bytesFromJsonable(
 
 /**
  * Provide de-serialize & set methods for properties
- * of {@link types!Foo}.
- */
-class SetterForFoo {
-
-}
-
-/**
- * Parse an instance of {@link types!Foo} from the JSON-able
- * structure `jsonable`.
- *
- * @param jsonable - structure to be parsed
- * @returns parsed instance of {@link types!Foo},
- * or an error if any
- */
-export function fooFromJsonable(
-  jsonable: JsonValue
-): AasCommon.Either<
-  AasTypes.Foo,
-  DeserializationError
-> {
-  if (jsonable === null) {
-    return newDeserializationError<AasTypes.Foo>(
-      "Expected a JSON object, but got null"
-    );
-  }
-    if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.Foo>(
-        "Expected a JSON object, but got a JSON array"
-      );
-    }
-  if (typeof jsonable !== "object") {
-    return newDeserializationError<AasTypes.Foo>(
-      `Expected a JSON object, but got: ${typeof jsonable}`
-    );
-  }
-
-  const setter = new SetterForFoo();
-
-  for (const key in jsonable) {
-    const jsonableValue = jsonable[key];
-    const setterMethod =
-      SETTER_MAP_FOR_FOO.get(key);
-
-    // NOTE (mristin, 2022-11-30):
-    // Since we conflate here a JavaScript object with a JSON object, we ignore
-    // properties which we do not know how to de-serialize and assume they are
-    // related to the *JavaScript* properties of the object or `Object` prototype.
-    if (setterMethod === undefined) {
-      continue;
-    }
-
-    const error = setterMethod.call(setter, jsonableValue);
-    if (error !== null) {
-      error.path.prepend(
-        new PropertySegment(<JsonObject>jsonable, key)
-      );
-      return new AasCommon.Either<
-        AasTypes.Foo,
-        DeserializationError
-      >(
-          null,
-          error
-        );
-    }
-  }
-
-  return new AasCommon.Either<
-    AasTypes.Foo,
-    DeserializationError
-  >(
-    new AasTypes.Foo(),
-    null
-  );
-}
-
-/**
- * Provide de-serialize & set methods for properties
  * of {@link types!ListOfPrimitives}.
  */
 class SetterForListOfPrimitives {
@@ -640,17 +563,6 @@ export function listOfPrimitivesFromJsonable(
   );
 }
 
-const SETTER_MAP_FOR_FOO =
-  new Map<
-    string,
-    (
-      jsonable: JsonValue
-    ) => DeserializationError | null
-  >(
-    [
-    ]
-  );
-
 const SETTER_MAP_FOR_LIST_OF_PRIMITIVES =
   new Map<
     string,
@@ -683,20 +595,6 @@ const SETTER_MAP_FOR_LIST_OF_PRIMITIVES =
  */
 class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
 
-
-  /**
-   * Serialize `that` to a JSON-able representation.
-   *
-   * @param that - instance to be serialization
-   * @returns JSON-able representation
-   */
-  transformFoo(
-    that: AasTypes.Foo
-  ): JsonObject {
-    const jsonable: JsonObject = {};
-
-    return jsonable;
-  }
 
   /**
    * Serialize `that` to a JSON-able representation.

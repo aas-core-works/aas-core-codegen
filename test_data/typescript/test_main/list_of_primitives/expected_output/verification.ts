@@ -1,13 +1,13 @@
 /**
  * Verify that the instances of the meta-model satisfy the invariants.
  *
- * Here is an example how to verify an instance of {@link types.Foo}:
+ * Here is an example how to verify an instance of {@link types.ListOfPrimitives}:
  *
  * ```ts
  * import * as AasTypes from "test/types";
  * import * as AasVerification from "test/verification";
  *
- * const anInstance = new AasTypes.Foo(
+ * const anInstance = new AasTypes.ListOfPrimitives(
  *   // ... some constructor arguments ...
  * );
  *
@@ -134,15 +134,6 @@ class Verifier
   extends AasTypes.AbstractTransformerWithContext<
     boolean, IterableIterator<VerificationError>
   > {
-  *transformFooWithContext(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    that: AasTypes.Foo,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: boolean
-  ): IterableIterator<VerificationError> {
-    // No verification has been defined for Foo.
-  }
-
   *transformListOfPrimitivesWithContext(
     that: AasTypes.ListOfPrimitives,
     context: boolean

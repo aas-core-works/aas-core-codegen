@@ -5,8 +5,7 @@
  * Represent runtime model type of an instance.
  */
 export enum ModelType {
-  Foo = 0,
-  ListOfPrimitives = 1
+  ListOfPrimitives = 0
 }
 
 /**
@@ -23,8 +22,7 @@ export function *overModelType (
   // NOTE (mristin, 2022-12-03):
   // We yield numbers instead of literals to avoid name lookups on platforms
   // which do not provide JIT compilation of hot paths.
-  yield <ModelType>0;  // Foo
-  yield <ModelType>1;  // ListOfPrimitives
+  yield <ModelType>0;  // ListOfPrimitives
 }
 
 /**
@@ -88,90 +86,6 @@ export abstract class Class {
   ): T;
 }
 
-export class Foo extends Class {
-  /**
-   * Indicate the runtime model type of the instance.
-   */
-  modelType(): ModelType {
-    // NOTE (mristin, 2022-12-03):
-    // We yield numbers instead of literals to avoid name lookups on platforms
-    // which do not provide JIT compilation of hot paths.
-    return <ModelType>0;  // Foo
-  }
-
-  /**
-   * Iterate over the instances referenced from this instance.
-   *
-   * We do not recurse into the referenced instances.
-   *
-   * @returns Iterator over the referenced instances
-   */
-  *descendOnce(): IterableIterator<Class> {
-    // No descendable properties
-  }
-
-  /**
-   * Iterate recursively over the instances referenced from this instance.
-   *
-   * @returns Iterator over the referenced instances
-   */
-  *descend(): IterableIterator<Class> {
-    // No descendable properties
-  }
-
-  /**
-   * Dispatch `visitor` on this instance.
-   *
-   * @param visitor - to visit this instance
-   */
-  accept(visitor: AbstractVisitor): void {
-    visitor.visitFoo(this);
-  }
-
-  /**
-   * Dispatch `visitor` with `context` on this instance.
-   *
-   * @param visitor - to visit this instance
-   * @param context - to be passed along to the dispatched visitor method
-   * @typeParam ContextT - type of the context
-   */
-  acceptWithContext<ContextT>(
-    visitor: AbstractVisitorWithContext<ContextT>,
-    context: ContextT
-  ) {
-    visitor.visitFooWithContext(this, context);
-  }
-
-  /**
-   * Dispatch the `transformer` on this instance.
-   *
-   * @param transformer - to transform this instance
-   * @returns transformation of this instance
-   * @paramType T - type of the transformation result
-   */
-  transform<T>(transformer: AbstractTransformer<T>): T {
-    return transformer.transformFoo(this);
-  }
-
-  /**
-   * Dispatch the `transformer` on this instance in `context`.
-   *
-   * @param transformer - to transform this instance
-   * @param context - to be passed along to the `transformer`
-   * @returns transformation of this instance
-   * @paramType T - type of the transformation result
-   * @paramType ContextT - type of the transformation context
-   */
-  transformWithContext<ContextT, T>(
-    transformer: AbstractTransformerWithContext<ContextT, T>,
-    context: ContextT
-  ): T {
-    return transformer.transformFooWithContext(
-      this, context
-    );
-  }
-}
-
 export class ListOfPrimitives extends Class {
   /**
    * Indicate the runtime model type of the instance.
@@ -180,7 +94,7 @@ export class ListOfPrimitives extends Class {
     // NOTE (mristin, 2022-12-03):
     // We yield numbers instead of literals to avoid name lookups on platforms
     // which do not provide JIT compilation of hot paths.
-    return <ModelType>1;  // ListOfPrimitives
+    return <ModelType>0;  // ListOfPrimitives
   }
 
   strings: Array<string>;
@@ -289,15 +203,6 @@ export abstract class AbstractVisitor {
    *
    * @param that - instance to be visited
    */
-  abstract visitFoo(
-    that: Foo
-  ): void;
-
-  /**
-   * Visit `that`.
-   *
-   * @param that - instance to be visited
-   */
   abstract visitListOfPrimitives(
     that: ListOfPrimitives
   ): void;
@@ -328,17 +233,6 @@ export abstract class AbstractVisitorWithContext<ContextT> {
    * @param that - instance to be visited
    * @param context - of the visitation
    */
-  abstract visitFooWithContext(
-    that: Foo,
-    context: ContextT
-  ): void;
-
-  /**
-   * Visit `that` in `context`.
-   *
-   * @param that - instance to be visited
-   * @param context - of the visitation
-   */
   abstract visitListOfPrimitivesWithContext(
     that: ListOfPrimitives,
     context: ContextT
@@ -353,19 +247,6 @@ export abstract class AbstractVisitorWithContext<ContextT> {
  * inherit from it, and implement only the relevant visit methods.
  */
 export class PassThroughVisitor extends AbstractVisitor {
-  /**
-   * Visit `that`.
-   *
-   * @param that - instance to be visited
-   */
-  visitFoo(
-    that: Foo
-  ): void {
-    for (const another of that.descendOnce()) {
-      this.visit(another);
-    }
-  }
-
   /**
    * Visit `that`.
    *
@@ -405,21 +286,6 @@ export class PassThroughVisitorWithContext<ContextT>
    * @param that - instance to be visited
    * @param context - of the visitation
    */
-  visitFooWithContext(
-    that: Foo,
-    context: ContextT
-  ): void {
-    for (const another of that.descendOnce()) {
-      this.visitWithContext(another, context);
-    }
-  }
-
-  /**
-   * Visit `that` in `context`.
-   *
-   * @param that - instance to be visited
-   * @param context - of the visitation
-   */
   visitListOfPrimitivesWithContext(
     that: ListOfPrimitives,
     context: ContextT
@@ -442,16 +308,6 @@ export abstract class AbstractTransformer<T> {
   transform(that: Class): T {
     return that.transform(this);
   }
-
-  /**
-   * Transform `that`.
-   *
-   * @param that - instance to be transformed
-   * @returns transformed `that`
-   */
-  abstract transformFoo(
-    that: Foo
-  ): T;
 
   /**
    * Transform `that`.
@@ -492,18 +348,6 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
    * @param context - of the transformation
    * @returns transformed `that`
    */
-  abstract transformFooWithContext(
-    that: Foo,
-    context: ContextT
-  ): T;
-
-  /**
-   * Transform `that` in `context`.
-   *
-   * @param that - instance to be transformed
-   * @param context - of the transformation
-   * @returns transformed `that`
-   */
   abstract transformListOfPrimitivesWithContext(
     that: ListOfPrimitives,
     context: ContextT
@@ -534,20 +378,6 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
     super();
     this.defaultResult = defaultResult;
   }
-
-  /**
-   * Transform `that`.
-   *
-   * @param that - instance to be transformed
-   * @returns transformed `that`
-   */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  transformFoo(
-    that: Foo
-  ): T {
-    return this.defaultResult;
-  }
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /**
    * Transform `that`.
@@ -599,22 +429,6 @@ export class TransformerWithDefaultAndContext<ContextT, T>
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  transformFooWithContext(
-    that: Foo,
-    context: ContextT
-  ): T {
-    return this.defaultResult;
-  }
-  /* eslint-enable @typescript-eslint/no-unused-vars */
-
-  /**
-   * Transform `that` in `context`.
-   *
-   * @param that - instance to be transformed
-   * @param context - of the visitation
-   * @returns transformed `that`
-   */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   transformListOfPrimitivesWithContext(
     that: ListOfPrimitives,
     context: ContextT
@@ -622,33 +436,6 @@ export class TransformerWithDefaultAndContext<ContextT, T>
     return this.defaultResult;
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
-}
-
-/**
- * Try to cast `that` instance to
- * the class {@link Foo}.
- *
- * @param that - instance to be casted
- * @returns - casted `that` if cast successful, or `null`
- */
-export function asFoo(
-  that: Class
-): Foo | null {
-  return (that instanceof Foo)
-    ? <Foo>that
-    : null;
-}
-
-/**
- * Check the type of `that` instance.
- *
- * @param that - instance to be type-checked
- * @returns `true` if the type check is successful
- */
-export function isFoo(
-  that: Class
-): that is Foo {
-  return that instanceof Foo;
 }
 
 /**
@@ -682,15 +469,6 @@ class TypeMatcher extends AbstractTransformerWithContext<
   Readonly<Class>,
   boolean
 > {
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  transformFooWithContext(
-    that: Foo,
-    other: Class
-  ): boolean {
-    return isFoo(other);
-  }
-  /* eslint-enable @typescript-eslint/no-unused-vars */
-
   /* eslint-disable @typescript-eslint/no-unused-vars */
   transformListOfPrimitivesWithContext(
     that: ListOfPrimitives,

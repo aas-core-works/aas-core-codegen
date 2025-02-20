@@ -1,10 +1,6 @@
 from typing import List
 
 
-class Foo:
-    pass
-
-
 class List_of_primitives:
     strings: List[str]
     integers: List[int]
