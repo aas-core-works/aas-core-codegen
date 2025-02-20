@@ -646,36 +646,35 @@ def _generate_deserialize_list_property(
     """Generate the code to de-serialize a property ``prop`` as a list."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    # fmt: off
-    assert (
-        isinstance(type_anno, intermediate.ListTypeAnnotation)
-        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
-        )
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
-    # fmt: on
-
+    assert isinstance(type_anno, intermediate.ListTypeAnnotation)
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-    item_our_type = type_anno.items.our_type
-
-    if (
-        isinstance(item_our_type, intermediate.AbstractClass)
-        or len(item_our_type.concrete_descendants) > 0
+    if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+        deserialize_method = "FOO"
+        item_type = "BAR"
+        cls_name = "BAR"
+        xml_prop_name_literal = "BAR"
+    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.items.our_type,
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
     ):
-        interface_name = java_naming.interface_name(type_anno.items.our_type.name)
-        deserialize_method = f"{interface_name}FromElement"
+        item_our_type = type_anno.items.our_type
+        if (
+            isinstance(item_our_type, intermediate.AbstractClass)
+            or len(item_our_type.concrete_descendants) > 0
+        ):
+            interface_name = java_naming.interface_name(type_anno.items.our_type.name)
+            deserialize_method = f"{interface_name}FromElement"
+        else:
+            class_name = java_naming.class_name(type_anno.items.our_type.name)
+            deserialize_method = f"{class_name}FromElement"
+        item_type = java_common.generate_type(type_anno.items)
+        cls_name = java_naming.class_name(cls.name)
+        xml_prop_name_literal = java_common.string_literal(
+            naming.xml_property(prop.name)
+        )
     else:
-        class_name = java_naming.class_name(type_anno.items.our_type.name)
-        deserialize_method = f"{class_name}FromElement"
-
-    item_type = java_common.generate_type(type_anno.items)
-
-    cls_name = java_naming.class_name(cls.name)
-
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+        assert_never(type_anno)
 
     return Stripped(
         f"""\
@@ -1768,16 +1767,13 @@ def _generate_serialize_list_property_as_content(
     """Generate the serialization of a list ``prop`` as a sequence of elements."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    # fmt: off
-    assert (
-        isinstance(type_anno, intermediate.ListTypeAnnotation)
-        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
-        )
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
-    # fmt: on
+    assert isinstance(type_anno, intermediate.ListTypeAnnotation)
+    #     and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+    #     and isinstance(
+    #         type_anno.items.our_type,
+    #         (intermediate.AbstractClass, intermediate.ConcreteClass)
+    #     )
+    # ), "See intermediate._translate._verify_only_simple_type_patterns"
 
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
