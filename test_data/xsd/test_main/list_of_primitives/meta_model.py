@@ -1,19 +1,23 @@
 from typing import List
 from icontract import DBC
 
+
 class Value_data_type(str, DBC):
     """
     any XSD simple type as specified via :class:`Data_type_def_XSD`
     """
 
+
 class Data_type_def_XSD(Enum):
     """
     Enumeration listing all XSD anySimpleTypes
     """
+
     Boolean = "xs:boolean"
     Date = "xs:date"
     Integer = "xs:integer"
     String = "xs:string"
+
 
 class My_class:
     pass

@@ -477,7 +477,7 @@ def _generate_xs_element_for_a_list_property(
             "xs:element",
             {
                 "name": "v",
-                "type":  _PRIMITIVE_MAP[type_anno.items.a_type],
+                "type": _PRIMITIVE_MAP[type_anno.items.a_type],
                 "minOccurs": min_occurs,
                 "maxOccurs": max_occurs,
             },
@@ -488,9 +488,7 @@ def _generate_xs_element_for_a_list_property(
         xs_complex_type = ET.Element("xs:complexType")
         xs_complex_type.append(xs_sequence)
 
-        xs_element = ET.Element(
-            "xs:element", {"name": naming.xml_property(prop.name)}
-        )
+        xs_element = ET.Element("xs:element", {"name": naming.xml_property(prop.name)})
         xs_element.append(xs_complex_type)
     else:
         return None, Error(

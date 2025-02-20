@@ -3009,6 +3009,14 @@ std::tie(
             False,
         )
 
+_PRIMITIVE_TYPE_TO_NATIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "bool",
+    intermediate.PrimitiveType.INT: "int64_t",
+    intermediate.PrimitiveType.FLOAT: "double",
+    intermediate.PrimitiveType.STR: "std::wstring",
+    intermediate.PrimitiveType.BYTEARRAY: "std::vector<std::uint8_t>",
+}
+
 
 def _generate_deserialize_list_property(
     prop: intermediate.Property,
@@ -4424,14 +4432,6 @@ assert all(
     primitive_type in _PRIMITIVE_TYPE_TO_SERIALIZE
     for primitive_type in intermediate.PrimitiveType
 )
-
-_PRIMITIVE_TYPE_TO_NATIVE_TYPE = {
-    intermediate.PrimitiveType.BOOL: "bool",
-    intermediate.PrimitiveType.INT: "int64_t",
-    intermediate.PrimitiveType.FLOAT: "double",
-    intermediate.PrimitiveType.STR: "std::wstring",
-    intermediate.PrimitiveType.BYTEARRAY: "std::vector<std::uint8_t>",
-}
 assert all(
     primitive_type in _PRIMITIVE_TYPE_TO_NATIVE_TYPE
     for primitive_type in intermediate.PrimitiveType
