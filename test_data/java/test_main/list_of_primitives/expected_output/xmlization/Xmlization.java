@@ -440,15 +440,15 @@ public class Xmlization {
                 int index = 0;
                 if(!currentEvent(reader).isStartElement()){
                   final Reporting.Error error = new Reporting.Error(
-                  "Expected a start element opening an instance of BAR, but got an XML "
+                  "Expected a start element opening an instance of std::wstring, but got an XML "
                     + getEventTypeAsString(currentEvent(reader)));
                   error.prependSegment(new Reporting.IndexSegment(index));
-                  error.prependSegment(new Reporting.NameSegment(BAR));
+                  error.prependSegment(new Reporting.NameSegment("strings"));
                   return Result.failure(error);
                 }
                 while (currentEvent(reader).isStartElement()) {
 
-                  Result<? extends BAR> itemResult = tryFOO(reader);
+                  Result<? extends std::wstring> itemResult = tryreadContentAsString(reader);
 
                   if (itemResult.isError()) {
                     itemResult.getError()
@@ -456,8 +456,8 @@ public class Xmlization {
                         new Reporting.IndexSegment(index));
                     itemResult.getError()
                       .prependSegment(
-                        new Reporting.NameSegment(BAR));
-                    return itemResult.castTo(BAR.class);
+                        new Reporting.NameSegment("strings"));
+                    return itemResult.castTo(std::wstring.class);
                   }
 
                   theStrings.add(itemResult.getResult());
@@ -475,15 +475,15 @@ public class Xmlization {
                 int index = 0;
                 if(!currentEvent(reader).isStartElement()){
                   final Reporting.Error error = new Reporting.Error(
-                  "Expected a start element opening an instance of BAR, but got an XML "
+                  "Expected a start element opening an instance of int64_t, but got an XML "
                     + getEventTypeAsString(currentEvent(reader)));
                   error.prependSegment(new Reporting.IndexSegment(index));
-                  error.prependSegment(new Reporting.NameSegment(BAR));
+                  error.prependSegment(new Reporting.NameSegment("integers"));
                   return Result.failure(error);
                 }
                 while (currentEvent(reader).isStartElement()) {
 
-                  Result<? extends BAR> itemResult = tryFOO(reader);
+                  Result<? extends int64_t> itemResult = tryreadContentAsInt(reader);
 
                   if (itemResult.isError()) {
                     itemResult.getError()
@@ -491,8 +491,8 @@ public class Xmlization {
                         new Reporting.IndexSegment(index));
                     itemResult.getError()
                       .prependSegment(
-                        new Reporting.NameSegment(BAR));
-                    return itemResult.castTo(BAR.class);
+                        new Reporting.NameSegment("integers"));
+                    return itemResult.castTo(int64_t.class);
                   }
 
                   theIntegers.add(itemResult.getResult());
@@ -510,15 +510,15 @@ public class Xmlization {
                 int index = 0;
                 if(!currentEvent(reader).isStartElement()){
                   final Reporting.Error error = new Reporting.Error(
-                  "Expected a start element opening an instance of BAR, but got an XML "
+                  "Expected a start element opening an instance of bool, but got an XML "
                     + getEventTypeAsString(currentEvent(reader)));
                   error.prependSegment(new Reporting.IndexSegment(index));
-                  error.prependSegment(new Reporting.NameSegment(BAR));
+                  error.prependSegment(new Reporting.NameSegment("booleans"));
                   return Result.failure(error);
                 }
                 while (currentEvent(reader).isStartElement()) {
 
-                  Result<? extends BAR> itemResult = tryFOO(reader);
+                  Result<? extends bool> itemResult = tryreadContentAsBool(reader);
 
                   if (itemResult.isError()) {
                     itemResult.getError()
@@ -526,8 +526,8 @@ public class Xmlization {
                         new Reporting.IndexSegment(index));
                     itemResult.getError()
                       .prependSegment(
-                        new Reporting.NameSegment(BAR));
-                    return itemResult.castTo(BAR.class);
+                        new Reporting.NameSegment("booleans"));
+                    return itemResult.castTo(bool.class);
                   }
 
                   theBooleans.add(itemResult.getResult());

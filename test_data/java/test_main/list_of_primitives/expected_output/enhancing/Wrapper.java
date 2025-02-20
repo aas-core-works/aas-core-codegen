@@ -33,48 +33,6 @@ class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    List<BAR> strings = that.getStrings();
-    List<BAR> FOO = strings.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof BAR)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a BAR " +
-            ", but got: " + transformed
-          );
-        }
-        return (BAR) transformed;
-      }).collect(Collectors.toList());
-    that.setStrings(FOO);
-
-    List<BAR> integers = that.getIntegers();
-    List<BAR> FOO = integers.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof BAR)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a BAR " +
-            ", but got: " + transformed
-          );
-        }
-        return (BAR) transformed;
-      }).collect(Collectors.toList());
-    that.setIntegers(FOO);
-
-    List<BAR> booleans = that.getBooleans();
-    List<BAR> FOO = booleans.stream()
-      .map(item -> {
-        IClass transformed = transform(item);
-        if (!(transformed instanceof BAR)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a BAR " +
-            ", but got: " + transformed
-          );
-        }
-        return (BAR) transformed;
-      }).collect(Collectors.toList());
-    that.setBooleans(FOO);
-
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
       ? that

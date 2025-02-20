@@ -589,8 +589,8 @@ if (that.{getter_name}().isPresent()) {{
                 assert_never(type_anno.our_type)
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                transformed_name = "FOO"
-                item_interface_name = "BAR"
+                # We can not enhance primitive types; nothing to do here.
+                continue
             elif isinstance(
                 type_anno.items, intermediate.OurTypeAnnotation
             ) and isinstance(
