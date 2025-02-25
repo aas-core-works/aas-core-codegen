@@ -5,7 +5,11 @@
 
 syntax = "proto3";
 
-package aas_core3;
+package aas_core.aas3_0;
+
+option csharp_namespace = "AasCore.Aas3_0.Proto";
+option java_package = "aas_core.aas3_0.types.proto";
+option go_package = "github.com/aas-core-works/aas-core3.0-golang/types/proto";
 
 
 /// <summary>
@@ -3282,14 +3286,14 @@ message Environment {
 /// </summary>
 message EmbeddedDataSpecification {
   /// <summary>
-  /// Reference to the data specification
-  /// </summary>
-  Reference data_specification = 1;
-
-  /// <summary>
   /// Actual content of the data specification
   /// </summary>
-  DataSpecificationContent_choice data_specification_content = 2;
+  DataSpecificationContent_choice data_specification_content = 1;
+
+  /// <summary>
+  /// Reference to the data specification
+  /// </summary>
+  Reference data_specification = 2;
 }
 
 enum DataTypeIec61360 {
