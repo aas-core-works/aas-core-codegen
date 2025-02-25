@@ -484,7 +484,9 @@ syntax = "proto3";
 
 package {namespace};
 
-option csharp_namespace = "{namespace}.Proto";
+option csharp_namespace = "AasCore.Aas3_0.Proto";
+option java_package = "aas_core.aas3_0.types.proto";
+option go_package = "github.com/aas-core-works/aas-core3.0-golang/types/proto";
 
 
 {code_blocks_joined}"""
