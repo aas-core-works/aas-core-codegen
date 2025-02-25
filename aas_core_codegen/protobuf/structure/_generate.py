@@ -484,6 +484,8 @@ syntax = "proto3";
 
 package {namespace};
 
+option csharp_namespace = "{namespace}.Proto";
+
 
 {code_blocks_joined}"""
         ),
