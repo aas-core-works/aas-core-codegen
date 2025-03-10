@@ -13,9 +13,10 @@ def interface_name(identifier: Identifier) -> Identifier:
     """
     Generate a ProtoBuf name for an interface based on its meta-model ``identifier``.
 
-    This method is not to be used because proto3 does not support interfaces.
+    Since proto3 does not directly support interfaces, but only one-of messages
+    (commonly suffixed "_choice"), these names are generated here.
     """
-    raise NotImplementedError("Interfaces are not supported by proto3.")
+    return aas_core_codegen.naming.capitalized_camel_case(identifier) + "_choice"
 
 
 def enum_name(identifier: Identifier) -> Identifier:
@@ -44,10 +45,6 @@ def enum_literal_name(identifier: Identifier) -> Identifier:
     return aas_core_codegen.naming.upper_snake_case(identifier)
 
 
-@ensure(
-    lambda result: "_" not in result,
-    "No underscode allowed so that we can attached our own suffixes such as ``_choice``",
-)
 def class_name(identifier: Identifier) -> Identifier:
     """
     Generate a ProtoBuf name for a class based on its meta-model ``identifier``.

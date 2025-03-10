@@ -138,32 +138,37 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
             return PRIMITIVE_TYPE_MAP[our_type.constrainee]
 
         elif isinstance(our_type, intermediate.Class):
+
             message_name = proto_naming.class_name(our_type.name)
+
             if len(our_type.concrete_descendants) > 0:
                 # NOTE (TomGneuss):
-                # We add the suffix "_choice" to the type name because this type
-                # (either abstract or concrete) has concrete subtypes.
-                # Thus, a choice-object (with that suffix) will be generated and must
-                # be used here.
-                message_name = Identifier(message_name + "_choice")
+                # If the current type is either interface, abstract, or concrete class
+                # and has concrete descendants, it must have the name of a
+                # choice-message to simulate polymorphism
+                message_name = proto_naming.interface_name(our_type.name)
 
             return Stripped(message_name)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         item_type = generate_type(type_annotation=type_annotation.items)
 
+        # NOTE (TomGneuss):
+        # Careful: This does not yet cover the hypothetical scenario where
+        # type_annotation.items is of type intermediate.OptionalTypeAnnotation.
+        # As below, constructs like "repeated optional <type> <name>" are invalid.
         return Stripped(f"repeated {item_type}")
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        value = generate_type(type_annotation=type_annotation.value)
+        value_name = generate_type(type_annotation=type_annotation.value)
 
         # NOTE (TomGneuss):
         # Careful: do not generate "optional" keyword for list-type elements since
         # otherwise we get invalid constructs like "optional repeated <type> <name>".
         if isinstance(type_annotation.value, intermediate.ListTypeAnnotation):
-            return Stripped(f"{value}")
+            return Stripped(f"{value_name}")
         else:
-            return Stripped(f"optional {value}")
+            return Stripped(f"optional {value_name}")
 
     else:
         assert_never(type_annotation)

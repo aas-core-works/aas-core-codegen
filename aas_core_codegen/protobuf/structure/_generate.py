@@ -244,7 +244,7 @@ def _generate_enum(
 
     # write enum and its name
     writer.write(f"enum {name} {{\n")
-    # write at least the unspecified enum entry
+    # write at least the default enum literal
     writer.write(textwrap.indent(f"{proto_naming.enum_name(name)}_UNSPECIFIED = 0;", I))
 
     if len(enum.literals) == 0:
@@ -275,13 +275,16 @@ def _generate_enum(
             writer.write(textwrap.indent(literal_comment, I))
             writer.write("\n")
 
-        # Enums cannot have string-values assigned to them in proto3. Instead, they each get assigned
-        # an ID that is used for (de-)serialization.
-        # If that ID is re-assigned to another literal in the same enum in a later version, a system using the
-        # old version will (de-)serialize that literal differently. Hence, hope that the order of writing the literals
-        # stays the same in each build so that one literal always gets the same ID. Otherwise, don't mix versions.
-        # With each version, compare to the previous one and assign same ID.
-        # With each version, add a `reserved`-statement for deleted literals and their IDs.
+        # Note (TomGneuss):
+        # Enums cannot have string-values assigned to them in proto3. Instead, they
+        # each get an ID assigned that is used for (de-)serialization. If that ID is
+        # re-assigned to another literal in the same enum in a later version, a system
+        # using the old version will (de-)serialize that literal differently.
+        # Hence, hope that the order of writing the literals stays the same in each
+        # build so that existing literals always get the same ID (backward compatible).
+        # Otherwise, don't mix versions. Ideally, with each version, compare to the
+        # previous one and assign the same ID. With every new version, add a
+        # `reserved`-statement for deleted literals and their IDs.
         writer.write(
             textwrap.indent(
                 f"""\
@@ -383,6 +386,10 @@ def _generate_choice_class(cls: intermediate.ClassUnion) -> Stripped:
 
     concrete_classes = []
     if isinstance(cls, intermediate.ConcreteClass):
+        # NOTE (TomGneuss):
+        # The type cls has concrete descendants but is itself concrete, so it must
+        # be listed as one of its own subtypes in the choice message because that
+        # is how proto3 tries to model polymorphism
         concrete_classes.append(cls)
 
     concrete_classes.extend(cls.concrete_descendants)
@@ -392,7 +399,7 @@ def _generate_choice_class(cls: intermediate.ClassUnion) -> Stripped:
         subtype_name = proto_naming.property_name(subtype.name)
         fields.append(Stripped(f"{subtype_type} {subtype_name} = {j + 1};"))
 
-    message_name = Identifier(proto_naming.class_name(cls.name) + "_choice")
+    message_name = Identifier(proto_naming.interface_name(cls.name))
 
     fields_joined = "\n".join(fields)
 
@@ -425,6 +432,7 @@ def generate(
 
     errors = []  # type: List[Error]
 
+    # generate message definitions for concrete classes and enums first
     for our_type in symbol_table.our_types:
         if not isinstance(
             our_type,
@@ -467,6 +475,8 @@ def generate(
         else:
             assert_never(our_type)
 
+    # generate choice messages for all interfaces and abstract or concrete classes
+    # that have concrete descendants
     for cls in symbol_table.classes:
         if len(cls.concrete_descendants) > 0:
             code_blocks.append(_generate_choice_class(cls))
@@ -483,7 +493,6 @@ def generate(
 syntax = "proto3";
 
 package {namespace};
-
 
 {code_blocks_joined}"""
         ),
