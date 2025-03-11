@@ -18,7 +18,7 @@ REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
 class Test_against_recorded(unittest.TestCase):
     def test_against_expected_meta_models(self) -> None:
-        parent_case_dir = REPO_DIR / "test_data" / "proto" / "test_main" / "expected"
+        parent_case_dir = REPO_DIR / "test_data" / "proto" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
         # fmt: off
