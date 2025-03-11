@@ -16,7 +16,9 @@ def interface_name(identifier: Identifier) -> Identifier:
     Since proto3 does not directly support interfaces, but only one-of messages
     (commonly suffixed "_choice"), these names are generated here.
     """
-    return aas_core_codegen.naming.capitalized_camel_case(identifier) + "_choice"
+    return Identifier(
+        aas_core_codegen.naming.capitalized_camel_case(identifier) + "_choice"
+    )
 
 
 def enum_name(identifier: Identifier) -> Identifier:

@@ -227,7 +227,9 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
             if isinstance(element.reference.cls, intermediate.AbstractClass):
                 # We do not generate ProtoBuf code for abstract classes, so we have to refer
                 # to the interface.
-                name_of_our_type = proto_naming.interface_name(element.reference.cls.name)
+                name_of_our_type = proto_naming.interface_name(
+                    element.reference.cls.name
+                )
             elif isinstance(element.reference.cls, intermediate.ConcreteClass):
                 # NOTE (mristin, 2021-12-25):
                 # Though a concrete class can have multiple descendants and the writer
