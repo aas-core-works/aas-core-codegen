@@ -66,16 +66,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    namespace_key = specific_implementations.ImplementationKey("namespace.txt")
+    namespace_key = specific_implementations.ImplementationKey("package.txt")
     namespace_text = context.spec_impls.get(namespace_key, None)
     if namespace_text is None:
-        stderr.write(f"The namespace snippet is missing: {namespace_key}\n")
+        stderr.write(f"The package snippet is missing: {namespace_key}\n")
         return 1
 
     if not proto_common.NAMESPACE_IDENTIFIER_RE.fullmatch(namespace_text):
         stderr.write(
             f"The text from the snippet {namespace_key} "
-            f"is not a valid namespace identifier: {namespace_text!r}\n"
+            f"is not a valid package identifier: {namespace_text!r}\n"
         )
         return 1
 

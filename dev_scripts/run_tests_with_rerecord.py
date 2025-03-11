@@ -24,6 +24,7 @@ def main() -> int:
         "tests.smoke.test_main.Test_against_recorded",
         "tests.typescript.test_main.Test_against_recorded",
         "tests.xsd.test_main.Test_against_recorded",
+        "tests.proto.test_main.Test_against_recorded",
     ]
 
     parser = argparse.ArgumentParser(description=__doc__)

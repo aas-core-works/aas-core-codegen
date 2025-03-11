@@ -5,7 +5,7 @@
 
 syntax = "proto3";
 
-package aas_core3;
+package aas_core.aas3_0;
 
 
 /// <summary>
@@ -40,7 +40,7 @@ message Extension {
   /// <ul>
   ///   <li>
   ///     Constraint AASd-077:
-  ///     The name of an extension (Extension/name) within <see cref="Aas.HasExtensions" /> needs
+  ///     The name of an extension (Extension/name) within <see cref="Aas.HasExtensions_choice" /> needs
   ///     to be unique.
   ///   </li>
   /// </ul>
@@ -164,7 +164,7 @@ enum QualifierKind {
 
   /// <summary>
   /// qualifies the semantic definition the element is referring to
-  /// (<see cref="Aas.HasSemantics.semantic_id" />)
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />)
   /// </summary>
   Qualifierkind_CONCEPT_QUALIFIER = 2;
 
@@ -271,7 +271,7 @@ message AssetAdministrationShell {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -284,8 +284,8 @@ message AssetAdministrationShell {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -585,7 +585,7 @@ message Submodel {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -598,8 +598,8 @@ message Submodel {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -714,7 +714,7 @@ message RelationshipElement {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -727,8 +727,8 @@ message RelationshipElement {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -863,23 +863,23 @@ enum AasSubmodelElements {
 ///   <li>
 ///     Constraint AASd-107:
 ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
-///     a <see cref="Aas.HasSemantics.semantic_id" /> it
+///     a <see cref="Aas.HasSemantics_choice.semantic_id" /> it
 ///     shall be identical to <see cref="Aas.SubmodelElementList.semantic_id_list_element" />.
 ///   </li>
 ///   <li>
 ///     Constraint AASd-114:
 ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
-///     a <see cref="Aas.HasSemantics.semantic_id" /> then they shall be identical.
+///     a <see cref="Aas.HasSemantics_choice.semantic_id" /> then they shall be identical.
 ///   </li>
 ///   <li>
 ///     Constraint AASd-115:
 ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
-///     specify a <see cref="Aas.HasSemantics.semantic_id" /> then the value is assumed to be
+///     specify a <see cref="Aas.HasSemantics_choice.semantic_id" /> then the value is assumed to be
 ///     identical to <see cref="Aas.SubmodelElementList.semantic_id_list_element" />.
 ///   </li>
 ///   <li>
 ///     Constraint AASd-120:
-///     The <see cref="Aas.SubmodelElementList.id_short" /> of a <see cref="Aas.SubmodelElement" /> being a direct child of a
+///     The <see cref="Aas.SubmodelElementList.id_short" /> of a <see cref="Aas.SubmodelElement_choice" /> being a direct child of a
 ///     <see cref="Aas.SubmodelElementList" /> shall not be specified.
 ///   </li>
 ///   <li>
@@ -912,7 +912,7 @@ message SubmodelElementList {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -925,8 +925,8 @@ message SubmodelElementList {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1049,7 +1049,7 @@ message SubmodelElementCollection {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1062,8 +1062,8 @@ message SubmodelElementCollection {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1168,7 +1168,7 @@ message Property {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1181,8 +1181,8 @@ message Property {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1300,7 +1300,7 @@ message MultiLanguageProperty {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1313,8 +1313,8 @@ message MultiLanguageProperty {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1414,7 +1414,7 @@ message Range {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1427,8 +1427,8 @@ message Range {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1538,7 +1538,7 @@ message ReferenceElement {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1551,8 +1551,8 @@ message ReferenceElement {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1647,7 +1647,7 @@ message Blob {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1660,8 +1660,8 @@ message Blob {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1777,7 +1777,7 @@ message File {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1790,8 +1790,8 @@ message File {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -1895,7 +1895,7 @@ message AnnotatedRelationshipElement {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -1908,8 +1908,8 @@ message AnnotatedRelationshipElement {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -2025,7 +2025,7 @@ message Entity {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -2038,8 +2038,8 @@ message Entity {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -2210,12 +2210,12 @@ message EventPayload {
   /// <summary>
   /// Reference to the source event element, including identification of
   /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
-  /// <see cref="Aas.SubmodelElement" />'s.
+  /// <see cref="Aas.SubmodelElement_choice" />'s.
   /// </summary>
   Reference source = 1;
 
   /// <summary>
-  /// <see cref="Aas.HasSemantics.semantic_id" /> of the source event element, if available
+  /// <see cref="Aas.HasSemantics_choice.semantic_id" /> of the source event element, if available
   /// </summary>
   /// <remarks>
   /// It is recommended to use a global reference.
@@ -2227,12 +2227,12 @@ message EventPayload {
   /// </summary>
   /// <remarks>
   /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
-  /// <see cref="Aas.SubmodelElement" />.
+  /// <see cref="Aas.SubmodelElement_choice" />.
   /// </remarks>
   Reference observable_reference = 3;
 
   /// <summary>
-  /// <see cref="Aas.HasSemantics.semantic_id" /> of the referable which defines the scope of
+  /// <see cref="Aas.HasSemantics_choice.semantic_id" /> of the referable which defines the scope of
   /// the event, if available.
   /// </summary>
   /// <remarks>
@@ -2286,7 +2286,7 @@ message BasicEventElement {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -2299,8 +2299,8 @@ message BasicEventElement {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -2370,9 +2370,9 @@ message BasicEventElement {
   repeated EmbeddedDataSpecification embedded_data_specifications = 9;
 
   /// <summary>
-  /// Reference to the <see cref="Aas.Referable" />, which defines the scope of the event.
+  /// Reference to the <see cref="Aas.Referable_choice" />, which defines the scope of the event.
   /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
-  /// <see cref="Aas.SubmodelElement" />.
+  /// <see cref="Aas.SubmodelElement_choice" />.
   /// </summary>
   /// <remarks>
   /// Reference to a referable, e.g., a data element or
@@ -2404,9 +2404,9 @@ message BasicEventElement {
 
   /// <summary>
   /// Information, which outer message infrastructure shall handle messages for
-  /// the <see cref="Aas.EventElement" />. Refers to a <see cref="Aas.Submodel" />,
+  /// the <see cref="Aas.EventElement_choice" />. Refers to a <see cref="Aas.Submodel" />,
   /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
-  /// <see cref="Aas.Entity" />, which contains <see cref="Aas.DataElement" />'s describing
+  /// <see cref="Aas.Entity" />, which contains <see cref="Aas.DataElement_choice" />'s describing
   /// the proprietary specification for the message broker.
   /// </summary>
   /// <remarks>
@@ -2462,7 +2462,7 @@ message BasicEventElement {
 /// <ul>
 ///   <li>
 ///     Constraint AASd-134:
-///     For an <see cref="Aas.Operation" /> the <see cref="Aas.Referable.id_short" /> of all
+///     For an <see cref="Aas.Operation" /> the <see cref="Aas.Referable_choice.id_short" /> of all
 ///     <see cref="Aas.OperationVariable.value" />'s in
 ///     <see cref="Aas.Operation.input_variables" />, <see cref="Aas.Operation.output_variables" />
 ///     and <see cref="Aas.Operation.inoutput_variables" /> shall be unique.
@@ -2483,7 +2483,7 @@ message Operation {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -2496,8 +2496,8 @@ message Operation {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -2615,7 +2615,7 @@ message Capability {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -2628,8 +2628,8 @@ message Capability {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -2802,7 +2802,7 @@ message ConceptDescription {
   /// </summary>
   /// <remarks>
   /// The category is not identical to the semantic definition
-  /// (<see cref="Aas.HasSemantics" />) of an element. The category e.g. could denote that
+  /// (<see cref="Aas.HasSemantics_choice" />) of an element. The category e.g. could denote that
   /// the element is a measurement value whereas the semantic definition of
   /// the element would denote that it is the measured temperature.
   /// </remarks>
@@ -2815,8 +2815,8 @@ message ConceptDescription {
   /// </summary>
   /// <remarks>
   /// In case the element is a property and the property has a semantic definition
-  /// (<see cref="Aas.HasSemantics.semantic_id" />) conformant to IEC61360
-  /// the <see cref="Aas.Referable.id_short" /> is typically identical to the short name in English.
+  /// (<see cref="Aas.HasSemantics_choice.semantic_id" />) conformant to IEC61360
+  /// the <see cref="Aas.Referable_choice.id_short" /> is typically identical to the short name in English.
   /// </remarks>
   optional string id_short = 3;
 
@@ -3002,7 +3002,7 @@ message Reference {
   ReferenceTypes type = 1;
 
   /// <summary>
-  /// <see cref="Aas.HasSemantics.semantic_id" /> of the referenced model element
+  /// <see cref="Aas.HasSemantics_choice.semantic_id" /> of the referenced model element
   /// (<see cref="Aas.Reference.type" /> = <see cref="Aas.ReferenceTypes.MODEL_REFERENCE" />).
   /// </summary>
   /// <remarks>
@@ -3084,7 +3084,7 @@ enum KeyTypes {
   /// Event.
   /// </summary>
   /// <remarks>
-  /// <see cref="Aas.EventElement" /> is abstract.
+  /// <see cref="Aas.EventElement_choice" /> is abstract.
   /// </remarks>
   Keytypes_EVENT_ELEMENT = 9;
 
@@ -3232,7 +3232,7 @@ message LangStringNameType {
   string language = 1;
 
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// Text in the <see cref="Aas.AbstractLangString_choice.language" />
   /// </summary>
   string text = 2;
 }
@@ -3247,7 +3247,7 @@ message LangStringTextType {
   string language = 1;
 
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// Text in the <see cref="Aas.AbstractLangString_choice.language" />
   /// </summary>
   string text = 2;
 }
@@ -3559,7 +3559,7 @@ message LangStringPreferredNameTypeIec61360 {
   string language = 1;
 
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// Text in the <see cref="Aas.AbstractLangString_choice.language" />
   /// </summary>
   string text = 2;
 }
@@ -3574,7 +3574,7 @@ message LangStringShortNameTypeIec61360 {
   string language = 1;
 
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// Text in the <see cref="Aas.AbstractLangString_choice.language" />
   /// </summary>
   string text = 2;
 }
@@ -3589,7 +3589,7 @@ message LangStringDefinitionTypeIec61360 {
   string language = 1;
 
   /// <summary>
-  /// Text in the <see cref="Aas.AbstractLangString.language" />
+  /// Text in the <see cref="Aas.AbstractLangString_choice.language" />
   /// </summary>
   string text = 2;
 }
@@ -3603,7 +3603,7 @@ message LangStringDefinitionTypeIec61360 {
 /// IEC61360 requires also a globally unique identifier for a concept
 /// description. This ID is not part of the data specification template.
 /// Instead the <see cref="Aas.ConceptDescription.id" /> as inherited via
-/// <see cref="Aas.Identifiable" /> is used. Same holds for administrative
+/// <see cref="Aas.Identifiable_choice" /> is used. Same holds for administrative
 /// information like the version and revision.
 /// </para>
 /// <para>
