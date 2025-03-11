@@ -494,6 +494,7 @@ syntax = "proto3";
 
 package {namespace};
 
+
 {code_blocks_joined}"""
         ),
         proto_common.WARNING,
