@@ -2,8 +2,6 @@
 
 from typing import Union
 
-from icontract import ensure
-
 import aas_core_codegen.naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never

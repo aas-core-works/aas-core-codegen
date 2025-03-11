@@ -6,7 +6,7 @@ from typing import List, cast
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Stripped, assert_never, Identifier
+from aas_core_codegen.common import Stripped, assert_never
 from aas_core_codegen.protobuf import naming as proto_naming
 
 
