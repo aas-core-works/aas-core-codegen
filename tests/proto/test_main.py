@@ -66,7 +66,8 @@ class Test_against_recorded(unittest.TestCase):
 
                 if stderr.getvalue() != "":
                     raise AssertionError(
-                        f"Expected no stderr on valid models, but got:\n"
+                        f"Expected no stderr on valid models, but got "
+                        f"for {test_case.model_path}:\n"
                         f"{stderr.getvalue()}"
                     )
 

@@ -3959,85 +3959,126 @@ def _verify_all_the_function_calls_in_the_contracts_are_valid(
     return contract_checker.errors
 
 
-def _verify_all_non_optional_properties_initialized(cls: Class) -> List[Error]:
+def _verify_all_properties_are_initialized_in_the_constructor(
+    symbol_table: SymbolTable,
+) -> List[Error]:
     """
-    Check that all properties of the class are properly initialized in the constructor.
+    Check that all required properties of the class are initialized in the constructor.
 
     For example, check that there is a default value assigned if the constructor
     argument is optional.
     """
     errors = []  # type: List[Error]
 
-    prop_initialized = {prop.name: False for prop in cls.properties}
+    for cls in symbol_table.classes:
+        prop_initialized = {prop.name: False for prop in cls.properties}
 
-    for stmt in cls.constructor.inlined_statements:
-        # NOTE (mristin, 2021-12-19):
-        # Check for type here since it is very likely that we introduce more statement
-        # types in the future. This assertion should warn us in that case.
-        assert isinstance(stmt, construction.AssignArgument)
+        for stmt in cls.constructor.inlined_statements:
+            # NOTE (mristin, 2021-12-19):
+            # Check for type here since it is very likely that we introduce more
+            # statement types in the future. This assertion should warn us in that case.
+            assert isinstance(stmt, construction.AssignArgument)
 
-        prop = cls.properties_by_name.get(stmt.name, None)
-        assert prop is not None, "This should have been caught before: {stmt.name=}"
-
-        if isinstance(prop.type_annotation, OptionalTypeAnnotation):
-            # Since the property is optional, it is enough that we assigned it to
-            # *something*, be it a ``None`` or something else.
-            prop_initialized[prop.name] = True
-
-        else:
-            # The property is mandatory.
-
-            constructor_arg = cls.constructor.arguments_by_name.get(stmt.argument, None)
+            prop = cls.properties_by_name.get(stmt.name, None)
             assert (
-                constructor_arg is not None
-            ), f"This should have been caught before. {stmt.argument=}"
+                prop is not None
+            ), f"This should have been caught before: {stmt.name=}"
 
-            if not isinstance(constructor_arg.type_annotation, OptionalTypeAnnotation):
-                # We know that the property is properly initialized since
-                # the constructor argument is not optional.
+            if isinstance(prop.type_annotation, OptionalTypeAnnotation):
+                # Since the property is optional, it is enough that we assigned it to
+                # *something*, be it a ``None`` or something else.
                 prop_initialized[prop.name] = True
 
-            elif stmt.default is not None:
-                if isinstance(
-                    stmt.default,
-                    (construction.EmptyList, construction.DefaultEnumLiteral),
-                ):
-                    # The property is mandatory, but a non-None default value is given
-                    # in the assign statement, so we know that the property is properly
-                    # initialized.
-                    prop_initialized[prop.name] = True
-                else:
-                    assert_never(stmt.default)
             else:
-                # The property remains improperly initialized since the default value
-                # has not been indicated, the property is not optional and
-                # the constructor argument is optional.
-                pass
+                # The property is mandatory.
 
-    for prop_name, is_initialized in prop_initialized.items():
-        if not is_initialized:
-            errors.append(
-                Error(
-                    (
-                        cls.constructor.parsed.node
-                        if cls.constructor.parsed is not None
-                        else cls.parsed.node
-                    ),
-                    f"The property {prop_name!r} is not properly initialized "
-                    f"in the constructor of the class {cls.name!r}.",
+                constructor_arg = cls.constructor.arguments_by_name.get(
+                    stmt.argument, None
                 )
-            )
+                assert (
+                    constructor_arg is not None
+                ), f"This should have been caught before. {stmt.argument=}"
+
+                if not isinstance(
+                    constructor_arg.type_annotation, OptionalTypeAnnotation
+                ):
+                    # We know that the property is properly initialized since
+                    # the constructor argument is not optional.
+                    prop_initialized[prop.name] = True
+
+                elif stmt.default is not None:
+                    if isinstance(
+                        stmt.default,
+                        (construction.EmptyList, construction.DefaultEnumLiteral),
+                    ):
+                        # The property is mandatory, but a non-None default value is
+                        # given in the assign statement, so we know that the property is
+                        # properly initialized.
+                        prop_initialized[prop.name] = True
+                    else:
+                        assert_never(stmt.default)
+                else:
+                    # The property remains improperly initialized since the default
+                    # value has not been indicated, the property is not optional and
+                    # the constructor argument is optional.
+                    pass
+
+        for prop_name, is_initialized in prop_initialized.items():
+            if not is_initialized:
+                errors.append(
+                    Error(
+                        (
+                            cls.constructor.parsed.node
+                            if cls.constructor.parsed is not None
+                            else cls.parsed.node
+                        ),
+                        f"The property {prop_name!r} is not properly initialized "
+                        f"in the constructor of the class {cls.name!r}.",
+                    )
+                )
 
     return errors
 
 
-def _verify_all_non_optional_properties_are_initialized_in_the_constructor(
+def _verify_optional_constructor_arguments_default_to_none(
     symbol_table: SymbolTable,
 ) -> List[Error]:
+    """
+    Check that all optional constructor arguments are set to ``None``.
+
+    While other values are possible, we enforce ``None`` for consistency to avoid
+    confusion of the users of the generated code.
+    """
     errors = []  # type: List[Error]
 
     for cls in symbol_table.classes:
-        errors.extend(_verify_all_non_optional_properties_initialized(cls=cls))
+        for arg in cls.constructor.arguments:
+            if not isinstance(arg.type_annotation, OptionalTypeAnnotation):
+                continue
+
+            if arg.default is None:
+                errors.append(
+                    Error(
+                        arg.parsed.node,
+                        f"Expected the optional constructor argument {arg.name!r} "
+                        f"of class {cls.name!r} to default to ``None``, "
+                        f"but no default has been set.",
+                    )
+                )
+                continue
+
+            if (
+                not isinstance(arg.default, DefaultPrimitive)
+                or arg.default.value is not None
+            ):
+                errors.append(
+                    Error(
+                        arg.parsed.node,
+                        f"Expected the optional constructor argument {arg.name!r} "
+                        f"of class {cls.name!r} to default to ``None``, "
+                        f"but it was set to a non-None default.",
+                    )
+                )
 
     return errors
 
@@ -4636,20 +4677,19 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
         )
     )
 
-    errors_if_not_all_non_optional_properties_are_initialized_in_the_constructor = (
-        _verify_all_non_optional_properties_are_initialized_in_the_constructor(
+    errors.extend(
+        _verify_optional_constructor_arguments_default_to_none(
             symbol_table=symbol_table
         )
     )
-    errors.extend(
-        errors_if_not_all_non_optional_properties_are_initialized_in_the_constructor
-    )
-    if (
-        len(
-            errors_if_not_all_non_optional_properties_are_initialized_in_the_constructor
+
+    errors_if_not_all_properties_are_initialized_in_the_constructor = (
+        _verify_all_properties_are_initialized_in_the_constructor(
+            symbol_table=symbol_table
         )
-        == 0
-    ):
+    )
+    errors.extend(errors_if_not_all_properties_are_initialized_in_the_constructor)
+    if len(errors_if_not_all_properties_are_initialized_in_the_constructor) == 0:
         errors.extend(
             _verify_constructor_arguments_and_properties_match(
                 symbol_table=symbol_table

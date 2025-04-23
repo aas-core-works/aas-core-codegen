@@ -9,7 +9,9 @@ class Something:
     items: List[Item]
     optional_items: Optional[List[Item]]
 
-    def __init__(self, items: List[Item], optional_items: Optional[List[Item]]) -> None:
+    def __init__(
+        self, items: List[Item], optional_items: Optional[List[Item]] = None
+    ) -> None:
         self.items = items
         self.optional_items = optional_items
 
