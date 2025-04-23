@@ -1,0 +1,1 @@
+Expected the optional constructor argument 'property_b' of class 'SomethingAbstract' to default to ``None``, but no default has been set.

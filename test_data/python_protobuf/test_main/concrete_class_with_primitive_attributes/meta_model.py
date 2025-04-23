@@ -18,11 +18,11 @@ class Something:
         some_float: float,
         some_str: str,
         some_byte_array: bytearray,
-        some_optional_bool: Optional[bool],
-        some_optional_int: Optional[int],
-        some_optional_float: Optional[float],
-        some_optional_str: Optional[str],
-        some_optional_byte_array: Optional[bytearray],
+        some_optional_bool: Optional[bool] = None,
+        some_optional_int: Optional[int] = None,
+        some_optional_float: Optional[float] = None,
+        some_optional_str: Optional[str] = None,
+        some_optional_byte_array: Optional[bytearray] = None
     ) -> None:
         self.some_bool = some_bool
         self.some_int = some_int
