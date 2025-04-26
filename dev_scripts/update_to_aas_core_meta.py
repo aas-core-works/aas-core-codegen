@@ -106,16 +106,18 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
     for starting_point in starting_points:
         print(f"Starting to run tests in: {starting_point} ...")
 
-        cmd = [
-            sys.executable,
-            "-m",
-            "unittest",
-            "discover",
-            "--start-directory",
-            str(starting_point),
-        ]
-
-        subprocess.check_call(cmd)
+        subprocess.check_call(
+            [
+                sys.executable,
+                "-m",
+                "unittest",
+                "discover",
+                "--start-directory",
+                str(starting_point),
+            ],
+            env=env,
+            cwd=str(repo_dir)
+        )
 
     duration = time.perf_counter() - start
     print(f"Re-recording took: {duration:.2f} seconds.")
