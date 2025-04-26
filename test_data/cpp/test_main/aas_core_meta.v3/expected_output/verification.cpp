@@ -5686,6 +5686,19 @@ class OfValueDataType : public impl::IVerificator {
     const std::wstring& value
   );
 
+  OfValueDataType(
+    const OfValueDataType& other
+  );
+  OfValueDataType(
+    OfValueDataType&& other
+  );
+  OfValueDataType& operator=(
+    const OfValueDataType& other
+  );
+  OfValueDataType& operator=(
+    OfValueDataType&& other
+  );
+
   void Start() override;
   void Next() override;
   bool Done() const override;
@@ -5695,58 +5708,199 @@ class OfValueDataType : public impl::IVerificator {
 
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
-  virtual ~OfValueDataType() = default;
+  ~OfValueDataType() override = default;
+
+ private:
+  const std::wstring* value_;
+  long index_;
+  std::unique_ptr<Error> error_;
+  bool done_;
+  std::uint32_t state_;
+
+  void Execute();
 };  // class OfValueDataType
 
 OfValueDataType::OfValueDataType(
-  const std::wstring&
-) {
+  const std::wstring& value
+) : value_(&value) {
   // Intentionally empty.
+}
+
+OfValueDataType::OfValueDataType(
+  const OfValueDataType& other
+) {
+  value_ = other.value_;
+  index_ = other.index_;
+  error_ = common::make_unique<Error>(*other.error_);
+  done_ = other.done_;
+  state_ = other.state_;
+}
+
+OfValueDataType::OfValueDataType(
+  OfValueDataType&& other
+) {
+  value_ = other.value_;
+  index_ = other.index_;
+  error_ = std::move(other.error_);
+  done_ = other.done_;
+  state_ = other.state_;
+}
+
+OfValueDataType& OfValueDataType::operator=(
+  const OfValueDataType& other
+) {
+  return *this = OfValueDataType(other);
+}
+
+OfValueDataType& OfValueDataType::operator=(
+  OfValueDataType&& other
+) {
+  if (this != &other) {
+    value_ = other.value_;
+    index_ = other.index_;
+    error_ = std::move(other.error_);
+    done_ = other.done_;
+    state_ = other.state_;
+  }
+
+  return *this;
 }
 
 void OfValueDataType::Start() {
-  // Intentionally empty.
+  state_ = 0;
+  Execute();
 }
 
 void OfValueDataType::Next() {
-  throw std::logic_error(
-    "You want to move "
-    "a verificator OfValueDataType, "
-    "but the verificator is always done as "
-    "there are no invariants defined for this constrained primitive."
-  );
+  #ifdef DEBUG
+  if (Done()) {
+    throw std::logic_error(
+      "You want to move a verificator OfValueDataType, "
+      "but the verificator was done."
+    );
+  }
+  #endif
+
+  Execute();
 }
 
 bool OfValueDataType::Done() const {
-  return true;
+  return done_;
 }
 
 const Error& OfValueDataType::Get() const {
-  throw std::logic_error(
-    "You want to get from "
-    "a verificator OfValueDataType, "
-    "but the verificator is always done as "
-    "there are no invariants defined for this constrained primitive."
-  );
+  #ifdef DEBUG
+  if (Done()) {
+    throw std::logic_error(
+      "You want to get from a verificator OfValueDataType, "
+      "but the verificator was done."
+    );
+  }
+  #endif
+
+  return *error_;
 }
 
 Error& OfValueDataType::GetMutable() {
-  throw std::logic_error(
-    "You want to get mutable from "
-    "a verificator OfValueDataType, "
-    "but the verificator is always done as "
-    "there are no invariants defined for this constrained primitive."
-  );
+  #ifdef DEBUG
+  if (Done()) {
+    throw std::logic_error(
+      "You want to get mutable from a verificator OfValueDataType, "
+      "but the verificator was done."
+    );
+  }
+  #endif
+
+  return *error_;
 }
 
 long OfValueDataType::Index() const {
-  return -1;
+  #ifdef DEBUG
+  if (Done() && index_ != -1) {
+    throw std::logic_error(
+      common::Concat(
+        "Expected index to be -1 "
+        "from a done verificator OfValueDataType, "
+        "but got: ",
+        std::to_string(index_)
+      )
+    );
+  }
+  #endif
+
+  return index_;
 }
 
 std::unique_ptr<impl::IVerificator> OfValueDataType::Clone() const {
   return common::make_unique<
     OfValueDataType
   >(*this);
+}
+
+void OfValueDataType::Execute() {
+  while (true) {
+    switch (state_) {
+      case 0: {
+        done_ = false;
+        error_ = nullptr;
+        index_ = -1;
+
+        if (
+          MatchesXmlSerializableString(
+            (*value_)
+          )
+        ) {
+          state_ = 1;
+          continue;
+        }
+
+        error_ = common::make_unique<Error>(
+          L"Constraint AASd-130: An attribute with data type 'string' "
+          L"shall consist of these characters only: "
+          L"^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
+        );
+        // No path is prepended as the error refers to the value itself.
+        ++index_;
+
+        state_ = 1;
+        return;
+      }
+
+      case 1: {
+        if ((*value_).size() >= 1) {
+          state_ = 2;
+          continue;
+        }
+
+        error_ = common::make_unique<Error>(
+          L"The value must not be empty."
+        );
+        // No path is prepended as the error refers to the value itself.
+        ++index_;
+
+        state_ = 2;
+        return;
+      }
+
+      case 2: {
+        done_ = true;
+        error_ = nullptr;
+        index_ = -1;
+
+        // We invalidate the state since we reached the end of the routine.
+        state_ = 3;
+        return;
+      }
+
+      default:
+        throw std::logic_error(
+          common::Concat(
+            "Invalid state_: ",
+            std::to_string(state_)
+          )
+        );
+    }
+  }
 }
 
 class OfIdShortType : public impl::IVerificator {

@@ -6300,6 +6300,12 @@
         ReferenceType="HasSubtype"
         IsForward="false"
       >String</Reference>
+      <Reference
+        ReferenceType="ns=1;i=2053660172"
+      >ns=1;i=1391739223</Reference>
+      <Reference
+        ReferenceType="ns=1;i=2053660172"
+      >ns=1;i=1586258210</Reference>
     </References>
   </UADataType>
   <UADataType

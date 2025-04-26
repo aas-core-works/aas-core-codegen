@@ -10180,10 +10180,21 @@ export function *verifyQualifierType(
  * @returns errors, if any
  */
 export function *verifyValueDataType(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   that: string
 ): IterableIterator<VerificationError> {
-  // There is no verification specified.
+  if (!matchesXmlSerializableString(that)) {
+    yield new VerificationError(
+      "Constraint AASd-130: An attribute with data type 'string' " +
+      "shall consist of these characters only: " +
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
+    )
+  }
+
+  if (!(that.length >= 1)) {
+    yield new VerificationError(
+      "The value must not be empty."
+    )
+  }
 }
 
 /**

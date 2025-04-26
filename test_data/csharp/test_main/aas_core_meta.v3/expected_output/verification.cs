@@ -9969,8 +9969,21 @@ namespace AasCore.Aas3_0
         public static IEnumerable<Reporting.Error> VerifyValueDataType (
             string that)
         {
-            // There is no verification specified.
-            yield break;
+            if (!Verification.MatchesXmlSerializableString(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Constraint AASd-130: An attribute with data type 'string' " +
+                    "shall consist of these characters only: " +
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
+            }
+
+            if (!(that.Length >= 1))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "The value must not be empty.");
+            }
         }
 
         /// <summary>
