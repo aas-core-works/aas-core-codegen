@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import Optional, List, MutableMapping
+from typing import Optional
 
 AAS_CORE_META_DEPENDENCY_RE = re.compile(
     r"aas-core-meta@git\+https://github.com/aas-core-works/aas-core-meta@([a-fA-F0-9]+)#egg=aas-core-meta"
@@ -116,7 +116,7 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
                 str(starting_point),
             ],
             env=env,
-            cwd=str(repo_dir)
+            cwd=str(repo_dir),
         )
 
     duration = time.perf_counter() - start
