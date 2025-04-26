@@ -470,7 +470,7 @@ UnverifiedSymbolTable(
       name='Value_data_type',
       is_implementation_specific=False,
       inheritances=[
-        'str'],
+        'Non_empty_XML_serializable_string'],
       properties=[],
       methods=[],
       invariants=[],

@@ -8608,18 +8608,21 @@ def verify_qualifier_type(
         )
 
 
-# noinspection PyUnusedLocal
 def verify_value_data_type(
         that: str
 ) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
-    # There is no verification specified.
-    return
+    if not matches_xml_serializable_string(that):
+        yield Error(
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
+        )
 
-    # Empty generator according to:
-    # https://stackoverflow.com/a/13243870/1600678
-    # noinspection PyUnreachableCode
-    yield
+    if not (len(that) >= 1):
+        yield Error(
+            'The value must not be empty.'
+        )
 
 
 def verify_id_short_type(

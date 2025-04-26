@@ -13733,7 +13733,28 @@ func VerifyValueDataType(
 ) (abort bool) {
 	abort = false
 
-	// There is no verification specified.
+	if !MatchesXMLSerializableString(that) {
+		abort = onError(
+			newVerificationError(
+				"Constraint AASd-130: An attribute with data type 'string' " +
+				"shall consist of these characters only: " +
+				"^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(len(that) >= 1) {
+		abort = onError(
+			newVerificationError(
+				"The value must not be empty.",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	return
 }
