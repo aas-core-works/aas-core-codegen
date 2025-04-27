@@ -9764,6 +9764,24 @@ export function *verify(
  * @param that - to be verified
  * @returns errors, if any
  */
+export function *verifyXmlSerializableString(
+  that: string
+): IterableIterator<VerificationError> {
+  if (!matchesXmlSerializableString(that)) {
+    yield new VerificationError(
+      "Constraint AASd-130: An attribute with data type 'string' " +
+      "shall consist of these characters only: " +
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
+    )
+  }
+}
+
+/**
+ * Verify the constraints of `that` value.
+ *
+ * @param that - to be verified
+ * @returns errors, if any
+ */
 export function *verifyNonEmptyXmlSerializableString(
   that: string
 ): IterableIterator<VerificationError> {
@@ -10187,12 +10205,6 @@ export function *verifyValueDataType(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
       "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
-    )
-  }
-
-  if (!(that.length >= 1)) {
-    yield new VerificationError(
-      "The value must not be empty."
     )
   }
 }

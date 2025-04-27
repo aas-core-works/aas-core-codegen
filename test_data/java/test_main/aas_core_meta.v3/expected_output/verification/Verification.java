@@ -9366,6 +9366,25 @@ public class Verification {
   /**
    * Verify the constraints of {@code that}.
    */
+  public static Stream<Reporting.Error> verifyXmlSerializableString (
+    String that) {
+    Stream<Reporting.Error> errorStream = Stream.empty();
+
+    if (!matchesXmlSerializableString(that)) {
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(new Reporting.Error(
+          "Invariant violated:\n" +
+          "Constraint AASd-130: An attribute with data type \'string\' " +
+          "shall consist of these characters only: " +
+          "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.")));
+    }
+
+    return errorStream;
+  }
+
+  /**
+   * Verify the constraints of {@code that}.
+   */
   public static Stream<Reporting.Error> verifyNonEmptyXmlSerializableString (
     String that) {
     Stream<Reporting.Error> errorStream = Stream.empty();
@@ -9830,13 +9849,6 @@ public class Verification {
           "Constraint AASd-130: An attribute with data type \'string\' " +
           "shall consist of these characters only: " +
           "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.")));
-    }
-
-    if (!(that.length() >= 1)) {
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(new Reporting.Error(
-          "Invariant violated:\n" +
-          "The value must not be empty.")));
     }
 
     return errorStream;

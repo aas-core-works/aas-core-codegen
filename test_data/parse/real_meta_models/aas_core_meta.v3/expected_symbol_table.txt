@@ -1,7 +1,7 @@
 UnverifiedSymbolTable(
   our_types=[
     ConcreteClass(
-      name='Non_empty_XML_serializable_string',
+      name='XML_serializable_string',
       is_implementation_specific=False,
       inheritances=[
         'str'],
@@ -18,7 +18,22 @@ UnverifiedSymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          node=...),
+          node=...)],
+      serialization=None,
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    ConcreteClass(
+      name='Non_empty_XML_serializable_string',
+      is_implementation_specific=False,
+      inheritances=[
+        'XML_serializable_string'],
+      properties=[],
+      methods=[],
+      invariants=[
         Invariant(
           description='The value must not be empty.',
           body=textwrap.dedent("""\
@@ -470,7 +485,7 @@ UnverifiedSymbolTable(
       name='Value_data_type',
       is_implementation_specific=False,
       inheritances=[
-        'Non_empty_XML_serializable_string'],
+        'XML_serializable_string'],
       properties=[],
       methods=[],
       invariants=[],

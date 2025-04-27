@@ -2297,6 +2297,213 @@ bool IsBcp47ForEnglish(
 
 namespace constrained_primitive_verificator {
 
+class OfXmlSerializableString : public impl::IVerificator {
+ public:
+  OfXmlSerializableString(
+    const std::wstring& value
+  );
+
+  OfXmlSerializableString(
+    const OfXmlSerializableString& other
+  );
+  OfXmlSerializableString(
+    OfXmlSerializableString&& other
+  );
+  OfXmlSerializableString& operator=(
+    const OfXmlSerializableString& other
+  );
+  OfXmlSerializableString& operator=(
+    OfXmlSerializableString&& other
+  );
+
+  void Start() override;
+  void Next() override;
+  bool Done() const override;
+  const Error& Get() const override;
+  Error& GetMutable() override;
+  long Index() const override;
+
+  std::unique_ptr<impl::IVerificator> Clone() const override;
+
+  ~OfXmlSerializableString() override = default;
+
+ private:
+  const std::wstring* value_;
+  long index_;
+  std::unique_ptr<Error> error_;
+  bool done_;
+  std::uint32_t state_;
+
+  void Execute();
+};  // class OfXmlSerializableString
+
+OfXmlSerializableString::OfXmlSerializableString(
+  const std::wstring& value
+) : value_(&value) {
+  // Intentionally empty.
+}
+
+OfXmlSerializableString::OfXmlSerializableString(
+  const OfXmlSerializableString& other
+) {
+  value_ = other.value_;
+  index_ = other.index_;
+  error_ = common::make_unique<Error>(*other.error_);
+  done_ = other.done_;
+  state_ = other.state_;
+}
+
+OfXmlSerializableString::OfXmlSerializableString(
+  OfXmlSerializableString&& other
+) {
+  value_ = other.value_;
+  index_ = other.index_;
+  error_ = std::move(other.error_);
+  done_ = other.done_;
+  state_ = other.state_;
+}
+
+OfXmlSerializableString& OfXmlSerializableString::operator=(
+  const OfXmlSerializableString& other
+) {
+  return *this = OfXmlSerializableString(other);
+}
+
+OfXmlSerializableString& OfXmlSerializableString::operator=(
+  OfXmlSerializableString&& other
+) {
+  if (this != &other) {
+    value_ = other.value_;
+    index_ = other.index_;
+    error_ = std::move(other.error_);
+    done_ = other.done_;
+    state_ = other.state_;
+  }
+
+  return *this;
+}
+
+void OfXmlSerializableString::Start() {
+  state_ = 0;
+  Execute();
+}
+
+void OfXmlSerializableString::Next() {
+  #ifdef DEBUG
+  if (Done()) {
+    throw std::logic_error(
+      "You want to move a verificator OfXmlSerializableString, "
+      "but the verificator was done."
+    );
+  }
+  #endif
+
+  Execute();
+}
+
+bool OfXmlSerializableString::Done() const {
+  return done_;
+}
+
+const Error& OfXmlSerializableString::Get() const {
+  #ifdef DEBUG
+  if (Done()) {
+    throw std::logic_error(
+      "You want to get from a verificator OfXmlSerializableString, "
+      "but the verificator was done."
+    );
+  }
+  #endif
+
+  return *error_;
+}
+
+Error& OfXmlSerializableString::GetMutable() {
+  #ifdef DEBUG
+  if (Done()) {
+    throw std::logic_error(
+      "You want to get mutable from a verificator OfXmlSerializableString, "
+      "but the verificator was done."
+    );
+  }
+  #endif
+
+  return *error_;
+}
+
+long OfXmlSerializableString::Index() const {
+  #ifdef DEBUG
+  if (Done() && index_ != -1) {
+    throw std::logic_error(
+      common::Concat(
+        "Expected index to be -1 "
+        "from a done verificator OfXmlSerializableString, "
+        "but got: ",
+        std::to_string(index_)
+      )
+    );
+  }
+  #endif
+
+  return index_;
+}
+
+std::unique_ptr<impl::IVerificator> OfXmlSerializableString::Clone() const {
+  return common::make_unique<
+    OfXmlSerializableString
+  >(*this);
+}
+
+void OfXmlSerializableString::Execute() {
+  while (true) {
+    switch (state_) {
+      case 0: {
+        done_ = false;
+        error_ = nullptr;
+        index_ = -1;
+
+        if (
+          MatchesXmlSerializableString(
+            (*value_)
+          )
+        ) {
+          state_ = 1;
+          continue;
+        }
+
+        error_ = common::make_unique<Error>(
+          L"Constraint AASd-130: An attribute with data type 'string' "
+          L"shall consist of these characters only: "
+          L"^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
+        );
+        // No path is prepended as the error refers to the value itself.
+        ++index_;
+
+        state_ = 1;
+        return;
+      }
+
+      case 1: {
+        done_ = true;
+        error_ = nullptr;
+        index_ = -1;
+
+        // We invalidate the state since we reached the end of the routine.
+        state_ = 2;
+        return;
+      }
+
+      default:
+        throw std::logic_error(
+          common::Concat(
+            "Invalid state_: ",
+            std::to_string(state_)
+          )
+        );
+    }
+  }
+}
+
 class OfNonEmptyXmlSerializableString : public impl::IVerificator {
  public:
   OfNonEmptyXmlSerializableString(
@@ -5867,28 +6074,12 @@ void OfValueDataType::Execute() {
       }
 
       case 1: {
-        if ((*value_).size() >= 1) {
-          state_ = 2;
-          continue;
-        }
-
-        error_ = common::make_unique<Error>(
-          L"The value must not be empty."
-        );
-        // No path is prepended as the error refers to the value itself.
-        ++index_;
-
-        state_ = 2;
-        return;
-      }
-
-      case 2: {
         done_ = true;
         error_ = nullptr;
         index_ = -1;
 
         // We invalidate the state since we reached the end of the routine.
-        state_ = 3;
+        state_ = 2;
         return;
       }
 
@@ -6167,6 +6358,54 @@ void OfIdShortType::Execute() {
 }  // namespace constrained_primitive_verificator
 
 namespace constrained_primitive_verification {
+
+// region OfXmlSerializableString
+
+class OfXmlSerializableString : public IVerification {
+ public:
+  OfXmlSerializableString(
+    const std::wstring& value
+  );
+
+  Iterator begin() const override;
+  const Iterator& end() const override;
+
+  ~OfXmlSerializableString() override = default;
+ private:
+  const std::wstring& value_;
+};  // class ConstrainedPrimitiveVerification
+
+OfXmlSerializableString::OfXmlSerializableString(
+  const std::wstring& value
+) : value_(value) {
+  // Intentionally empty.
+}
+
+Iterator OfXmlSerializableString::begin() const {
+  std::unique_ptr<impl::IVerificator> verificator(
+    common::make_unique<
+      constrained_primitive_verificator::OfXmlSerializableString
+    >(value_)
+  );
+
+  verificator->Start();
+
+  // NOTE(mristin):
+  // We short-circuit here for efficiency, as we can immediately dispose
+  // of the verificator.
+  if (verificator->Done()) {
+    return Iterator(common::make_unique<AlwaysDoneVerificator>());
+  }
+
+  return Iterator(std::move(verificator));
+}
+
+const Iterator& OfXmlSerializableString::end() const {
+  static Iterator iterator(common::make_unique<AlwaysDoneVerificator>());
+  return iterator;
+}
+
+// endregion OfXmlSerializableString
 
 // region OfNonEmptyXmlSerializableString
 
@@ -6985,6 +7224,14 @@ const Iterator& OfIdShortType::end() const {
 // endregion OfIdShortType
 
 }  // namespace constrained_primitive_verification
+
+std::unique_ptr<IVerification> VerifyXmlSerializableString(
+  const std::wstring& that
+) {
+  return common::make_unique<
+    constrained_primitive_verification::OfXmlSerializableString
+  >(that);
+}
 
 std::unique_ptr<IVerification> VerifyNonEmptyXmlSerializableString(
   const std::wstring& that
