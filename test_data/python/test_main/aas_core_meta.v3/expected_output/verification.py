@@ -8301,6 +8301,18 @@ def verify(
     yield from _TRANSFORMER.transform(that)
 
 
+def verify_xml_serializable_string(
+        that: str
+) -> Iterator[Error]:
+    """Verify the constraints of :paramref:`that`."""
+    if not matches_xml_serializable_string(that):
+        yield Error(
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
+        )
+
+
 def verify_non_empty_xml_serializable_string(
         that: str
 ) -> Iterator[Error]:
@@ -8617,11 +8629,6 @@ def verify_value_data_type(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
             '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
-        )
-
-    if not (len(that) >= 1):
-        yield Error(
-            'The value must not be empty.'
         )
 
 

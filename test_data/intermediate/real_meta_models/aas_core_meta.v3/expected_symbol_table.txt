@@ -1,7 +1,7 @@
 SymbolTable(
   our_types=[
     ConstrainedPrimitive(
-      name='Non_empty_XML_serializable_string',
+      name='XML_serializable_string',
       inheritances=[],
       inheritance_id_set=...,
       ancestors=[],
@@ -20,7 +20,43 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
+          parsed=...)],
+      invariant_id_set=...,
+      description=DescriptionOfOurType(
+        summary='<paragraph>Represent a string which must be serializable to XML.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[
+          [
+            'AASd-130',
+            textwrap.dedent("""\
+              <field_body><paragraph>An attribute with data type "string" shall consist of these characters only:
+              <literal>^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u00010000-\\u0010FFFF]*$</literal>.</paragraph></field_body>""")]],
+        parsed=...),
+      parsed=...),
+    ConstrainedPrimitive(
+      name='Non_empty_XML_serializable_string',
+      inheritances=[
+        'Reference to ConstrainedPrimitive XML_serializable_string'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string'],
+      ancestor_id_set=...,
+      descendant_id_set=...,
+      constrainee='STR',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description="Constraint AASd-130: An attribute with data type 'string' shall consist of these characters only: ^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.",
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='matches_XML_serializable_string',
+              args=[
+                Name(
+                  identifier='self',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -42,17 +78,9 @@ SymbolTable(
           parsed=...)],
       invariant_id_set=...,
       description=DescriptionOfOurType(
-        summary='<paragraph>Represent a string with at least one character.</paragraph>',
-        remarks=[
-          textwrap.dedent("""\
-            <paragraph>The string should also be serializable to XML, which is the background for
-            the following constraint.</paragraph>""")],
-        constraints_by_identifier=[
-          [
-            'AASd-130',
-            textwrap.dedent("""\
-              <field_body><paragraph>An attribute with data type "string" shall consist of these characters only:
-              <literal>^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u00010000-\\u0010FFFF]*$</literal>.</paragraph></field_body>""")]],
+        summary='<paragraph>Represent an XML-serializable string with at least one character.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
         parsed=...),
       parsed=...),
     ConstrainedPrimitive(
@@ -148,6 +176,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -164,7 +193,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -215,6 +244,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -231,7 +261,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -282,6 +312,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -298,7 +329,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -349,6 +380,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -365,7 +397,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -428,6 +460,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -444,7 +477,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -507,6 +540,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -523,7 +557,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -574,6 +608,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -590,7 +625,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -671,6 +706,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
@@ -687,7 +723,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -760,6 +796,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Identifier'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
         'Reference to ConstrainedPrimitive Identifier'],
       ancestor_id_set=...,
@@ -777,7 +814,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -831,6 +868,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Name_type'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
         'Reference to ConstrainedPrimitive Name_type'],
       ancestor_id_set=...,
@@ -848,7 +886,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -896,10 +934,10 @@ SymbolTable(
     ConstrainedPrimitive(
       name='Value_data_type',
       inheritances=[
-        'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
+        'Reference to ConstrainedPrimitive XML_serializable_string'],
       inheritance_id_set=...,
       ancestors=[
-        'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string'],
+        'Reference to ConstrainedPrimitive XML_serializable_string'],
       ancestor_id_set=...,
       descendant_id_set=...,
       constrainee='STR',
@@ -915,25 +953,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
-          parsed=...),
-        Invariant(
-          description='The value must not be empty.',
-          body=textwrap.dedent("""\
-            Comparison(
-              left=FunctionCall(
-                name='len',
-                args=[
-                  Name(
-                    identifier='self',
-                    original_node=...)],
-                original_node=...),
-              op='GE',
-              right=Constant(
-                value=1,
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...)],
       invariant_id_set=...,
       description=DescriptionOfOurType(
@@ -948,6 +968,7 @@ SymbolTable(
         'Reference to ConstrainedPrimitive Name_type'],
       inheritance_id_set=...,
       ancestors=[
+        'Reference to ConstrainedPrimitive XML_serializable_string',
         'Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
         'Reference to ConstrainedPrimitive Name_type'],
       ancestor_id_set=...,
@@ -965,7 +986,7 @@ SymbolTable(
                   identifier='self',
                   original_node=...)],
               original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Non_empty_XML_serializable_string',
+          specified_for='Reference to ConstrainedPrimitive XML_serializable_string',
           parsed=...),
         Invariant(
           description='The value must not be empty.',
@@ -27456,6 +27477,7 @@ SymbolTable(
     'Reference to our type Blob_type',
     'Reference to our type Capability',
     'Reference to our type Concept_description',
+    'Reference to our type XML_serializable_string',
     'Reference to our type Non_empty_XML_serializable_string',
     'Reference to our type Content_type',
     'Reference to our type Data_specification_content',
@@ -27515,6 +27537,7 @@ SymbolTable(
     'Reference to our type Data_type_def_XSD',
     'Reference to our type Data_type_IEC_61360'],
   constrained_primitives=[
+    'Reference to our type XML_serializable_string',
     'Reference to our type Non_empty_XML_serializable_string',
     'Reference to our type Date_time_UTC',
     'Reference to our type Duration',

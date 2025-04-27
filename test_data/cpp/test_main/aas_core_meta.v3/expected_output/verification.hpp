@@ -812,6 +812,18 @@ bool IsBcp47ForEnglish(
  * \param that value to be verified
  * \return Iterable over constraint violations
  */
+std::unique_ptr<IVerification> VerifyXmlSerializableString(
+  const std::wstring& that
+);
+
+/**
+ * \brief Verify that the invariants hold for \p that value.
+ *
+ * The \p that value should outlive the verification.
+ *
+ * \param that value to be verified
+ * \return Iterable over constraint violations
+ */
 std::unique_ptr<IVerification> VerifyNonEmptyXmlSerializableString(
   const std::wstring& that
 );
