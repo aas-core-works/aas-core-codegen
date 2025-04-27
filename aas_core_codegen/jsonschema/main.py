@@ -10,6 +10,7 @@ from typing import (
     List,
     Sequence,
     Mapping,
+    Callable,
 )
 
 from icontract import ensure, require
@@ -173,11 +174,17 @@ def _define_constraints_for_primitive_type(
     primitive_type: intermediate.PrimitiveType,
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    fix_pattern: Callable[[str], str],
 ) -> MutableMapping[str, Any]:
     """
     Generate the constraints, if any, for the ``primitive_type``.
 
     If there are no constraints, an empty mapping is returned.
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the regex engine. For example, some JSON schema verification engines expect only
+    characters below Basic Multilingual Plane (BMP), and use surrogate pairs to
+    represent characters above BMP.
     """
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
 
@@ -198,9 +205,7 @@ def _define_constraints_for_primitive_type(
         and len(pattern_constraints) > 0
     ):
         if len(pattern_constraints) == 1:
-            definition["pattern"] = fix_pattern_for_utf16(
-                pattern_constraints[0].pattern
-            )
+            definition["pattern"] = fix_pattern(pattern_constraints[0].pattern)
         else:
             all_of = [definition]  # type: List[MutableMapping[str, Any]]
 
@@ -210,7 +215,7 @@ def _define_constraints_for_primitive_type(
                         [
                             (
                                 "pattern",
-                                fix_pattern_for_utf16(pattern_constraint.pattern),
+                                fix_pattern(pattern_constraint.pattern),
                             )
                         ]
                     )
@@ -226,11 +231,17 @@ def _define_constraints(
     type_annotation: intermediate.TypeAnnotation,
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
     """
     Generate only the constraints for the given ``type_annotation``.
 
     The type is generated in a separated function, `_generate_type`.
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the regex engine. For example, some JSON schema verification engines expect only
+    characters below Basic Multilingual Plane (BMP), and use surrogate pairs to
+    represent characters above BMP.
 
     If there are no constraints, an empty mapping is returned.
     """
@@ -240,6 +251,7 @@ def _define_constraints(
                 primitive_type=type_annotation.a_type,
                 len_constraint=len_constraint,
                 pattern_constraints=pattern_constraints,
+                fix_pattern=fix_pattern,
             ),
             None,
         )
@@ -260,6 +272,7 @@ def _define_constraints(
                     primitive_type=type_annotation.our_type.constrainee,
                     len_constraint=len_constraint,
                     pattern_constraints=pattern_constraints,
+                    fix_pattern=fix_pattern,
                 ),
                 None,
             )
@@ -324,6 +337,7 @@ def _define_constraints(
 def _define_properties(
     cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the definitions of the meta-model properties for the given ``cls``.
@@ -331,6 +345,11 @@ def _define_properties(
     The property ``modelType`` is defined separately as we need to distinguish
     cases where it is set (concrete class) and not (abstract class, or stub of
     a concrete class with descendants).
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the regex engine. For example, some JSON schema verification engines expect only
+    characters below Basic Multilingual Plane (BMP), and use surrogate pairs to
+    represent characters above BMP.
     """
     errors = []  # type: List[Error]
 
@@ -369,6 +388,7 @@ def _define_properties(
             type_annotation=type_anno,
             len_constraint=len_constraint,
             pattern_constraints=pattern_constraints,
+            fix_pattern=fix_pattern,
         )
         if error is not None:
             errors.append(error)
@@ -454,9 +474,13 @@ def _define_all_of_for_inheritance(
 def _generate_inheritable_definition(
     cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate a definition of ``cls`` for inheritance through ``allOf``.
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the respective JSON schema engine.
 
     The definitions are to be *extended* with the resulting mapping.
     """
@@ -467,6 +491,7 @@ def _generate_inheritable_definition(
     properties, properties_error = _define_properties(
         cls=cls,
         constraints_by_property=constraints_by_property,
+        fix_pattern=fix_pattern,
     )
     if properties_error is not None:
         errors.extend(properties_error)
@@ -547,8 +572,14 @@ def _generate_choice_definition(
 def _generate_concrete_definition(
     cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
-    """Generate the definition of a concrete class to be matched by an instance."""
+    """
+    Generate the definition of a concrete class to be matched by an instance.
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the respective JSON schema engine.
+    """
     # NOTE (mristin, 2023-03-13):
     # We distinguish between two definitions corresponding to the same concrete
     # class:
@@ -586,6 +617,7 @@ def _generate_concrete_definition(
     properties, properties_error = _define_properties(
         cls=cls,
         constraints_by_property=constraints_by_property,
+        fix_pattern=fix_pattern,
     )
     if properties_error is not None:
         errors.extend(properties_error)
@@ -674,11 +706,22 @@ class Definitions:
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate(
+def generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
+    fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the JSON schema based on the ``symbol_table."""
+    """
+    Generate the JSON schema based on the symbol table.
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the respective JSON schema engine.
+
+    This function is intended to be used not only by aas-core-codegen, but also for
+    downstream clients. For example, the downstream clients should use this function
+    to customize how patterns should be rendered / fixed for the respective regex
+    engine.
+    """
     schema_base_key = specific_implementations.ImplementationKey("schema_base.json")
 
     schema_base_json = spec_impls.get(schema_base_key, None)
@@ -823,6 +866,7 @@ def _generate(
                     inheritable, definition_errors = _generate_inheritable_definition(
                         cls=our_type,
                         constraints_by_property=constraints_by_class[our_type],
+                        fix_pattern=fix_pattern,
                     )
 
                     if definition_errors is not None:
@@ -854,6 +898,7 @@ def _generate(
                     definition, definition_errors = _generate_concrete_definition(
                         cls=our_type,
                         constraints_by_property=constraints_by_class[our_type],
+                        fix_pattern=fix_pattern,
                     )
                     if definition_errors is not None:
                         errors.extend(definition_errors)
@@ -905,8 +950,10 @@ def _generate(
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    code, errors = _generate(
-        symbol_table=context.symbol_table, spec_impls=context.spec_impls
+    code, errors = generate(
+        symbol_table=context.symbol_table,
+        spec_impls=context.spec_impls,
+        fix_pattern=fix_pattern_for_utf16,
     )
 
     if errors is not None:
