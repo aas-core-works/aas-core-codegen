@@ -782,11 +782,13 @@ class IteratorQualities:
                 relevant_properties.append(prop)
 
             elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                assert isinstance(
-                    type_anno.items, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                assert (
+                    isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+                    or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                    and isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    )
                 ), (
                     f"NOTE (mristin, 2023-09-27): We expect only lists of classes "
                     f"at the moment, but you specified {prop.type_annotation} "
@@ -947,11 +949,13 @@ item_ = std::move(
                 flow.append(yielding_flow.Yield())
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            assert (
+                isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+                or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                )
             ), (
                 f"NOTE (mristin, 2023-09-27): We expect only lists of classes "
                 f"at the moment, but you specified {prop.type_annotation} "

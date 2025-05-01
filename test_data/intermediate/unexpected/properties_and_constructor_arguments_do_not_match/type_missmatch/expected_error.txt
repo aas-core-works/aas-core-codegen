@@ -1,0 +1,1 @@
+The constructor argument 'x' and the property 'x' for the class 'SomeContainerClass' mismatch in type. The argument is typed as List[int] while the property is typed as List[str]. We expect the constructors and the properties to match in type.

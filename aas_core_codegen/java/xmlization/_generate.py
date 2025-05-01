@@ -249,6 +249,31 @@ private static boolean isEmptyElement(XMLEventReader reader) {{
     )
 
 
+_PRIMITIVE_TYPE_TO_DESERIALIZE = {
+    intermediate.PrimitiveType.BOOL: "readContentAsBool",
+    intermediate.PrimitiveType.INT: "readContentAsInt",
+    intermediate.PrimitiveType.FLOAT: "readContentAsFloat",
+    intermediate.PrimitiveType.STR: "readContentAsString",
+    intermediate.PrimitiveType.BYTEARRAY: "readContentAsBase64",
+}
+assert all(
+    primitive_type in _PRIMITIVE_TYPE_TO_DESERIALIZE
+    for primitive_type in intermediate.PrimitiveType
+)
+
+_PRIMITIVE_TYPE_TO_NATIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "bool",
+    intermediate.PrimitiveType.INT: "int",
+    intermediate.PrimitiveType.FLOAT: "double",
+    intermediate.PrimitiveType.STR: "String",
+    intermediate.PrimitiveType.BYTEARRAY: "bytes",
+}
+assert all(
+    primitive_type in _PRIMITIVE_TYPE_TO_NATIVE_TYPE
+    for primitive_type in intermediate.PrimitiveType
+)
+
+
 def _generate_deserialize_primitive_property(
     prop: intermediate.Property, cls: intermediate.ConcreteClass
 ) -> Stripped:
@@ -258,19 +283,7 @@ def _generate_deserialize_primitive_property(
     a_type = intermediate.try_primitive_type(type_anno)
     assert a_type is not None, f"Unexpected type annotation: {prop.type_annotation}"
 
-    deserialization_expr: str
-    if a_type is intermediate.PrimitiveType.BOOL:
-        deserialization_expr = "readContentAsBool(reader)"
-    elif a_type is intermediate.PrimitiveType.INT:
-        deserialization_expr = "readContentAsInt(reader)"
-    elif a_type is intermediate.PrimitiveType.FLOAT:
-        deserialization_expr = "readContentAsFloat(reader)"
-    elif a_type is intermediate.PrimitiveType.STR:
-        deserialization_expr = "readContentAsString(reader)"
-    elif a_type is intermediate.PrimitiveType.BYTEARRAY:
-        deserialization_expr = "readContentAsBase64(reader)"
-    else:
-        assert_never(a_type)
+    deserialization_expr: str = f"{_PRIMITIVE_TYPE_TO_DESERIALIZE[a_type]}(reader)"
 
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
 
@@ -646,34 +659,31 @@ def _generate_deserialize_list_property(
     """Generate the code to de-serialize a property ``prop`` as a list."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    # fmt: off
-    assert (
-        isinstance(type_anno, intermediate.ListTypeAnnotation)
-        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
-        )
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
-    # fmt: on
-
+    assert isinstance(type_anno, intermediate.ListTypeAnnotation)
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-    item_our_type = type_anno.items.our_type
-
-    if (
-        isinstance(item_our_type, intermediate.AbstractClass)
-        or len(item_our_type.concrete_descendants) > 0
+    if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+        deserialize_method = _PRIMITIVE_TYPE_TO_DESERIALIZE[type_anno.items.a_type]
+        item_type = _PRIMITIVE_TYPE_TO_NATIVE_TYPE[type_anno.items.a_type]
+        cls_name = _PRIMITIVE_TYPE_TO_NATIVE_TYPE[type_anno.items.a_type]
+    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.items.our_type,
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
     ):
-        interface_name = java_naming.interface_name(type_anno.items.our_type.name)
-        deserialize_method = f"{interface_name}FromElement"
+        item_our_type = type_anno.items.our_type
+        if (
+            isinstance(item_our_type, intermediate.AbstractClass)
+            or len(item_our_type.concrete_descendants) > 0
+        ):
+            interface_name = java_naming.interface_name(type_anno.items.our_type.name)
+            deserialize_method = f"{interface_name}FromElement"
+        else:
+            class_name = java_naming.class_name(type_anno.items.our_type.name)
+            deserialize_method = f"{class_name}FromElement"
+        item_type = java_common.generate_type(type_anno.items)
+        cls_name = java_naming.class_name(cls.name)
     else:
-        class_name = java_naming.class_name(type_anno.items.our_type.name)
-        deserialize_method = f"{class_name}FromElement"
-
-    item_type = java_common.generate_type(type_anno.items)
-
-    cls_name = java_naming.class_name(cls.name)
+        assert_never(type_anno)
 
     xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
 
@@ -1768,16 +1778,13 @@ def _generate_serialize_list_property_as_content(
     """Generate the serialization of a list ``prop`` as a sequence of elements."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    # fmt: off
-    assert (
-        isinstance(type_anno, intermediate.ListTypeAnnotation)
-        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
-        )
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
-    # fmt: on
+    assert isinstance(type_anno, intermediate.ListTypeAnnotation)
+    #     and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+    #     and isinstance(
+    #         type_anno.items.our_type,
+    #         (intermediate.AbstractClass, intermediate.ConcreteClass)
+    #     )
+    # ), "See intermediate._translate._verify_only_simple_type_patterns"
 
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))

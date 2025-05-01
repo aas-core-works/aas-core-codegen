@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="listOfPrimitives">
+    <xs:sequence>
+      <xs:element name="foo" type="xs:string"/>
+      <xs:element name="strings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="integers">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:long" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="booleans">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:boolean" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="classes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="myClass" type="myClass_t" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="myClass">
+    <xs:sequence/>
+  </xs:group>
+  <xs:simpleType name="valueDataType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="listOfPrimitives_t">
+    <xs:sequence>
+      <xs:group ref="listOfPrimitives"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="myClass_t">
+    <xs:sequence>
+      <xs:group ref="myClass"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="list_of_primitives" type="listOfPrimitives_t"/>
+</xs:schema>

@@ -3009,6 +3009,23 @@ std::tie(
             False,
         )
 
+_PRIMITIVE_TYPE_TO_NATIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "bool",
+    intermediate.PrimitiveType.INT: "int64_t",
+    intermediate.PrimitiveType.FLOAT: "double",
+    intermediate.PrimitiveType.STR: "std::wstring",
+    intermediate.PrimitiveType.BYTEARRAY: "std::vector<std::uint8_t>",
+}
+
+
+_PRIMITIVE_TYPE_TO_NATIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: "bool",
+    intermediate.PrimitiveType.INT: "int64_t",
+    intermediate.PrimitiveType.FLOAT: "double",
+    intermediate.PrimitiveType.STR: "std::wstring",
+    intermediate.PrimitiveType.BYTEARRAY: "std::vector<std::uint8_t>",
+}
+
 
 def _generate_deserialize_list_property(
     prop: intermediate.Property,
@@ -3022,23 +3039,30 @@ def _generate_deserialize_list_property(
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.ListTypeAnnotation)
 
-    assert isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    assert (
+        isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+        or isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+        and isinstance(
+            type_anno.items.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        )
     ), (
         f"NOTE (mristin, 2023-12-10): We expect only lists of classes "
         f"at the moment, but you specified {type_anno}. "
         f"Please contact the developers if you need this feature."
     )
 
-    item_type = cpp_common.generate_type(
-        type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
-    )
-
-    from_element_name = cpp_naming.function_name(
-        Identifier(f"{type_anno.items.our_type.name}_from_element")
-    )
-
+    if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+        primitive_type = intermediate.try_primitive_type(type_anno.items)
+        item_type = _PRIMITIVE_TYPE_TO_NATIVE_TYPE[primitive_type]
+        from_element_name = _PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]
+    else:
+        item_type = cpp_common.generate_type(
+            type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+        from_element_name = cpp_naming.function_name(
+            Identifier(f"{type_anno.items.our_type.name}_from_element")
+        )
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
     # NOTE (mristin, 2023-12-12):
@@ -4417,6 +4441,10 @@ assert all(
     primitive_type in _PRIMITIVE_TYPE_TO_SERIALIZE
     for primitive_type in intermediate.PrimitiveType
 )
+assert all(
+    primitive_type in _PRIMITIVE_TYPE_TO_NATIVE_TYPE
+    for primitive_type in intermediate.PrimitiveType
+)
 
 
 def _generate_serialize_primitive_value(
@@ -4462,26 +4490,32 @@ def _generate_serialize_list(
     item_type_annotation: intermediate.TypeAnnotationUnion, var_name: Identifier
 ) -> Stripped:
     """Serialize the list at ``var_name``."""
-    assert isinstance(
-        item_type_annotation, intermediate.OurTypeAnnotation
-    ) and isinstance(
-        item_type_annotation.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    assert (
+        isinstance(item_type_annotation, intermediate.PrimitiveTypeAnnotation)
+        or isinstance(item_type_annotation, intermediate.OurTypeAnnotation)
+        and isinstance(
+            item_type_annotation.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        )
     ), (
         f"NOTE (mristin, 2023-12-20): We expect only lists of classes "
         f"at the moment, but you specified a list of {item_type_annotation}. "
         f"Please contact the developers if you need this feature."
     )
 
-    item_cls = item_type_annotation.our_type
-
-    item_serialize_function = cpp_naming.function_name(
-        Identifier(f"serialize_{item_cls.name}_as_element")
-    )
-
-    item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=item_type_annotation, types_namespace=cpp_common.TYPES_NAMESPACE
-    )
+    if isinstance(item_type_annotation, intermediate.PrimitiveTypeAnnotation):
+        primitive_type = intermediate.try_primitive_type(item_type_annotation)
+        item_type = _PRIMITIVE_TYPE_TO_NATIVE_TYPE[primitive_type]
+        item_serialize_function = _PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]
+    else:
+        item_cls = item_type_annotation.our_type
+        item_serialize_function = cpp_naming.function_name(
+            Identifier(f"serialize_{item_cls.name}_as_element")
+        )
+        item_type = cpp_common.generate_type_with_const_ref_if_applicable(
+            type_annotation=item_type_annotation,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
+        )
 
     return Stripped(
         f"""\

@@ -18281,7 +18281,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -18306,7 +18306,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.refersTo !== null) {
-      const refersToArray = new Array<JsonObject>();
+      const refersToArray = new Array<JsonValue>();
       for (const item of that.refersTo) {
         refersToArray.push(
           this.transform(item)
@@ -18330,7 +18330,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -18379,7 +18379,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -18428,7 +18428,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -18448,7 +18448,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -18458,7 +18458,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -18476,7 +18476,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
       that.id;
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -18494,7 +18494,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
       this.transform(that.assetInformation);
 
     if (that.submodels !== null) {
-      const submodelsArray = new Array<JsonObject>();
+      const submodelsArray = new Array<JsonValue>();
       for (const item of that.submodels) {
         submodelsArray.push(
           this.transform(item)
@@ -18530,7 +18530,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.specificAssetIds !== null) {
-      const specificAssetIdsArray = new Array<JsonObject>();
+      const specificAssetIdsArray = new Array<JsonValue>();
       for (const item of that.specificAssetIds) {
         specificAssetIdsArray.push(
           this.transform(item)
@@ -18591,7 +18591,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -18626,7 +18626,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -18646,7 +18646,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -18656,7 +18656,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -18686,7 +18686,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -18696,7 +18696,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -18706,7 +18706,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -18716,7 +18716,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.submodelElements !== null) {
-      const submodelElementsArray = new Array<JsonObject>();
+      const submodelElementsArray = new Array<JsonValue>();
       for (const item of that.submodelElements) {
         submodelElementsArray.push(
           this.transform(item)
@@ -18742,7 +18742,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -18762,7 +18762,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -18772,7 +18772,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -18787,7 +18787,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -18797,7 +18797,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -18807,7 +18807,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -18839,7 +18839,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -18859,7 +18859,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -18869,7 +18869,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -18884,7 +18884,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -18894,7 +18894,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -18904,7 +18904,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -18936,7 +18936,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.value !== null) {
-      const valueArray = new Array<JsonObject>();
+      const valueArray = new Array<JsonValue>();
       for (const item of that.value) {
         valueArray.push(
           this.transform(item)
@@ -18962,7 +18962,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -18982,7 +18982,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -18992,7 +18992,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19007,7 +19007,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19017,7 +19017,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19027,7 +19027,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19037,7 +19037,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.value !== null) {
-      const valueArray = new Array<JsonObject>();
+      const valueArray = new Array<JsonValue>();
       for (const item of that.value) {
         valueArray.push(
           this.transform(item)
@@ -19063,7 +19063,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19083,7 +19083,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19093,7 +19093,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19108,7 +19108,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19118,7 +19118,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19128,7 +19128,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19169,7 +19169,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19189,7 +19189,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19199,7 +19199,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19214,7 +19214,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19224,7 +19224,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19234,7 +19234,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19244,7 +19244,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.value !== null) {
-      const valueArray = new Array<JsonObject>();
+      const valueArray = new Array<JsonValue>();
       for (const item of that.value) {
         valueArray.push(
           this.transform(item)
@@ -19275,7 +19275,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19295,7 +19295,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19305,7 +19305,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19320,7 +19320,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19330,7 +19330,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19340,7 +19340,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19381,7 +19381,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19401,7 +19401,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19411,7 +19411,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19426,7 +19426,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19436,7 +19436,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19446,7 +19446,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19477,7 +19477,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19497,7 +19497,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19507,7 +19507,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19522,7 +19522,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19532,7 +19532,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19542,7 +19542,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19576,7 +19576,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19596,7 +19596,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19606,7 +19606,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19621,7 +19621,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19631,7 +19631,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19641,7 +19641,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19675,7 +19675,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19695,7 +19695,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19705,7 +19705,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19720,7 +19720,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19730,7 +19730,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19740,7 +19740,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19756,7 +19756,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
       this.transform(that.second);
 
     if (that.annotations !== null) {
-      const annotationsArray = new Array<JsonObject>();
+      const annotationsArray = new Array<JsonValue>();
       for (const item of that.annotations) {
         annotationsArray.push(
           this.transform(item)
@@ -19782,7 +19782,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19802,7 +19802,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19812,7 +19812,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19827,7 +19827,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -19837,7 +19837,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -19847,7 +19847,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -19857,7 +19857,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.statements !== null) {
-      const statementsArray = new Array<JsonObject>();
+      const statementsArray = new Array<JsonValue>();
       for (const item of that.statements) {
         statementsArray.push(
           this.transform(item)
@@ -19877,7 +19877,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.specificAssetIds !== null) {
-      const specificAssetIdsArray = new Array<JsonObject>();
+      const specificAssetIdsArray = new Array<JsonValue>();
       for (const item of that.specificAssetIds) {
         specificAssetIdsArray.push(
           this.transform(item)
@@ -19951,7 +19951,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -19971,7 +19971,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -19981,7 +19981,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -19996,7 +19996,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -20006,7 +20006,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -20016,7 +20016,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -20080,7 +20080,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -20100,7 +20100,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -20110,7 +20110,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -20125,7 +20125,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -20135,7 +20135,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -20145,7 +20145,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -20155,7 +20155,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.inputVariables !== null) {
-      const inputVariablesArray = new Array<JsonObject>();
+      const inputVariablesArray = new Array<JsonValue>();
       for (const item of that.inputVariables) {
         inputVariablesArray.push(
           this.transform(item)
@@ -20165,7 +20165,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.outputVariables !== null) {
-      const outputVariablesArray = new Array<JsonObject>();
+      const outputVariablesArray = new Array<JsonValue>();
       for (const item of that.outputVariables) {
         outputVariablesArray.push(
           this.transform(item)
@@ -20175,7 +20175,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.inoutputVariables !== null) {
-      const inoutputVariablesArray = new Array<JsonObject>();
+      const inoutputVariablesArray = new Array<JsonValue>();
       for (const item of that.inoutputVariables) {
         inoutputVariablesArray.push(
           this.transform(item)
@@ -20218,7 +20218,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -20238,7 +20238,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -20248,7 +20248,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -20263,7 +20263,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.supplementalSemanticIds !== null) {
-      const supplementalSemanticIdsArray = new Array<JsonObject>();
+      const supplementalSemanticIdsArray = new Array<JsonValue>();
       for (const item of that.supplementalSemanticIds) {
         supplementalSemanticIdsArray.push(
           this.transform(item)
@@ -20273,7 +20273,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.qualifiers !== null) {
-      const qualifiersArray = new Array<JsonObject>();
+      const qualifiersArray = new Array<JsonValue>();
       for (const item of that.qualifiers) {
         qualifiersArray.push(
           this.transform(item)
@@ -20283,7 +20283,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -20309,7 +20309,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.extensions !== null) {
-      const extensionsArray = new Array<JsonObject>();
+      const extensionsArray = new Array<JsonValue>();
       for (const item of that.extensions) {
         extensionsArray.push(
           this.transform(item)
@@ -20329,7 +20329,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.displayName !== null) {
-      const displayNameArray = new Array<JsonObject>();
+      const displayNameArray = new Array<JsonValue>();
       for (const item of that.displayName) {
         displayNameArray.push(
           this.transform(item)
@@ -20339,7 +20339,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.description !== null) {
-      const descriptionArray = new Array<JsonObject>();
+      const descriptionArray = new Array<JsonValue>();
       for (const item of that.description) {
         descriptionArray.push(
           this.transform(item)
@@ -20357,7 +20357,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
       that.id;
 
     if (that.embeddedDataSpecifications !== null) {
-      const embeddedDataSpecificationsArray = new Array<JsonObject>();
+      const embeddedDataSpecificationsArray = new Array<JsonValue>();
       for (const item of that.embeddedDataSpecifications) {
         embeddedDataSpecificationsArray.push(
           this.transform(item)
@@ -20367,7 +20367,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.isCaseOf !== null) {
-      const isCaseOfArray = new Array<JsonObject>();
+      const isCaseOfArray = new Array<JsonValue>();
       for (const item of that.isCaseOf) {
         isCaseOfArray.push(
           this.transform(item)
@@ -20402,7 +20402,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
         this.transform(that.referredSemanticId);
     }
 
-    const keysArray = new Array<JsonObject>();
+    const keysArray = new Array<JsonValue>();
     for (const item of that.keys) {
       keysArray.push(
         this.transform(item)
@@ -20487,7 +20487,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     const jsonable: JsonObject = {};
 
     if (that.assetAdministrationShells !== null) {
-      const assetAdministrationShellsArray = new Array<JsonObject>();
+      const assetAdministrationShellsArray = new Array<JsonValue>();
       for (const item of that.assetAdministrationShells) {
         assetAdministrationShellsArray.push(
           this.transform(item)
@@ -20497,7 +20497,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.submodels !== null) {
-      const submodelsArray = new Array<JsonObject>();
+      const submodelsArray = new Array<JsonValue>();
       for (const item of that.submodels) {
         submodelsArray.push(
           this.transform(item)
@@ -20507,7 +20507,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.conceptDescriptions !== null) {
-      const conceptDescriptionsArray = new Array<JsonObject>();
+      const conceptDescriptionsArray = new Array<JsonValue>();
       for (const item of that.conceptDescriptions) {
         conceptDescriptionsArray.push(
           this.transform(item)
@@ -20596,7 +20596,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
   ): JsonObject {
     const jsonable: JsonObject = {};
 
-    const valueReferencePairsArray = new Array<JsonObject>();
+    const valueReferencePairsArray = new Array<JsonValue>();
     for (const item of that.valueReferencePairs) {
       valueReferencePairsArray.push(
         this.transform(item)
@@ -20678,7 +20678,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
   ): JsonObject {
     const jsonable: JsonObject = {};
 
-    const preferredNameArray = new Array<JsonObject>();
+    const preferredNameArray = new Array<JsonValue>();
     for (const item of that.preferredName) {
       preferredNameArray.push(
         this.transform(item)
@@ -20687,7 +20687,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     jsonable["preferredName"] = preferredNameArray;
 
     if (that.shortName !== null) {
-      const shortNameArray = new Array<JsonObject>();
+      const shortNameArray = new Array<JsonValue>();
       for (const item of that.shortName) {
         shortNameArray.push(
           this.transform(item)
@@ -20724,7 +20724,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
     }
 
     if (that.definition !== null) {
-      const definitionArray = new Array<JsonObject>();
+      const definitionArray = new Array<JsonValue>();
       for (const item of that.definition) {
         definitionArray.push(
           this.transform(item)

@@ -472,6 +472,24 @@ def _generate_xs_element_for_a_list_property(
             )
         else:
             assert_never(our_type)
+    elif isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+        xs_element_inner = ET.Element(
+            "xs:element",
+            {
+                "name": "v",
+                "type": _PRIMITIVE_MAP[type_anno.items.a_type],
+                "minOccurs": min_occurs,
+                "maxOccurs": max_occurs,
+            },
+        )
+        xs_sequence = ET.Element("xs:sequence")
+        xs_sequence.append(xs_element_inner)
+
+        xs_complex_type = ET.Element("xs:complexType")
+        xs_complex_type.append(xs_sequence)
+
+        xs_element = ET.Element("xs:element", {"name": naming.xml_property(prop.name)})
+        xs_element.append(xs_complex_type)
     else:
         return None, Error(
             prop.parsed.node,

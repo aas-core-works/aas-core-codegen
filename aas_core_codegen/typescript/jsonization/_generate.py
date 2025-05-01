@@ -1102,23 +1102,21 @@ jsonable[{key_literal}] =
             )
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items,
-                (intermediate.PrimitiveType, intermediate.OurTypeAnnotation),
-            ), (
-                "We expect only lists of primitive and our types. Lists of optionals "
-                "and nested lists are not handled yet. Please contact the developers."
-            )
-
-            transformation_expression = _generate_transform_atomic_value(
-                access_expression=Stripped("item"), type_anno=type_anno.items
-            )
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                transformation_expression = f"{_PARSE_FUNCTION_BY_PRIMITIVE_TYPE[type_anno.items.a_type]}(item).mustValue()"
+            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                transformation_expression = _generate_transform_atomic_value(
+                    access_expression=Stripped("item"), type_anno=type_anno.items
+                )
+            else:
+                assert_never(type_anno)
+                raise AssertionError("Unexpected code path")
 
             var_name = typescript_naming.variable_name(Identifier(f"{prop.name}_array"))
 
             block = Stripped(
                 f"""\
-const {var_name} = new Array<JsonObject>();
+const {var_name} = new Array<JsonValue>();
 for (const item of that.{prop_name}) {{
 {I}{var_name}.push(
 {II}{indent_but_first_line(transformation_expression, II)}

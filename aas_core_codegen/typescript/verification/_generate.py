@@ -856,7 +856,10 @@ for (const error of this.transformWithContext(
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.OurTypeAnnotation), (
+        assert isinstance(
+            type_anno.items,
+            (intermediate.OurTypeAnnotation, intermediate.PrimitiveTypeAnnotation),
+        ), (
             "We chose to implement only a very limited pattern matching; "
             "see the note above in the code."
         )

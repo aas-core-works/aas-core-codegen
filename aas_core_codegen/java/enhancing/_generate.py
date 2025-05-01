@@ -588,27 +588,24 @@ if (that.{getter_name}().isPresent()) {{
             else:
                 assert_never(type_anno.our_type)
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            # fmt: off
-            assert (
-                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass)
-               )
-            ), (
-                "We handle only lists of classes in the enhancing at the moment. "
-                "The meta-model does not contain any other lists, so we wanted to "
-                "keep the code as simple as possible, and avoid unrolling. Please "
-                "contact the developers if you need this feature."
-            )
-            # fmt: on
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                # We can not enhance primitive types; nothing to do here.
+                continue
+            elif isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                transformed_name = java_naming.variable_name(
+                    Identifier(f"transformed_{prop.name}")
+                )
 
-            item_interface_name = java_naming.interface_name(
-                type_anno.items.our_type.name
-            )
-            transformed_name = java_naming.variable_name(
-                Identifier(f"transformed_{prop.name}")
-            )
+                item_interface_name = java_naming.interface_name(
+                    type_anno.items.our_type.name
+                )
+            else:
+                assert_never(type_anno)
 
             getter_name = java_naming.getter_name(prop.name)
 
