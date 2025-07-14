@@ -171,6 +171,9 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
             if not isinstance(type_anno, intermediate.ListTypeAnnotation):
                 continue
 
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                continue
+
             assert isinstance(
                 type_anno.items, intermediate.OurTypeAnnotation
             ) and isinstance(type_anno.items.our_type, intermediate.Class), (

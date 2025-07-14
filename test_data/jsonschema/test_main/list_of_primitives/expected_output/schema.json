@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "AssetAdministrationShellEnvironment",
+  "type": "object",
+  "$id": "https://dummy.com",
+  "definitions": {
+    "ListOfPrimitives": {
+      "type": "object",
+      "properties": {
+        "strings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "integers": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "booleans": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        }
+      },
+      "required": [
+        "strings",
+        "integers",
+        "booleans"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": []
+    }
+  }
+}

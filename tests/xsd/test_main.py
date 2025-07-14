@@ -109,26 +109,26 @@ class Test_against_recorded(unittest.TestCase):
     _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
     PARENT_CASE_DIR = _REPO_DIR / "test_data" / "xsd" / "test_main"
 
-    def test_against_aas_core_meta(self) -> None:
+    def test_against_meta_models(self) -> None:
         assert (
             Test_against_recorded.PARENT_CASE_DIR.exists()
             and Test_against_recorded.PARENT_CASE_DIR.is_dir()
         ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        for module in [aas_core_meta.v3]:
-            case_dir = Test_against_recorded.PARENT_CASE_DIR / module.__name__
-            assert case_dir.is_dir(), case_dir
+        # fmt: off
+        test_cases = (
+            tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
+                parent_case_dir=Test_against_recorded.PARENT_CASE_DIR,
+                aas_core_meta_modules=[aas_core_meta.v3]
+            )
+        )
+        # fmt: on
 
-            assert (
-                module.__file__ is not None
-            ), f"Expected the module {module!r} to have a __file__, but it has None"
-            model_pth = pathlib.Path(module.__file__)
-            assert model_pth.exists() and model_pth.is_file(), model_pth
-
-            snippets_dir = case_dir / "input/snippets"
+        for test_case in test_cases:
+            snippets_dir = test_case.case_dir / "input/snippets"
             assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir
 
-            expected_output_dir = case_dir / "expected_output"
+            expected_output_dir = test_case.case_dir / "expected_output"
 
             with contextlib.ExitStack() as exit_stack:
                 if tests.common.RERECORD:
@@ -145,7 +145,7 @@ class Test_against_recorded(unittest.TestCase):
                     output_dir = pathlib.Path(tmp_dir.name)
 
                 params = aas_core_codegen.main.Parameters(
-                    model_path=model_pth,
+                    model_path=test_case.model_path,
                     target=aas_core_codegen.main.Target.XSD,
                     snippets_dir=snippets_dir,
                     output_dir=output_dir,
