@@ -142,5 +142,6 @@ dmypy.json
 
 # generated output
 out/
+integration_tests/output
 # namespace configuration for output
 snippets/namespace.txt
