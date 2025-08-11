@@ -25,7 +25,6 @@ import docutils.core
 import docutils.io
 import docutils.nodes
 
-# noinspection PyUnresolvedReferences
 from icontract import ensure, require
 
 from aas_core_codegen.common import (
