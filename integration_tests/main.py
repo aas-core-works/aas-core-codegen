@@ -1,52 +1,78 @@
-import aas_core_codegen.main
-import pathlib
-import os
+"""Test end-to-end: generate the SDK and then apply it on concrete models."""
+
+import argparse
 import io
-import warnings
-import json
-from typing import List
+import os
+import pathlib
+import shlex
 import shutil
 import subprocess
-import argparse
+import sys
+from typing import Final, Sequence, Iterator, Tuple
 
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    # NOTE (mristin, 2022-04-08):
-    # We need to disable warnings. Jsonschema package at the latest version (4.4.0) has
-    # a problem with JSON schema draft 2019-09 and crashes with an recursion error,
-    # see: https://github.com/python-jsonschema/jsonschema/issues/847.
-    #
-    # We revert back to jsonschema 3.2.0, which can not handle 2019-09, but still seems
-    # to validate correctly our examples.
-    import jsonschema
-
-
-def copy_dir_contents(src_dir, dst_dir):
-    for item in os.listdir(src_dir):
-        src_path = os.path.join(src_dir, item)
-        dst_path = os.path.join(dst_dir, item)
-        if os.path.isdir(src_path):
-            shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
-        else:
-            shutil.copy2(src_path, dst_path)
+import aas_core_codegen.main
 
 
 class IntegrationTestCase:
+    """
+    Provide a protocol for running different stages of an integration test.
 
-    target: aas_core_codegen.main.Target
-    output_subdir = ""
+    It is expected that the code of the SDK has been previously generated.
 
-    def generate(
+    There are two stages of an integration test:
+    * ``build`` — where the project files, including test drivers, are built, and
+    * ``execute`` — where the test driver is executed.
+    """
+
+    name: Final[str]
+    meta_model_path: Final[pathlib.Path]
+    input_dir: Final[pathlib.Path]
+    output_dir: Final[pathlib.Path]
+    test_data_dir: Final[pathlib.Path]
+
+    def __init__(
         self,
-        model_path: pathlib.Path,
+        name: str,
+        meta_model_path: pathlib.Path,
         input_dir: pathlib.Path,
         output_dir: pathlib.Path,
-    ):
+        test_data_dir: pathlib.Path,
+    ) -> None:
+        self.name = name
+        self.meta_model_path = meta_model_path
+        self.input_dir = input_dir
+        self.output_dir = output_dir
+        self.test_data_dir = test_data_dir
+
+    def _info(self, message: str) -> None:
+        """Log the ``message`` to STDOUT."""
+        print(f"[{self.name}] {message}")
+
+    def _panic(self, message: str) -> None:
+        """Log the ``message`` to STDERR and exit the program."""
+        print(f"[{self.name}] {message}", file=sys.stderr)
+        sys.exit(1)
+
+    def _generate(
+        self,
+        meta_model_path: pathlib.Path,
+        target: aas_core_codegen.main.Target,
+        target_dir: pathlib.Path,
+    ) -> None:
+        """
+        Generate the SDK.
+
+        This method is expected to be called from within the :py:meth:`setup`.
+        """
         params = aas_core_codegen.main.Parameters(
-            model_path=model_path,
-            target=self.target,
-            snippets_dir=input_dir / "snippets",
-            output_dir=output_dir / self.output_subdir,
+            model_path=meta_model_path,
+            target=target,
+            snippets_dir=self.input_dir / "snippets",
+            # NOTE (mristin):
+            # The output directory for aas-core-codegen is where we put the SDK code.
+            # The SDK code might not necessarily live at the root of the test driver
+            # directory, so we call it here ``target_dir``.
+            output_dir=target_dir,
         )
 
         stdout = io.StringIO()
@@ -56,101 +82,177 @@ class IntegrationTestCase:
             params=params, stdout=stdout, stderr=stderr
         )
         if stderr.getvalue() != "":
-            raise AssertionError(
-                f"Expected no stderr on valid models, but got:\n" f"{stderr.getvalue()}"
+            self._panic(
+                f"Expected no stderr when generating the SDK, "
+                f"but got:\n{stderr.getvalue()}"
             )
-        assert return_code == 0, "Expected 0 return code on valid models"
+        if return_code != 0:
+            self._panic(
+                f"Expected 0 return code when generating the SDK, "
+                f"but got: {return_code}"
+            )
 
-        additional_dir = input_dir / "additional"
-        if additional_dir.exists():
-            copy_dir_contents(additional_dir, output_dir)
+    def setup(self) -> None:
+        """Generate the SDK, copy the boilerplate code and set up the test project."""
+        return
 
-    def build(self):
-        print("Nothing to build.")
+    def build(self) -> None:
+        """
+        Build the test project to be executed in the integration test.
 
-    def execute(
-        self, is_xml: bool, output_dir: pathlib.Path, test_data_dir: pathlib.Path
-    ):
-        raise NotImplementedError(self)
+        The default is to build nothing — override this method to specify how to build
+        the test project.
+        """
+        return
+
+    def _must_call(self, command: Sequence[str], cwd: pathlib.Path) -> None:
+        """Log the command, execute it and panic if it fails."""
+        assert all(
+            isinstance(part, str) for part in command
+        ), f"Expected all parts of the command to be string, but got command: {command}"
+
+        cmd_joined = " ".join(shlex.quote(part) for part in command)
+        self._info(f"Executing: {cmd_joined}")
+        return_code = subprocess.call(command, cwd=str(cwd))
+
+        if return_code != 0:
+            self._panic(
+                f"The command {cmd_joined} failed with return code {return_code}"
+            )
+
+    def execute(self) -> None:
+        """
+        Execute the test driver.
+
+        The default is to execute nothing — override this method to call
+        your specific test driver.
+        """
+        return
+
+
+def _escaped_and_joined_command(command: Sequence[str]) -> str:
+    """Generate the string such that it can be copy/pasted into a terminal."""
+    return " ".join(shlex.quote(part) for part in command)
 
 
 class JsonSchemaIntegrationTest(IntegrationTestCase):
-    target = aas_core_codegen.main.Target.JSONSCHEMA
+    """Test the generation of JSON schema and validate it against the test data."""
 
-    def execute(self, output_dir: pathlib.Path, test_data_dir: pathlib.Path):
-        if "xml" in test_data_dir.parts:
-            print("XML not supported")
-            return
-        schema_path = output_dir / "schema.json"
-        with open(schema_path) as fd:
-            schema = json.load(fd)
-        for file in test_data_dir.iterdir():
-            with open(file) as fd:
-                instance = json.load(fd)
-            try:
-                jsonschema.validate(instance=instance, schema=schema)
-            except jsonschema.ValidationError as err:
-                raise AssertionError(
-                    f"Failed to validate {file} against {schema_path}"
-                ) from err
-            print(f"{file}: pass")
+    def setup(self) -> None:
+        self._generate(
+            meta_model_path=self.meta_model_path,
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            target_dir=self.output_dir,
+        )
+
+        shutil.copy(
+            str(self.input_dir / "boilerplate" / "main.py"), self.output_dir / "main.py"
+        )
+
+    def execute(self) -> None:
+        self._must_call(
+            command=[
+                sys.executable,
+                str(self.output_dir / "main.py"),
+                "--schema_path",
+                str(self.output_dir / "schema.json"),
+                "--model_path",
+                str(self.test_data_dir / "json" / "full.json"),
+            ],
+            cwd=self.output_dir,
+        )
+
+
+def _over_model_paths(test_data_dir: pathlib.Path) -> Iterator[pathlib.Path]:
+    """Iterate over all the possible model files in the given test data directory."""
+    for path in test_data_dir.glob("**/*"):
+        if path.suffix.lower() in (".xml", ".json"):
+            yield path
 
 
 class PythonIntegrationTest(IntegrationTestCase):
-    target = aas_core_codegen.main.Target.PYTHON
-    output_subdir = "aas_core"
+    def setup(self) -> None:
+        self._generate(
+            meta_model_path=self.meta_model_path,
+            target=aas_core_codegen.main.Target.PYTHON,
+            target_dir=self.output_dir / "sdk",
+        )
 
-    def execute(self, output_dir, test_data_dir):
-        subprocess.check_call(["python3", output_dir / "main.py", test_data_dir])
+        shutil.copy(
+            str(self.input_dir / "boilerplate" / "main.py"), self.output_dir / "main.py"
+        )
 
-    def execute_xml(self, output_dir, test_data_dir):
-        subprocess.check_call(["python3", output_dir / "main.py", test_data_dir])
+    def execute(self) -> None:
+        for model_path in _over_model_paths(self.test_data_dir):
+            self._must_call(
+                command=[
+                    sys.executable,
+                    str(self.output_dir / "main.py"),
+                    "--model_path",
+                    str(model_path),
+                ],
+                cwd=self.output_dir,
+            )
 
 
-tests: List[IntegrationTestCase] = [
-    JsonSchemaIntegrationTest(),
-    PythonIntegrationTest(),
-]
+def main() -> None:
+    """Execute the main routine."""
+    repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent
+    integration_tests_dir = repo_dir / "integration_tests"
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--target",
-        type=aas_core_codegen.main.Target,
-        choices=list(aas_core_codegen.main.Target),
-        default=None,
-        help="Run integration test for specific target only",
+    meta_model_path = integration_tests_dir / "input" / "meta_model.py"
+    test_data_dir = integration_tests_dir / "test_data"
+
+    test_names_to_tests = {
+        "jsonschema": JsonSchemaIntegrationTest(
+            name="jsonschema",
+            meta_model_path=meta_model_path,
+            input_dir=integration_tests_dir / "input" / "jsonschema",
+            output_dir=integration_tests_dir / "output" / "jsonschema",
+            test_data_dir=test_data_dir,
+        ),
+        "python": PythonIntegrationTest(
+            name="python",
+            meta_model_path=meta_model_path,
+            input_dir=integration_tests_dir / "input" / "python",
+            output_dir=integration_tests_dir / "output" / "python",
+            test_data_dir=test_data_dir,
+        ),
+    }
+
+    # NOTE (mristin):
+    # We enforce this convention in order to avoid the confusion on the side of
+    # the user.
+    assert all(
+        test_name == test.name for test_name, test in test_names_to_tests.items()
     )
+
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--skip-generation",
-        action="store_true",
-        default=False,
-        help="Skip code generation",
+        "--test",
+        choices=sorted(test_names_to_tests.keys()),
+        default=None,
+        help="Run only a specific integration test",
     )
     args = parser.parse_args()
-    print("Running integration tests, this might take a few minutes.")
-    print()
-    root_dir = pathlib.Path(os.path.realpath(__file__)).parent
-    model_path = root_dir / "input" / "model.py"
-    if args.target:
-        selected_tests = [i for i in tests if i.target == args.target]
+
+    selected_test_names_tests: Sequence[Tuple[str, IntegrationTestCase]]
+
+    if args.test is not None:
+        selected_test_names_tests = [(args.test, test_names_to_tests[args.test])]
     else:
-        selected_tests = tests
-    for test in selected_tests:
-        input_dir = root_dir / "input" / test.target.value
-        output_dir = root_dir / "output" / test.target.value
-        print(f"Target: {test.target.value}:")
-        print("Generating...")
-        if args.skip_generation:
-            print("Skipped.")
-        else:
-            test.generate(model_path, input_dir, output_dir)
-        print("Building...")
+        selected_test_names_tests = [
+            (test_name, test_names_to_tests[test_name])
+            for test_name in sorted(test_names_to_tests.keys())
+        ]
+
+    for test_name, test in selected_test_names_tests:
+        print(f"Running the test case: {test_name} ...")
+
+        test.setup()
         test.build()
-        print("Executing JSON...")
-        test.execute(output_dir, root_dir / "test_data" / "json")
-        print("Executing XML...")
-        test.execute(output_dir, root_dir / "test_data" / "xml")
-        print(f"Target {test.target.value} finished without errors.")
-        print()
-    print(f"{len(selected_tests)} integration tests finished without errors.")
+        test.execute()
+
+
+if __name__ == "__main__":
+    main()
