@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "$ref": "#/definitions/Root",
+  "$id": "https://dummy.com",
+  "definitions": {
+    "ModelType": {
+      "type": "string",
+      "enum": []
+    },
+    "MyClass": {
+      "type": "object",
+      "properties": {
+        "stringProp": {
+          "type": "string"
+        },
+        "intProp": {
+          "type": "integer"
+        },
+        "boolProp": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "stringProp",
+        "intProp",
+        "boolProp"
+      ]
+    },
+    "Root": {
+      "type": "object",
+      "properties": {
+        "foo": {
+          "$ref": "#/definitions/MyClass"
+        },
+        "foos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MyClass"
+          }
+        },
+        "strings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "integers": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "booleans": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        }
+      },
+      "required": [
+        "foo",
+        "foos",
+        "strings",
+        "integers",
+        "booleans"
+      ]
+    }
+  }
+}
