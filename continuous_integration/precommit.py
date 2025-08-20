@@ -25,6 +25,7 @@ class Step(enum.Enum):
     DOCTEST = "doctest"
     CHECK_INIT_AND_SETUP_COINCIDE = "check-init-and-setup-coincide"
     CHECK_HELP_IN_README = "check-help-in-readme"
+    INTEGRATION_TEST = "integration-test"
 
 
 def call_and_report(
@@ -109,6 +110,7 @@ def main() -> int:
             "aas_core_codegen",
             "continuous_integration",
             "dev_scripts",
+            "integration_tests",
             "tests",
             "test_data",
             "setup.py",
@@ -266,6 +268,21 @@ def main() -> int:
             return 1
     else:
         print("Skipped testing.")
+
+    if Step.INTEGRATION_TEST in selects and Step.INTEGRATION_TEST not in skips:
+        print("Integration testing...")
+        exit_code = call_and_report(
+            verb="execute unit tests",
+            cmd=[
+                sys.executable,
+                "integration_tests/main.py",
+            ],
+            cwd=repo_root,
+        )
+        if exit_code != 0:
+            return 1
+    else:
+        print("Skipped integration testing.")
 
     if Step.DOCTEST in selects and Step.DOCTEST not in skips:
         print("Doctest'ing...")
