@@ -1673,21 +1673,16 @@ self._write_end_element({xml_prop_literal})"""
                         assert_never(our_type)
 
                 elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                    assert (
-                        isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                        and isinstance(
-                            type_anno.items.our_type,
-                            (intermediate.AbstractClass, intermediate.ConcreteClass),
-                        )
-                    ) or isinstance(
-                        type_anno.items, intermediate.PrimitiveTypeAnnotation
-                    ), "See intermediate._translate._verify_only_simple_type_patterns"
-                    # fmt: on
-
                     variable = next(generator_for_loop_variables)
 
-                    write_prop = Stripped(
-                        f"""\
+                    if isinstance(
+                        type_anno.items, intermediate.OurTypeAnnotation
+                    ) and isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    ):
+                        write_prop = Stripped(
+                            f"""\
 if len(that.{prop_name}) == 0:
 {I}self._write_empty_element({xml_prop_literal})
 else:
@@ -1695,7 +1690,26 @@ else:
 {I}for {variable} in that.{prop_name}:
 {II}self.visit({variable})
 {I}self._write_end_element({xml_prop_literal})"""
-                    )
+                        )
+                    elif isinstance(
+                        type_anno.items, intermediate.PrimitiveTypeAnnotation
+                    ):
+                        write_method = _WRITE_METHOD_BY_PRIMITIVE_TYPE[
+                            type_anno.items.a_type
+                        ]
+                        write_prop = Stripped(
+                            f"""\
+if len(that.{prop_name}) == 0:
+{I}self._write_empty_element({xml_prop_literal})
+else:
+{I}self._write_start_element({xml_prop_literal})
+{I}for {variable} in that.{prop_name}:
+{II}self.{write_method}('v', {variable})
+{I}self._write_end_element({xml_prop_literal})"""
+                        )
+                    else:
+                        assert False
+
                 else:
                     assert_never(type_anno)
 

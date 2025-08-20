@@ -4,7 +4,7 @@ import difflib
 import json
 import pathlib
 import sys
-import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 if sys.version_info >= (3, 9):
     from typing import Literal, Optional, Any
@@ -22,8 +22,9 @@ from sdk import types, jsonization, xmlization, verification
 
 def normalize_xml(xml_text: str) -> str:
     """Normalize XML for comparison."""
-    elem = ET.fromstring(xml_text)
-    return ET.tostring(elem, encoding="unicode")
+    normalized = minidom.parseString(xml_text).toprettyxml(indent=" ")
+    # Remove blank lines
+    return "\n".join([line for line in normalized.splitlines() if line.strip()])
 
 
 def main() -> None:

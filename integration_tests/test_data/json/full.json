@@ -4,7 +4,13 @@
         "intProp": 42,
         "boolProp": true
     },
-    "foos": [],
+    "foos": [
+        {
+            "stringProp": "abc",
+            "intProp": 42,
+            "boolProp": true
+        }
+    ],
     "strings": [
         "abc"
     ],
