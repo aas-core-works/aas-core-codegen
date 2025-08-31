@@ -104,7 +104,6 @@ public static readonly byte[] {constant_name} = (
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -225,7 +224,6 @@ public static readonly HashSet<byte[]> {constant_name} = (
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     return Stripped(writer.getvalue()), None
 

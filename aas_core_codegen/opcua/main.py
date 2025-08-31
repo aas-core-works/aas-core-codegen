@@ -690,7 +690,6 @@ def _generate_for_property(
 
     else:
         assert_never(prop.type_annotation)
-        raise AssertionError("Unexpected execution path")
 
     if not isinstance(
         type_anno,

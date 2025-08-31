@@ -64,7 +64,6 @@ def _human_readable_identifier(
         result = f"meta-model concrete class {something.name!r}"
     else:
         assert_never(something)
-        raise AssertionError("Unexpected execution path")
 
     return result
 

@@ -799,7 +799,6 @@ def _ann_assign_to_constant(
         )
     else:
         assert_never(type_annotation)
-        raise AssertionError("Unexpected execution path")
 
 
 # noinspection PyTypeChecker
@@ -3538,7 +3537,6 @@ def _verify_symbol_table(
 
         else:
             assert_never(type_annotation)
-            raise AssertionError(type_annotation)
 
     for our_type in symbol_table.our_types:
         if not isinstance(our_type, Class):

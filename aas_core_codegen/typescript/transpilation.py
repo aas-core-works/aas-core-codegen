@@ -778,7 +778,6 @@ AasCommon.at(
             return Stripped(f"{left} - {right}"), None
         else:
             assert_never(node)
-            raise AssertionError("Unexpected execution path")
 
     def transform_add(
         self, node: parse_tree.Add

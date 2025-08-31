@@ -126,7 +126,6 @@ export const {constant_name} =
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     return Stripped(writer.getvalue()), None
 
@@ -216,7 +215,6 @@ def _generate_constant_set_of_primitives(
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     literals_joined = ",\n".join(literal_codes)
 
