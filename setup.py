@@ -43,7 +43,7 @@ setup(
         "dev": [
             "black==22.3.0",
             "mypy==1.9.0",
-            "pylint==3.1.0",
+            "pylint==3.3.8",
             "pydocstyle>=2.1.1, <3",
             "coverage>=4.5.1, <5",
             "pygments>=2, <3",

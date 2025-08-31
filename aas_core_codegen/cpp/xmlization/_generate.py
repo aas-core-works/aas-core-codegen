@@ -4587,7 +4587,6 @@ if (writer.error()) {{
             )
         else:
             assert_never(type_anno.our_type)
-            raise AssertionError("Unexpected execution path")
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         code = _generate_serialize_list(
@@ -4596,7 +4595,6 @@ if (writer.error()) {{
 
     else:
         assert_never(type_anno)
-        raise AssertionError("Unexpected execution path")
 
     blocks.append(code)
 

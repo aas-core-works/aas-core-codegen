@@ -114,7 +114,6 @@ def _generate_constant_primitive(
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     return Stripped(writer.getvalue()), None
 
@@ -248,7 +247,6 @@ def _generate_constant_set_of_primitives(
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     return Stripped(writer.getvalue()), None
 

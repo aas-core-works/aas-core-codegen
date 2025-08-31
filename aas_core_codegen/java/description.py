@@ -158,7 +158,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[List[_Token]]
             )
         else:
             assert_never(element.our_type)
-            raise AssertionError("Unexpected code path")
 
         return [_TokenText(reference)], None
 
@@ -188,7 +187,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[List[_Token]]
                 base = Stripped(f"types.impl.{cls_name}")
             else:
                 assert_never(element.reference.cls)
-                raise AssertionError("Unexpected execution path")
 
             return [
                 _TokenText(

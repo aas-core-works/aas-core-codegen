@@ -432,10 +432,8 @@ def _parse_function_for_atomic_value(
 
         else:
             assert_never(our_type)
-            raise AssertionError("Unexpected code path")
     else:
         assert_never(type_annotation)
-        raise AssertionError("Unexpected code path")
 
     return Stripped(function_name)
 
@@ -565,7 +563,6 @@ return null;"""
 
         else:
             assert_never(type_anno)
-            raise AssertionError("Unexpected execution path")
 
         method_name = typescript_naming.method_name(
             Identifier(f"set_{prop.name}_from_jsonable")
@@ -1129,7 +1126,6 @@ jsonable[{key_literal}] = {var_name};"""
 
         else:
             assert_never(type_anno)
-            raise AssertionError("Unexpected code path")
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             block = Stripped(

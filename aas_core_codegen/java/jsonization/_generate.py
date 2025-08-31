@@ -947,7 +947,6 @@ transform(
             assert_never(our_type)
     else:
         assert_never(type_annotation)
-        raise AssertionError("Unexpected execution path")
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))

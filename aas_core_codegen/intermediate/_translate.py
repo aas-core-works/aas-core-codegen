@@ -2230,7 +2230,6 @@ def _to_constant(
 
     else:
         assert_never(parsed)
-        raise AssertionError("Unexpected execution path")
 
 
 # endregion
@@ -4499,7 +4498,6 @@ def _verify_invariant_descriptions_unique(symbol_table: SymbolTable) -> List[Err
                     what = "constrained primitive"
                 else:
                     assert_never(something_with_invariants)
-                    raise AssertionError("Unexpected execution path")
 
                 if conflicting_invariant.specified_for is invariant.specified_for:
                     errors.append(
