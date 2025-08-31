@@ -1691,6 +1691,7 @@ else:
 {II}self.visit({variable})
 {I}self._write_end_element({xml_prop_literal})"""
                         )
+
                     elif isinstance(
                         type_anno.items, intermediate.PrimitiveTypeAnnotation
                     ):
@@ -1707,8 +1708,13 @@ else:
 {II}self.{write_method}('v', {variable})
 {I}self._write_end_element({xml_prop_literal})"""
                         )
+
                     else:
-                        assert False
+                        raise NotImplementedError(
+                            f"We only handle lists of class instances and primitive values, "
+                            f"but you supplied the following type: {type_anno}. Please contact the developers "
+                            f"if you need this feature."
+                        )
 
                 else:
                     assert_never(type_anno)
