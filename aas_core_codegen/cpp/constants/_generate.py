@@ -94,7 +94,6 @@ def _generate_constant_primitive_definition(
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     return Stripped(writer.getvalue()), None
 
@@ -166,7 +165,6 @@ const std::vector<std::uint_8> {constant_name} = (
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -217,7 +215,6 @@ def _generate_constant_set_of_primitives_definition(
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     constant_name = cpp_naming.constant_name(constant.name)
 
@@ -284,7 +281,6 @@ std::unordered_set<
 
     else:
         assert_never(constant.a_type)
-        raise AssertionError("Unexpected execution path")
 
     literals_joined = ",\n".join(literal_codes)
 

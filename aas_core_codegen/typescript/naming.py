@@ -69,7 +69,6 @@ def name_of(
 
     else:
         assert_never(something)
-        raise AssertionError("Unexpected execution path")  # for mypy
 
 
 def enum_literal_name(identifier: Identifier) -> Identifier:

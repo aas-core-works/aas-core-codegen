@@ -119,7 +119,6 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
             return ["."]
         else:
             assert_never(node.kind)
-            raise AssertionError("Expected to never get here")
 
     def transform_term(self, node: Term) -> List[Union[str, FormattedValue]]:
         """Transform the ``term``."""

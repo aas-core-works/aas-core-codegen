@@ -553,7 +553,6 @@ self.{prop_name} = items"""
 
         else:
             assert_never(type_anno)
-            raise AssertionError("Unexpected execution path")
 
         method_writer = io.StringIO()
         method_writer.write(

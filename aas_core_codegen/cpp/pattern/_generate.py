@@ -226,7 +226,6 @@ program.emplace_back({maybe_label_comment}
                 instruction_cls = Stripped("InstructionNotSet")
             else:
                 assert_never(node_or_leaf.instruction)
-                raise AssertionError("Unexpected execution path")
 
             instruction_code = Stripped(
                 f"""\
@@ -283,7 +282,6 @@ program.emplace_back({maybe_label_comment}
 
         else:
             assert_never(node_or_leaf.instruction)
-            raise AssertionError("Unexpected execution path")
 
         writer.write(
             f"{whitespace}{indent_but_first_line(instruction_code, whitespace)}"

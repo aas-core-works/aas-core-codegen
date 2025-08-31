@@ -117,7 +117,6 @@ def string_literal(
         enclosing = '"'
     else:
         assert_never(quoting)
-        raise AssertionError("Unexpected execution path")
 
     if duplicate_curly_brackets:
         if mapping is _ESCAPING_IN_PYTHON_INCLUDING_DOUBLE_QUOTES:

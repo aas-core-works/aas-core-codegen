@@ -892,7 +892,6 @@ def _write_recursively(
                 instruction_str = f"not-set {ranges_str!r}"
             else:
                 assert_never(node_or_leaf.instruction)
-                raise AssertionError("Unexpected execution path")
 
         elif isinstance(node_or_leaf.instruction, InstructionAny):
             instruction_str = "any"
@@ -914,7 +913,6 @@ def _write_recursively(
 
         else:
             assert_never(node_or_leaf.instruction)
-            raise AssertionError("Unexpected execution path")
 
         writer.write(f"{label_prefix}{whitespace}{instruction_str}")
 

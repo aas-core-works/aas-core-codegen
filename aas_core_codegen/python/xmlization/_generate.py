@@ -1020,7 +1020,6 @@ self.{prop_name} = result"""
 
         else:
             assert_never(type_anno)
-            raise AssertionError("Unexpected execution path")
 
         method_name = python_naming.method_name(Identifier(f"read_and_set_{prop.name}"))
         methods.append(
