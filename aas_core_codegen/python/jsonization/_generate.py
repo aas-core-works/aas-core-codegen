@@ -992,7 +992,7 @@ jsonable[{key_literal}] = (
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert isinstance(
                 type_anno.items,
-                (intermediate.PrimitiveType, intermediate.OurTypeAnnotation),
+                (intermediate.PrimitiveTypeAnnotation, intermediate.OurTypeAnnotation),
             ), (
                 "We expect only lists of primitive and our types. Lists of optionals "
                 "and nested lists are not handled yet. Please contact the developers."

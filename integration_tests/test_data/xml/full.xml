@@ -1,0 +1,23 @@
+<root xmlns="https://dummy.com">
+    <foo>
+        <stringProp>abc</stringProp>
+        <intProp>42</intProp>
+        <boolProp>true</boolProp>
+    </foo>
+    <foos>
+        <myClass>
+            <stringProp>abc</stringProp>
+            <intProp>42</intProp>
+            <boolProp>true</boolProp>
+        </myClass>
+    </foos>
+    <strings>
+        <v>xyz</v>
+    </strings>
+    <integers>
+        <v>42</v>
+    </integers>
+    <booleans>
+        <v>true</v>
+    </booleans>
+</root>

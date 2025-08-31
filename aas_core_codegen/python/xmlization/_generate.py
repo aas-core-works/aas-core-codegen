@@ -943,28 +943,32 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                     )
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            if not (
-                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                )
+            if isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
             ):
+                read_item_cls_as_element = python_naming.function_name(
+                    Identifier(f"_read_{type_anno.items.our_type.name}_as_element")
+                )
+
+                items_type = python_common.generate_type(
+                    type_anno.items, types_module=Identifier("aas_types")
+                )
+            elif isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                read_item_cls_as_element = Identifier(
+                    _READ_FUNCTION_BY_PRIMITIVE_TYPE[type_anno.items.a_type]
+                )
+                items_type = Stripped(str(type_anno.items.a_type))
+            else:
                 raise AssertionError(
-                    "(mristin, 2022-10-09) We handle only lists of classes in the XML "
-                    "de-serialization at the moment. The meta-model does not contain "
+                    "(mristin, 2022-10-09) We handle only lists of classes and primitive types"
+                    "in the XML de-serialization at the moment. The meta-model does not contain "
                     "any other lists, so we wanted to keep the code as simple as "
                     "possible, and avoid unrolling. Please contact the developers "
                     "if you need this feature."
                 )
-
-            read_item_cls_as_element = python_naming.function_name(
-                Identifier(f"_read_{type_anno.items.our_type.name}_as_element")
-            )
-
-            items_type = python_common.generate_type(
-                type_anno.items, types_module=Identifier("aas_types")
-            )
 
             method_body = Stripped(
                 f"""\
@@ -1668,21 +1672,16 @@ self._write_end_element({xml_prop_literal})"""
                         assert_never(our_type)
 
                 elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                    # fmt: off
-                    assert (
-                        isinstance(type_anno, intermediate.ListTypeAnnotation)
-                        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                        and isinstance(
-                            type_anno.items.our_type,
-                            (intermediate.AbstractClass, intermediate.ConcreteClass)
-                        )
-                    ), "See intermediate._translate._verify_only_simple_type_patterns"
-                    # fmt: on
-
                     variable = next(generator_for_loop_variables)
 
-                    write_prop = Stripped(
-                        f"""\
+                    if isinstance(
+                        type_anno.items, intermediate.OurTypeAnnotation
+                    ) and isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    ):
+                        write_prop = Stripped(
+                            f"""\
 if len(that.{prop_name}) == 0:
 {I}self._write_empty_element({xml_prop_literal})
 else:
@@ -1690,7 +1689,32 @@ else:
 {I}for {variable} in that.{prop_name}:
 {II}self.visit({variable})
 {I}self._write_end_element({xml_prop_literal})"""
-                    )
+                        )
+
+                    elif isinstance(
+                        type_anno.items, intermediate.PrimitiveTypeAnnotation
+                    ):
+                        write_method = _WRITE_METHOD_BY_PRIMITIVE_TYPE[
+                            type_anno.items.a_type
+                        ]
+                        write_prop = Stripped(
+                            f"""\
+if len(that.{prop_name}) == 0:
+{I}self._write_empty_element({xml_prop_literal})
+else:
+{I}self._write_start_element({xml_prop_literal})
+{I}for {variable} in that.{prop_name}:
+{II}self.{write_method}('v', {variable})
+{I}self._write_end_element({xml_prop_literal})"""
+                        )
+
+                    else:
+                        raise NotImplementedError(
+                            f"We only handle lists of class instances and primitive values, "
+                            f"but you supplied the following type: {type_anno}. Please contact the developers "
+                            f"if you need this feature."
+                        )
+
                 else:
                     assert_never(type_anno)
 

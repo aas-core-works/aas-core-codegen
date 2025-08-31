@@ -1,0 +1,24 @@
+{
+    "foo": {
+        "stringProp": "abc",
+        "intProp": 42,
+        "boolProp": true
+    },
+    "foos": [
+        {
+            "stringProp": "abc",
+            "intProp": 42,
+            "boolProp": true
+        }
+    ],
+    "strings": [
+        "abc"
+    ],
+    "integers": [
+        1
+    ],
+    "booleans": [
+        true,
+        false
+    ]
+}
