@@ -8620,7 +8620,7 @@ public class Verification {
                 that.getKeys().size() - 1
             ).allMatch(
                 i -> !(that.getKeys().get(i).getType() == KeyTypes.SUBMODEL_ELEMENT_LIST)
-                    || matchesXsPositiveInteger(that.getKeys().get(i + 1).getValue()))
+                    || matchesXsNonNegativeInteger(that.getKeys().get(i + 1).getValue()))
         ))) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(

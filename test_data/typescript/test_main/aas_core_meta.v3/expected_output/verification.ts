@@ -9040,7 +9040,7 @@ class Verifier
             ),
             i =>
               !(AasCommon.at(that.keys, i).type == AasTypes.KeyTypes.SubmodelElementList)
-              || matchesXsPositiveInteger(
+              || matchesXsNonNegativeInteger(
                 AasCommon.at(that.keys, i + 1).value
               )
           )

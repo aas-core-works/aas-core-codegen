@@ -21540,7 +21540,7 @@ void OfReference::Execute() {
           || common::AllRange(
             [&](size_t i) -> bool {
               return !(instance_->keys().at(i)->type() == types::KeyTypes::kSubmodelElementList)
-              || MatchesXsPositiveInteger(
+              || MatchesXsNonNegativeInteger(
                 instance_->keys().at(i + (1))->value()
               );
             },
