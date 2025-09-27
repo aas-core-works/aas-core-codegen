@@ -11927,7 +11927,9 @@ func VerifyReference(
 		aascommon.AllRange(
 			func(i int) bool {
 				return !(that.Keys()[i].Type() == aastypes.KeyTypesSubmodelElementList) ||
-					MatchesXsPositiveInteger(that.Keys()[i + 1].Value())
+					MatchesXsNonNegativeInteger(
+						that.Keys()[i + 1].Value(),
+					)
 			},
 			0,
 			len(that.Keys()) - 1,

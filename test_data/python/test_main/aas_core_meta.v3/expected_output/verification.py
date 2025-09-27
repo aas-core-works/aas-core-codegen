@@ -7697,7 +7697,9 @@ class _Transformer(
             or (
                 all(
                     not (that.keys[i].type == aas_types.KeyTypes.SUBMODEL_ELEMENT_LIST)
-                    or matches_xs_positive_integer(that.keys[i + 1].value)
+                    or matches_xs_non_negative_integer(
+                        that.keys[i + 1].value
+                    )
                     for i in range(
                         0,
                         len(that.keys) - 1

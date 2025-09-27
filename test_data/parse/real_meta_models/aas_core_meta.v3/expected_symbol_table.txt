@@ -9987,7 +9987,7 @@ UnverifiedSymbolTable(
                       original_node=...),
                     original_node=...),
                   consequent=FunctionCall(
-                    name='matches_xs_positive_integer',
+                    name='matches_xs_non_negative_integer',
                     args=[
                       Member(
                         instance=Index(
