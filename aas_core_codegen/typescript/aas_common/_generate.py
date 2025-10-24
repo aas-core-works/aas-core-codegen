@@ -409,6 +409,54 @@ export function base64Decode(text: string): Either<Uint8Array, string> {{
 {I}return new Either<Uint8Array, string>(bytes, null);
 }}"""
         ),
+        Stripped(
+            f"""\
+/**
+ * Encode a byte array in base64url.
+ *
+ * This encoding differs from base64 in so far that the characters `+` and `/` are
+ * replaced with `-` and `_` and the padding (`=`) is removed, so that the encoded
+ * value can be inserted into URIs without escaping.
+ *
+ * See RFC 4648 for more details:
+ * https://www.rfc-editor.org/rfc/rfc4648#section-5
+ *
+ * @param bytes - to be encoded
+ * @returns `bytes` encoded as base64url text
+ */
+export function base64UrlEncode(bytes: Uint8Array): string {{
+{I}return base64Encode(bytes)
+{II}.replace(
+{III}/[+/=]/g,
+{III}m =>
+{IIII}m === '+'  ? '-' :
+{IIII}m === '/'  ? '_' :
+{IIII}'' // The padding `=` is removed.
+{II});
+}}"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Decode a base64url-encoded byte array.
+ *
+ * This encoding differs from base64 in so far that the characters `+` and `/` are
+ * replaced with `-` and `_` and the padding (`=`) is removed, so that the encoded
+ * value can be inserted into URIs without escaping.
+ *
+ * @param text - to be decoded
+ * @returns either the array or an error, if `text` is not a valid base64url encoding
+ */
+export function base64UrlDecode(text: string): Either<Uint8Array, string> {{
+{I}let base64Text = text.replace(/[-_]/g, m => m === '-' ? '+' : '/');
+{I}const pad = base64Text.length % 4;
+{I}if (pad > 0) {{
+{II}base64Text += '='.repeat(4 - pad);
+{I}}}
+
+{I}return base64Decode(base64Text);
+}}"""
+        ),
         typescript_common.WARNING,
     ]
 
