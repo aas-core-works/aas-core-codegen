@@ -13,8 +13,6 @@ from typing import Optional, Tuple, List
 import asttokens
 import docutils.nodes
 
-import aas_core_meta.v3
-
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier
 
@@ -461,13 +459,8 @@ class Test_against_recorded(unittest.TestCase):
         assert test_cases_dir.exists(), f"{test_cases_dir=}"
         assert test_cases_dir.is_dir(), f"{test_cases_dir=}"
 
-        for module in [aas_core_meta.v3]:
-            case_dir = test_cases_dir / module.__name__
-
-            assert (
-                module.__file__ is not None
-            ), f"Expected the module {module!r} to have a __file__, but it has None"
-            meta_model_pth = pathlib.Path(module.__file__)
+        for meta_model_pth in tests.common.REAL_META_MODEL_PATHS:
+            case_dir = test_cases_dir / meta_model_pth.stem
 
             try:
                 source = meta_model_pth.read_text(encoding="utf-8")

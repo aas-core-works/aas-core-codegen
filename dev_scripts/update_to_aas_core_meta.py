@@ -7,16 +7,13 @@ Git is expected to be installed.
 import argparse
 import os
 import pathlib
-import re
 import subprocess
 import sys
 import tempfile
 import time
 from typing import Optional
 
-AAS_CORE_META_DEPENDENCY_RE = re.compile(
-    r"aas-core-meta@git\+https://github.com/aas-core-works/aas-core-meta@([a-fA-F0-9]+)#egg=aas-core-meta"
-)
+import dev_scripts.download_latest_aas_core_meta_v3
 
 
 def _make_sure_no_changed_files(
@@ -45,41 +42,6 @@ def _make_sure_no_changed_files(
         return 1
 
     return None
-
-
-def _update_setup_py(repo_dir: pathlib.Path, aas_core_meta_revision: str) -> None:
-    """Update the aas-core-meta in setup.py."""
-    setup_py = repo_dir / "setup.py"
-    text = setup_py.read_text(encoding="utf-8")
-
-    aas_core_meta_dependency = (
-        f"aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta"
-        f"@{aas_core_meta_revision}#egg=aas-core-meta"
-    )
-
-    text = re.sub(AAS_CORE_META_DEPENDENCY_RE, aas_core_meta_dependency, text)
-
-    setup_py.write_text(text, encoding="utf-8")
-
-
-def _uninstall_and_install_aas_core_meta(
-    repo_dir: pathlib.Path, aas_core_meta_revision: str
-) -> None:
-    """Uninstall and install the latest aas-core-meta in the virtual environment."""
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "uninstall", "-y", "aas-core-meta"],
-        cwd=str(repo_dir),
-    )
-
-    aas_core_meta_dependency = (
-        f"aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta"
-        f"@{aas_core_meta_revision}#egg=aas-core-meta"
-    )
-
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", aas_core_meta_dependency],
-        cwd=str(repo_dir),
-    )
 
 
 def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
@@ -163,39 +125,13 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--aas_core_meta_repo",
-        help="path to the aas-core-meta repository",
-        default=str(repo_dir.parent / "aas-core-meta"),
-    )
-    parser.add_argument(
         "--expected_our_branch",
         help="Git branch expected in this repository",
         default="main",
     )
-    parser.add_argument(
-        "--expected_aas_core_meta_branch",
-        help="Git branch expected in the aas-core-meta repository",
-        default="main",
-    )
     args = parser.parse_args()
 
-    aas_core_meta_repo = pathlib.Path(args.aas_core_meta_repo)
     expected_our_branch = str(args.expected_our_branch)
-    expected_aas_core_meta_branch = str(args.expected_aas_core_meta_branch)
-
-    if not aas_core_meta_repo.exists():
-        print(
-            f"--aas_core_meta_repo does not exist: {aas_core_meta_repo}",
-            file=sys.stderr,
-        )
-        return 1
-
-    if not aas_core_meta_repo.is_dir():
-        print(
-            f"--aas_core_meta_repo is not a directory: {aas_core_meta_repo}",
-            file=sys.stderr,
-        )
-        return 1
 
     our_branch = subprocess.check_output(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"],
@@ -210,37 +146,19 @@ def main() -> int:
         )
         return 1
 
-    aas_core_meta_branch = subprocess.check_output(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-        cwd=str(aas_core_meta_repo),
-        encoding="utf-8",
-    ).strip()
-    if aas_core_meta_branch != expected_aas_core_meta_branch:
-        print(
-            f"--expected_aas_core_meta_branch is {expected_aas_core_meta_branch}, "
-            f"but got {aas_core_meta_branch} "
-            f"in --aas_core_meta_repo: {aas_core_meta_repo}",
-            file=sys.stderr,
-        )
-        return 1
-
-    aas_core_meta_revision = subprocess.check_output(
-        ["git", "rev-parse", "--short", "HEAD"],
-        cwd=str(aas_core_meta_repo),
-        encoding="utf-8",
-    ).strip()
-
     exit_code = _make_sure_no_changed_files(
         repo_dir=repo_dir, expected_our_branch=expected_our_branch
     )
     if exit_code is not None:
         return exit_code
 
-    _update_setup_py(repo_dir=repo_dir, aas_core_meta_revision=aas_core_meta_revision)
+    # fmt: off
+    aas_core_meta_revision = (
+        dev_scripts.download_latest_aas_core_meta_v3.retrieve_sha_and_download()
+    )[:8]
+    # fmt: on
 
-    _uninstall_and_install_aas_core_meta(
-        repo_dir=repo_dir, aas_core_meta_revision=aas_core_meta_revision
-    )
+    print(f"The aas-core-meta revision is: {aas_core_meta_revision}")
 
     exit_code = _rerecord_everything(repo_dir=repo_dir)
     if exit_code is not None:

@@ -4,8 +4,6 @@ import tempfile
 import unittest
 import io
 
-import aas_core_meta.v3
-
 from aas_core_codegen.main import Parameters, Target, execute
 
 import tests.common
@@ -14,14 +12,9 @@ from tests.rdf_shacl.test_main import REPO_DIR
 
 class Test_jsonld_context(unittest.TestCase):
     def test_jsonld_context_generation(self) -> None:
-        for module in [aas_core_meta.v3]:
-            case_dir = REPO_DIR / "test_data" / "jsonld_context" / module.__name__
+        for model_pth in tests.common.REAL_META_MODEL_PATHS:
+            case_dir = REPO_DIR / "test_data" / "jsonld_context" / model_pth.stem
             expected_output_dir = case_dir / "output"
-            assert (
-                module.__file__ is not None
-            ), f"Expected the module {module!r} to have a __file__, but it has None"
-            model_pth = pathlib.Path(module.__file__)
-            assert model_pth.exists() and model_pth.is_file(), model_pth
 
             with contextlib.ExitStack() as exit_stack:
                 if tests.common.RERECORD:

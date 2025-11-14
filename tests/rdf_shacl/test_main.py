@@ -7,8 +7,6 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_meta.v3
-
 import aas_core_codegen.main
 
 import tests.common
@@ -18,19 +16,14 @@ REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
 class Test_against_recorded(unittest.TestCase):
     def test_against_expected_meta_models(self) -> None:
-        parent_case_dir = (
-            REPO_DIR / "test_data" / "rdf_shacl" / "test_main" / "expected"
-        )
-        assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
+        base_case_dir = REPO_DIR / "test_data" / "rdf_shacl" / "test_main" / "expected"
 
-        # fmt: off
-        test_cases = (
-            tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
-                parent_case_dir=parent_case_dir,
-                aas_core_meta_modules=[aas_core_meta.v3]
-            )
+        test_cases = tests.common.test_cases_from_base_case_dir(
+            base_case_dir=base_case_dir
+        ) + tests.common.test_cases_from_real_world_models(
+            base_case_dir=base_case_dir,
+            real_meta_model_paths=tests.common.REAL_META_MODEL_PATHS,
         )
-        # fmt: on
 
         for test_case in test_cases:
             snippets_dir = test_case.case_dir / "input/snippets"
@@ -115,19 +108,11 @@ class Test_against_recorded(unittest.TestCase):
                         )
 
     def test_against_unexpected_meta_models(self) -> None:
-        parent_case_dir = (
-            REPO_DIR / "test_data" / "rdf_shacl" / "test_main" / "unexpected"
-        )
-        assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
-
-        # fmt: off
-        test_cases = (
-            tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
-                parent_case_dir=parent_case_dir,
-                aas_core_meta_modules=[]
+        test_cases = tests.common.test_cases_from_base_case_dir(
+            base_case_dir=(
+                REPO_DIR / "test_data" / "rdf_shacl" / "test_main" / "unexpected"
             )
         )
-        # fmt: on
 
         for test_case in test_cases:
             snippets_dir = test_case.case_dir / "input/snippets"
