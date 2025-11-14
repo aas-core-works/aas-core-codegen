@@ -9,8 +9,6 @@ import tempfile
 import unittest
 import warnings
 
-import aas_core_meta.v3
-
 import tests.common
 
 with warnings.catch_warnings():
@@ -33,19 +31,12 @@ class Test_against_recorded(unittest.TestCase):
     PARENT_CASE_DIR = _REPO_DIR / "test_data" / "jsonschema" / "test_main"
 
     def test_against_meta_models(self) -> None:
-        assert (
-            Test_against_recorded.PARENT_CASE_DIR.exists()
-            and Test_against_recorded.PARENT_CASE_DIR.is_dir()
-        ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
-
-        # fmt: off
-        test_cases = (
-            tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
-                parent_case_dir=Test_against_recorded.PARENT_CASE_DIR,
-                aas_core_meta_modules=[aas_core_meta.v3]
-            )
+        test_cases = tests.common.test_cases_from_base_case_dir(
+            base_case_dir=Test_against_recorded.PARENT_CASE_DIR
+        ) + tests.common.test_cases_from_real_world_models(
+            base_case_dir=Test_against_recorded.PARENT_CASE_DIR,
+            real_meta_model_paths=tests.common.REAL_META_MODEL_PATHS,
         )
-        # fmt: on
 
         for test_case in test_cases:
             snippets_dir = test_case.case_dir / "input/snippets"

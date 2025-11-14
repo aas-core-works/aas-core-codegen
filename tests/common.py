@@ -1,8 +1,7 @@
 """Provide common functionality across different tests."""
 import os
 import pathlib
-from types import ModuleType
-from typing import List, Tuple, Optional, Union, Sequence, MutableMapping, Final
+from typing import List, Tuple, Optional, Union, Sequence, Final
 
 import asttokens
 from icontract import ensure, require
@@ -140,38 +139,22 @@ class TestCaseWithDirectoryAndMetaModel:
         self.model_path = model_path
 
 
-@require(lambda parent_case_dir: parent_case_dir.is_dir())
-def find_meta_models_in_parent_directory_of_test_cases_and_modules(
-    parent_case_dir: pathlib.Path, aas_core_meta_modules: Sequence[ModuleType]
+@require(lambda base_case_dir: base_case_dir.exists() and base_case_dir.is_dir())
+def test_cases_from_base_case_dir(
+    base_case_dir: pathlib.Path,
 ) -> List[TestCaseWithDirectoryAndMetaModel]:
     """
-    Find meta-model files both from one of the ``test_data`` subdirectories and from
-    imported aas-core-meta modules.
+    Find meta-model files beneath the ``base_case_dir``.
 
-    We have two sources of metamodels. The main metamodels come from
-    aas-core-meta package. For regression tests or more localized tests, we want
-    to test against much smaller metamodels which are stored locally, as the test
-    data.
+    We resolve the meta-model source by checking for each test case directory if
+    the file ``meta_model.py`` exists.
 
-    We resolve the metamodel source like the following. We first check for each
-    test case directory if the file ``meta_model.py`` exists. If it does not, we
-    look up whether the name of the test case directory corresponds to a module
-    name from aas-core-meta.
-
-    :param aas_core_meta_modules: list of relevant modules from aas-core-meta
-    :param parent_case_dir: parent directory where test cases reside
+    :param base_case_dir: parent directory where test cases reside
     :return: list of found test cases
     """
-    module_name_to_path = dict()  # type: MutableMapping[str, pathlib.Path]
-    for module in aas_core_meta_modules:
-        assert (
-            module.__file__ is not None
-        ), f"Expected module {module} to have the ``__file__`` attribute set."
-        module_name_to_path[module.__name__] = pathlib.Path(module.__file__)
-
     test_cases = []  # type: List[TestCaseWithDirectoryAndMetaModel]
 
-    for case_dir in sorted(pth for pth in parent_case_dir.iterdir() if pth.is_dir()):
+    for case_dir in sorted(pth for pth in base_case_dir.iterdir() if pth.is_dir()):
         model_pth = case_dir / "meta_model.py"  # type: Optional[pathlib.Path]
         assert model_pth is not None
 
@@ -183,23 +166,32 @@ def find_meta_models_in_parent_directory_of_test_cases_and_modules(
             )
             continue
 
-        model_pth = module_name_to_path.get(case_dir.name, None)
-        if model_pth is None:
-            raise FileNotFoundError(
-                f"We could not resolve the metamodel for the test case "
-                f"{case_dir}. Neither meta_model.py exists in it, nor does "
-                f"it correspond to any module "
-                f"among {[module.__name__ for module in aas_core_meta_modules]!r}."
-            )
-
-        if not model_pth.exists():
-            raise FileNotFoundError(
-                f"The metamodel corresponding to the test case {case_dir} "
-                f"does not exist: {model_pth}"
-            )
-
-        test_cases.append(
-            TestCaseWithDirectoryAndMetaModel(case_dir=case_dir, model_path=model_pth)
-        )
-
     return test_cases
+
+
+@require(lambda base_case_dir: base_case_dir.exists() and base_case_dir.is_dir())
+def test_cases_from_real_world_models(
+    base_case_dir: pathlib.Path, real_meta_model_paths: Sequence[pathlib.Path]
+) -> List[TestCaseWithDirectoryAndMetaModel]:
+    """
+    Find the test cases for the given real-world models.
+
+    The meta-model path will point to the real-world model, which is shared across many
+    different tests, while the case directory will be situated beneath
+    the ``base_case_dir`` corresponding to the file name of the real-world model.
+    """
+    return [
+        TestCaseWithDirectoryAndMetaModel(
+            case_dir=base_case_dir / model_pth.stem, model_path=model_pth
+        )
+        for model_pth in real_meta_model_paths
+    ]
+
+
+def _repo_root() -> pathlib.Path:
+    return pathlib.Path(os.path.realpath(__file__)).parent.parent
+
+
+REAL_META_MODEL_PATHS: Final[Sequence[pathlib.Path]] = [
+    _repo_root() / "test_data/real_meta_models/aas_core_meta.v3.py"
+]

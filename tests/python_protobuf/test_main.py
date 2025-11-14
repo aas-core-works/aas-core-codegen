@@ -7,33 +7,22 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_meta.v3
-
 import aas_core_codegen.main
 import aas_core_codegen.python_protobuf.main
 import tests.common
 
 
 class Test_against_recorded(unittest.TestCase):
-    _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
-    PARENT_CASE_DIR = _REPO_DIR / "test_data" / "python_protobuf" / "test_main"
-
     def test_against_meta_models(self) -> None:
-        assert (
-            Test_against_recorded.PARENT_CASE_DIR.exists()
-            and Test_against_recorded.PARENT_CASE_DIR.is_dir()
-        ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
+        repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+        base_case_dir = repo_root / "test_data" / "python_protobuf" / "test_main"
 
-        # fmt: off
-        test_cases = (
-            tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
-                parent_case_dir=Test_against_recorded.PARENT_CASE_DIR,
-                aas_core_meta_modules=[
-                    aas_core_meta.v3
-                ]
-            )
+        test_cases = tests.common.test_cases_from_base_case_dir(
+            base_case_dir=base_case_dir
+        ) + tests.common.test_cases_from_real_world_models(
+            base_case_dir=base_case_dir,
+            real_meta_model_paths=tests.common.REAL_META_MODEL_PATHS,
         )
-        # fmt: on
 
         for test_case in test_cases:
             snippets_dir = test_case.case_dir / "input/snippets"

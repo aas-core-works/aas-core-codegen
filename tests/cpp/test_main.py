@@ -7,8 +7,6 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_meta.v3
-
 import aas_core_codegen.main
 
 import tests.common
@@ -21,15 +19,9 @@ class Test_against_recorded(unittest.TestCase):
         parent_case_dir = repo_dir / "test_data" / "cpp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
-        for module in [aas_core_meta.v3]:
-            case_dir = parent_case_dir / module.__name__
+        for model_pth in tests.common.REAL_META_MODEL_PATHS:
+            case_dir = parent_case_dir / model_pth.stem
             assert case_dir.is_dir(), case_dir
-
-            assert (
-                module.__file__ is not None
-            ), f"Expected the module {module!r} to have a __file__, but it has None"
-            model_pth = pathlib.Path(module.__file__)
-            assert model_pth.exists() and model_pth.is_file(), model_pth
 
             snippets_dir = case_dir / "input/snippets"
             assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir

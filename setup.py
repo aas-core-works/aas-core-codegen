@@ -47,12 +47,13 @@ setup(
             "pydocstyle>=2.1.1, <3",
             "coverage>=4.5.1, <5",
             "pygments>=2, <3",
-            "pyinstaller>=4, <5",
+            "pyinstaller>=4,<5",
             "twine",
             "jsonschema==3.2.0",
             "xmlschema==3.3.1",
-            "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@899add1#egg=aas-core-meta",
             "ssort==0.12.3",
+            "requests==2.32.4",
+            "types-requests==2.32.4.20250913",
         ]
     },
     # fmt: on

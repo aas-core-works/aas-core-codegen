@@ -6,8 +6,6 @@ import textwrap
 import unittest
 from typing import List, Tuple
 
-import aas_core_meta.v3
-
 from aas_core_codegen import intermediate
 from aas_core_codegen.intermediate import doc as intermediate_doc
 from aas_core_codegen.common import Identifier
@@ -279,13 +277,8 @@ class Test_against_recorded(unittest.TestCase):
         repo_root = this_dir.parent.parent
         test_cases_dir = repo_root / "test_data/intermediate/real_meta_models"
 
-        for module in [aas_core_meta.v3]:
-            case_dir = test_cases_dir / module.__name__
-
-            assert (
-                module.__file__ is not None
-            ), f"Expected the module {module!r} to have a __file__, but it has None"
-            meta_model_pth = pathlib.Path(module.__file__)
+        for meta_model_pth in tests.common.REAL_META_MODEL_PATHS:
+            case_dir = test_cases_dir / meta_model_pth.stem
 
             try:
                 source = meta_model_pth.read_text(encoding="utf-8")
@@ -312,7 +305,7 @@ class Test_against_recorded(unittest.TestCase):
             if error is not None:
                 raise AssertionError(
                     f"Expected no errors when translating "
-                    f"the real meta-model {module.__name__}, but got:\n"
+                    f"the real meta-model {meta_model_pth}, but got:\n"
                     f"{tests.common.most_underlying_messages(error)}"
                 )
 

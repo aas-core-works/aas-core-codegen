@@ -7,8 +7,6 @@ import os
 import pathlib
 import unittest
 
-import aas_core_meta.v3
-
 from aas_core_codegen.smoke import main as smoke_main
 
 import tests.common
@@ -25,9 +23,7 @@ class Test_against_recorded(unittest.TestCase):
 
         model_paths_of_the_expected = sorted(
             list(expected_dir.glob("**/*.py"))
-            + [
-                pathlib.Path(aas_core_meta.v3.__file__),
-            ]
+            + list(tests.common.REAL_META_MODEL_PATHS)
         )
 
         for model_pth in model_paths_of_the_expected:
