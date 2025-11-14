@@ -36,27 +36,8 @@ setup(
     ],
     license="License :: OSI Approved :: MIT License",
     keywords="asset administration shell code generation industry 4.0 industrie i4.0",
-    packages=find_packages(exclude=["tests", "continuous_integration", "dev_scripts"]),
+    packages=find_packages(exclude=["dev"]),
     install_requires=install_requires,
-    # fmt: off
-    extras_require={
-        "dev": [
-            "black==22.3.0",
-            "mypy==1.9.0",
-            "pylint==3.3.8",
-            "pydocstyle>=2.1.1, <3",
-            "coverage>=4.5.1, <5",
-            "pygments>=2, <3",
-            "pyinstaller>=4,<5",
-            "twine",
-            "jsonschema==3.2.0",
-            "xmlschema==3.3.1",
-            "ssort==0.12.3",
-            "requests==2.32.4",
-            "types-requests==2.32.4.20250913",
-        ]
-    },
-    # fmt: on
     py_modules=["aas_core_codegen"],
     package_data={"aas_core_codegen": ["py.typed"]},
     data_files=[(".", ["LICENSE", "README.rst", "requirements.txt"])],
