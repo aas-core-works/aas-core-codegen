@@ -22,28 +22,29 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install the package with development dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip3 install -e .[dev]
+          pip3 install -e .
+          pip3 install -e dev
 
       - name: Install coveralls
         run: pip3 install --upgrade coveralls
         if: github.event.repository.fork == false
 
       # NOTE (mristin, 2022-12-21):
-      # Have this as a fast-fail
+      # We introduce this check as a fast-fail.
       - name: Check help in readme
-        run: python3 continuous_integration/precommit.py --select check-help-in-readme
+        run: python3 dev/continuous_integration/precommit.py --select check-help-in-readme
 
       # NOTE (mristin, 2022-12-21):
-      # Have this as a fast-fail
+      # We introduce this check as a fast-fail.
       - name: Check __init__.py and setup.py coincide
-        run: python3 continuous_integration/precommit.py --select check-init-and-setup-coincide
+        run: python3 dev/continuous_integration/precommit.py --select check-init-and-setup-coincide
 
       - name: Run checks
         run: |
-          python3 continuous_integration/precommit.py
+          python3 dev/continuous_integration/precommit.py
 
       - name: Upload Coverage
         run: coveralls --service=github

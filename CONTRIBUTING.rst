@@ -40,12 +40,11 @@ and on Windows:
 Install Development Dependencies
 ================================
 
-Once you activated the virtual environment, you can install the development 
-dependencies using ``pip``:
+Once you activated the virtual environment, you can install the package using ``pip``:
 
 .. code-block::
 
-    pip3 install --editable .[dev]
+    pip3 install --editable .
 
 The `--editable <pip-editable_>`_ option is necessary so that all the changes
 made to the repository are automatically reflected in the virtual environment 
@@ -53,6 +52,12 @@ made to the repository are automatically reflected in the virtual environment
 
 .. _pip-editable: https://pip.pypa.io/en/stable/reference/pip_install/#install-editable
 .. _pip-editable-stackoverflow: https://stackoverflow.com/questions/35064426/when-would-the-e-editable-option-be-useful-with-pip-install
+
+You also have to install the development dependencies, including different development modules:
+
+.. code-block::
+
+    pip3 install --editable dev
 
 Background Literature
 =====================
@@ -255,9 +260,9 @@ Write unit tests for everything that can be obviously tested at the function/cla
 
 For many inter-dependent code regions, writing unit tests is too tedious or nigh impossible to later maintain.
 For such parts of the system, prefer integration tests with comparisons against initially recorded and reviewed golden data.
-See, for example, ``tests/csharp/test_main.py`` or ``tests/intermediate/test_translate.py``.
+See, for example, ``dev/tests/csharp/test_main.py`` or ``dev/tests/intermediate/test_translate.py``.
 
-The golden test data resides in ``test_data/``.
+The golden test data resides in ``dev/test_data/``.
 The structure of the test data directory follows in general the test module structure.
 
 Pre-commit Checks
