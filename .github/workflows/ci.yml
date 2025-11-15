@@ -39,8 +39,8 @@ jobs:
 
       # NOTE (mristin, 2022-12-21):
       # We introduce this check as a fast-fail.
-      - name: Check __init__.py and setup.py coincide
-        run: python3 dev/continuous_integration/precommit.py --select check-init-and-setup-coincide
+      - name: Check that __init__.py and pyproject.toml are consistent
+        run: python3 dev/continuous_integration/precommit.py --select check-init-and-pyproject-consistent
 
       - name: Run checks
         run: |

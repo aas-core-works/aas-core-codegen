@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aas-core-codegen"
+version = "0.0.15"
+description = "Generate implementations and schemas based on an AAS meta-model."
+readme = "README.rst"
+authors = [
+    {name = "Marko Ristin", email = "marko@ristin.ch"},
+    {name = "Nico Braunisch", email = "nico.braunisch@tu-dresden.de"}
+]
+license = {text = "MIT"}
+keywords = ["asset administration shell", "code generation", "industry 4.0", "industrie 4.0", "i4.0"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "asttokens>=2.0.8,<3",
+    "icontract>=2.5.2,<3",
+    "sortedcontainers>=2.4.0,<3",
+    "docutils==0.20.1",
+    "more-itertools>=8,<9",
+    "greenery==4.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/aas-core-works/aas-core-codegen"
+
+[project.scripts]
+aas-core-codegen = "aas_core_codegen.main:entry_point"
+aas-core-codegen-smoke = "aas_core_codegen.smoke.main:entry_point"
+
+[tool.setuptools.packages.find]
+exclude = ["dev"]
+
+[tool.setuptools.package-data]
+aas_core_codegen = ["py.typed"]
