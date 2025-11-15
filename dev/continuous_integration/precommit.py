@@ -23,7 +23,7 @@ class Step(enum.Enum):
     PYLINT = "pylint"
     TEST = "test"
     DOCTEST = "doctest"
-    CHECK_INIT_AND_SETUP_COINCIDE = "check-init-and-setup-coincide"
+    CHECK_INIT_AND_PYPROJECT_CONSISTENT = "check-init-and-pyproject-consistent"
     CHECK_HELP_IN_README = "check-help-in-readme"
     INTEGRATION_TEST = "integration-test"
 
@@ -113,7 +113,6 @@ def main() -> int:
             "dev/integration_tests",
             "dev/tests",
             "dev/test_data",
-            "setup.py",
         ]
 
         # NOTE (mristin, 2022-10-29):
@@ -155,7 +154,6 @@ def main() -> int:
             "dev/continuous_integration",
             "dev/dev_scripts",
             "dev/tests",
-            "setup.py",
         ]
 
         if overwrite:
@@ -321,15 +319,21 @@ def main() -> int:
         print("Skipped doctest'ing.")
 
     if (
-        Step.CHECK_INIT_AND_SETUP_COINCIDE in selects
-        and Step.CHECK_INIT_AND_SETUP_COINCIDE not in skips
+        Step.CHECK_INIT_AND_PYPROJECT_CONSISTENT in selects
+        and Step.CHECK_INIT_AND_PYPROJECT_CONSISTENT not in skips
     ):
-        print("Checking that aas_core_codegen/__init__.py and setup.py coincide...")
+        print(
+            "Checking that aas_core_codegen/__init__.py and pyproject.toml "
+            "are consistent..."
+        )
         exit_code = call_and_report(
-            verb="check that aas_core_codegen/__init__.py and setup.py coincide",
+            verb=(
+                "check that aas_core_codegen/__init__.py and pyproject.toml "
+                "are consistent"
+            ),
             cmd=[
                 sys.executable,
-                "dev/continuous_integration/check_init_and_setup_coincide.py",
+                "dev/continuous_integration/check_init_and_pyproject_consistent.py",
             ],
             cwd=repo_root,
         )
@@ -338,7 +342,7 @@ def main() -> int:
     else:
         print(
             "Skipped checking that aas_core_codegen/__init__.py and "
-            "setup.py coincide."
+            "pyproject.toml are consistent."
         )
 
     # NOTE (mristin, 2022-01-22):
