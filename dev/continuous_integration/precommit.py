@@ -345,11 +345,11 @@ def main() -> int:
             "pyproject.toml are consistent."
         )
 
-    # NOTE (mristin, 2022-01-22):
+    # NOTE (mristin):
     # We need to check for the Python version since ``argparse`` output changes
-    # between the versions. Hence, we pin it at the moment to Python 3.8.
+    # between the versions. Hence, we pin it at the moment to Python 3.12.
 
-    if sys.version_info < (3, 9):
+    if (3, 12) <= sys.version_info < (3, 13):
         if (
             Step.CHECK_HELP_IN_README in selects
             and Step.CHECK_HELP_IN_README not in skips
@@ -390,7 +390,7 @@ def main() -> int:
     else:
         print(
             "Skipped checking that --help's and the doc coincide "
-            "since we pin it on Python version 3.8."
+            "since we pin it on Python version 3.12."
         )
 
     return 0

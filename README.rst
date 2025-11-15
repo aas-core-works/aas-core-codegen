@@ -144,7 +144,7 @@ Call the generator with the appropriate target:
 
     Generate implementations and schemas based on an AAS meta-model.
 
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       --model_path MODEL_PATH
                             path to the meta-model
