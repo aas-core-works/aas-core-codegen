@@ -26,7 +26,7 @@ dependencies = [
     "asttokens>=2.0.8,<3",
     "icontract>=2.5.2,<3",
     "sortedcontainers>=2.4.0,<3",
-    "docutils==0.20.1",
+    "docutils==0.22.3",
     "more-itertools>=8,<9",
     "greenery==4.1.0",
 ]
