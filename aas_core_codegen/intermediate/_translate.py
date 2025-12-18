@@ -156,7 +156,7 @@ def _role_reference_to_our_type(  # type: ignore
         options = {}
 
     # noinspection PyUnresolvedReferences
-    docutils.parsers.rst.roles.set_classes(options)
+    options = docutils.parsers.rst.roles.normalize_options(options)
 
     # NOTE (mristin, 2021-12-27):
     # We need to create a placeholder as the symbol table might not be fully created
@@ -215,7 +215,7 @@ def _role_reference_to_attribute(  # type: ignore
         options = {}
 
     # noinspection PyUnresolvedReferences
-    docutils.parsers.rst.roles.set_classes(options)
+    options = docutils.parsers.rst.roles.normalize_options(options)
 
     path = _strip_sphinx_formatting_directives_from_reference(text)
 
@@ -250,7 +250,7 @@ def _role_reference_to_argument(  # type: ignore
         options = {}
 
     # noinspection PyUnresolvedReferences
-    docutils.parsers.rst.roles.set_classes(options)
+    options = docutils.parsers.rst.roles.normalize_options(options)
 
     reference = text
 
@@ -273,7 +273,7 @@ def _role_reference_to_constraint(  # type: ignore
         options = {}
 
     # noinspection PyUnresolvedReferences
-    docutils.parsers.rst.roles.set_classes(options)
+    options = docutils.parsers.rst.roles.normalize_options(options)
 
     reference = text
 

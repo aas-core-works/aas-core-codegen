@@ -49,7 +49,10 @@ def _extract_authors(metadata: PackageMetadata) -> List[str]:
                 authors.append(entry)
 
     # We also check Author field as a fallback.
-    author = metadata["Author"]
+    try:
+        author = metadata["Author"]
+    except KeyError:
+        author = None
 
     if author is not None and len(authors) == 0:
         authors = [author.strip()]
