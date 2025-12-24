@@ -2823,6 +2823,48 @@ class SymbolTable:
 
         return result
 
+    def is_enumeration_literal_of(
+        self, literal: EnumerationLiteral, enumeration_or_constant_set_name: Identifier
+    ) -> bool:
+        """
+        Check that the given ``literal`` is a member of the enumeration or constant set.
+
+        We assume that the enumeration or the constant set of enumeration literals
+        exists in the symbol table.
+
+        :raises:
+            :py:class:`KeyError` if the ``enumeration_or_constant_set_name`` is neither
+            in our types nor in constants
+
+        :raises:
+             :py:class:`TypeError` if the ``enumeration_or_constant_set_name`` is
+             neither an enumeration nor a constant set of enumeration literals, but
+             exists in our types or in the constants.
+        """
+        our_type = self._name_to_our_type.get(enumeration_or_constant_set_name, None)
+        if our_type is not None:
+            if not isinstance(our_type, Enumeration):
+                raise TypeError(
+                    f"Expected an enumeration "
+                    f"under the name {enumeration_or_constant_set_name!r}, "
+                    f"but got {type(our_type)}: {our_type}"
+                )
+
+            return id(literal) in our_type.literal_id_set
+
+        constant = self.constants_by_name.get(enumeration_or_constant_set_name, None)
+        if constant is not None:
+            if not isinstance(constant, ConstantSetOfEnumerationLiterals):
+                raise TypeError(
+                    f"Expected a constant set of enumeration literals "
+                    f"under the name {enumeration_or_constant_set_name!r}, "
+                    f"but got {type(constant)}: {constant}"
+                )
+
+            return id(literal) in constant.literal_id_set
+
+        raise KeyError(enumeration_or_constant_set_name)
+
 
 def try_primitive_type(type_annotation: TypeAnnotationUnion) -> Optional[PrimitiveType]:
     """
