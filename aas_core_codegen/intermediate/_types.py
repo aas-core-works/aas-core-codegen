@@ -2741,6 +2741,88 @@ class SymbolTable:
 
         return result
 
+    def must_find_constant(self, name: Identifier) -> "ConstantUnion":
+        """
+        Find the constant with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our constants.
+        """
+        result = self.constants_by_name.get(name, None)
+        if result is None:
+            raise KeyError(name)
+
+        return result
+
+    def must_find_constant_primitive(self, name: Identifier) -> ConstantPrimitive:
+        """
+        Find the primitive constant with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in the constants.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is in the constants, but it is not
+            a constant primitive.
+        """
+        result = self.constants_by_name.get(name, None)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, ConstantPrimitive):
+            raise TypeError(
+                f"Found {name} in the constants; "
+                f"expected an instance of {ConstantPrimitive.__name__},"
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_constant_set_of_primitives(
+        self, name: Identifier
+    ) -> ConstantSetOfPrimitives:
+        """
+        Find the constant set of primitives with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in the constants.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is in the constants, but it is not
+            a constant set of primitives.
+        """
+        result = self.constants_by_name.get(name, None)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, ConstantSetOfPrimitives):
+            raise TypeError(
+                f"Found {name} in the constants; "
+                f"expected an instance of {ConstantSetOfPrimitives.__name__},"
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_constant_set_of_enumeration_literals(
+        self, name: Identifier
+    ) -> ConstantSetOfEnumerationLiterals:
+        """
+        Find the constant set of enumeration literals with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in the constants.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is in the constants, but it is not
+            a constant set of enumeration literals.
+        """
+        result = self.constants_by_name.get(name, None)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, ConstantSetOfEnumerationLiterals):
+            raise TypeError(
+                f"Found {name} in the constants; "
+                f"expected an instance of {ConstantSetOfEnumerationLiterals.__name__},"
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
 
 def try_primitive_type(type_annotation: TypeAnnotationUnion) -> Optional[PrimitiveType]:
     """
