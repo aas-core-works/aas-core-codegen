@@ -3119,6 +3119,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     AbstractClass(
       name='Has_kind',
@@ -4052,6 +4053,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     ConcreteClass(
       name='Qualifier',
@@ -5762,6 +5764,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     ConcreteClass(
       name='Specific_asset_ID',
@@ -8849,6 +8852,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     ConcreteClass(
       name='Submodel_element_list',
@@ -18741,6 +18745,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     Enumeration(
       name='Direction',
@@ -18772,6 +18777,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     Enumeration(
       name='State_of_event',
@@ -18803,6 +18809,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     ConcreteClass(
       name='Event_payload',
@@ -23603,6 +23610,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     ConcreteClass(
       name='Reference',
@@ -24765,6 +24773,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     Enumeration(
       name='Data_type_def_XSD',
@@ -24927,6 +24936,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     AbstractClass(
       name='Abstract_lang_string',
@@ -25958,6 +25968,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...),
     ConcreteClass(
       name='Level_type',
@@ -27675,6 +27686,7 @@ SymbolTable(
       literals=[
         'Reference to EnumerationLiteral Fragment_reference'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of all identifiable elements within an asset administration shell.</paragraph>',
@@ -27687,6 +27699,7 @@ SymbolTable(
       literals=[
         'Reference to EnumerationLiteral Global_reference'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
@@ -27702,6 +27715,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Identifiable',
         'Reference to EnumerationLiteral Submodel'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
@@ -27730,6 +27744,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_collection',
         'Reference to EnumerationLiteral Submodel_element_list'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of all submodel elements within an asset administration shell.</paragraph>',
@@ -27758,6 +27773,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_collection',
         'Reference to EnumerationLiteral Submodel_element_list'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals AAS_submodel_elements_as_keys'],
       description=DescriptionOfConstant(
@@ -27792,6 +27808,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_collection',
         'Reference to EnumerationLiteral Submodel_element_list'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals AAS_referable_non_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals AAS_identifiables'],
@@ -27810,6 +27827,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Identifiable',
         'Reference to EnumerationLiteral Submodel'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals AAS_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Generic_globally_identifiables'],
@@ -27841,6 +27859,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_collection',
         'Reference to EnumerationLiteral Submodel_element_list'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals AAS_referable_non_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Generic_fragment_keys'],
@@ -27868,6 +27887,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Time',
         'Reference to EnumerationLiteral Timestamp'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>IEC 61360 data types for concept descriptions categorized with PROPERTY or VALUE.</paragraph>',
@@ -27882,6 +27902,7 @@ SymbolTable(
         'Reference to EnumerationLiteral IRI',
         'Reference to EnumerationLiteral IRDI'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>IEC 61360 data types for concept descriptions categorized with REFERENCE.</paragraph>',
@@ -27896,6 +27917,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Blob',
         'Reference to EnumerationLiteral HTML'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>IEC 61360 data types for concept descriptions categorized with DOCUMENT.</paragraph>',
@@ -27912,6 +27934,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Integer_currency',
         'Reference to EnumerationLiteral Real_currency'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=DescriptionOfConstant(
         summary='<paragraph>These data types imply that the unit is defined in the data specification.</paragraph>',

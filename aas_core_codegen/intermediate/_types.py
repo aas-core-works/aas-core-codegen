@@ -1066,6 +1066,9 @@ class Enumeration:
     #: Collect IDs (with :py:func:`id`) of the literal objects in a set
     literal_id_set: Final[FrozenSet[int]]
 
+    #: Set of all the literal values
+    literal_value_set: Final[FrozenSet[str]]
+
     def __init__(
         self,
         name: Identifier,
@@ -1087,6 +1090,7 @@ class Enumeration:
         }
 
         self.literal_id_set = frozenset(id(literal) for literal in literals)
+        self.literal_value_set = frozenset(literal.value for literal in literals)
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1926,7 +1930,7 @@ class ConstantSetOfPrimitives(Constant):
     parsed: Final[parse.ConstantSet]
 
     #: Set of all the literal values
-    literal_value_set: Final[Set[Union[bool, int, float, str, bytearray]]]
+    literal_value_set: Final[FrozenSet[Union[bool, int, float, str, bytearray]]]
 
     # fmt: off
     # noinspection PyTypeHints
@@ -1972,7 +1976,7 @@ class ConstantSetOfPrimitives(Constant):
         self.subsets = subsets
         self.parsed = parsed
 
-        self.literal_value_set = {literal.value for literal in literals}
+        self.literal_value_set = frozenset(literal.value for literal in literals)
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1997,7 +2001,10 @@ class ConstantSetOfEnumerationLiterals(Constant):
     parsed: Final[parse.ConstantSet]
 
     #: Set of all the IDs (as in Python objects) of the literals
-    literal_id_set: Final[Set[int]]
+    literal_id_set: Final[FrozenSet[int]]
+
+    #: Set of all the literal values
+    literal_value_set: Final[FrozenSet[str]]
 
     # fmt: off
     @require(
@@ -2038,7 +2045,8 @@ class ConstantSetOfEnumerationLiterals(Constant):
         self.subsets = subsets
         self.parsed = parsed
 
-        self.literal_id_set = {id(literal) for literal in self.literals}
+        self.literal_id_set = frozenset(id(literal) for literal in self.literals)
+        self.literal_value_set = frozenset(literal.value for literal in self.literals)
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""

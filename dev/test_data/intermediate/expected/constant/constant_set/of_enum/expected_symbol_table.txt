@@ -22,6 +22,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
   enumerations=[
@@ -37,6 +38,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Some_literal',
         'Reference to EnumerationLiteral Another_literal'],
       literal_id_set=...,
+      literal_value_set=...,
       subsets=[],
       description=None,
       parsed=...)],

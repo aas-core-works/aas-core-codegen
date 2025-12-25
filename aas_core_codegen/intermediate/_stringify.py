@@ -510,6 +510,7 @@ def _stringify_enumeration(
             stringify_mod.PropertyEllipsis("literals_by_name", that.literals_by_name),
             stringify_mod.PropertyEllipsis("literals_by_value", that.literals_by_value),
             stringify_mod.PropertyEllipsis("literal_id_set", that.literal_id_set),
+            stringify_mod.PropertyEllipsis("literal_value_set", that.literal_value_set),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
@@ -711,6 +712,7 @@ def _stringify_constant_set_of_enumeration_literals(
                 ],
             ),
             stringify_mod.PropertyEllipsis("literal_id_set", that.literal_id_set),
+            stringify_mod.PropertyEllipsis("literal_value_set", that.literal_value_set),
             stringify_mod.Property(
                 "subsets",
                 [
