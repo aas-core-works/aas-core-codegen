@@ -484,5 +484,82 @@ __xml_namespace__ = "https://dummy.com"
             )
 
 
+class TestLiteralValueSet(unittest.TestCase):
+    def test_enumeration(self) -> None:
+        source = """\
+class SomeEnum(Enum):
+    Some_literal = "SOME-LITERAL"
+    Another_literal = "ANOTHER-LITERAL"
+    Yet_another_literal = "YET-ANOTHER-LITERAL"
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        some_enum = symbol_table.must_find_enumeration(Identifier("SomeEnum"))
+
+        expected_literal_values = frozenset(
+            ["SOME-LITERAL", "ANOTHER-LITERAL", "YET-ANOTHER-LITERAL"]
+        )
+
+        self.assertEqual(expected_literal_values, some_enum.literal_value_set)
+
+    def test_constant_set_of_primitives(self) -> None:
+        source = """\
+SomeSet: Set[str] = constant_set(
+    values=["hello", "world", "test"]
+)
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        some_set = symbol_table.must_find_constant_set_of_primitives(
+            Identifier("SomeSet")
+        )
+
+        expected_literal_values = frozenset(["hello", "world", "test"])
+
+        self.assertEqual(expected_literal_values, some_set.literal_value_set)
+
+    def test_constant_set_of_enumeration_literals(self) -> None:
+        source = """\
+class SomeEnum(Enum):
+    Some_literal = "SOME-LITERAL"
+    Another_literal = "ANOTHER-LITERAL"
+    Yet_another_literal = "YET-ANOTHER-LITERAL"
+
+SomeSet: Set[SomeEnum] = constant_set(
+    values=[SomeEnum.Some_literal, SomeEnum.Another_literal]
+)
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        some_set = symbol_table.must_find_constant_set_of_enumeration_literals(
+            Identifier("SomeSet")
+        )
+
+        expected_literal_values = frozenset(["SOME-LITERAL", "ANOTHER-LITERAL"])
+
+        self.assertEqual(expected_literal_values, some_set.literal_value_set)
+
+
 if __name__ == "__main__":
     unittest.main()

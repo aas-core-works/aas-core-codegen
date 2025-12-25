@@ -19,6 +19,7 @@ SymbolTable(
       literals_by_name=...,
       literals_by_value=...,
       literal_id_set=...,
+      literal_value_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
   enumerations=[
