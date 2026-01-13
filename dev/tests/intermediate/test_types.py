@@ -8,6 +8,64 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier
 
 
+class TestMappingOfPrimitiveTypesProperlyExposed(unittest.TestCase):
+    def test_primitive_type_to_python_type(self) -> None:
+        self.assertEqual(
+            intermediate.PRIMITIVE_TYPE_TO_PYTHON_TYPE[intermediate.PrimitiveType.BOOL],
+            bool,
+        )
+
+        self.assertEqual(
+            intermediate.PRIMITIVE_TYPE_TO_PYTHON_TYPE[intermediate.PrimitiveType.INT],
+            int,
+        )
+
+        self.assertEqual(
+            intermediate.PRIMITIVE_TYPE_TO_PYTHON_TYPE[
+                intermediate.PrimitiveType.FLOAT
+            ],
+            float,
+        )
+
+        self.assertEqual(
+            intermediate.PRIMITIVE_TYPE_TO_PYTHON_TYPE[intermediate.PrimitiveType.STR],
+            str,
+        )
+
+        self.assertEqual(
+            intermediate.PRIMITIVE_TYPE_TO_PYTHON_TYPE[
+                intermediate.PrimitiveType.BYTEARRAY
+            ],
+            bytearray,
+        )
+
+    def test_python_type_to_primitive_type(self) -> None:
+        self.assertEqual(
+            intermediate.PYTHON_TYPE_TO_PRIMITIVE_TYPE[bool],
+            intermediate.PrimitiveType.BOOL,
+        )
+
+        self.assertEqual(
+            intermediate.PYTHON_TYPE_TO_PRIMITIVE_TYPE[int],
+            intermediate.PrimitiveType.INT,
+        )
+
+        self.assertEqual(
+            intermediate.PYTHON_TYPE_TO_PRIMITIVE_TYPE[float],
+            intermediate.PrimitiveType.FLOAT,
+        )
+
+        self.assertEqual(
+            intermediate.PYTHON_TYPE_TO_PRIMITIVE_TYPE[str],
+            intermediate.PrimitiveType.STR,
+        )
+
+        self.assertEqual(
+            intermediate.PYTHON_TYPE_TO_PRIMITIVE_TYPE[bytearray],
+            intermediate.PrimitiveType.BYTEARRAY,
+        )
+
+
 class TestIsSubclassOf(unittest.TestCase):
     def test_no_inheritances(self) -> None:
         source = textwrap.dedent(

@@ -53,12 +53,15 @@ STR_TO_PRIMITIVE_TYPE = {
 }  # type: Mapping[str, PrimitiveType]
 
 # fmt: off
-PRIMITIVE_TYPE_TO_PYTHON_TYPE: Mapping[
-    PrimitiveType,
-    Union[Type[bool], Type[int], Type[float], Type[str], Type[bytearray]]
+PRIMITIVE_TYPE_TO_PYTHON_TYPE: Final[
+    Mapping[
+        PrimitiveType,
+        Union[Type[bool], Type[int], Type[float], Type[str], Type[bytearray]
+        ]
+    ]
 ] = {
     PrimitiveType.BOOL: bool,
-    PrimitiveType.INT : int,
+    PrimitiveType.INT: int,
     PrimitiveType.FLOAT: float,
     PrimitiveType.STR: str,
     PrimitiveType.BYTEARRAY: bytearray,
