@@ -7,6 +7,7 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations, infer_for_schema
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
+from aas_core_codegen.infer_for_schema import PatternConstraint
 from aas_core_codegen.jsonschema import main as jsonschema_main
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
@@ -23,6 +24,8 @@ def _define_property_shape(
     xml_namespace: Stripped,
     our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    pattern_constraint: PatternConstraint,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the shape of a property ``prop`` of the intermediate ``cls``.
@@ -31,8 +34,6 @@ def _define_property_shape(
     """
 
     len_constraint = constraints_by_property.len_constraints_by_property.get(prop, None)
-
-    pattern_constraints = constraints_by_property.patterns_by_property.get(prop, [])
 
     # NOTE (mristin, 2023-02-08):
     # This check might come as a bit off. In SHACL, to the best of our understanding —
@@ -43,7 +44,7 @@ def _define_property_shape(
     # further constraints in the descendant classes.
     if (
         len_constraint is None
-        and len(pattern_constraints) == 0
+        and pattern_constraint is None
         and prop.specified_for is not cls
     ):
         return Stripped(""), None
@@ -60,7 +61,14 @@ def _define_property_shape(
         type_annotation=type_anno, our_type_to_rdfs_range=our_type_to_rdfs_range
     )
 
-    cls_name = rdf_shacl_naming.class_name(cls.name)
+    # NOTE (mhrimaz):
+    # For Subclasses of Abstract Lang String, we don't need the concert class name in the
+    # property path as discussed in aas-core-codegen/issues/519
+    abstract_lang_string_cls = symbol_table.find_our_type(Identifier("Abstract_lang_string"))
+    if cls.is_subclass_of(abstract_lang_string_cls):
+        cls_name = rdf_shacl_naming.class_name(abstract_lang_string_cls.name)
+    else:
+        cls_name = rdf_shacl_naming.class_name(cls.name)
 
     stmts.append(Stripped(f"sh:path <{xml_namespace}/{cls_name}/{prop_name}> ;"))
 
@@ -214,7 +222,7 @@ def _define_property_shape(
 
     # region Define patterns
 
-    for pattern_constraint in pattern_constraints:
+    if pattern_constraint:
         # NOTE (mristin):
         # We need to render the regular expression so that the pattern appears in
         # the canonical form. The original pattern in the specification might be written
@@ -260,26 +268,37 @@ def _define_for_class(
     our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     xml_namespace: Stripped,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition for the class ``cls``."""
     prop_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
     for prop in cls.properties:
-        prop_block, error = _define_property_shape(
-            prop=prop,
-            cls=cls,
-            xml_namespace=xml_namespace,
-            our_type_to_rdfs_range=our_type_to_rdfs_range,
-            constraints_by_property=constraints_by_property,
-        )
+        pattern_constraints = constraints_by_property.patterns_by_property.get(prop, [None,])
+        for pattern_constraint in pattern_constraints:
+            # NOTE (mhrimaz):
+            # In SHACL, a PropertyShape cannot have multiple sh:pattern
+            # this is not valid according to shacl-shacl rules
+            # https://github.com/w3c/data-shapes/blob/gh-pages/shacl/shacl-shacl.ttl
+            # and the behaviour of validator engine is not predictable. So we need to
+            # create multiple sh:property
+            prop_block, error = _define_property_shape(
+                prop=prop,
+                cls=cls,
+                xml_namespace=xml_namespace,
+                our_type_to_rdfs_range=our_type_to_rdfs_range,
+                constraints_by_property=constraints_by_property,
+                pattern_constraint=pattern_constraint,
+                symbol_table=symbol_table
+            )
 
-        if error is not None:
-            errors.append(error)
-        else:
-            assert prop_block is not None
-            if prop_block != "":
-                prop_blocks.append(prop_block)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert prop_block is not None
+                if prop_block != "":
+                    prop_blocks.append(prop_block)
 
     if len(errors) > 0:
         return None, Error(
@@ -301,7 +320,7 @@ aas:{shape_name} a sh:NodeShape ;
             Identifier(f"{inheritance.name}_shape")
         )
 
-        writer.write(f"\n{I}rdfs:subClassOf aas:{subclass_shape_name} ;")
+        writer.write(f"\n{I}sh:node aas:{subclass_shape_name} ;")
 
     if isinstance(cls, intermediate.AbstractClass):
         writer.write("\n")
@@ -316,7 +335,7 @@ sh:sparql [
 {I}sh:select """
 {II}SELECT ?this ?type
 {II}WHERE {{
-{III}?this rdf:type ?type .
+{III}?this <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .
 {III}FILTER (?type = aas:{cls_name})
 {II}}}
 {I}""" ;
@@ -357,8 +376,6 @@ def generate(
 
 # Metadata
 <{xml_namespace}/> a owl:Ontology ;
-    owl:imports <http://datashapes.org/dash> ;
-    owl:imports sh: ;
     sh:declare [
         a sh:PrefixDeclaration ;
         sh:namespace "{xml_namespace}/"^^xs:anyURI ;
@@ -437,6 +454,7 @@ def generate(
                     our_type_to_rdfs_range=our_type_to_rdfs_range,
                     xml_namespace=xml_namespace,
                     constraints_by_property=constraints_by_class[our_type],
+                    symbol_table=symbol_table
                 )
 
                 if error is not None:
