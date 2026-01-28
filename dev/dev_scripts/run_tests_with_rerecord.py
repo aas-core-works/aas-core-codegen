@@ -44,6 +44,8 @@ def main() -> int:
 
     repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
+    dev_root = repo_root / "dev"
+
     env = os.environ.copy()
     env["AAS_CORE_CODEGEN_RERECORD"] = "1"
 
@@ -56,7 +58,7 @@ def main() -> int:
         cmd = [sys.executable, "-m", "unittest", "-v", qualified_test_name]
 
         print(f"Executing {qualified_test_name}...")
-        exit_code = subprocess.call(cmd, cwd=str(repo_root), env=env)
+        exit_code = subprocess.call(cmd, cwd=str(dev_root), env=env)
         if exit_code != 0:
             cmd_str = " ".join(shlex.quote(part) for part in cmd)
             print(f"Failed to execute the test: {cmd_str}")
