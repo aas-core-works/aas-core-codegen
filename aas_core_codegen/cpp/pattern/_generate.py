@@ -201,7 +201,7 @@ def _write_instructions_recursively(
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::InstructionChar>({char_literal})
+{I}common::make_unique<revm::InstructionChar>({char_literal})
 );"""
             )
 
@@ -230,7 +230,7 @@ program.emplace_back({maybe_label_comment}
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::{instruction_cls}>(
+{I}common::make_unique<revm::{instruction_cls}>(
 {II}std::vector<revm::Range>{{
 {III}{indent_but_first_line(ranges_joined, III)}
 {II}}}
@@ -242,7 +242,7 @@ program.emplace_back({maybe_label_comment}
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::InstructionAny>()
+{I}common::make_unique<revm::InstructionAny>()
 );"""
             )
 
@@ -250,7 +250,7 @@ program.emplace_back({maybe_label_comment}
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::InstructionMatch>()
+{I}common::make_unique<revm::InstructionMatch>()
 );"""
             )
 
@@ -258,7 +258,7 @@ program.emplace_back({maybe_label_comment}
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::InstructionJump>({node_or_leaf.instruction.target})
+{I}common::make_unique<revm::InstructionJump>({node_or_leaf.instruction.target})
 );"""
             )
 
@@ -268,7 +268,7 @@ program.emplace_back({maybe_label_comment}
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::InstructionSplit>({first_target}, {second_target})
+{I}common::make_unique<revm::InstructionSplit>({first_target}, {second_target})
 );"""
             )
 
@@ -276,7 +276,7 @@ program.emplace_back({maybe_label_comment}
             instruction_code = Stripped(
                 f"""\
 program.emplace_back({maybe_label_comment}
-{I}std::make_unique<revm::InstructionEnd>()
+{I}common::make_unique<revm::InstructionEnd>()
 );"""
             )
 
@@ -449,6 +449,7 @@ def generate_implementation(
         cpp_common.WARNING,
         Stripped(
             f'''\
+#include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/pattern.hpp"
 #include "{include_prefix_path}/revm.hpp"'''
         ),
