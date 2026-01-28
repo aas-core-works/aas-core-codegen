@@ -11,6 +11,8 @@ import shlex
 def main() -> int:
     """Execute the main routine."""
     available_tests = [
+        "tests.cpp.test_main.Test_against_recorded",
+        "tests.cpp.test_verification.Test_against_recorded",
         "tests.csharp.test_main.Test_against_recorded",
         "tests.csharp.test_verification.Test_against_recorded",
         "tests.csharp.test_structure.Test_generation_against_recorded",
