@@ -449,6 +449,7 @@ def generate_implementation(
         cpp_common.WARNING,
         Stripped(
             f'''\
+#include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/pattern.hpp"
 #include "{include_prefix_path}/revm.hpp"'''
         ),
