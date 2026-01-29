@@ -1,0 +1,179 @@
+SymbolTable(
+  our_types=[
+    ConstrainedPrimitive(
+      name='Something',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendants=[
+        'Reference to ConstrainedPrimitive Child',
+        'Reference to ConstrainedPrimitive Grand_child'],
+      descendant_id_set=...,
+      constrainee='STR',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='Non-empty',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Something',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConstrainedPrimitive(
+      name='Child',
+      inheritances=[
+        'Reference to ConstrainedPrimitive Something'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to ConstrainedPrimitive Something'],
+      ancestor_id_set=...,
+      descendants=[
+        'Reference to ConstrainedPrimitive Grand_child'],
+      descendant_id_set=...,
+      constrainee='STR',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='Non-empty',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Something',
+          parsed=...),
+        Invariant(
+          description='At most 9 characters',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=9,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Child',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConstrainedPrimitive(
+      name='Grand_child',
+      inheritances=[
+        'Reference to ConstrainedPrimitive Child'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to ConstrainedPrimitive Something',
+        'Reference to ConstrainedPrimitive Child'],
+      ancestor_id_set=...,
+      descendants=[],
+      descendant_id_set=...,
+      constrainee='STR',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='Non-empty',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Something',
+          parsed=...),
+        Invariant(
+          description='At most 9 characters',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=9,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Child',
+          parsed=...),
+        Invariant(
+          description='At most 5 characters',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=5,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Grand_child',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...)],
+  our_types_topologically_sorted=[
+    'Reference to our type Something',
+    'Reference to our type Child',
+    'Reference to our type Grand_child'],
+  enumerations=[],
+  constrained_primitives=[
+    'Reference to our type Something',
+    'Reference to our type Child',
+    'Reference to our type Grand_child'],
+  classes=[],
+  concrete_classes=[],
+  constants=[],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    version='dummy',
+    xml_namespace='https://dummy.com'))
