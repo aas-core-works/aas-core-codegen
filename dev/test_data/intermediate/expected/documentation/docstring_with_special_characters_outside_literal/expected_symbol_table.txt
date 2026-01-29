@@ -6,6 +6,7 @@ SymbolTable(
       inheritance_id_set=...,
       ancestors=[],
       ancestor_id_set=...,
+      descendants=[],
       descendant_id_set=...,
       constrainee='STR',
       is_implementation_specific=False,

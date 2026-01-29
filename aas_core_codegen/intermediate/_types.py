@@ -1139,6 +1139,8 @@ class ConstrainedPrimitive:
     # ``@property`` so that the translation code is forced to use
     # ``_set_descendants``.
 
+    _descendants: Sequence["ConstrainedPrimitive"]
+
     _descendant_id_set: FrozenSet[int]
 
     # endregion
@@ -1186,6 +1188,7 @@ class ConstrainedPrimitive:
 
         This method is expected to be called only during the translation phase.
         """
+        self._descendants = descendants
         self._descendant_id_set = frozenset(
             id(descendant) for descendant in descendants
         )
@@ -1295,8 +1298,8 @@ class ConstrainedPrimitive:
         """
         Return the ancestor constrained primitives.
 
-         These are the constrained primitives that this one directly or indirectly
-         inherits from.
+        These are the constrained primitives that this one directly or indirectly
+        inherits from.
         """
         return self._ancestors
 
@@ -1319,6 +1322,16 @@ class ConstrainedPrimitive:
             return True
 
         return id(constrained_primitive) in self._ancestor_id_set
+
+    @property
+    def descendants(self) -> Sequence["ConstrainedPrimitive"]:
+        """
+        Return the ancestor constrained primitives.
+
+        These are the constrained primitives that directly or indirectly inherit from
+        this one.
+        """
+        return self._descendants
 
     @property
     def descendant_id_set(self) -> FrozenSet[int]:
