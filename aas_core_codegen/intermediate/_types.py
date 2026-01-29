@@ -15,6 +15,8 @@ from typing import (
     OrderedDict,
     Type,
     get_args,
+    Dict,
+    Any,
 )
 
 import docutils.nodes
@@ -837,7 +839,7 @@ class Method(SignatureLike):
                     arg in arg_set
                     for snapshot in contracts.snapshots
                     for arg in snapshot.args
-                    if arg.name != 'self'
+                    if arg != 'self'
                 )
         )[1],
         "All arguments of contracts defined in method arguments except ``self``"
@@ -1092,8 +1094,30 @@ class Enumeration:
             literal.value: literal for literal in self.literals
         }
 
-        self.literal_id_set = frozenset(id(literal) for literal in literals)
+        self.literal_id_set = self.__class__._compute_literal_id_set(literals)
         self.literal_value_set = frozenset(literal.value for literal in literals)
+
+    @staticmethod
+    def _compute_literal_id_set(
+        literals: Sequence[EnumerationLiteral],
+    ) -> FrozenSet[int]:
+        return frozenset(id(literal) for literal in literals)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+
+        state.pop("literal_id_set", None)
+
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+
+        # NOTE (mristin):
+        # We rebuild what we could not pickle.
+        setattr(
+            self, "literal_id_set", Enumeration._compute_literal_id_set(self.literals)
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1178,8 +1202,7 @@ class ConstrainedPrimitive:
         This method is expected to be called only during the translation phase.
         """
         self._ancestors = ancestors
-
-        self._ancestor_id_set = frozenset(id(ancestor) for ancestor in ancestors)
+        self._ancestor_id_set = self.__class__._compute_ancestor_id_set(ancestors)
 
     @require(lambda self, descendants: self not in descendants)
     def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
@@ -1189,9 +1212,7 @@ class ConstrainedPrimitive:
         This method is expected to be called only during the translation phase.
         """
         self._descendants = descendants
-        self._descendant_id_set = frozenset(
-            id(descendant) for descendant in descendants
-        )
+        self._descendant_id_set = self.__class__._compute_descendant_id_set(descendants)
 
     def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
         """
@@ -1200,7 +1221,7 @@ class ConstrainedPrimitive:
         This method is expected to be called only during the translation phase.
         """
         self._invariants = invariants
-        self._invariant_id_set = frozenset(id(inv) for inv in invariants)
+        self._invariant_id_set = self.__class__._compute_invariant_id_set(invariants)
 
     # fmt: off
     @require(
@@ -1216,9 +1237,8 @@ class ConstrainedPrimitive:
         This method is expected to be called only during the translation phase.
         """
         self._inheritances = inheritances
-
-        self._inheritance_id_set = frozenset(
-            id(inheritance) for inheritance in self._inheritances
+        self._inheritance_id_set = self.__class__._compute_inheritance_id_set(
+            self._inheritances
         )
 
     # fmt: off
@@ -1282,6 +1302,28 @@ class ConstrainedPrimitive:
         self._set_invariants(invariants)
         self.description = description
         self.parsed = parsed
+
+    @staticmethod
+    def _compute_ancestor_id_set(
+        ancestors: Sequence["ConstrainedPrimitive"],
+    ) -> FrozenSet[int]:
+        return frozenset(id(ancestor) for ancestor in ancestors)
+
+    @staticmethod
+    def _compute_descendant_id_set(
+        descendants: Sequence["ConstrainedPrimitive"],
+    ) -> FrozenSet[int]:
+        return frozenset(id(descendant) for descendant in descendants)
+
+    @staticmethod
+    def _compute_invariant_id_set(invariants: Sequence[Invariant]) -> FrozenSet[int]:
+        return frozenset(id(inv) for inv in invariants)
+
+    @staticmethod
+    def _compute_inheritance_id_set(
+        inheritances: Sequence["ConstrainedPrimitive"],
+    ) -> FrozenSet[int]:
+        return frozenset(id(inheritance) for inheritance in inheritances)
 
     @property
     def inheritances(self) -> Sequence["ConstrainedPrimitive"]:
@@ -1347,6 +1389,40 @@ class ConstrainedPrimitive:
     def invariant_id_set(self) -> FrozenSet[int]:
         """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
         return self._invariant_id_set
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+
+        state.pop("_inheritance_id_set", None)
+        state.pop("_ancestor_id_set", None)
+        state.pop("_descendant_id_set", None)
+        state.pop("_invariant_id_set", None)
+
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+
+        setattr(
+            self,
+            "_inheritance_id_set",
+            self.__class__._compute_inheritance_id_set(self._inheritances),
+        )
+        setattr(
+            self,
+            "_ancestor_id_set",
+            self.__class__._compute_ancestor_id_set(self._ancestors),
+        )
+        setattr(
+            self,
+            "_descendant_id_set",
+            self.__class__._compute_descendant_id_set(self._descendants),
+        )
+        setattr(
+            self,
+            "_invariant_id_set",
+            ConstrainedPrimitive._compute_invariant_id_set(self._invariants),
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1477,9 +1553,8 @@ class Class(DBC):
         This method is expected to be called only during the translation phase.
         """
         self._inheritances = inheritances
-
-        self._inheritance_id_set = frozenset(
-            id(inheritance) for inheritance in self._inheritances
+        self._inheritance_id_set = self.__class__._compute_inheritance_id_set(
+            self._inheritances
         )
 
     @require(lambda self, ancestors: self not in ancestors)
@@ -1489,8 +1564,7 @@ class Class(DBC):
 
         This method is expected to be called only during the translation phase.
         """
-        self._ancestor_id_set = frozenset(id(ancestor) for ancestor in ancestors)
-
+        self._ancestor_id_set = self.__class__._compute_ancestor_id_set(ancestors)
         self._ancestors = ancestors
 
     @require(lambda self, descendants: self not in descendants)
@@ -1500,9 +1574,7 @@ class Class(DBC):
 
         This method is expected to be called only during the translation phase.
         """
-        self._descendant_id_set = frozenset(
-            id(descendant) for descendant in descendants
-        )
+        self._descendant_id_set = self.__class__._compute_descendant_id_set(descendants)
 
         self._descendants = descendants
 
@@ -1512,8 +1584,10 @@ class Class(DBC):
             if isinstance(descendant, ConcreteClass)
         ]
 
-        self._concrete_descendant_id_set = frozenset(
-            id(descendant) for descendant in self._concrete_descendants
+        self._concrete_descendant_id_set = (
+            self.__class__._compute_concrete_descendant_id_set(
+                self._concrete_descendants
+            )
         )
 
     # fmt: off
@@ -1531,7 +1605,7 @@ class Class(DBC):
         """
         self._properties = properties
         self._properties_by_name = {prop.name: prop for prop in properties}
-        self._property_id_set = frozenset(id(prop) for prop in properties)
+        self._property_id_set = self.__class__._compute_property_id_set(properties)
 
     # fmt: off
     @require(
@@ -1548,7 +1622,7 @@ class Class(DBC):
         """
         self._methods = methods
         self._methods_by_name = {method.name: method for method in methods}
-        self._method_id_set = frozenset(id(method) for method in methods)
+        self._method_id_set = self.__class__._compute_method_id_set(methods)
 
     def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
         """
@@ -1557,7 +1631,7 @@ class Class(DBC):
         This method is expected to be called only during the translation phase.
         """
         self._invariants = invariants
-        self._invariant_id_set = frozenset(id(inv) for inv in invariants)
+        self._invariant_id_set = self.__class__._compute_invariant_id_set(invariants)
 
     # fmt: off
     @require(
@@ -1651,6 +1725,40 @@ class Class(DBC):
         self.serialization = serialization
         self.description = description
         self.parsed = parsed
+
+    @staticmethod
+    def _compute_inheritance_id_set(
+        inheritances: Sequence["ClassUnion"],
+    ) -> FrozenSet[int]:
+        return frozenset(id(inheritance) for inheritance in inheritances)
+
+    @staticmethod
+    def _compute_ancestor_id_set(ancestors: Sequence["ClassUnion"]) -> FrozenSet[int]:
+        return frozenset(id(ancestor) for ancestor in ancestors)
+
+    @staticmethod
+    def _compute_descendant_id_set(
+        descendants: Sequence["ClassUnion"],
+    ) -> FrozenSet[int]:
+        return frozenset(id(descendant) for descendant in descendants)
+
+    @staticmethod
+    def _compute_concrete_descendant_id_set(
+        concrete_descendants: Sequence["ConcreteClass"],
+    ) -> FrozenSet[int]:
+        return frozenset(id(descendant) for descendant in concrete_descendants)
+
+    @staticmethod
+    def _compute_property_id_set(properties: Sequence[Property]) -> FrozenSet[int]:
+        return frozenset(id(prop) for prop in properties)
+
+    @staticmethod
+    def _compute_method_id_set(methods: Sequence["MethodUnion"]) -> FrozenSet[int]:
+        return frozenset(id(method) for method in methods)
+
+    @staticmethod
+    def _compute_invariant_id_set(invariants: Sequence[Invariant]) -> FrozenSet[int]:
+        return frozenset(id(inv) for inv in invariants)
 
     @property
     def inheritances(self) -> Sequence["ClassUnion"]:
@@ -1751,6 +1859,48 @@ class Class(DBC):
     def invariant_id_set(self) -> FrozenSet[int]:
         """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
         return self._invariant_id_set
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+
+        state.pop("_inheritance_id_set", None)
+        state.pop("_ancestor_id_set", None)
+        state.pop("_descendant_id_set", None)
+        state.pop("_concrete_descendant_id_set", None)
+        state.pop("_property_id_set", None)
+        state.pop("_method_id_set", None)
+        state.pop("_invariant_id_set", None)
+
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+
+        setattr(
+            self,
+            "_inheritance_id_set",
+            Class._compute_inheritance_id_set(self._inheritances),
+        )
+        setattr(
+            self, "_ancestor_id_set", Class._compute_ancestor_id_set(self._ancestors)
+        )
+        setattr(
+            self,
+            "_descendant_id_set",
+            Class._compute_descendant_id_set(self._descendants),
+        )
+        setattr(
+            self,
+            "_concrete_descendant_id_set",
+            Class._compute_concrete_descendant_id_set(self._concrete_descendants),
+        )
+        setattr(
+            self, "_property_id_set", Class._compute_property_id_set(self._properties)
+        )
+        setattr(self, "_method_id_set", Class._compute_method_id_set(self._methods))
+        setattr(
+            self, "_invariant_id_set", Class._compute_invariant_id_set(self._invariants)
+        )
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -2061,8 +2211,31 @@ class ConstantSetOfEnumerationLiterals(Constant):
         self.subsets = subsets
         self.parsed = parsed
 
-        self.literal_id_set = frozenset(id(literal) for literal in self.literals)
+        self.literal_id_set = self.__class__._compute_literal_id_set(self.literals)
         self.literal_value_set = frozenset(literal.value for literal in self.literals)
+
+    @staticmethod
+    def _compute_literal_id_set(
+        literals: Sequence[EnumerationLiteral],
+    ) -> FrozenSet[int]:
+        return frozenset(id(literal) for literal in literals)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+
+        state.pop("literal_id_set", None)
+
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+
+        # We rebuild what we did not pickle.
+        setattr(
+            self,
+            "literal_id_set",
+            self.__class__._compute_literal_id_set(self.literals),
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -2407,7 +2580,25 @@ class Interface:
             prop.name: prop for prop in self.properties
         }
 
-        self.property_id_set = frozenset(id(prop) for prop in self.properties)
+        self.property_id_set = self.__class__._compute_property_id_set(self.properties)
+
+    @staticmethod
+    def _compute_property_id_set(properties: Sequence[Property]) -> FrozenSet[int]:
+        return frozenset(id(prop) for prop in properties)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+
+        state.pop("property_id_set", None)
+
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+
+        setattr(
+            self, "property_id_set", Interface._compute_property_id_set(self.properties)
+        )
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -2963,15 +3154,6 @@ def map_descendability(
     _ = recurse(a_type_annotation=type_annotation)
 
     return mapping
-
-
-class _ConstructorArgumentOfClass:
-    """Represent a constructor argument with its corresponding class."""
-
-    def __init__(self, arg: Argument, cls: Class) -> None:
-        """Initialize with the given values."""
-        self.arg = arg
-        self.cls = cls
 
 
 def collect_ids_of_our_types_in_properties(symbol_table: SymbolTable) -> Set[int]:
