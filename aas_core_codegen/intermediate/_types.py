@@ -15,6 +15,8 @@ from typing import (
     OrderedDict,
     Type,
     get_args,
+    Dict,
+    Any,
 )
 
 import docutils.nodes
@@ -1095,6 +1097,19 @@ class Enumeration:
         self.literal_id_set = frozenset(id(literal) for literal in literals)
         self.literal_value_set = frozenset(literal.value for literal in literals)
 
+    def __getstate__(self) -> Dict[str, Any]:
+        """Prepare state for pickling by excluding ID-based sets."""
+        state = self.__dict__.copy()
+        # Remove the ID set since it won't be valid after unpickling
+        state.pop('literal_id_set', None)
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """Restore state from pickle and rebuild ID-based sets."""
+        self.__dict__.update(state)
+        # Rebuild the literal_id_set from the literals
+        object.__setattr__(self, 'literal_id_set', frozenset(id(literal) for literal in self.literals))
+
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
         return (
@@ -1334,6 +1349,30 @@ class ConstrainedPrimitive:
     def invariant_id_set(self) -> FrozenSet[int]:
         """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
         return self._invariant_id_set
+
+    def __getstate__(self) -> Dict[str, Any]:
+        """Prepare state for pickling by excluding ID-based sets."""
+        state = self.__dict__.copy()
+        # Remove the ID sets since they won't be valid after unpickling
+        state.pop('_inheritance_id_set', None)
+        state.pop('_ancestor_id_set', None)
+        state.pop('_descendant_id_set', None)
+        state.pop('_invariant_id_set', None)
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """Restore state from pickle and rebuild ID-based sets."""
+        self.__dict__.update(state)
+        # Rebuild the ID sets from the objects
+        if hasattr(self, '_inheritances'):
+            self._inheritance_id_set = frozenset(
+                id(inheritance) for inheritance in self._inheritances
+            )
+        if hasattr(self, '_ancestors'):
+            self._ancestor_id_set = frozenset(id(ancestor) for ancestor in self._ancestors)
+        if hasattr(self, '_invariants'):
+            self._invariant_id_set = frozenset(id(inv) for inv in self._invariants)
+        # Note: _descendant_id_set is not rebuilt here as descendants are set separately
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1739,6 +1778,37 @@ class Class(DBC):
         """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
         return self._invariant_id_set
 
+    def __getstate__(self) -> Dict[str, Any]:
+        """Prepare state for pickling by excluding ID-based sets."""
+        state = self.__dict__.copy()
+        # Remove the ID sets since they won't be valid after unpickling
+        state.pop('_inheritance_id_set', None)
+        state.pop('_ancestor_id_set', None)
+        state.pop('_descendant_id_set', None)
+        state.pop('_concrete_descendant_id_set', None)
+        state.pop('_property_id_set', None)
+        state.pop('_method_id_set', None)
+        state.pop('_invariant_id_set', None)
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """Restore state from pickle and rebuild ID-based sets."""
+        self.__dict__.update(state)
+        # Rebuild the ID sets from the objects
+        if hasattr(self, '_inheritances'):
+            self._inheritance_id_set = frozenset(
+                id(inheritance) for inheritance in self._inheritances
+            )
+        if hasattr(self, '_ancestors'):
+            self._ancestor_id_set = frozenset(id(ancestor) for ancestor in self._ancestors)
+        if hasattr(self, '_properties'):
+            self._property_id_set = frozenset(id(prop) for prop in self._properties)
+        if hasattr(self, '_methods'):
+            self._method_id_set = frozenset(id(method) for method in self._methods)
+        if hasattr(self, '_invariants'):
+            self._invariant_id_set = frozenset(id(inv) for inv in self._invariants)
+        # Note: descendant and concrete_descendant ID sets are not rebuilt here as descendants are set separately
+
     @abc.abstractmethod
     def __repr__(self) -> str:
         # Signal that this is a purely abstract class.
@@ -2050,6 +2120,19 @@ class ConstantSetOfEnumerationLiterals(Constant):
 
         self.literal_id_set = frozenset(id(literal) for literal in self.literals)
         self.literal_value_set = frozenset(literal.value for literal in self.literals)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        """Prepare state for pickling by excluding ID-based sets."""
+        state = self.__dict__.copy()
+        # Remove the ID set since it won't be valid after unpickling
+        state.pop('literal_id_set', None)
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """Restore state from pickle and rebuild ID-based sets."""
+        self.__dict__.update(state)
+        # Rebuild the literal_id_set from the literals
+        object.__setattr__(self, 'literal_id_set', frozenset(id(literal) for literal in self.literals))
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -2395,6 +2478,19 @@ class Interface:
         }
 
         self.property_id_set = frozenset(id(prop) for prop in self.properties)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        """Prepare state for pickling by excluding ID-based sets."""
+        state = self.__dict__.copy()
+        # Remove the ID set since it won't be valid after unpickling
+        state.pop('property_id_set', None)
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """Restore state from pickle and rebuild ID-based sets."""
+        self.__dict__.update(state)
+        # Rebuild the property_id_set from the properties
+        object.__setattr__(self, 'property_id_set', frozenset(id(prop) for prop in self.properties))
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
