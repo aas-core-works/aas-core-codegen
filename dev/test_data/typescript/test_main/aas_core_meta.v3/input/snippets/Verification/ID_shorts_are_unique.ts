@@ -10,11 +10,13 @@ export function idShortsAreUnique(
 ): boolean {
   const idShortSet = new Set<string>();
   for (const referable of referables) {
-    if (idShortSet.has(referable.idShort)) {
-      return false;
-    }
+    if (referable.idShort !== null) {
+      if (idShortSet.has(referable.idShort)) {
+        return false;
+      }
 
-    idShortSet.add(referable.idShort);
+      idShortSet.add(referable.idShort);
+    }
   }
 
   return true;
