@@ -7,43 +7,43 @@ std::vector<
     {  // -?[0-9]+
       {  // -?
         program.emplace_back(
-          std::make_unique<revm::InstructionSplit>(1, 2)
+          common::make_unique<revm::InstructionSplit>(1, 2)
         );
         // -
         program.emplace_back(  // 1
-          std::make_unique<revm::InstructionChar>(L'-')
+          common::make_unique<revm::InstructionChar>(L'-')
         );
       }  // -?
       {  // [0-9]+
         // [0-9]
         program.emplace_back(  // 2
-          std::make_unique<revm::InstructionSet>(
+          common::make_unique<revm::InstructionSet>(
             std::vector<revm::Range>{
               revm::Range(L'0', L'9')
             }
           )
         );
         program.emplace_back(
-          std::make_unique<revm::InstructionSplit>(2, 4)
+          common::make_unique<revm::InstructionSplit>(2, 4)
         );
       }  // [0-9]+
     }  // -?[0-9]+
     // -
     program.emplace_back(  // 4
-      std::make_unique<revm::InstructionChar>(L'-')
+      common::make_unique<revm::InstructionChar>(L'-')
     );
     {  // 0[1-9]|1[0-2]
       program.emplace_back(
-        std::make_unique<revm::InstructionSplit>(6, 9)
+        common::make_unique<revm::InstructionSplit>(6, 9)
       );
       {  // 0[1-9]
         // 0
         program.emplace_back(  // 6
-          std::make_unique<revm::InstructionChar>(L'0')
+          common::make_unique<revm::InstructionChar>(L'0')
         );
         // [1-9]
         program.emplace_back(
-          std::make_unique<revm::InstructionSet>(
+          common::make_unique<revm::InstructionSet>(
             std::vector<revm::Range>{
               revm::Range(L'1', L'9')
             }
@@ -51,16 +51,16 @@ std::vector<
         );
       }  // 0[1-9]
       program.emplace_back(
-        std::make_unique<revm::InstructionJump>(11)
+        common::make_unique<revm::InstructionJump>(11)
       );
       {  // 1[0-2]
         // 1
         program.emplace_back(  // 9
-          std::make_unique<revm::InstructionChar>(L'1')
+          common::make_unique<revm::InstructionChar>(L'1')
         );
         // [0-2]
         program.emplace_back(
-          std::make_unique<revm::InstructionSet>(
+          common::make_unique<revm::InstructionSet>(
             std::vector<revm::Range>{
               revm::Range(L'0', L'2')
             }
@@ -70,20 +70,20 @@ std::vector<
     }  // 0[1-9]|1[0-2]
     // -
     program.emplace_back(  // 11
-      std::make_unique<revm::InstructionChar>(L'-')
+      common::make_unique<revm::InstructionChar>(L'-')
     );
     {  // 0[0-9]|1[0-9]|2[0-9]|30|31
       program.emplace_back(
-        std::make_unique<revm::InstructionSplit>(13, 16)
+        common::make_unique<revm::InstructionSplit>(13, 16)
       );
       {  // 0[0-9]
         // 0
         program.emplace_back(  // 13
-          std::make_unique<revm::InstructionChar>(L'0')
+          common::make_unique<revm::InstructionChar>(L'0')
         );
         // [0-9]
         program.emplace_back(
-          std::make_unique<revm::InstructionSet>(
+          common::make_unique<revm::InstructionSet>(
             std::vector<revm::Range>{
               revm::Range(L'0', L'9')
             }
@@ -91,19 +91,19 @@ std::vector<
         );
       }  // 0[0-9]
       program.emplace_back(
-        std::make_unique<revm::InstructionJump>(30)
+        common::make_unique<revm::InstructionJump>(30)
       );
       program.emplace_back(  // 16
-        std::make_unique<revm::InstructionSplit>(17, 20)
+        common::make_unique<revm::InstructionSplit>(17, 20)
       );
       {  // 1[0-9]
         // 1
         program.emplace_back(  // 17
-          std::make_unique<revm::InstructionChar>(L'1')
+          common::make_unique<revm::InstructionChar>(L'1')
         );
         // [0-9]
         program.emplace_back(
-          std::make_unique<revm::InstructionSet>(
+          common::make_unique<revm::InstructionSet>(
             std::vector<revm::Range>{
               revm::Range(L'0', L'9')
             }
@@ -111,19 +111,19 @@ std::vector<
         );
       }  // 1[0-9]
       program.emplace_back(
-        std::make_unique<revm::InstructionJump>(30)
+        common::make_unique<revm::InstructionJump>(30)
       );
       program.emplace_back(  // 20
-        std::make_unique<revm::InstructionSplit>(21, 24)
+        common::make_unique<revm::InstructionSplit>(21, 24)
       );
       {  // 2[0-9]
         // 2
         program.emplace_back(  // 21
-          std::make_unique<revm::InstructionChar>(L'2')
+          common::make_unique<revm::InstructionChar>(L'2')
         );
         // [0-9]
         program.emplace_back(
-          std::make_unique<revm::InstructionSet>(
+          common::make_unique<revm::InstructionSet>(
             std::vector<revm::Range>{
               revm::Range(L'0', L'9')
             }
@@ -131,37 +131,37 @@ std::vector<
         );
       }  // 2[0-9]
       program.emplace_back(
-        std::make_unique<revm::InstructionJump>(30)
+        common::make_unique<revm::InstructionJump>(30)
       );
       program.emplace_back(  // 24
-        std::make_unique<revm::InstructionSplit>(25, 28)
+        common::make_unique<revm::InstructionSplit>(25, 28)
       );
       {  // 30
         // 3
         program.emplace_back(  // 25
-          std::make_unique<revm::InstructionChar>(L'3')
+          common::make_unique<revm::InstructionChar>(L'3')
         );
         // 0
         program.emplace_back(
-          std::make_unique<revm::InstructionChar>(L'0')
+          common::make_unique<revm::InstructionChar>(L'0')
         );
       }  // 30
       program.emplace_back(
-        std::make_unique<revm::InstructionJump>(30)
+        common::make_unique<revm::InstructionJump>(30)
       );
       {  // 31
         // 3
         program.emplace_back(  // 28
-          std::make_unique<revm::InstructionChar>(L'3')
+          common::make_unique<revm::InstructionChar>(L'3')
         );
         // 1
         program.emplace_back(
-          std::make_unique<revm::InstructionChar>(L'1')
+          common::make_unique<revm::InstructionChar>(L'1')
         );
       }  // 31
     }  // 0[0-9]|1[0-9]|2[0-9]|30|31
     program.emplace_back(  // 30
-      std::make_unique<revm::InstructionMatch>()
+      common::make_unique<revm::InstructionMatch>()
     );
   }  // ^(-?[0-9]+)-(0[1-9]|1[0-2])-(0[0-9]|1[0-9]|2[0-9]|30|31).*$
 

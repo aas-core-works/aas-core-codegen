@@ -902,8 +902,8 @@ bool Match(
 {I}// See: https://swtch.com/~rsc/regexp/regexp2.html,
 {I}// Section "Thompson's Implementation".
 
-{I}std::unique_ptr<ThreadList> clist(std::make_unique<ThreadList>(program.size()));
-{I}std::unique_ptr<ThreadList> nlist(std::make_unique<ThreadList>(program.size()));
+{I}std::unique_ptr<ThreadList> clist(common::make_unique<ThreadList>(program.size()));
+{I}std::unique_ptr<ThreadList> nlist(common::make_unique<ThreadList>(program.size()));
 
 {I}clist->Spawn(0);
 
