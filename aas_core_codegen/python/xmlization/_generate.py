@@ -2117,7 +2117,9 @@ def _write_float_property(
 {II}else:
 {III}self.stream.write('0.0')
 {I}else:
-{II}self.stream.write(str(value))"""
+{II}self.stream.write(str(value))
+
+{I}self._write_end_element(name)"""
         ),
         Stripped(
             f"""\
