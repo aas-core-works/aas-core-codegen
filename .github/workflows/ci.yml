@@ -33,16 +33,25 @@ jobs:
         if: github.event.repository.fork == false
 
       # NOTE (mristin):
+      # We run this command to detect nasty errors such as import cycles early.
+      - name: Run --help to check that the command works
+        run: aas-core-codegen --help
+
+      # NOTE (mristin):
       # We introduce this check as a fast-fail.
       - name: Check help in readme
-        run: python3 dev/continuous_integration/precommit.py --select check-help-in-readme
+        run: |
+          python3 dev/continuous_integration/precommit.py \
+            --select check-help-in-readme
 
       # NOTE (mristin):
       # We introduce this check as a fast-fail.
       - name: Check that __init__.py and pyproject.toml are consistent
-        run: python3 dev/continuous_integration/precommit.py --select check-init-and-pyproject-consistent
+        run: |
+          python3 dev/continuous_integration/precommit.py \
+            --select check-init-and-pyproject-consistent
 
-      - name: Run the checks except testing
+      - name: Run the other checks except testing
         run: |
           python3 dev/continuous_integration/precommit.py \
             --skip \

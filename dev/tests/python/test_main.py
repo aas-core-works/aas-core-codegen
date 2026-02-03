@@ -4,6 +4,7 @@ import contextlib
 import io
 import os
 import pathlib
+import shutil
 import tempfile
 import unittest
 
@@ -31,6 +32,14 @@ class Test_against_recorded(unittest.TestCase):
             with contextlib.ExitStack() as exit_stack:
                 if tests.common.RERECORD:
                     output_dir = expected_output_dir
+
+                    # NOTE (mristin):
+                    # We add this check to make sure we do not delete anything
+                    # important.
+                    assert output_dir.name == "expected_output"
+
+                    shutil.rmtree(expected_output_dir, ignore_errors=True)
+
                     expected_output_dir.mkdir(exist_ok=True, parents=True)
                 else:
                     assert (
@@ -67,60 +76,20 @@ class Test_against_recorded(unittest.TestCase):
                     0, return_code, "Expected 0 return code on valid models"
                 )
 
-                stdout_pth = expected_output_dir / "stdout.txt"
                 normalized_stdout = stdout.getvalue().replace(
                     str(output_dir), "<output dir>"
                 )
 
                 if tests.common.RERECORD:
+                    stdout_pth = expected_output_dir / "stdout.txt"
                     stdout_pth.write_text(normalized_stdout, encoding="utf-8")
-                else:
-                    self.assertEqual(
-                        normalized_stdout,
-                        stdout_pth.read_text(encoding="utf-8"),
-                        stdout_pth,
+
+                if not tests.common.RERECORD:
+                    tests.common.assert_got_as_expected_output_dir(
+                        output_dir=output_dir,
+                        expected_output_dir=expected_output_dir,
+                        normalized_stdout=normalized_stdout,
                     )
-
-                for relevant_rel_pth in [
-                    pathlib.Path("types.py"),
-                    pathlib.Path("common.py"),
-                    pathlib.Path("constants.py"),
-                    pathlib.Path("stringification.py"),
-                    pathlib.Path("verification.py"),
-                    pathlib.Path("jsonization.py"),
-                    pathlib.Path("xmlization.py"),
-                ]:
-                    expected_pth = expected_output_dir / relevant_rel_pth
-                    output_pth = output_dir / relevant_rel_pth
-
-                    if not output_pth.exists():
-                        raise FileNotFoundError(
-                            f"The output file is missing: {output_pth}"
-                        )
-
-                    try:
-                        output = output_pth.read_text(encoding="utf-8")
-                    except Exception as exception:
-                        raise RuntimeError(
-                            f"Failed to read the output from {output_pth}"
-                        ) from exception
-
-                    if tests.common.RERECORD:
-                        expected_pth.write_text(output, encoding="utf-8")
-                    else:
-                        try:
-                            expected_output = expected_pth.read_text(encoding="utf-8")
-                        except Exception as exception:
-                            raise RuntimeError(
-                                f"Failed to read the expected output "
-                                f"from {expected_pth}"
-                            ) from exception
-
-                        self.assertEqual(
-                            expected_output,
-                            output,
-                            f"The files {expected_pth} and {output_pth} do not match.",
-                        )
 
 
 if __name__ == "__main__":

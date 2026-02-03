@@ -1,7 +1,8 @@
 """Provide common functionality across different tests."""
+import difflib
 import os
 import pathlib
-from typing import List, Tuple, Optional, Union, Sequence, Final
+from typing import List, Tuple, Optional, Union, Sequence, Final, Set
 
 import asttokens
 from icontract import ensure, require
@@ -201,3 +202,94 @@ def _repo_root() -> pathlib.Path:
 REAL_META_MODEL_PATHS: Final[Sequence[pathlib.Path]] = [
     _repo_root() / "dev/test_data/real_meta_models/aas_core_meta.v3.py"
 ]
+
+
+@require(lambda output_dir: output_dir.is_dir())
+@require(lambda expected_output_dir: expected_output_dir.is_dir())
+@require(lambda expected_output_dir: (expected_output_dir / "stdout.txt").exists())
+def assert_got_as_expected_output_dir(
+    output_dir: pathlib.Path, expected_output_dir: pathlib.Path, normalized_stdout: str
+) -> None:
+    """Assert that the recorded expected output coincides with the output."""
+    output_files = set()  # type: Set[pathlib.Path]
+    for file_path in output_dir.rglob("*"):
+        if file_path.is_file():
+            output_files.add(file_path.relative_to(output_dir))
+
+    expected_files = set()  # type: Set[pathlib.Path]
+    for file_path in expected_output_dir.rglob("*"):
+        if file_path.is_file():
+            expected_files.add(file_path.relative_to(expected_output_dir))
+
+    # NOTE (mristin):
+    # We check stdout.txt separately since it's not generated.
+    stdout_rel_path = pathlib.Path("stdout.txt")
+    if stdout_rel_path in expected_files:
+        expected_stdout_path = expected_output_dir / stdout_rel_path
+        try:
+            expected_stdout = expected_stdout_path.read_text(encoding="utf-8")
+        except Exception as exception:
+            raise RuntimeError(
+                f"Failed to read expected stdout from {expected_stdout_path}"
+            ) from exception
+
+        if normalized_stdout != expected_stdout:
+            diff = "\n".join(
+                difflib.unified_diff(
+                    expected_stdout.splitlines(keepends=True),
+                    normalized_stdout.splitlines(keepends=True),
+                    fromfile=str(expected_stdout_path),
+                    tofile="<actual stdout>",
+                )
+            )
+            raise AssertionError(f"Mismatch against {expected_stdout_path}:\n{diff}")
+
+        # NOTE (mristin):
+        # We remove stdout.txt from expected_files since it's handled separately.
+        expected_files.discard(stdout_rel_path)
+
+    missing_files = expected_files - output_files
+    if missing_files:
+        missing_files_joined = "\n".join(f"{f}" for f in sorted(missing_files))
+        raise AssertionError(
+            f"Missing output files against {expected_output_dir}:\n"
+            f"{missing_files_joined}"
+        )
+
+    # Check that no unexpected files exist in output
+    unexpected_files = output_files - expected_files
+    if unexpected_files:
+        unexpected_list = "\n".join(f"  - {f}" for f in sorted(unexpected_files))
+        raise AssertionError(
+            f"Unexpected output files against {expected_output_dir}:\n"
+            f"{unexpected_list}"
+        )
+
+    for rel_path in expected_files:
+        expected_path = expected_output_dir / rel_path
+        output_path = output_dir / rel_path
+
+        try:
+            expected_content = expected_path.read_text(encoding="utf-8")
+        except Exception as exception:
+            raise RuntimeError(
+                f"Failed to read expected content from {expected_path}"
+            ) from exception
+
+        try:
+            output_content = output_path.read_text(encoding="utf-8")
+        except Exception as exception:
+            raise RuntimeError(
+                f"Failed to read output content from {output_path}"
+            ) from exception
+
+        if expected_content != output_content:
+            diff = "\n".join(
+                difflib.unified_diff(
+                    expected_content.splitlines(keepends=True),
+                    output_content.splitlines(keepends=True),
+                    fromfile=str(expected_path),
+                    tofile=str(output_path),
+                )
+            )
+            raise AssertionError(f"File content mismatch in {rel_path}:\n" f"{diff}")
