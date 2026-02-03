@@ -1,7 +1,9 @@
 """Generate Python code to handle AAS models based on the meta-model."""
-from typing import TextIO
+import pathlib
+from typing import TextIO, Sequence, Callable, Tuple, Optional, List
 
 from aas_core_codegen import specific_implementations, run, intermediate
+from aas_core_codegen.common import Error
 from aas_core_codegen.python import (
     common as python_common,
     structure as python_structure,
@@ -91,123 +93,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     aas_module = python_common.QualifiedModuleName(aas_module_text)
 
-    # region Structure
-
-    code, errors = python_structure.generate(
-        symbol_table=verified_ir_table,
-        aas_module=aas_module,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the structures in the Python code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "types.py"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the Python structures to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Constants
-
-    code, errors = python_constants.generate(
-        symbol_table=context.symbol_table, aas_module=aas_module
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the constants in the Python code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "constants.py"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the constants in the Python code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Common
-
-    code = python_aas_common.generate(aas_module=aas_module)
-
-    pth = context.output_dir / "common.py"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the common Python code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Stringification
-
-    code, errors = python_stringification.generate(
-        symbol_table=context.symbol_table, aas_module=aas_module
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the stringification Python code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "stringification.py"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the stringification Python code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Verification
-
     verify_errors = python_verification.verify(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
@@ -221,103 +106,87 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    code, errors = python_verification.generate(
-        symbol_table=verified_ir_table,
-        aas_module=aas_module,
-        spec_impls=context.spec_impls,
-    )
+    rel_paths_generators: Sequence[
+        Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
+    ] = [
+        (
+            pathlib.Path("types.py"),
+            lambda: python_structure.generate(
+                symbol_table=verified_ir_table,
+                aas_module=aas_module,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            pathlib.Path("constants.py"),
+            lambda: python_constants.generate(
+                symbol_table=context.symbol_table, aas_module=aas_module
+            ),
+        ),
+        (
+            pathlib.Path("common.py"),
+            lambda: (python_aas_common.generate(aas_module=aas_module), None),
+        ),
+        (
+            pathlib.Path("stringification.py"),
+            lambda: python_stringification.generate(
+                symbol_table=context.symbol_table, aas_module=aas_module
+            ),
+        ),
+        (
+            pathlib.Path("verification.py"),
+            lambda: python_verification.generate(
+                symbol_table=verified_ir_table,
+                aas_module=aas_module,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            pathlib.Path("jsonization.py"),
+            lambda: python_jsonization.generate(
+                symbol_table=context.symbol_table,
+                aas_module=aas_module,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            pathlib.Path("xmlization.py"),
+            lambda: python_xmlization.generate(
+                symbol_table=context.symbol_table,
+                aas_module=aas_module,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+    ]
 
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the verification Python code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+    for rel_path, generator_func in rel_paths_generators:
+        assert not rel_path.is_absolute()
 
-    assert code is not None
+        code, errors = generator_func()
 
-    pth = context.output_dir / "verification.py"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the verification Python code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
+        if errors is not None:
+            run.write_error_report(
+                message=f"Failed to generate {rel_path} "
+                f"based on {context.model_path}",
+                errors=[
+                    context.lineno_columner.error_message(error) for error in errors
+                ],
+                stderr=stderr,
+            )
+            return 1
 
-    # endregion
+        assert code is not None
 
-    # region Jsonization
-
-    code, errors = python_jsonization.generate(
-        symbol_table=context.symbol_table,
-        aas_module=aas_module,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the jsonization Python code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "jsonization.py"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the jsonization Python code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Xmlization
-
-    code, errors = python_xmlization.generate(
-        symbol_table=context.symbol_table,
-        aas_module=aas_module,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the xmlization Python code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "xmlization.py"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the xmlization Python code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
+        pth = context.output_dir / rel_path
+        try:
+            pth.write_text(code, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
