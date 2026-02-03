@@ -3,6 +3,31 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.17 (2026-02-03)
+===================
+* Extend ``must_find`` to constants (#564)
+* Add ``is_literal_of`` method to symbol table (#565)
+* Add literal value set to IR (#566)
+* Expose mapping from and to primitive types (#567)
+* Fix typescript unique ID-Short constraint (#569)
+* Track descendants of constrained primitives (#573)
+* Make symbol table pickle-able (#574)
+* Fix cpp 11 compilation issue (#572)
+* Fix XML serialization of float in Python (#575)
+
+This version provides a set of ergonomic methods for
+aas-core-testdatagen so that we can generate the test data using
+reflection on symbol table more easily.
+
+In addition, it contains a couple of minor fixes to C++ and Python
+generators.
+
+0.0.16 (2025-11-15)
+===================
+We had a long release freeze as we operated on revision hashes for
+versioning. This is a first release after the freeze, as we wanted
+to use pyproject.toml and had to go back to proper numerical versioning.
+
 0.0.15 (2022-06-21)
 ===================
 This version includes minor enhancements to make the work of
