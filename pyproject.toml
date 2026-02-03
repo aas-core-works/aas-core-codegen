@@ -41,6 +41,7 @@ aas-core-codegen = "aas_core_codegen.main:entry_point"
 aas-core-codegen-smoke = "aas_core_codegen.smoke.main:entry_point"
 
 [tool.setuptools.packages.find]
+include = ["aas_core_codegen"]
 exclude = ["dev"]
 
 [tool.setuptools.package-data]
