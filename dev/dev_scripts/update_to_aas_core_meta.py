@@ -51,7 +51,7 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
     Return an error code, if any.
     """
     env = os.environ.copy()
-    env["AAS_CORE_CODEGEN_RERECORD"] = "1"
+    env["AAS_CORE_CODEGEN_TESTS_RERECORD"] = "1"
 
     starting_points = [
         pth

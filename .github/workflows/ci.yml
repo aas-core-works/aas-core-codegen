@@ -32,19 +32,35 @@ jobs:
         run: pip3 install --upgrade coveralls
         if: github.event.repository.fork == false
 
-      # NOTE (mristin, 2022-12-21):
+      # NOTE (mristin):
       # We introduce this check as a fast-fail.
       - name: Check help in readme
         run: python3 dev/continuous_integration/precommit.py --select check-help-in-readme
 
-      # NOTE (mristin, 2022-12-21):
+      # NOTE (mristin):
       # We introduce this check as a fast-fail.
       - name: Check that __init__.py and pyproject.toml are consistent
         run: python3 dev/continuous_integration/precommit.py --select check-init-and-pyproject-consistent
 
-      - name: Run checks
+      - name: Run the checks except testing
         run: |
-          python3 dev/continuous_integration/precommit.py
+          python3 dev/continuous_integration/precommit.py \
+            --skip \
+              check-help-in-readme \
+              check-init-and-pyproject-consistent \
+              test
+
+      # NOTE (mristin):
+      # We run tests separately since they take most of the time, and we want to
+      # specify different environment variables to other precommit checks.
+      - name: Run tests
+        run: |
+          python3 dev/continuous_integration/precommit.py --select test
+        env:
+          # NOTE (mristin):
+          # Caching the main models make the tests run faster since the same meta-model
+          # is not reparsed again and again across the tests
+          AAS_CORE_CODEGEN_TESTS_CACHE_MAIN_MODELS: 1
 
       - name: Upload Coverage
         run: coveralls --service=github
