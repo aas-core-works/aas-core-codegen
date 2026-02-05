@@ -1,4 +1,4 @@
-"""Run all the tests with the environment variable ``AAS_CORE_CODEGEN_RERECORD`` set."""
+"""Run all the tests with the environment variable set to re-record."""
 
 import argparse
 import os
@@ -49,7 +49,7 @@ def main() -> int:
     dev_root = repo_root / "dev"
 
     env = os.environ.copy()
-    env["AAS_CORE_CODEGEN_RERECORD"] = "1"
+    env["AAS_CORE_CODEGEN_TESTS_RERECORD"] = "1"
 
     if args.select is not None:
         tests_to_run = list(args.select)

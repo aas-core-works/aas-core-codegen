@@ -1,12 +1,17 @@
 """Encapsulate the entry point to different generators."""
+import hashlib
 import io
 import pathlib
+import pickle
+import tempfile
 import textwrap
-from typing import Sequence, TextIO, Tuple, Optional
+import uuid
+from typing import Sequence, TextIO, Tuple, Optional, Final
 
 import asttokens
 from icontract import require, ensure
 
+import aas_core_codegen
 from aas_core_codegen import specific_implementations, intermediate, parse
 from aas_core_codegen.common import LinenoColumner
 
@@ -57,15 +62,47 @@ def write_error_report(message: str, errors: Sequence[str], stderr: TextIO) -> N
         stderr.write(f"{indented}\n")
 
 
+class _Cached:
+    symbol_table: Final[intermediate.SymbolTable]
+    atok: Final[asttokens.ASTTokens]
+
+    def __init__(
+        self, symbol_table: intermediate.SymbolTable, atok: asttokens.ASTTokens
+    ) -> None:
+        self.symbol_table = symbol_table
+        self.atok = atok
+
+
 @require(lambda model_path: model_path.exists() and model_path.is_file())
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def load_model(
-    model_path: pathlib.Path,
+    model_path: pathlib.Path, cache_model: bool = False
 ) -> Tuple[
     Optional[Tuple[intermediate.SymbolTable, asttokens.ASTTokens]], Optional[str]
 ]:
-    """Load the given meta-model from the file system and understand it."""
+    """
+    Load the given meta-model from the file system and understand it.
+
+    If the ``cache_model`` is set, the symbol table will be stored in the temporary
+    directory of your OS keyed on the hash of the model source code. On subsequent
+    calls to this function, the model will be loaded from the cache instead of reparsed
+    as long as the content of the source code did not change.
+    """
     text = model_path.read_text(encoding="utf-8")
+
+    text_hash = hashlib.sha256(text.encode()).hexdigest()
+    cache_path = (
+        pathlib.Path(tempfile.gettempdir())
+        / f"aas-core-codegen-{aas_core_codegen.__version__}"
+        / f"model-{text_hash}.pickle"
+    )
+    if cache_model:
+        if cache_path.exists():
+            with cache_path.open("rb") as fid:
+                cached = pickle.load(fid)
+                assert isinstance(cached, _Cached)
+
+                return (cached.symbol_table, cached.atok), None
 
     atok, parse_exception = parse.source_to_atok(source=text)
     if parse_exception:
@@ -120,5 +157,17 @@ def load_model(
         return None, writer.getvalue()
 
     assert ir_symbol_table is not None
+
+    if cache_model:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+        tmp_path = cache_path.with_suffix(f".{uuid.uuid4()}.tmp")
+        try:
+            with tmp_path.open("wb") as fid:
+                pickle.dump(_Cached(symbol_table=ir_symbol_table, atok=atok), fid)
+
+            tmp_path.rename(cache_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
 
     return (ir_symbol_table, atok), None

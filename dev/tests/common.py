@@ -117,11 +117,17 @@ def must_translate_source_to_intermediate(
 
 #: If set, this environment variable indicates that the golden files should be
 #: re-recorded instead of checked against.
-RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
+RERECORD = os.environ.get("AAS_CORE_CODEGEN_TESTS_RERECORD", "").lower() in (
     "1",
     "true",
     "on",
 )
+
+#: If set, the meta-models in test_main's will be cached in the temporary directory of
+#: the OS.
+CACHE_MAIN_MODELS = os.environ.get(
+    "AAS_CORE_CODEGEN_TESTS_CACHE_MAIN_MODELS", ""
+).lower() in ("1", "true", "on")
 
 
 class TestCaseWithDirectoryAndMetaModel:

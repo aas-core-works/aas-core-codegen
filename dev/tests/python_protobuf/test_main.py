@@ -51,6 +51,7 @@ class Test_against_recorded(unittest.TestCase):
                     target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
                     snippets_dir=snippets_dir,
                     output_dir=output_dir,
+                    cache_model=tests.common.CACHE_MAIN_MODELS,
                 )
 
                 stdout = io.StringIO()

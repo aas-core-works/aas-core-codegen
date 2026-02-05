@@ -53,12 +53,14 @@ class Parameters:
         target: Target,
         snippets_dir: pathlib.Path,
         output_dir: pathlib.Path,
+        cache_model: bool = False,
     ) -> None:
         """Initialize with the given values."""
         self.model_path = model_path
         self.target = target
         self.snippets_dir = snippets_dir
         self.output_dir = output_dir
+        self.cache_model = True
 
 
 # noinspection SpellCheckingInspection
@@ -114,7 +116,9 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     assert spec_impls is not None
 
-    symbol_table_atok, error_message = run.load_model(model_path=params.model_path)
+    symbol_table_atok, error_message = run.load_model(
+        model_path=params.model_path, cache_model=params.cache_model
+    )
     if error_message is not None:
         stderr.write(error_message)
         return 1
@@ -212,6 +216,15 @@ def main(prog: str) -> int:
         choices=[literal.value for literal in Target],
     )
     parser.add_argument(
+        "--cache_model",
+        help=(
+            "If set, cache the parsed meta-model in the temporary directory of your OS. "
+            "This makes the repeated runs faster as the meta-model does not need to be "
+            "reparsed."
+        ),
+        action="store_true",
+    )
+    parser.add_argument(
         "--version", help="show the current version and exit", action="store_true"
     )
 
@@ -231,6 +244,7 @@ def main(prog: str) -> int:
         target=target_to_str[args.target],
         snippets_dir=pathlib.Path(args.snippets_dir),
         output_dir=pathlib.Path(args.output_dir),
+        cache_model=bool(args.cache_model),
     )
 
     return execute(params=params, stdout=sys.stdout, stderr=sys.stderr)

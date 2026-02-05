@@ -37,6 +37,7 @@ class Test_jsonld_context(unittest.TestCase):
                     target=Target.JSONLD_CONTEXT,
                     snippets_dir=case_dir,
                     output_dir=output_dir,
+                    cache_model=tests.common.CACHE_MAIN_MODELS,
                 )
 
                 stdout = io.StringIO()
