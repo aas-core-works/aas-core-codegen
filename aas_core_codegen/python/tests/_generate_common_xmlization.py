@@ -47,17 +47,9 @@ else:
     from typing_extensions import Final"""
         ),
         Stripped(
-            """\
-from icontract import require"""
-        ),
-        Stripped(
             f"""\
 import {aas_module}.types as aas_types
 import {aas_module}.xmlization as aas_xmlization"""
-        ),
-        Stripped(
-            """\
-import tests.common"""
         ),
         Stripped(
             f'''\
