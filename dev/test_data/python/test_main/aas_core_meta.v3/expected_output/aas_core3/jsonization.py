@@ -288,7 +288,6 @@ def _try_to_cast_to_array_like(
     >>> assert _try_to_cast_to_array_like({1, 2, 3}) is None
     """
     if (
-        
         not isinstance(jsonable, (str, bytearray, bytes))
         and hasattr(jsonable, "__iter__")
         and not hasattr(jsonable, "keys")

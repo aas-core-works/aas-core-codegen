@@ -175,12 +175,14 @@ class PythonIntegrationTest(IntegrationTestCase):
         self._generate(
             meta_model_path=self.meta_model_path,
             target=aas_core_codegen.main.Target.PYTHON,
-            target_dir=self.output_dir / "sdk",
+            target_dir=self.output_dir,
         )
 
         shutil.copy(
             str(self.input_dir / "boilerplate" / "main.py"), self.output_dir / "main.py"
         )
+
+        (self.output_dir / "sdk" / "__init__.py").write_text("\n", encoding="utf-8")
 
     def execute(self) -> None:
         for model_path in _over_model_paths(self.test_data_dir):

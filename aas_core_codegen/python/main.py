@@ -6,19 +6,14 @@ from aas_core_codegen import specific_implementations, run, intermediate
 from aas_core_codegen.common import Error
 from aas_core_codegen.python import (
     common as python_common,
-    structure as python_structure,
-    constants as python_constants,
-    aas_common as python_aas_common,
-    stringification as python_stringification,
-    verification as python_verification,
-    jsonization as python_jsonization,
-    xmlization as python_xmlization,
+    lib as python_lib,
+    tests as python_tests,
 )
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    verified_ir_table, errors = python_structure.verify(
+    verified_ir_table, errors = python_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
 
@@ -93,7 +88,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     aas_module = python_common.QualifiedModuleName(aas_module_text)
 
-    verify_errors = python_verification.verify(
+    verify_errors = python_lib.verify_for_verification(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
     )
@@ -106,55 +101,159 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
+    aas_module_rel_path = pathlib.Path(aas_module.replace(".", "/"))
+    assert not aas_module_rel_path.is_absolute()
+
+    tests_rel_path = pathlib.Path("dev/tests")
+
     rel_paths_generators: Sequence[
         Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
     ] = [
         (
-            pathlib.Path("types.py"),
-            lambda: python_structure.generate(
-                symbol_table=verified_ir_table,
-                aas_module=aas_module,
-                spec_impls=context.spec_impls,
-            ),
+            aas_module_rel_path / "common.py",
+            lambda: (python_lib.generate_common(aas_module=aas_module), None),
         ),
         (
-            pathlib.Path("constants.py"),
-            lambda: python_constants.generate(
+            aas_module_rel_path / "constants.py",
+            lambda: python_lib.generate_constants(
                 symbol_table=context.symbol_table, aas_module=aas_module
             ),
         ),
         (
-            pathlib.Path("common.py"),
-            lambda: (python_aas_common.generate(aas_module=aas_module), None),
-        ),
-        (
-            pathlib.Path("stringification.py"),
-            lambda: python_stringification.generate(
-                symbol_table=context.symbol_table, aas_module=aas_module
-            ),
-        ),
-        (
-            pathlib.Path("verification.py"),
-            lambda: python_verification.generate(
-                symbol_table=verified_ir_table,
-                aas_module=aas_module,
-                spec_impls=context.spec_impls,
-            ),
-        ),
-        (
-            pathlib.Path("jsonization.py"),
-            lambda: python_jsonization.generate(
+            aas_module_rel_path / "jsonization.py",
+            lambda: python_lib.generate_jsonization(
                 symbol_table=context.symbol_table,
                 aas_module=aas_module,
                 spec_impls=context.spec_impls,
             ),
         ),
         (
-            pathlib.Path("xmlization.py"),
-            lambda: python_xmlization.generate(
+            aas_module_rel_path / "stringification.py",
+            lambda: python_lib.generate_stringification(
+                symbol_table=context.symbol_table, aas_module=aas_module
+            ),
+        ),
+        (
+            aas_module_rel_path / "types.py",
+            lambda: python_lib.generate_types(
+                symbol_table=verified_ir_table,
+                aas_module=aas_module,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            aas_module_rel_path / "verification.py",
+            lambda: python_lib.generate_verification(
+                symbol_table=verified_ir_table,
+                aas_module=aas_module,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            aas_module_rel_path / "xmlization.py",
+            lambda: python_lib.generate_xmlization(
                 symbol_table=context.symbol_table,
                 aas_module=aas_module,
                 spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            tests_rel_path / "common.py",
+            lambda: (python_tests.generate_common(aas_module=aas_module), None),
+        ),
+        (
+            tests_rel_path / "common_jsonization.py",
+            lambda: (
+                python_tests.generate_common_jsonization(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "common_xmlization.py",
+            lambda: (
+                python_tests.generate_common_xmlization(aas_module=aas_module),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_descend_and_pass_through_visitor.py",
+            lambda: (
+                python_tests.generate_test_descend_and_pass_through_visitor(
+                    aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_descend_once.py",
+            lambda: (
+                python_tests.generate_test_descend_once(aas_module=aas_module),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_for_over_X_or_empty.py",
+            lambda: (
+                python_tests.generate_test_for_over_x_or_empty(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_for_x_or_default.py",
+            lambda: (
+                python_tests.generate_test_for_x_or_default(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_jsonization_of_classes_with_descendants.py",
+            lambda: (
+                python_tests.generate_test_jsonization_of_classes_with_descendants(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_jsonization_of_concrete_classes.py",
+            lambda: (
+                python_tests.generate_test_jsonization_of_concrete_classes(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_jsonization_of_enums.py",
+            lambda: (
+                python_tests.generate_test_jsonization_of_enums(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_xmlization_of_classes_with_descendants.py",
+            lambda: (
+                python_tests.generate_test_xmlization_of_classes_with_descendants(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "test_xmlization_of_concrete_classes.py",
+            lambda: (
+                python_tests.generate_test_xmlization_of_concrete_classes(
+                    symbol_table=context.symbol_table, aas_module=aas_module
+                ),
+                None,
             ),
         ),
     ]
@@ -178,6 +277,23 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         assert code is not None
 
         pth = context.output_dir / rel_path
+
+        try:
+            pth.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to create the directory {pth.parent}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
+
+        # NOTE (mristin):
+        # We add this type check since we had many problems during the development.
+        assert isinstance(
+            code, str
+        ), f"Unexpected code {code} for the generator for {rel_path}"
+
         try:
             pth.write_text(code, encoding="utf-8")
         except Exception as exception:

@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>Replace curly brackets, backslashes and indent</title>
+<script>
+    function processInput() {
+        var input = document.getElementById("input");
+        var output = document.getElementById("output");
+
+        var text = input.value
+            .replaceAll("{", "{{")
+            .replaceAll("}", "}}")
+            .replaceAll(/^                        /gm, "{IIIIII}")
+            .replaceAll(/^                    /gm, "{IIIII}")
+            .replaceAll(/^                /gm, "{IIII}")
+            .replaceAll(/^            /gm, "{III}")
+            .replaceAll(/^        /gm, "{II}")
+            .replaceAll(/^    /gm, "{I}")
+            .replaceAll("\\", "\\\\");
+
+        output.value = text;
+    }
+
+    function copyOutput() {
+        var output = document.getElementById("output");
+        output.select();
+        document.execCommand("copy");
+    }
+
+    window.onload = function() {
+        processInput();
+    }
+</script>
+</head>
+<body>
+<textarea id="input" cols="120" rows="10" oninput="processInput()"></textarea>
+<br/><br/><br/>
+<textarea id="output" cols="120" rows="10" readonly></textarea>
+<br/><br/><br/>
+<button onclick="copyOutput()">Copy</button>
+</body>
