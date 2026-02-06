@@ -37,13 +37,8 @@ def main() -> None:
             f"in {pyproject_toml_path}"
         )
 
-    if len(include_packages) != 1:
-        raise AssertionError(
-            f"Expected exactly one package in [tool.setuptools.packages.find] include "
-            f"in pyproject.toml, "
-            f"but got: {include_packages}"
-        )
-
+    # NOTE (mristin):
+    # We assume that the first include package is the main one.
     module_name = include_packages[0]
 
     module = __import__(module_name)

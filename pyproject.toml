@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "aas-core-codegen"
 # NOTE (mristin):
 # Do not forget to update the CHANGELOG.rst and __init__.py!
-version = "0.0.18"
+version = "0.0.18.post1"
 description = "Generate implementations and schemas based on an AAS meta-model."
 readme = "README.rst"
 authors = [
@@ -43,8 +43,18 @@ aas-core-codegen = "aas_core_codegen.main:entry_point"
 aas-core-codegen-smoke = "aas_core_codegen.smoke.main:entry_point"
 
 [tool.setuptools.packages.find]
-include = ["aas_core_codegen"]
-exclude = ["dev"]
+include = [
+    "aas_core_codegen",
+    "aas_core_codegen.*"
+]
+# NOTE (mristin):
+# The ``exclude`` here refers to the module names, not filesystem paths!
+exclude = [
+    "continuous_integration",
+    "dev_scripts",
+    "integration_tests",
+    "tests"
+]
 
 [tool.setuptools.package-data]
 aas_core_codegen = ["py.typed"]
