@@ -3,6 +3,12 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.18.post1 (2026-02-06)
+========================
+We had a bug in our publishing pipeline where submodules under
+``aas_core_codegen`` were not included. In this version, the submodules
+should be now included as well.
+
 0.0.18 (2026-02-06)
 ===================
 * Cache meta-models optionally (#579)
