@@ -18,14 +18,8 @@ else:
     from typing_extensions import Final
 
 
-from icontract import require
-
-
 import aas_core3.types as aas_types
 import aas_core3.xmlization as aas_xmlization
-
-
-import tests.common
 
 
 class Difference:
