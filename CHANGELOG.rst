@@ -3,6 +3,21 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.18 (2026-02-06)
+===================
+* Cache meta-models optionally (#579)
+* Generate unit tests for Python (#580)
+
+This version improves the development speed of both aas-core-codegen
+and its downstream clients by allowing caching of intermediate
+symbol table in temporary directory on file system. This can bring
+down cycles from some 20 seconds to 5 seconds.
+
+This version is also a milestone for aas-core3.1-python. We move
+the logic for generating unit tests back into the aas-core-codegen
+from aas-core3.1-python development scripts, so that all code generation
+lives in one place for maintainability.
+
 0.0.17 (2026-02-03)
 ===================
 * Extend ``must_find`` to constants (#564)

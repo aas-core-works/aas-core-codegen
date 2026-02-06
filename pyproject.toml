@@ -4,7 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aas-core-codegen"
-version = "0.0.17"
+# NOTE (mristin):
+# Do not forget to update the CHANGELOG.rst and __init__.py!
+version = "0.0.18"
 description = "Generate implementations and schemas based on an AAS meta-model."
 readme = "README.rst"
 authors = [
