@@ -7,7 +7,7 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import LinenoColumner, Error
 from aas_core_codegen.csharp import (
     common as csharp_common,
-    verification as csharp_verification,
+    lib as csharp_lib,
 )
 from aas_core_codegen import parse
 
@@ -49,7 +49,7 @@ class Test_against_recorded(unittest.TestCase):
             )
             assert ir_symbol_table is not None
 
-            code, errors = csharp_verification.generate(
+            code, errors = csharp_lib.generate_verification(
                 symbol_table=ir_symbol_table,
                 namespace=csharp_common.NamespaceIdentifier("dummyNamespace"),
                 spec_impls=dict(),
