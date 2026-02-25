@@ -12,7 +12,8 @@ from aas_core_codegen.python.common import INDENT as I, INDENT2 as II
 
 
 def _generate_enum_from_string(
-    enumeration: intermediate.Enumeration, aas_module: python_common.QualifiedModuleName
+    enumeration: intermediate.Enumeration,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the functions for de-serializing enumeration from strings."""
     blocks = []  # type: List[Stripped]
@@ -59,14 +60,14 @@ def {from_str_name}(
 ) -> Optional[aas_types.{name}]:
 {I}\"\"\"
 {I}Parse :paramref:`text` as string representation
-{I}of :py:class:`{aas_module}.{name}`.
+{I}of :py:class:`{qualified_module_name}.{name}`.
 
 {I}If :paramref:`text` is not a valid string representation of a literal
-{I}of :py:class:`{aas_module}.{name}`, return ``None``.
+{I}of :py:class:`{qualified_module_name}.{name}`, return ``None``.
 
 {I}:param text: to be parsed
 {I}:return:
-{II}the corresponding literal of :py:class:`{aas_module}.{name}`
+{II}the corresponding literal of :py:class:`{qualified_module_name}.{name}`
 {II}or ``None``, if :paramref:`text` invalid.
 {I}\"\"\"
 {I}return {from_str_map_name}.get(text, None)"""
@@ -89,12 +90,12 @@ def {from_str_name}(
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the Python code for the de-serialization of strings.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped('"""De-serialize enumerations from string representations."""'),
@@ -106,13 +107,15 @@ from typing import (
 {I}Optional,
 )
 
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.types as aas_types"""
         ),
     ]
 
     for enum in symbol_table.enumerations:
         blocks.append(
-            _generate_enum_from_string(enumeration=enum, aas_module=aas_module)
+            _generate_enum_from_string(
+                enumeration=enum, qualified_module_name=qualified_module_name
+            )
         )
 
     blocks.append(python_common.WARNING)

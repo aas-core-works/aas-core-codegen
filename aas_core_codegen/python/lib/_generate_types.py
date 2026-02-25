@@ -239,7 +239,7 @@ def verify(
 def _generate_comment_for_enumeration_literal(
     enumeration: intermediate.Enumeration,
     literal: intermediate.EnumerationLiteral,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given enumeration literal."""
     # NOTE (mristin, 2022-10-29):
@@ -249,7 +249,9 @@ def _generate_comment_for_enumeration_literal(
     text, errors = python_description.generate_summary_remarks(
         description=literal.description,
         context=python_description.Context(
-            aas_module=aas_module, module=Identifier("types"), cls_or_enum=enumeration
+            qualified_module_name=qualified_module_name,
+            module=Identifier("types"),
+            cls_or_enum=enumeration,
         ),
     )
 
@@ -264,7 +266,7 @@ def _generate_comment_for_enumeration_literal(
 @require(lambda cls_or_enum: cls_or_enum.description is not None)
 def _generate_docstring_for_cls_or_enum(
     cls_or_enum: Union[intermediate.Enumeration, intermediate.ClassUnion],
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the docstring for our type."""
     # NOTE (mristin, 2022-10-29):
@@ -274,7 +276,9 @@ def _generate_docstring_for_cls_or_enum(
     text, errors = python_description.generate_summary_remarks_constraints(
         description=cls_or_enum.description,
         context=python_description.Context(
-            aas_module=aas_module, module=Identifier("types"), cls_or_enum=cls_or_enum
+            qualified_module_name=qualified_module_name,
+            module=Identifier("types"),
+            cls_or_enum=cls_or_enum,
         ),
     )
 
@@ -288,7 +292,8 @@ def _generate_docstring_for_cls_or_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-    enum: intermediate.Enumeration, aas_module: python_common.QualifiedModuleName
+    enum: intermediate.Enumeration,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the Python code for the enum."""
     writer = io.StringIO()
@@ -301,7 +306,7 @@ def _generate_enum(
         docstring, docstring_errors = (
             _generate_docstring_for_cls_or_enum(
                 cls_or_enum=enum,
-                aas_module=aas_module
+                qualified_module_name=qualified_module_name
             )
         )
         # fmt: on
@@ -342,7 +347,9 @@ def _generate_enum(
 
             if literal.description is not None:
                 comment, comment_errors = _generate_comment_for_enumeration_literal(
-                    enumeration=enum, literal=literal, aas_module=aas_module
+                    enumeration=enum,
+                    literal=literal,
+                    qualified_module_name=qualified_module_name,
                 )
                 if comment_errors is not None:
                     errors.append(
@@ -775,7 +782,7 @@ self.{python_naming.property_name(stmt.name)} = (
 def _generate_comment_for_property(
     cls: intermediate.ClassUnion,
     prop: intermediate.Property,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given property."""
     # NOTE (mristin, 2022-10-29):
@@ -785,7 +792,9 @@ def _generate_comment_for_property(
     text, errors = python_description.generate_summary_remarks_constraints(
         description=prop.description,
         context=python_description.Context(
-            aas_module=aas_module, module=Identifier("types"), cls_or_enum=cls
+            qualified_module_name=qualified_module_name,
+            module=Identifier("types"),
+            cls_or_enum=cls,
         ),
     )
 
@@ -802,7 +811,7 @@ def _generate_comment_for_property(
 def _generate_class(
     cls: intermediate.ClassUnion,
     spec_impls: specific_implementations.SpecificImplementations,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate Python code for the given concrete class ``cls``."""
@@ -820,7 +829,7 @@ def _generate_class(
         prop_comment = None  # type: Optional[Stripped]
         if prop.description is not None:
             prop_comment, prop_comment_errors = _generate_comment_for_property(
-                cls=cls, prop=prop, aas_module=aas_module
+                cls=cls, prop=prop, qualified_module_name=qualified_module_name
             )
             if prop_comment_errors is not None:
                 return None, Error(
@@ -1024,7 +1033,7 @@ def transform_with_context(
     docstring = None  # type: Optional[Stripped]
     if cls.description is not None:
         docstring, docstring_errors = _generate_docstring_for_cls_or_enum(
-            cls_or_enum=cls, aas_module=aas_module
+            cls_or_enum=cls, qualified_module_name=qualified_module_name
         )
         if docstring_errors is not None:
             return None, Error(
@@ -1560,13 +1569,15 @@ class TransformerWithDefaultAndContext(
 
 def _generate_docstring_for_meta_model(
     description: intermediate.DescriptionOfMetaModel,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the docstring for the given meta-model."""
     text, errors = python_description.generate_summary_remarks_constraints(
         description=description,
         context=python_description.Context(
-            aas_module=aas_module, module=Identifier("types"), cls_or_enum=None
+            qualified_module_name=qualified_module_name,
+            module=Identifier("types"),
+            cls_or_enum=None,
         ),
     )
 
@@ -1588,13 +1599,13 @@ def _generate_docstring_for_meta_model(
 # fmt: on
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the Python code of the structures based on the symbol table.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     errors = []  # type: List[Error]
 
@@ -1605,7 +1616,7 @@ def generate(
         docstring, docstring_errors = (
             _generate_docstring_for_meta_model(
                 description=symbol_table.meta_model.description,
-                aas_module=aas_module
+                qualified_module_name=qualified_module_name
             )
         )
         # fmt: on
@@ -1714,7 +1725,9 @@ class Class(abc.ABC):
         error: Optional[Error]
 
         if isinstance(our_type, intermediate.Enumeration):
-            block, error = _generate_enum(enum=our_type, aas_module=aas_module)
+            block, error = _generate_enum(
+                enum=our_type, qualified_module_name=qualified_module_name
+            )
             if error is None:
                 assert block is not None
                 blocks.append(block)
@@ -1749,7 +1762,7 @@ class Class(abc.ABC):
                 block, error = _generate_class(
                     cls=our_type,
                     spec_impls=spec_impls,
-                    aas_module=aas_module,
+                    qualified_module_name=qualified_module_name,
                     symbol_table=symbol_table,
                 )
                 if error is None:

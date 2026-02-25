@@ -34,7 +34,7 @@ class Context:
     """Structure the context of the rendering of a description."""
 
     #: Qualified module name of the base module for the SDK
-    aas_module: Final[python_common.QualifiedModuleName]
+    qualified_module_name: Final[python_common.QualifiedModuleName]
 
     #: Our internal module in which the description resides
     module: Final[Identifier]
@@ -51,12 +51,12 @@ class Context:
 
     def __init__(
         self,
-        aas_module: python_common.QualifiedModuleName,
+        qualified_module_name: python_common.QualifiedModuleName,
         module: Identifier,
         cls_or_enum: Optional[Union[intermediate.ClassUnion, intermediate.Enumeration]],
     ) -> None:
         """Initialize with the given values."""
-        self.aas_module = aas_module
+        self.qualified_module_name = qualified_module_name
         self.module = module
         self.cls_or_enum = cls_or_enum
 

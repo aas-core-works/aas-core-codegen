@@ -49,7 +49,7 @@ def _generate_documentation_comment_for_constant(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_primitive(
     constant: intermediate.ConstantPrimitive,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant primitive."""
     writer = io.StringIO()
@@ -58,7 +58,9 @@ def _generate_constant_primitive(
         docstring, docstring_errors = _generate_documentation_comment_for_constant(
             description=constant.description,
             context=python_description.Context(
-                aas_module=aas_module, module=Identifier("constants"), cls_or_enum=None
+                qualified_module_name=qualified_module_name,
+                module=Identifier("constants"),
+                cls_or_enum=None,
             ),
         )
         if docstring_errors is not None:
@@ -121,7 +123,7 @@ def _generate_constant_primitive(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_primitives(
     constant: intermediate.ConstantSetOfPrimitives,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant set of primitives."""
     writer = io.StringIO()
@@ -130,7 +132,9 @@ def _generate_constant_set_of_primitives(
         docstring, docstring_errors = _generate_documentation_comment_for_constant(
             description=constant.description,
             context=python_description.Context(
-                aas_module=aas_module, module=Identifier("constants"), cls_or_enum=None
+                qualified_module_name=qualified_module_name,
+                module=Identifier("constants"),
+                cls_or_enum=None,
             ),
         )
         if docstring_errors is not None:
@@ -254,7 +258,7 @@ def _generate_constant_set_of_primitives(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_enumeration_literals(
     constant: intermediate.ConstantSetOfEnumerationLiterals,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant set of enumeration literals."""
     writer = io.StringIO()
@@ -263,7 +267,9 @@ def _generate_constant_set_of_enumeration_literals(
         docstring, docstring_errors = _generate_documentation_comment_for_constant(
             description=constant.description,
             context=python_description.Context(
-                aas_module=aas_module, module=Identifier("constants"), cls_or_enum=None
+                qualified_module_name=qualified_module_name,
+                module=Identifier("constants"),
+                cls_or_enum=None,
             ),
         )
         if docstring_errors is not None:
@@ -311,12 +317,12 @@ def _generate_constant_set_of_enumeration_literals(
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the Python code of the constants based on the symbol table.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     errors = []  # type: List[Error]
 
@@ -327,7 +333,7 @@ def generate(
             f"""\
 from typing import Set
 
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.types as aas_types"""
         ),
     ]  # type: List[Stripped]
 
@@ -337,15 +343,15 @@ import {aas_module}.types as aas_types"""
 
         if isinstance(constant, intermediate.ConstantPrimitive):
             block, error = _generate_constant_primitive(
-                constant=constant, aas_module=aas_module
+                constant=constant, qualified_module_name=qualified_module_name
             )
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):
             block, error = _generate_constant_set_of_primitives(
-                constant=constant, aas_module=aas_module
+                constant=constant, qualified_module_name=qualified_module_name
             )
         elif isinstance(constant, intermediate.ConstantSetOfEnumerationLiterals):
             block, error = _generate_constant_set_of_enumeration_literals(
-                constant=constant, aas_module=aas_module
+                constant=constant, qualified_module_name=qualified_module_name
             )
         else:
             assert_never(constant)

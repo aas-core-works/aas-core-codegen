@@ -244,7 +244,7 @@ class _PatternVerificationTranspiler(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_pattern_verification(
     verification: intermediate.PatternVerification,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verification function that checks the regular expressions."""
     # NOTE (mristin, 2022-09-30):
@@ -340,7 +340,7 @@ def {function_name}({arg_name}: str) -> bool:
         ) = python_description.generate_docstring_for_signature(
             description=verification.description,
             context=python_description.Context(
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
                 module=Identifier("verification"),
                 cls_or_enum=None,
             ),
@@ -441,7 +441,7 @@ def _transpile_transpilable_verification(
     verification: intermediate.TranspilableVerification,
     symbol_table: intermediate.SymbolTable,
     environment: intermediate_type_inference.Environment,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile a verification function."""
     # fmt: off
@@ -528,7 +528,7 @@ def {function_name}(
         ) = python_description.generate_docstring_for_signature(
             description=verification.description,
             context=python_description.Context(
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
                 module=Identifier("verification"),
                 cls_or_enum=None,
             ),
@@ -1146,7 +1146,7 @@ def {function_name}(
 
 def _generate_module_docstring(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the docstring for the module."""
     docstring_blocks = [
@@ -1166,12 +1166,12 @@ def _generate_module_docstring(
         docstring_blocks.append(
             Stripped(
                 f"""\
-Here is an example how to verify an instance of :py:class:`{aas_module}.types.{cls_name}`:
+Here is an example how to verify an instance of :py:class:`{qualified_module_name}.types.{cls_name}`:
 
 .. code-block::
 
-    import {aas_module}.types as aas_types
-    import {aas_module}.verification as aas_verification
+    import {qualified_module_name}.types as aas_types
+    import {qualified_module_name}.verification as aas_verification
 
     {an_instance_variable} = aas_types.{cls_name}(
         # ... some constructor arguments ...
@@ -1207,17 +1207,19 @@ Here is an example how to verify an instance of :py:class:`{aas_module}.types.{c
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the Python code for verification based on the symbol table.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     # region Module docstring
     blocks = [
-        _generate_module_docstring(symbol_table=symbol_table, aas_module=aas_module),
+        _generate_module_docstring(
+            symbol_table=symbol_table, qualified_module_name=qualified_module_name
+        ),
         python_common.WARNING,
         Stripped(
             f"""\
@@ -1243,7 +1245,7 @@ if sys.version_info >= (3, 8):
 else:
 {I}from typing_extensions import Final
 
-from {aas_module} import (
+from {qualified_module_name} import (
 {I}constants as aas_constants,
 {I}types as aas_types,
 )"""
@@ -1363,7 +1365,7 @@ class Error:
 
         elif isinstance(verification, intermediate.PatternVerification):
             implementation, error = _transpile_pattern_verification(
-                verification=verification, aas_module=aas_module
+                verification=verification, qualified_module_name=qualified_module_name
             )
 
             if error is not None:
@@ -1377,7 +1379,7 @@ class Error:
                 verification=verification,
                 symbol_table=symbol_table,
                 environment=base_environment,
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
             )
 
             if error is not None:

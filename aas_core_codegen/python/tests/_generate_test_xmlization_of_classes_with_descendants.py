@@ -118,12 +118,12 @@ class TestRoundTrips(unittest.TestCase):
 )
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
     Generate the code to test XML de/serialization of classes with descendants.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
@@ -145,7 +145,7 @@ import xml.etree.ElementTree as ET"""
         ),
         Stripped(
             f"""\
-import {aas_module}.xmlization as aas_xmlization"""
+import {qualified_module_name}.xmlization as aas_xmlization"""
         ),
         Stripped(
             """\

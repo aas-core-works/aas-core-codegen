@@ -18,18 +18,18 @@ from aas_core_codegen.python.common import (
     lambda result: result.endswith("\n"),
     "Trailing newline mandatory for valid end-of-files",
 )
-def generate(aas_module: python_common.QualifiedModuleName) -> str:
+def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
     """
     Generate the code to test descend and pass-through visitor jointly.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
             f'''\
 """
-Test jointly :py:method:`{aas_module}.types.Class.descend` and
-:py:method:`{aas_module}.types.PassThroughVisitor`.
+Test jointly :py:method:`{qualified_module_name}.types.Class.descend` and
+:py:method:`{qualified_module_name}.types.PassThroughVisitor`.
 """'''
         ),
         python_common.WARNING,
@@ -47,7 +47,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             """\

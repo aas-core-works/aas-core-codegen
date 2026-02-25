@@ -22,12 +22,8 @@ from aas_core_codegen.python.common import (
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
-def generate(aas_module: python_common.QualifiedModuleName) -> str:
-    """
-    Generate the Python code for common functions.
-
-    The ``aas_module`` indicates the fully-qualified name of the base module.
-    """
+def generate() -> str:
+    """Generate the Python code for common functions."""
     blocks = [
         Stripped('"""Provide common functions shared among the modules."""'),
         python_common.WARNING,
