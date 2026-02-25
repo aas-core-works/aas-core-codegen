@@ -1105,13 +1105,13 @@ class _Serializer(
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the Python code for the general serialization.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
@@ -1148,9 +1148,9 @@ if sys.version_info >= (3, 8):
 else:
 {I}from typing_extensions import Final
 
-import {aas_module}.common as aas_common
-import {aas_module}.stringification as aas_stringification
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.common as aas_common
+import {qualified_module_name}.stringification as aas_stringification
+import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             f"""\

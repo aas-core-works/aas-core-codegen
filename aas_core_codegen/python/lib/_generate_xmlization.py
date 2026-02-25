@@ -25,7 +25,7 @@ from aas_core_codegen.python.common import (
 
 def _generate_module_docstring(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the docstring of the whole module."""
     first_cls = (
@@ -63,7 +63,7 @@ different from :py:mod:`xml.etree.ElementTree`. For example, you can pass in
 
 All XML elements are expected to live in the :py:attr:`~NAMESPACE`.
 
-For writing, use the function :py:func:`{aas_module}.xmlization.write` which
+For writing, use the function :py:func:`{qualified_module_name}.xmlization.write` which
 translates the instance of the model into an XML document and writes it in one pass
 to the stream."""
         )
@@ -86,7 +86,7 @@ Here is an example usage how to de-serialize from a file:
     import pathlib
     import xml.etree.ElementTree as ET
 
-    import {aas_module}.xmlization as aas_xmlization
+    import {qualified_module_name}.xmlization as aas_xmlization
 
     path = pathlib.Path(...)
     instance = aas_xmlization.{read_first_cls_from_file}(
@@ -101,8 +101,8 @@ Here is another code example where we serialize the instance:
 
     import pathlib
 
-    import {aas_module}.types as aas_types
-    import {aas_module}.xmlization as aas_xmlization
+    import {qualified_module_name}.types as aas_types
+    import {qualified_module_name}.xmlization as aas_xmlization
 
     instance = {first_cls_name}(
        ... # some constructor arguments
@@ -174,7 +174,7 @@ def {function_name}(
 
 def _generate_read_cls_from_iterparse(
     cls: Union[intermediate.AbstractClass, intermediate.ConcreteClass],
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the public function for the reading for a ``cls``."""
     function_name = python_naming.function_name(
@@ -203,7 +203,7 @@ def {function_name}(
 {I}    import pathlib
 {I}    import xml.etree.ElementTree as ET
 
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    path = pathlib.Path(...)
 {I}    with path.open("rt") as fid:
@@ -255,7 +255,7 @@ def {function_name}(
 
 def _generate_read_cls_from_stream(
     cls: Union[intermediate.AbstractClass, intermediate.ConcreteClass],
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the public function for the reading of a ``cls`` from a stream."""
     function_name = python_naming.function_name(Identifier(f"{cls.name}_from_stream"))
@@ -280,7 +280,7 @@ def {function_name}(
 
 {I}.. code-block::
 
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    with open_some_stream_over_network(...) as stream:
 {I}        instance = aas_xmlization.{function_name}(
@@ -315,7 +315,7 @@ def {function_name}(
 
 def _generate_read_cls_from_file(
     cls: Union[intermediate.AbstractClass, intermediate.ConcreteClass],
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the public function for the reading of a ``cls`` from a file."""
     function_name = python_naming.function_name(Identifier(f"{cls.name}_from_file"))
@@ -341,7 +341,7 @@ def {function_name}(
 {I}.. code-block::
 
 {I}    import pathlib
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    path = pathlib.Path(...)
 {I}    instance = aas_xmlization.{function_name}(
@@ -377,7 +377,7 @@ def {function_name}(
 
 def _generate_read_cls_from_str(
     cls: Union[intermediate.AbstractClass, intermediate.ConcreteClass],
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the public function for the reading of a ``cls`` from a string."""
     function_name = python_naming.function_name(Identifier(f"{cls.name}_from_str"))
@@ -403,7 +403,7 @@ def {function_name}(
 {I}.. code-block::
 
 {I}    import pathlib
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    text = "<...>...</...>"
 {I}    instance = aas_xmlization.{function_name}(
@@ -529,7 +529,7 @@ def {function_name}(
 
 
 def _generate_read_from_iterparse(
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the general read function to parse an instance from iterparse."""
     function_name = "from_iterparse"
@@ -551,7 +551,7 @@ def {function_name}(
 {I}    import pathlib
 {I}    import xml.etree.ElementTree as ET
 
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    path = pathlib.Path(...)
 {I}    with path.open("rt") as fid:
@@ -601,7 +601,7 @@ def {function_name}(
 
 
 def _generate_read_from_stream(
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the general read function to parse an instance from a text stream."""
     function_name = python_naming.function_name(Identifier("from_stream"))
@@ -621,7 +621,7 @@ def {function_name}(
 
 {I}.. code-block::
 
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    with open_some_stream_over_network(...) as stream:
 {I}        instance = aas_xmlization.{function_name}(
@@ -652,7 +652,9 @@ def {function_name}(
     )
 
 
-def _generate_read_from_file(aas_module: python_common.QualifiedModuleName) -> Stripped:
+def _generate_read_from_file(
+    qualified_module_name: python_common.QualifiedModuleName,
+) -> Stripped:
     """Generate the general read function to parse an instance from a file."""
     function_name = python_naming.function_name(Identifier("from_file"))
 
@@ -670,7 +672,7 @@ def {function_name}(
 {I}.. code-block::
 
 {I}    import pathlib
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    path = pathlib.Path(...)
 {I}    instance = aas_xmlization.{function_name}(
@@ -702,7 +704,9 @@ def {function_name}(
     )
 
 
-def _generate_read_from_str(aas_module: python_common.QualifiedModuleName) -> Stripped:
+def _generate_read_from_str(
+    qualified_module_name: python_common.QualifiedModuleName,
+) -> Stripped:
     """Generate the general read function to parse an instance from a string."""
     function_name = python_naming.function_name(Identifier("from_str"))
 
@@ -720,7 +724,7 @@ def {function_name}(
 {I}.. code-block::
 
 {I}    import pathlib
-{I}    import {aas_module}.xmlization as aas_xmlization
+{I}    import {qualified_module_name}.xmlization as aas_xmlization
 
 {I}    text = "<...>...</...>"
 {I}    instance = aas_xmlization.{function_name}(
@@ -2215,7 +2219,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
 def _generate_write_to_stream(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the function to write an instance as XML to a stream."""
     docstring_blocks = [
@@ -2243,8 +2247,8 @@ Example usage:
 
     import pathlib
 
-    import {aas_module}.types as aas_types
-    import {aas_module}.xmlization as aas_xmlization
+    import {qualified_module_name}.types as aas_types
+    import {qualified_module_name}.xmlization as aas_xmlization
 
     instance = {first_cls_name}(
        ... # some constructor arguments
@@ -2291,20 +2295,22 @@ def write(instance: aas_types.Class, stream: TextIO) -> None:
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the Python code for the general XML de/serialization.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     xml_namespace_literal = python_common.string_literal(
         symbol_table.meta_model.xml_namespace
     )
 
     blocks = [
-        _generate_module_docstring(symbol_table=symbol_table, aas_module=aas_module),
+        _generate_module_docstring(
+            symbol_table=symbol_table, qualified_module_name=qualified_module_name
+        ),
         python_common.WARNING,
         # pylint: disable=line-too-long
         Stripped(
@@ -2340,8 +2346,8 @@ else:
 {II}Protocol
 {I})
 
-import {aas_module}.stringification as aas_stringification
-import {aas_module}.types as aas_types
+import {qualified_module_name}.stringification as aas_stringification
+import {qualified_module_name}.types as aas_types
 
 # See: https://stackoverflow.com/questions/55076778/why-isnt-this-function-type-annotated-correctly-error-missing-type-parameters
 if TYPE_CHECKING:
@@ -2534,20 +2540,36 @@ def _with_elements_cleared_after_yield(
     # We generate first the public methods so that the reader can jump straight
     # to the most important part of the code.
     for cls in symbol_table.classes:
-        blocks.append(_generate_read_cls_from_iterparse(cls=cls, aas_module=aas_module))
+        blocks.append(
+            _generate_read_cls_from_iterparse(
+                cls=cls, qualified_module_name=qualified_module_name
+            )
+        )
 
-        blocks.append(_generate_read_cls_from_stream(cls=cls, aas_module=aas_module))
+        blocks.append(
+            _generate_read_cls_from_stream(
+                cls=cls, qualified_module_name=qualified_module_name
+            )
+        )
 
-        blocks.append(_generate_read_cls_from_file(cls=cls, aas_module=aas_module))
+        blocks.append(
+            _generate_read_cls_from_file(
+                cls=cls, qualified_module_name=qualified_module_name
+            )
+        )
 
-        blocks.append(_generate_read_cls_from_str(cls=cls, aas_module=aas_module))
+        blocks.append(
+            _generate_read_cls_from_str(
+                cls=cls, qualified_module_name=qualified_module_name
+            )
+        )
 
     blocks.extend(
         [
-            _generate_read_from_iterparse(aas_module=aas_module),
-            _generate_read_from_stream(aas_module=aas_module),
-            _generate_read_from_file(aas_module=aas_module),
-            _generate_read_from_str(aas_module=aas_module),
+            _generate_read_from_iterparse(qualified_module_name=qualified_module_name),
+            _generate_read_from_stream(qualified_module_name=qualified_module_name),
+            _generate_read_from_file(qualified_module_name=qualified_module_name),
+            _generate_read_from_str(qualified_module_name=qualified_module_name),
         ]
     )
 
@@ -2972,7 +2994,9 @@ def _read_bytes_from_element_text(
     blocks.append(_generate_serializer(symbol_table=symbol_table))
 
     blocks.append(
-        _generate_write_to_stream(symbol_table=symbol_table, aas_module=aas_module)
+        _generate_write_to_stream(
+            symbol_table=symbol_table, qualified_module_name=qualified_module_name
+        )
     )
 
     blocks.append(

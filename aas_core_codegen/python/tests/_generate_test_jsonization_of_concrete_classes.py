@@ -77,12 +77,12 @@ class TestRoundTrips(unittest.TestCase):
 )
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
     Generate the code to test JSON de/serialization of concrete classes.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
@@ -101,7 +101,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {aas_module}.jsonization as aas_jsonization"""
+import {qualified_module_name}.jsonization as aas_jsonization"""
         ),
         Stripped(
             """\

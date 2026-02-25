@@ -75,12 +75,12 @@ _MODEL_TYPE_TO_CLASS: Mapping[
 )
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
     Generate the shared code used across the jsonization unit tests.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
@@ -108,9 +108,9 @@ else:
         ),
         Stripped(
             f"""\
-import {aas_module}.common as aas_common
-import {aas_module}.jsonization as aas_jsonization
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.common as aas_common
+import {qualified_module_name}.jsonization as aas_jsonization
+import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             f'''\

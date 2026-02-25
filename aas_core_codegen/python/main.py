@@ -68,25 +68,28 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    aas_module_key = specific_implementations.ImplementationKey(
+    qualified_module_name_key = specific_implementations.ImplementationKey(
         "qualified_module_name.txt"
     )
 
-    aas_module_text = context.spec_impls.get(aas_module_key, None)
-    if aas_module_text is None:
+    qualified_module_name_text = context.spec_impls.get(qualified_module_name_key, None)
+    if qualified_module_name_text is None:
         stderr.write(
-            f"The snippet with the qualified module name is missing: {aas_module_key}\n"
+            f"The snippet with the qualified module name is missing: "
+            f"{qualified_module_name_key}\n"
         )
         return 1
 
-    if not python_common.QUALIFIED_MODULE_NAME_RE.fullmatch(aas_module_text):
+    if not python_common.QUALIFIED_MODULE_NAME_RE.fullmatch(qualified_module_name_text):
         stderr.write(
-            f"The text from the snippet {aas_module_key} "
-            f"is not a valid qualified module name: {aas_module_text!r}\n"
+            f"The text from the snippet {qualified_module_name_key} "
+            f"is not a valid qualified module name: {qualified_module_name_text!r}\n"
         )
         return 1
 
-    aas_module = python_common.QualifiedModuleName(aas_module_text)
+    qualified_module_name = python_common.QualifiedModuleName(
+        qualified_module_name_text
+    )
 
     verify_errors = python_lib.verify_for_verification(
         spec_impls=context.spec_impls,
@@ -95,14 +98,14 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     if verify_errors is not None:
         run.write_error_report(
-            message="Failed to verify the Python-specific structures",
+            message=("Failed to verify the verification functions for code generation"),
             errors=verify_errors,
             stderr=stderr,
         )
         return 1
 
-    aas_module_rel_path = pathlib.Path(aas_module.replace(".", "/"))
-    assert not aas_module_rel_path.is_absolute()
+    module_rel_path = pathlib.Path(qualified_module_name.replace(".", "/"))
+    assert not module_rel_path.is_absolute()
 
     tests_rel_path = pathlib.Path("dev/tests")
 
@@ -110,62 +113,70 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
     ] = [
         (
-            aas_module_rel_path / "common.py",
-            lambda: (python_lib.generate_common(aas_module=aas_module), None),
+            module_rel_path / "common.py",
+            lambda: (python_lib.generate_common(), None),
         ),
         (
-            aas_module_rel_path / "constants.py",
+            module_rel_path / "constants.py",
             lambda: python_lib.generate_constants(
-                symbol_table=context.symbol_table, aas_module=aas_module
+                symbol_table=context.symbol_table,
+                qualified_module_name=qualified_module_name,
             ),
         ),
         (
-            aas_module_rel_path / "jsonization.py",
+            module_rel_path / "jsonization.py",
             lambda: python_lib.generate_jsonization(
                 symbol_table=context.symbol_table,
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
                 spec_impls=context.spec_impls,
             ),
         ),
         (
-            aas_module_rel_path / "stringification.py",
+            module_rel_path / "stringification.py",
             lambda: python_lib.generate_stringification(
-                symbol_table=context.symbol_table, aas_module=aas_module
+                symbol_table=context.symbol_table,
+                qualified_module_name=qualified_module_name,
             ),
         ),
         (
-            aas_module_rel_path / "types.py",
+            module_rel_path / "types.py",
             lambda: python_lib.generate_types(
                 symbol_table=verified_ir_table,
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
                 spec_impls=context.spec_impls,
             ),
         ),
         (
-            aas_module_rel_path / "verification.py",
+            module_rel_path / "verification.py",
             lambda: python_lib.generate_verification(
                 symbol_table=verified_ir_table,
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
                 spec_impls=context.spec_impls,
             ),
         ),
         (
-            aas_module_rel_path / "xmlization.py",
+            module_rel_path / "xmlization.py",
             lambda: python_lib.generate_xmlization(
                 symbol_table=context.symbol_table,
-                aas_module=aas_module,
+                qualified_module_name=qualified_module_name,
                 spec_impls=context.spec_impls,
             ),
         ),
         (
             tests_rel_path / "common.py",
-            lambda: (python_tests.generate_common(aas_module=aas_module), None),
+            lambda: (
+                python_tests.generate_common(
+                    qualified_module_name=qualified_module_name
+                ),
+                None,
+            ),
         ),
         (
             tests_rel_path / "common_jsonization.py",
             lambda: (
                 python_tests.generate_common_jsonization(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -173,7 +184,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         (
             tests_rel_path / "common_xmlization.py",
             lambda: (
-                python_tests.generate_common_xmlization(aas_module=aas_module),
+                python_tests.generate_common_xmlization(
+                    qualified_module_name=qualified_module_name
+                ),
                 None,
             ),
         ),
@@ -181,7 +194,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_descend_and_pass_through_visitor.py",
             lambda: (
                 python_tests.generate_test_descend_and_pass_through_visitor(
-                    aas_module=aas_module
+                    qualified_module_name=qualified_module_name
                 ),
                 None,
             ),
@@ -189,7 +202,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         (
             tests_rel_path / "test_descend_once.py",
             lambda: (
-                python_tests.generate_test_descend_once(aas_module=aas_module),
+                python_tests.generate_test_descend_once(
+                    qualified_module_name=qualified_module_name
+                ),
                 None,
             ),
         ),
@@ -197,7 +212,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_for_over_X_or_empty.py",
             lambda: (
                 python_tests.generate_test_for_over_x_or_empty(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -206,7 +222,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_for_x_or_default.py",
             lambda: (
                 python_tests.generate_test_for_x_or_default(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -215,7 +232,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_jsonization_of_classes_with_descendants.py",
             lambda: (
                 python_tests.generate_test_jsonization_of_classes_with_descendants(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -224,7 +242,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_jsonization_of_concrete_classes.py",
             lambda: (
                 python_tests.generate_test_jsonization_of_concrete_classes(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -233,7 +252,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_jsonization_of_enums.py",
             lambda: (
                 python_tests.generate_test_jsonization_of_enums(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -242,7 +262,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_xmlization_of_classes_with_descendants.py",
             lambda: (
                 python_tests.generate_test_xmlization_of_classes_with_descendants(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),
@@ -251,7 +272,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             tests_rel_path / "test_xmlization_of_concrete_classes.py",
             lambda: (
                 python_tests.generate_test_xmlization_of_concrete_classes(
-                    symbol_table=context.symbol_table, aas_module=aas_module
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
                 ),
                 None,
             ),

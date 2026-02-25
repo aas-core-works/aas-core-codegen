@@ -18,16 +18,16 @@ from aas_core_codegen.python.common import (
     lambda result: result.endswith("\n"),
     "Trailing newline mandatory for valid end-of-files",
 )
-def generate(aas_module: python_common.QualifiedModuleName) -> str:
+def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
     """
     Generate the code to unit test ``descend_once`` methods..
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
             f'''\
-"""Test :py:method:`{aas_module}.types.Class.descend_once`."""'''
+"""Test :py:method:`{qualified_module_name}.types.Class.descend_once`."""'''
         ),
         python_common.WARNING,
         Stripped(

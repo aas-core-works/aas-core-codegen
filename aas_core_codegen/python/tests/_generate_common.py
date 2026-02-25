@@ -21,11 +21,11 @@ from aas_core_codegen.python.common import (
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
-def generate(aas_module: python_common.QualifiedModuleName) -> str:
+def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
     """
     Generate the Python code shared across unit tests.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
@@ -46,8 +46,8 @@ from typing import Union, Sequence"""
         ),
         Stripped(
             f"""\
-import {aas_module}.common as aas_common
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.common as aas_common
+import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             """\

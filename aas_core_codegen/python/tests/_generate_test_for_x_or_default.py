@@ -99,12 +99,12 @@ class {test_class_name}(unittest.TestCase):
 )
 def generate(
     symbol_table: intermediate.SymbolTable,
-    aas_module: python_common.QualifiedModuleName,
+    qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
     Generate the test code for the ``X_or_default`` methods.
 
-    The ``aas_module`` indicates the fully-qualified name of the base module.
+    The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     blocks = [
         Stripped(
@@ -123,7 +123,7 @@ import unittest"""
         ),
         Stripped(
             f"""\
-import {aas_module}.types as aas_types"""
+import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             """\
