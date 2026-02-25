@@ -7,7 +7,7 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import LinenoColumner, Error
 from aas_core_codegen.csharp import (
     common as csharp_common,
-    structure as csharp_structure,
+    lib as csharp_lib,
 )
 from aas_core_codegen import parse
 
@@ -18,7 +18,7 @@ class Test_generation_against_recorded(unittest.TestCase):
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent.parent
 
-        parent_case_dir = repo_dir / "dev/test_data/csharp/test_structure"
+        parent_case_dir = repo_dir / "dev/test_data/csharp/test_types"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
         for model_pth in sorted(parent_case_dir.glob("**/meta_model.py")):
@@ -49,12 +49,14 @@ class Test_generation_against_recorded(unittest.TestCase):
             )
             assert ir_symbol_table is not None
 
-            verified_symbol_table, errors = csharp_structure.verify(
+            verified_symbol_table, errors = csharp_lib.verify_for_types(
                 symbol_table=ir_symbol_table
             )
             if errors is not None:
                 joined_error = Error(
-                    None, "Generating verification code failed", errors
+                    None,
+                    "Failed to verify the symbol table for types generation",
+                    errors,
                 )
                 raise AssertionError(
                     f"Unexpected errors when verifying "
@@ -62,13 +64,13 @@ class Test_generation_against_recorded(unittest.TestCase):
                 )
             assert verified_symbol_table is not None
 
-            code, errors = csharp_structure.generate(
+            code, errors = csharp_lib.generate_types(
                 symbol_table=verified_symbol_table,
                 namespace=csharp_common.NamespaceIdentifier("dummyNamespace"),
                 spec_impls=dict(),
             )
             if errors is not None:
-                joined_error = Error(None, "Generating structure code failed", errors)
+                joined_error = Error(None, "Generating types code failed", errors)
                 raise AssertionError(
                     f"Unexpected errors in generating structure code "
                     f"for {model_pth}: {lineno_columner.error_message(joined_error)}"

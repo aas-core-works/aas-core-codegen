@@ -13,9 +13,6 @@ from aas_core_codegen.common import Error, Stripped, Rstripped, Identifier
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 
 
-# region Generate
-
-
 def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the visitor interface."""
     blocks = []  # type: List[Stripped]
@@ -574,6 +571,3 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
-
-
-# endregion

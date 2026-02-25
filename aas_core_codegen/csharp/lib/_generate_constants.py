@@ -27,9 +27,6 @@ from aas_core_codegen.csharp.common import (
 )
 
 
-# region Generation
-
-
 def _byte_array_as_expr(value: bytearray) -> Stripped:
     """Return a multi-line C# code representing the ``value``."""
     writer = io.StringIO()
@@ -404,6 +401,3 @@ namespace {namespace}
     out.write("\n")
 
     return out.getvalue(), None
-
-
-# endregion

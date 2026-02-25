@@ -1,25 +1,15 @@
 """Generate C# code to handle asset administration shells based on the meta-model."""
-from typing import TextIO
+import pathlib
+from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import specific_implementations, run, intermediate
-from aas_core_codegen.csharp import (
-    common as csharp_common,
-    constants as csharp_constants,
-    structure as csharp_structure,
-    visitation as csharp_visitation,
-    verification as csharp_verification,
-    reporting as csharp_reporting,
-    stringification as csharp_stringification,
-    jsonization as csharp_jsonization,
-    xmlization as csharp_xmlization,
-    copying as csharp_copying,
-    enhancing as csharp_enhancing,
-)
+from aas_core_codegen.common import Error
+from aas_core_codegen.csharp import common as csharp_common, lib as csharp_lib
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    verified_ir_table, errors = csharp_structure.verify(
+    verified_ir_table, errors = csharp_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
 
@@ -89,333 +79,136 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     namespace = csharp_common.NamespaceIdentifier(namespace_text)
 
-    # region Structure
-
-    code, errors = csharp_structure.generate(
-        symbol_table=verified_ir_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the structures in the C# code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "types.cs"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the C# structures to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Visitation
-
-    code, errors = csharp_visitation.generate(
-        symbol_table=context.symbol_table, namespace=namespace
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the C# code for visitation "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "visitation.cs"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the visitation C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Constants
-
-    code, errors = csharp_constants.generate(
-        symbol_table=context.symbol_table,
-        namespace=namespace,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the constants in the C# code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "constants.cs"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the constants in the C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Verification
-
-    verify_errors = csharp_verification.verify(
+    verify_errors = csharp_lib.verify_for_verification(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
     )
 
     if verify_errors is not None:
         run.write_error_report(
-            message="Failed to verify for generation of C# verification code",
+            message="Failed to verify the verification functions for code generation",
             errors=verify_errors,
             stderr=stderr,
         )
         return 1
 
-    code, errors = csharp_verification.generate(
-        symbol_table=verified_ir_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
-    )
+    project_rel_path = pathlib.Path(namespace)
+    assert not project_rel_path.is_absolute()
 
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the verification C# code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+    rel_paths_generators: Sequence[
+        Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
+    ] = [
+        (
+            project_rel_path / "constants.cs",
+            lambda: csharp_lib.generate_constants(
+                symbol_table=context.symbol_table, namespace=namespace
+            ),
+        ),
+        (
+            project_rel_path / "copying.cs",
+            lambda: csharp_lib.generate_copying(
+                symbol_table=context.symbol_table,
+                namespace=namespace,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "enhancing.cs",
+            lambda: csharp_lib.generate_enhancing(
+                symbol_table=context.symbol_table,
+                namespace=namespace,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "jsonization.cs",
+            lambda: csharp_lib.generate_jsonization(
+                symbol_table=context.symbol_table,
+                namespace=namespace,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "reporting.cs",
+            lambda: (csharp_lib.generate_reporting(namespace=namespace), None),
+        ),
+        (
+            project_rel_path / "stringification.cs",
+            lambda: csharp_lib.generate_stringification(
+                symbol_table=context.symbol_table, namespace=namespace
+            ),
+        ),
+        (
+            project_rel_path / "types.cs",
+            lambda: csharp_lib.generate_types(
+                symbol_table=verified_ir_table,
+                namespace=namespace,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "verification.cs",
+            lambda: csharp_lib.generate_verification(
+                symbol_table=verified_ir_table,
+                namespace=namespace,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "visitation.cs",
+            lambda: csharp_lib.generate_visitation(
+                symbol_table=context.symbol_table, namespace=namespace
+            ),
+        ),
+        (
+            project_rel_path / "xmlization.cs",
+            lambda: csharp_lib.generate_xmlization(
+                symbol_table=context.symbol_table,
+                namespace=namespace,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+    ]
 
-    assert code is not None
+    for rel_path, generator_func in rel_paths_generators:
+        assert not rel_path.is_absolute()
 
-    pth = context.output_dir / "verification.cs"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the verification C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
+        code, errors = generator_func()
 
-    # endregion
+        if errors is not None:
+            run.write_error_report(
+                message=f"Failed to generate {rel_path} "
+                f"based on {context.model_path}",
+                errors=[
+                    context.lineno_columner.error_message(error) for error in errors
+                ],
+                stderr=stderr,
+            )
+            return 1
 
-    # region Reporting
+        assert code is not None
 
-    code = csharp_reporting.generate(namespace=namespace)
+        pth = context.output_dir / rel_path
 
-    pth = context.output_dir / "reporting.cs"
-    pth.parent.mkdir(exist_ok=True)
+        try:
+            pth.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to create the directory {pth.parent}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the reporting C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Stringification
-
-    code, errors = csharp_stringification.generate(
-        symbol_table=context.symbol_table, namespace=namespace
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the stringification C# code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "stringification.cs"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the stringification C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Jsonization
-
-    code, errors = csharp_jsonization.generate(
-        symbol_table=context.symbol_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the jsonization C# code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "jsonization.cs"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the jsonization C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Xmlization
-
-    code, errors = csharp_xmlization.generate(
-        symbol_table=context.symbol_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the xmlization C# code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "xmlization.cs"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the xmlization C# code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Copying
-
-    code, errors = csharp_copying.generate(
-        symbol_table=context.symbol_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the C# code for shallow and deep copying "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "copying.cs"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the C# code for shallow and deep copying "
-            f"to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Enhancing
-
-    code, errors = csharp_enhancing.generate(
-        symbol_table=context.symbol_table,
-        namespace=namespace,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the C# code for enhancing "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "enhancing.cs"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the C# code for enhancing to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
+        try:
+            pth.write_text(code, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0

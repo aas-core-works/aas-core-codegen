@@ -15,13 +15,7 @@ from aas_core_codegen import (
     specific_implementations,
 )
 from aas_core_codegen.common import LinenoColumner, Error, Stripped
-from aas_core_codegen.csharp import common as csharp_common
-from aas_core_codegen.csharp.structure import (
-    _generate as csharp_structure_generate,
-)
-from aas_core_codegen.csharp.verification import (
-    _generate as csharp_verification_generate,
-)
+from aas_core_codegen.csharp import common as csharp_common, lib as csharp_lib
 
 assert __doc__ == aas_core_codegen.smoke.__doc__
 
@@ -29,14 +23,14 @@ assert __doc__ == aas_core_codegen.smoke.__doc__
 def _smoke_transpile_to_csharp(symbol_table: intermediate.SymbolTable) -> List[Error]:
     """Try to transpile to C# what you can without snippets."""
     # fmt: off
-    verified_symbol_table, structure_verification_errors = (
-        csharp_structure_generate.verify(
+    verified_symbol_table, errors_in_types = (
+        csharp_lib.verify_for_types(
             symbol_table
         )
     )
     # fmt: on
-    if structure_verification_errors is not None:
-        return structure_verification_errors
+    if errors_in_types is not None:
+        return errors_in_types
 
     assert verified_symbol_table is not None
 
@@ -51,7 +45,7 @@ def _smoke_transpile_to_csharp(symbol_table: intermediate.SymbolTable) -> List[E
     for cls in symbol_table.classes:
         if cls.is_implementation_specific:
             key = specific_implementations.ImplementationKey(
-                "Types/{our_type.name}/{our_type.name}.cs"
+                f"Types/{cls.name}/{cls.name}.cs"
             )
             spec_impls[key] = dummy_implementation
             continue
@@ -72,13 +66,13 @@ def _smoke_transpile_to_csharp(symbol_table: intermediate.SymbolTable) -> List[E
 
     namespace = csharp_common.NamespaceIdentifier("DummyNamespace")
 
-    _, structure_errors = csharp_structure_generate.generate(
+    _, types_errors = csharp_lib.generate_types(
         symbol_table=verified_symbol_table, namespace=namespace, spec_impls=spec_impls
     )
-    if structure_errors is not None:
-        errors.extend(structure_errors)
+    if types_errors is not None:
+        errors.extend(types_errors)
 
-    _, verification_errors = csharp_verification_generate.generate(
+    _, verification_errors = csharp_lib.generate_verification(
         symbol_table=symbol_table, namespace=namespace, spec_impls=spec_impls
     )
     if verification_errors is not None:
