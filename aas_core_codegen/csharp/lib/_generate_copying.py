@@ -252,6 +252,7 @@ if (that.{prop_name} != null)
                     else:
                         constructor_arg_exprs.append(f"Deep(that.{prop_name})")
                 else:
+                    # noinspection PyTypeChecker
                     assert_never(type_anno.our_type)
 
             elif isinstance(type_anno, intermediate.ListTypeAnnotation):
@@ -261,6 +262,7 @@ if (that.{prop_name} != null)
                     csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
                 )
             else:
+                # noinspection PyTypeChecker
                 assert_never(type_anno)
 
         return_statement_writer = io.StringIO()
