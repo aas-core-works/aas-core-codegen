@@ -4,7 +4,11 @@ from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import specific_implementations, run, intermediate
 from aas_core_codegen.common import Error
-from aas_core_codegen.csharp import common as csharp_common, lib as csharp_lib
+from aas_core_codegen.csharp import (
+    common as csharp_common,
+    lib as csharp_lib,
+    tests as csharp_tests,
+)
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
@@ -95,6 +99,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     project_rel_path = pathlib.Path(namespace)
     assert not project_rel_path.is_absolute()
 
+    tests_rel_path = pathlib.Path(f"{namespace}.Tests")
+    assert not tests_rel_path.is_absolute()
+
     rel_paths_generators: Sequence[
         Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
     ] = [
@@ -166,6 +173,140 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 symbol_table=context.symbol_table,
                 namespace=namespace,
                 spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            tests_rel_path / "Common.cs",
+            lambda: (csharp_tests.generate_common(namespace=namespace), None),
+        ),
+        (
+            tests_rel_path / "CommonJson.cs",
+            lambda: (csharp_tests.generate_common_json(namespace=namespace), None),
+        ),
+        (
+            tests_rel_path / "CommonJsonization.cs",
+            lambda: (
+                csharp_tests.generate_common_jsonization(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestCopying.cs",
+            lambda: (
+                csharp_tests.generate_test_copying(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestDescendAndVisitorThrough.cs",
+            lambda: (
+                csharp_tests.generate_test_descend_and_visitor_through(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestDescendOnce.cs",
+            lambda: (
+                csharp_tests.generate_test_descend_once(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestEnhancing.cs",
+            lambda: (
+                csharp_tests.generate_test_enhancing(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestJsonizationOfConcreteClasses.cs",
+            lambda: (
+                csharp_tests.generate_test_jsonization_of_concrete_classes(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestJsonizationOfEnums.cs",
+            lambda: (
+                csharp_tests.generate_test_jsonization_of_enums(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestJsonizationOfInterfaces.cs",
+            lambda: (
+                csharp_tests.generate_test_jsonization_of_interfaces(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestOverXOrEmpty.cs",
+            lambda: (
+                csharp_tests.generate_test_over_x_or_empty(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestVerificationOfEnums.cs",
+            lambda: (
+                csharp_tests.generate_test_verification_of_enums(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestXOrDefault.cs",
+            lambda: (
+                csharp_tests.generate_test_x_or_default(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestXmlizationErrors.cs",
+            lambda: (
+                csharp_tests.generate_test_xmlization_errors(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestXmlizationOfConcreteClasses.cs",
+            lambda: (
+                csharp_tests.generate_test_xmlization_of_concrete_classes(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path / "TestXmlizationOfInterfaces.cs",
+            lambda: (
+                csharp_tests.generate_test_xmlization_of_interfaces(
+                    namespace=namespace, symbol_table=context.symbol_table
+                ),
+                None,
             ),
         ),
     ]

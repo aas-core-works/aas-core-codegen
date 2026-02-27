@@ -6,16 +6,31 @@
         var input = document.getElementById("input");
         var output = document.getElementById("output");
 
-        var text = input.value
-            .replaceAll("{", "{{")
-            .replaceAll("}", "}}")
+        var dontEscapeBackslashes = (
+            document.getElementById("dontEscapeBackslashes").checked
+        );
+        var dontEscapeCurlyBrackets = (
+            document.getElementById("dontEscapeCurlyBrackets").checked
+        );
+
+        var text = input.value;
+
+        if (dontEscapeCurlyBrackets === false) {
+            text = text.replaceAll("{", "{{").replaceAll("}", "}}");
+        }
+
+        if (dontEscapeBackslashes === false) {
+            text = text.replaceAll("\\", "\\\\");
+        }
+
+        text = text
+            .replaceAll(/^                            /gm, "{IIIIIII}")
             .replaceAll(/^                        /gm, "{IIIIII}")
             .replaceAll(/^                    /gm, "{IIIII}")
             .replaceAll(/^                /gm, "{IIII}")
             .replaceAll(/^            /gm, "{III}")
             .replaceAll(/^        /gm, "{II}")
-            .replaceAll(/^    /gm, "{I}")
-            .replaceAll("\\", "\\\\");
+            .replaceAll(/^    /gm, "{I}");
 
         output.value = text;
     }
@@ -33,7 +48,19 @@
 </head>
 <body>
 <textarea id="input" cols="120" rows="10" oninput="processInput()"></textarea>
-<br/><br/><br/>
+<br/><br/>
+<input
+        type="checkbox"
+        id="dontEscapeBackslashes"
+        onchange="processInput()"
+><label for="dontEscapeBackslashes"
+>Don't escape backslashes</label><br/>
+<input
+        type="checkbox"
+        id="dontEscapeCurlyBrackets"
+        onchange="processInput()"
+><label for="dontEscapeCurlyBrackets">Don't escape curly brackets</label><br/>
+<br/><br/>
 <textarea id="output" cols="120" rows="10" readonly></textarea>
 <br/><br/><br/>
 <button onclick="copyOutput()">Copy</button>
