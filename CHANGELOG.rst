@@ -3,6 +3,18 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.19 (2026-02-27)
+===================
+* Add test code generation in C# (#586)
+* Remove AAS 3.1 tails from Python generator (#588)
+
+In this version, we change the C# generator so that the test data from
+aas-core-testdatagen are used. This simplifies the development pipeline
+in aas-core*-csharp significantly.
+
+In addition, we remove unintended bits of logic from Python generator
+which were hard-wired to AAS meta-model v3.1.
+
 0.0.18.post2 (2026-02-06)
 =========================
 We forgot to check in changes in Python test code generation, so
