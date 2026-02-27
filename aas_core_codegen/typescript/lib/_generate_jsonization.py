@@ -1,4 +1,4 @@
-"""Generate TypeScript code for JSON-ization based on the intermediate representation."""
+"""Generate TypeScript code for JSON de/serialization."""
 
 import io
 import textwrap
@@ -1214,7 +1214,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the TypeScript code for the general de/serialization."""
+    """Generate TypeScript code for JSON de/serialization."""
     blocks = [
         typescript_description.documentation_comment(
             Stripped(
@@ -1508,3 +1508,7 @@ export function toJsonable(that: AasTypes.Class): JsonObject {{
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

@@ -1,0 +1,1 @@
+Create, manipulate and de/serialize Asset Administration Shells.

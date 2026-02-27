@@ -1,4 +1,4 @@
-"""Generate the TypeScript data structures from the intermediate representation."""
+"""Generate the TypeScript data structures."""
 import io
 import textwrap
 from typing import (
@@ -67,6 +67,7 @@ def _human_readable_identifier(
     elif isinstance(something, intermediate.ConcreteClass):
         result = f"meta-model concrete class {something.name!r}"
     else:
+        # noinspection PyTypeChecker
         assert_never(something)
 
     return result
@@ -141,6 +142,7 @@ def _verify_intra_structure_collisions(
                 )
 
     else:
+        # noinspection PyTypeChecker
         assert_never(our_type)
 
     if len(errors) > 0:
@@ -738,7 +740,9 @@ def _generate_default_value(
         elif isinstance(default.value, str):
             code = typescript_common.string_literal(default.value)
         else:
+            # noinspection PyTypeChecker
             assert_never(default.value)
+
     elif isinstance(default, intermediate.DefaultEnumerationLiteral):
         code = ".".join(
             [
@@ -747,6 +751,7 @@ def _generate_default_value(
             ]
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(default)
 
     return Stripped(code), None
@@ -859,9 +864,11 @@ this.{typescript_naming.property_name(stmt.name)} = ({arg_name})
                         )
                     )
                 else:
+                    # noinspection PyTypeChecker
                     assert_never(stmt.default)
 
         else:
+            # noinspection PyTypeChecker
             assert_never(stmt)
 
     blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
@@ -968,6 +975,7 @@ def _generate_interface(
             signature_blocks.append(signature_comment)
 
         # fmt: off
+        # noinspection PyTypeChecker
         returns = (
             typescript_common.generate_type(type_annotation=signature.returns)
             if signature.returns is not None else "void"
@@ -2165,11 +2173,7 @@ def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """
-    Generate the TypeScript code of the structures based on the symbol table.
-
-    The ``aas_module`` indicates the fully-qualified name of the base module.
-    """
+    """Generate the TypeScript data structures."""
     errors = []  # type: List[Error]
 
     blocks = []  # type: List[Stripped]
@@ -2324,6 +2328,7 @@ export abstract class Class {{
                         assert block is not None
                         blocks.append(block)
         else:
+            # noinspection PyTypeChecker
             assert_never(our_type)
 
     if len(errors) > 0:
@@ -2498,3 +2503,6 @@ export function typesMatch<ClassT extends Class>(
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

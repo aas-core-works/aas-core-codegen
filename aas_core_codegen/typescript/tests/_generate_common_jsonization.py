@@ -1,0 +1,157 @@
+"""Generate the common functions to de/serialize instances of a class."""
+
+import io
+from typing import List
+
+from icontract import ensure
+
+from aas_core_codegen import intermediate, naming
+from aas_core_codegen.common import Stripped, Identifier
+from aas_core_codegen.typescript import (
+    common as typescript_common,
+    naming as typescript_naming,
+)
+from aas_core_codegen.typescript.common import (
+    INDENT as I,
+    INDENT2 as II,
+    INDENT3 as III,
+)
+
+
+# fmt: off
+@ensure(
+    lambda result: result.endswith('\n'),
+    "Trailing newline mandatory for valid end-of-files"
+)
+# fmt: on
+def generate(symbol_table: intermediate.SymbolTable) -> str:
+    """Generate the common functions to de/serialize instances of a class."""
+    blocks = [
+        Stripped(
+            """\
+/**
+ * Provide functions for loading generated examples of AAS instances.
+ */"""
+        ),
+        typescript_common.WARNING,
+        Stripped(
+            """\
+import * as path from "path";
+
+import * as AasTypes from "../src/types";
+import * as AasJsonization from "../src/jsonization";
+
+import * as TestCommon from "./common";"""
+        ),
+    ]  # type: List[Stripped]
+
+    for concrete_cls in symbol_table.concrete_classes:
+        cls_name_typescript = typescript_naming.class_name(concrete_cls.name)
+        cls_name_json = naming.json_model_type(concrete_cls.name)
+
+        deserialization_function = typescript_naming.function_name(
+            Identifier(f"{concrete_cls.name}_from_jsonable")
+        )
+
+        load_maximal_name = typescript_naming.function_name(
+            Identifier(f"load_maximal_{concrete_cls.name}")
+        )
+
+        load_minimal_name = typescript_naming.function_name(
+            Identifier(f"load_minimal_{concrete_cls.name}")
+        )
+
+        as_function = typescript_naming.function_name(
+            Identifier(f"as_{concrete_cls.name}")
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+/**
+ * Load a maximal example of {{@link types.{cls_name_typescript}}} from
+ * the test data directory.
+ */
+export function {load_maximal_name}(
+): AasTypes.{cls_name_typescript} {{
+{I}const aPath = path.join(
+{II}TestCommon.TEST_DATA_DIR,
+{II}"Json",
+{II}"Expected",
+{II}{typescript_common.string_literal(cls_name_json)},
+{II}"maximal.json"
+{I});
+
+{I}const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+{I}const instanceOrError = AasJsonization.{deserialization_function}(
+{II}jsonable
+{I});
+{I}expect(instanceOrError.error).toBeNull();
+{I}const instance = instanceOrError.mustValue();
+
+{I}const casted = AasTypes.{as_function}(instance);
+{I}if (casted === null) {{
+{II}throw new Error(
+{III}`Expected instance of {cls_name_typescript} in ${{aPath}}, ` +
+{III}`but got: ${{typeof instance}}`
+{II});
+{I}}}
+{I}return casted;
+}}"""
+            )
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+/**
+ * Load a minimal example of {{@link types.{cls_name_typescript}}} from
+ * the test data directory.
+ */
+export function {load_minimal_name}(
+): AasTypes.{cls_name_typescript} {{
+{I}const aPath = path.join(
+{II}TestCommon.TEST_DATA_DIR,
+{II}"Json",
+{II}"Expected",
+{II}{typescript_common.string_literal(cls_name_json)},
+{II}"minimal.json"
+{I});
+
+{I}const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+{I}const instanceOrError = AasJsonization.{deserialization_function}(
+{II}jsonable
+{I});
+{I}expect(instanceOrError.error).toBeNull();
+{I}const instance = instanceOrError.mustValue();
+
+{I}const casted = AasTypes.{as_function}(instance);
+{I}if (casted === null) {{
+{II}throw new Error(
+{III}`Expected instance of {cls_name_typescript} in ${{aPath}}, ` +
+{III}`but got: ${{typeof instance}}`
+{II});
+{I}}}
+{I}return casted;
+}}"""
+            )
+        )
+
+    blocks.append(typescript_common.WARNING)
+
+    writer = io.StringIO()
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(block)
+
+    writer.write("\n")
+
+    return writer.getvalue()
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

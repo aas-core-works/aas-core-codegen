@@ -77,7 +77,7 @@ class _RegexRendererForJavaScript(parse_retree.Renderer):
     r"""
     Render the regular expressions as expected by JavaScript.
 
-    For example, unicode characters are rendered as ``\u{...}``.
+    For example, Unicode characters are rendered as ``\u{...}``.
     """
 
     def char_to_str_and_escape_or_encode_if_necessary(
@@ -153,6 +153,7 @@ class _PatternVerificationTranspiler(
 
                 parts.append(f"${{{code}}}")
             else:
+                # noinspection PyTypeChecker
                 assert_never(value)
 
         parts_joined = "".join(parts)
@@ -853,6 +854,7 @@ for (const error of this.transformWithContext(
                 )
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
@@ -1307,7 +1309,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the TypeScript code for verification based on the symbol table."""
+    """Generate the invariant verifiers from the intermediate representation."""
     errors = []  # type: List[Error]
 
     module_docstring, module_docstring_error = _generate_module_comment(
@@ -1491,6 +1493,7 @@ export class VerificationError {{
                 blocks.append(implementation)
 
         else:
+            # noinspection PyTypeChecker
             assert_never(verification)
 
     transformer_block, transformer_errors = _generate_transformer(
@@ -1556,6 +1559,7 @@ export function *verify(
             # class ``Class``.
             pass
         else:
+            # noinspection PyTypeChecker
             assert_never(our_type)
 
     blocks.append(typescript_common.WARNING)
@@ -1576,3 +1580,6 @@ export function *verify(
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

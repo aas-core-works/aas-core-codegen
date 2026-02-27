@@ -234,7 +234,7 @@ export function {from_str_name}(
 
 
 def _generate_enum_to_string(enumeration: intermediate.Enumeration) -> Stripped:
-    """Generate the functions for serializing enumerations to strings."""
+    """Generate TypeScript code for de/serialization of enumerations."""
     blocks = []  # type: List[Stripped]
 
     name = typescript_naming.enum_name(enumeration.name)
@@ -335,7 +335,7 @@ export function {must_to_str_name}(
 def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the TypeScript code for the de/serialization of strings."""
+    """Generate TypeScript code for de/serialization of enumerations."""
     blocks = [
         Stripped(
             """\
@@ -365,3 +365,7 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

@@ -25,9 +25,6 @@ from aas_core_codegen.typescript.common import (
 )
 
 
-# region Generation
-
-
 def _generate_documentation_comment_for_constant(
     description: intermediate.DescriptionOfConstant,
     context: typescript_description.Context,
@@ -289,7 +286,7 @@ export const {constant_name} = new Set<AasTypes.{enum_name}>([
 def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the TypeScript code of the constants based on the symbol table."""
+    """Generate TypeScript constants corresponding to the constants of the meta-model."""
     errors = []  # type: List[Error]
 
     blocks = [
@@ -344,4 +341,5 @@ def generate(
     return writer.getvalue(), None
 
 
-# endregion
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())
