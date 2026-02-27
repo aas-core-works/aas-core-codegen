@@ -29,7 +29,7 @@ TEST_DATA_DIR = _REPO_ROOT / "test_data"
 
 #: If set, the golden files in the tests should be re-recorded instead
 #: of checked against.
-RECORD_MODE = os.environ.get("AAS_CORE3_1_PYTHON_TESTS_RECORD_MODE", "").lower() in (
+RECORD_MODE = os.environ.get("AAS_CORE3_TESTS_RECORD_MODE", "").lower() in (
     "1",
     "on",
     "true",
@@ -94,12 +94,7 @@ def trace(
     :return: segment in the descent trace
     """
     if isinstance(that, aas_types.Class):
-        if isinstance(that, aas_types.Identifiable):
-            return f"{that.__class__.__name__} with ID {that.id}"
-        elif isinstance(that, aas_types.Referable):
-            return f"{that.__class__.__name__} with ID-short {that.id_short}"
-        else:
-            return that.__class__.__name__
+        return that.__class__.__name__
     elif isinstance(that, (bool, int, float, str, enum.Enum)):
         return str(that)
     elif isinstance(that, bytes):

@@ -27,6 +27,10 @@ def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
+    record_variable_name = (
+        qualified_module_name.replace(".", "_").upper() + "_TESTS_RECORD_MODE"
+    )
+
     blocks = [
         Stripped(
             '"""Provide functionality used across the tests."""',
@@ -62,7 +66,7 @@ TEST_DATA_DIR = _REPO_ROOT / "test_data"'''
             f"""\
 #: If set, the golden files in the tests should be re-recorded instead
 #: of checked against.
-RECORD_MODE = os.environ.get("AAS_CORE3_1_PYTHON_TESTS_RECORD_MODE", "").lower() in (
+RECORD_MODE = os.environ.get("{record_variable_name}", "").lower() in (
 {I}"1",
 {I}"on",
 {I}"true",
@@ -129,12 +133,7 @@ def trace(
 {I}:return: segment in the descent trace
 {I}"""
 {I}if isinstance(that, aas_types.Class):
-{II}if isinstance(that, aas_types.Identifiable):
-{III}return f"{{that.__class__.__name__}} with ID {{that.id}}"
-{II}elif isinstance(that, aas_types.Referable):
-{III}return f"{{that.__class__.__name__}} with ID-short {{that.id_short}}"
-{II}else:
-{III}return that.__class__.__name__
+{II}return that.__class__.__name__
 {I}elif isinstance(that, (bool, int, float, str, enum.Enum)):
 {II}return str(that)
 {I}elif isinstance(that, bytes):
