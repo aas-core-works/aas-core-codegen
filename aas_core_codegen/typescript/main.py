@@ -1,20 +1,15 @@
-"""Generate TypeScript code to handle AAS models based on the meta-model."""
-from typing import TextIO
+"""Generate TypeScript code based on the meta-model."""
+import pathlib
+from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import run, intermediate
-from aas_core_codegen.typescript import (
-    aas_common as typescript_aas_common,
-    constants as typescript_constants,
-    jsonization as typescript_jsonization,
-    stringification as typescript_stringification,
-    structure as typescript_structure,
-    verification as typescript_verification,
-)
+from aas_core_codegen.common import Error
+from aas_core_codegen.typescript import lib as typescript_lib, tests as typescript_tests
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    verified_ir_table, errors = typescript_structure.verify(
+    verified_ir_table, errors = typescript_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
 
@@ -69,190 +64,238 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    # region Common
-    pth = context.output_dir / "common.ts"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(typescript_aas_common.generate(), encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the common TypeScript code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Constants
-
-    code, errors = typescript_constants.generate(symbol_table=context.symbol_table)
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the constants in the TypeScript code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "constants.ts"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the constants in the TypeScript code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Jsonization
-
-    code, errors = typescript_jsonization.generate(
-        symbol_table=context.symbol_table, spec_impls=context.spec_impls
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the jsonization TypeScript code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "jsonization.ts"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the jsonization TypeScript code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Stringification
-
-    code, errors = typescript_stringification.generate(
-        symbol_table=context.symbol_table
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the stringification TypeScript code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "stringification.ts"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the stringification TypeScript code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Structure
-
-    code, errors = typescript_structure.generate(
-        symbol_table=verified_ir_table,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the structures in the TypeScript code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "types.ts"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the TypeScript structures to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Verification
-
-    verify_errors = typescript_verification.verify(
+    verification_functions_errors = typescript_lib.verify_verification_functions(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
     )
 
-    if verify_errors is not None:
+    if verification_functions_errors is not None:
         run.write_error_report(
-            message="Failed to verify for the generation of TypeScript verification code",
-            errors=verify_errors,
+            message=(
+                "Failed to verify for the generation of TypeScript verification "
+                "functions code"
+            ),
+            errors=verification_functions_errors,
             stderr=stderr,
         )
         return 1
 
-    code, errors = typescript_verification.generate(
-        symbol_table=verified_ir_table,
-        spec_impls=context.spec_impls,
-    )
+    src_rel_path = pathlib.Path("src")
+    assert not src_rel_path.is_absolute()
 
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the verification TypeScript code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+    test_rel_path = pathlib.Path("test")
+    assert not test_rel_path.is_absolute()
 
-    assert code is not None
+    rel_paths_generators: Sequence[
+        Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
+    ] = [
+        (src_rel_path / "common.ts", lambda: (typescript_lib.generate_common(), None)),
+        (
+            src_rel_path / "constants.ts",
+            lambda: typescript_lib.generate_constants(
+                symbol_table=context.symbol_table
+            ),
+        ),
+        (
+            src_rel_path / "index.ts",
+            lambda: typescript_lib.generate_index(
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            src_rel_path / "jsonization.ts",
+            lambda: typescript_lib.generate_jsonization(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            src_rel_path / "stringification.ts",
+            lambda: typescript_lib.generate_stringification(
+                symbol_table=context.symbol_table
+            ),
+        ),
+        (
+            src_rel_path / "types.ts",
+            lambda: typescript_lib.generate_types(
+                symbol_table=verified_ir_table,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            src_rel_path / "verification.ts",
+            lambda: typescript_lib.generate_verification(
+                symbol_table=verified_ir_table,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            test_rel_path / "common.ts",
+            lambda: typescript_tests.generate_common(spec_impls=context.spec_impls),
+        ),
+        (
+            test_rel_path / "common.base64.spec.ts",
+            lambda: (
+                typescript_tests.generate_common_base64_spec(),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "common.base64url.spec.ts",
+            lambda: (
+                typescript_tests.generate_common_base64url_spec(),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "commonJsonization.ts",
+            lambda: (
+                typescript_tests.generate_common_jsonization(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "jsonization.concreteClasses.spec.ts",
+            lambda: (
+                typescript_tests.generate_jsonization_concrete_classes_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "jsonization.enums.spec.ts",
+            lambda: (
+                typescript_tests.generate_jsonization_enums_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "jsonization.interfaces.spec.ts",
+            lambda: (
+                typescript_tests.generate_jsonization_interfaces_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.casts.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_casts_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.descendAndPassThroughVisitor.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_descend_and_pass_through_visitor_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.descendOnce.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_descend_once_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.modelType.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_model_type_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.overEnum.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_over_enum_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.overXOrEmpty.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_over_x_or_empty_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.typeMatches.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_type_matches_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "types.xOrDefault.spec.ts",
+            lambda: (
+                typescript_tests.generate_types_x_or_default_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+    ]
 
-    pth = context.output_dir / "verification.ts"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the verification TypeScript code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
+    for rel_path, generator_func in rel_paths_generators:
+        assert not rel_path.is_absolute()
 
-    # endregion
+        code, errors = generator_func()
+
+        if errors is not None:
+            run.write_error_report(
+                message=f"Failed to generate {rel_path} "
+                f"based on {context.model_path}",
+                errors=[
+                    context.lineno_columner.error_message(error) for error in errors
+                ],
+                stderr=stderr,
+            )
+            return 1
+
+        assert code is not None
+
+        pth = context.output_dir / rel_path
+
+        try:
+            pth.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to create the directory {pth.parent}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
+
+        try:
+            pth.write_text(code, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0

@@ -1,4 +1,4 @@
-"""Generate TypeScript code of common functions by including the code directly."""
+"""Generate TypeScript code of common functions."""
 
 import io
 
@@ -27,7 +27,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate() -> str:
-    """Generate the TypeScript code for common functions."""
+    """Generate TypeScript code of common functions."""
     blocks = [
         Stripped(
             """\
@@ -470,3 +470,7 @@ export function base64UrlDecode(text: string): Either<Uint8Array, string> {{
     writer.write("\n")
 
     return writer.getvalue()
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())
