@@ -3,6 +3,14 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.20 (2026-03-01)
+===================
+* Add test code generation in TypeScript (#590)
+
+In this version, we make the TypeScript generator generate
+the unit tests which use the test data from aas-core-testdatagen. This
+simplifies the development and future updates a lot.
+
 0.0.19 (2026-02-27)
 ===================
 * Add test code generation in C# (#586)
