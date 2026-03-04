@@ -1,24 +1,15 @@
-"""Generate Golang code to handle AAS models based on the meta-model."""
-from typing import TextIO
+"""Generate the Golang code."""
+import pathlib
+from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import run, intermediate, specific_implementations
-from aas_core_codegen.common import Stripped
-from aas_core_codegen.golang import (
-    aas_common as golang_aas_common,
-    constants as golang_constants,
-    enhancing as golang_enhancing,
-    jsonization as golang_jsonization,
-    reporting as golang_reporting,
-    stringification as golang_stringification,
-    structure as golang_structure,
-    verification as golang_verification,
-    xmlization as golang_xmlization,
-)
+from aas_core_codegen.common import Stripped, Error
+from aas_core_codegen.golang import lib as golang_lib, tests as golang_tests
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    verified_ir_table, errors = golang_structure.verify(
+    verified_ir_table, errors = golang_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
 
@@ -73,6 +64,19 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
+    verification_functions_errors = golang_lib.verify_verification_functions(
+        spec_impls=context.spec_impls,
+        verification_functions=verified_ir_table.verification_functions,
+    )
+
+    if verification_functions_errors is not None:
+        run.write_error_report(
+            message="Failed to verify for the generation of Golang verification code",
+            errors=verification_functions_errors,
+            stderr=stderr,
+        )
+        return 1
+
     # region Repo URL
 
     repo_url_key = specific_implementations.ImplementationKey("repo_url.txt")
@@ -85,284 +89,262 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
-    # region Common
-    pth = context.output_dir / "common/common.go"
-    pth.parent.mkdir(exist_ok=True)
+    base_rel_path = pathlib.Path(".")
+    assert not base_rel_path.is_absolute()
 
-    try:
-        pth.write_text(golang_aas_common.generate(), encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the common Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
+    rel_paths_generators: Sequence[
+        Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
+    ] = [
+        (
+            base_rel_path / "common/common.go",
+            lambda: (golang_lib.generate_common(), None),
+        ),
+        (
+            base_rel_path / "constants/constants.go",
+            lambda: golang_lib.generate_constants(
+                symbol_table=context.symbol_table, repo_url=repo_url
+            ),
+        ),
+        (
+            base_rel_path / "enhancing/enhancing.go",
+            lambda: golang_lib.generate_enhancing(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                repo_url=repo_url,
+            ),
+        ),
+        (
+            base_rel_path / "jsonization/jsonization.go",
+            lambda: golang_lib.generate_jsonization(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                repo_url=repo_url,
+            ),
+        ),
+        (
+            base_rel_path / "reporting/reporting.go",
+            lambda: (golang_lib.generate_reporting(), None),
+        ),
+        (
+            base_rel_path / "stringification/stringification.go",
+            lambda: golang_lib.generate_stringification(
+                symbol_table=context.symbol_table, repo_url=repo_url
+            ),
+        ),
+        (
+            base_rel_path / "types/types.go",
+            lambda: golang_lib.generate_types(
+                symbol_table=verified_ir_table, spec_impls=context.spec_impls
+            ),
+        ),
+        (
+            base_rel_path / "verification/verification.go",
+            lambda: golang_lib.generate_verification(
+                symbol_table=verified_ir_table,
+                spec_impls=context.spec_impls,
+                repo_url=repo_url,
+            ),
+        ),
+        (
+            base_rel_path / "xmlization/xmlization.go",
+            lambda: golang_lib.generate_xmlization(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                repo_url=repo_url,
+            ),
+        ),
+        (
+            base_rel_path / "aastesting/common_jsonization.go",
+            lambda: (
+                golang_tests.generate_aastesting_common_jsonization(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "aastesting/constants.go",
+            lambda: (
+                golang_tests.generate_aastesting_constants(repo_url=repo_url),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "aastesting/deep_equal.go",
+            lambda: (
+                golang_tests.generate_aastesting_deep_equal(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "aastesting/doc.go",
+            lambda: (golang_tests.generate_aastesting_doc(), None),
+        ),
+        (
+            base_rel_path / "aastesting/filesystem.go",
+            lambda: (golang_tests.generate_aastesting_filesystem(), None),
+        ),
+        (
+            base_rel_path / "aastesting/tracing.go",
+            lambda: (
+                golang_tests.generate_aastesting_tracing(repo_url=repo_url),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "enhancing/test/enhancing_test.go",
+            lambda: (
+                golang_tests.generate_enhancing_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "jsonization/test/classes_with_descendants_test.go",
+            lambda: (
+                golang_tests.generate_jsonization_test_classes_with_descendants_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "jsonization/test/common_test.go",
+            lambda: (
+                golang_tests.generate_jsonization_test_common_test(repo_url=repo_url),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "jsonization/test/concrete_classes_test.go",
+            lambda: (
+                golang_tests.generate_jsonization_test_concrete_classes_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "jsonization/test/enums_test.go",
+            lambda: (
+                golang_tests.generate_jsonization_test_enums_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "types/descend_test/common.go",
+            lambda: (
+                golang_tests.generate_descend_test_common(repo_url=repo_url),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "types/descend_test/descend_once_test.go",
+            lambda: (
+                golang_tests.generate_descend_test_descend_once_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "types/descend_test/descend_test.go",
+            lambda: (
+                golang_tests.generate_descend_test_descend_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "types/is_xxx_test/is_xxx_test.go",
+            lambda: (
+                golang_tests.generate_is_xxx_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "types/xxx_or_default_test/xxx_or_default_test.go",
+            lambda: (
+                golang_tests.generate_xxx_or_default_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "verification/test/verification_test.go",
+            lambda: (
+                golang_tests.generate_verification_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "xmlization/test/common_test.go",
+            lambda: (
+                golang_tests.generate_xmlization_test_common_test(repo_url=repo_url),
+                None,
+            ),
+        ),
+        (
+            base_rel_path / "xmlization/test/concrete_classes_test.go",
+            lambda: (
+                golang_tests.generate_xmlization_test_concrete_classes_test(
+                    symbol_table=verified_ir_table, repo_url=repo_url
+                ),
+                None,
+            ),
+        ),
+    ]
 
-    # endregion
+    for rel_path, generator_func in rel_paths_generators:
+        assert not rel_path.is_absolute()
 
-    # region Constants
+        code, errors = generator_func()
 
-    code, errors = golang_constants.generate(
-        symbol_table=context.symbol_table, repo_url=repo_url
-    )
+        if errors is not None:
+            run.write_error_report(
+                message=f"Failed to generate {rel_path} "
+                f"based on {context.model_path}",
+                errors=[
+                    context.lineno_columner.error_message(error) for error in errors
+                ],
+                stderr=stderr,
+            )
+            return 1
 
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the constants in the Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+        assert code is not None
 
-    assert code is not None
+        pth = context.output_dir / rel_path
 
-    pth = context.output_dir / "constants/constants.go"
-    pth.parent.mkdir(exist_ok=True)
+        try:
+            pth.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to create the directory {pth.parent}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the constants in the Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Enhancing
-
-    code, errors = golang_enhancing.generate(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        repo_url=repo_url,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the enhancing Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "enhancing/enhancing.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the enhancing Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Jsonization
-
-    code, errors = golang_jsonization.generate(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        repo_url=repo_url,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the jsonization Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "jsonization/jsonization.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the jsonization Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Reporting
-
-    code = golang_reporting.generate()
-
-    pth = context.output_dir / "reporting/reporting.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the reporting Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Stringification
-
-    code, errors = golang_stringification.generate(
-        symbol_table=context.symbol_table, repo_url=repo_url
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the stringification Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "stringification/stringification.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the stringification Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Structure
-
-    code, errors = golang_structure.generate(
-        symbol_table=verified_ir_table,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the structures in the Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "types/types.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the Golang structures to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Verification
-
-    verify_errors = golang_verification.verify(
-        spec_impls=context.spec_impls,
-        verification_functions=verified_ir_table.verification_functions,
-    )
-
-    if verify_errors is not None:
-        run.write_error_report(
-            message="Failed to verify for the generation of Golang verification code",
-            errors=verify_errors,
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = golang_verification.generate(
-        symbol_table=verified_ir_table, spec_impls=context.spec_impls, repo_url=repo_url
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the verification Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "verification/verification.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the verification Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Xmlization
-
-    code, errors = golang_xmlization.generate(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        repo_url=repo_url,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the xmlization Golang code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "xmlization/xmlization.go"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the xmlization Golang code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
+        try:
+            pth.write_text(code, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
