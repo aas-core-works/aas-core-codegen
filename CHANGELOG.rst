@@ -3,6 +3,15 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.21 (2026-03-04)
+===================
+* Add generation of test code for Golang (#592)
+
+In this version, following the updates in the previous versions, we
+extend the Golang generator to generate the unit tests which use
+the test data from aas-core-testdatagen.
+
+
 0.0.20 (2026-03-01)
 ===================
 * Add test code generation in TypeScript (#590)
