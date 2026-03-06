@@ -80,7 +80,7 @@ def wstring_literal(text: str) -> Stripped:
         else:
             escaped.append(character)
 
-    # NOTE (mristin, 2023-06-28):
+    # NOTE (mristin):
     # We use std::wstring, therefore ``L`` prefix.
     return Stripped('L"{}"'.format("".join(escaped)))
 
@@ -144,7 +144,7 @@ def wchar_literal(character: str) -> Stripped:
 
 
 # fmt: off
-# NOTE (mristin, 2023-09-24):
+# NOTE (mristin):
 # We use a pre-condition here to simplify the client code. The client must check
 # before if the input text is all in ASCII, and report to the user if there are
 # any non-ASCII characters in the input.
@@ -428,7 +428,7 @@ def generate_type(
         elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            # NOTE (mristin, 2023-06-28):
+            # NOTE (mristin):
             # We always refer to interfaces even in cases of concrete classes without
             # concrete descendants since we want to allow enhancing.
             interface_name = cpp_naming.interface_name(our_type.name)
@@ -578,7 +578,7 @@ def break_type_in_lines(text: str) -> str:
         last_match = match
 
     if last_match is None:
-        # NOTE (mristin, 2024-01-18):
+        # NOTE (mristin):
         # Not a signle angle bracket has been detected.
         return text
 
@@ -679,3 +679,67 @@ def non_documentation_comment(text: str) -> str:
             lines.append("//")
 
     return "\n".join(lines)
+
+
+def assert_module_docstring_and_generate_header_consistent(
+    module_doc: str, generate_header_doc: str
+) -> None:
+    """Check that the two docstrings are consistent and raise an exception otherwise."""
+    generate_code_text = "Generate code "
+    if not module_doc.startswith(generate_code_text):
+        raise ValueError(
+            f"Expected the module docstring to start "
+            f"with {generate_code_text!r}, but got: {module_doc}"
+        )
+
+    generate_header_text = "Generate header "
+    if not generate_header_doc.startswith(generate_header_text):
+        raise ValueError(
+            f"Expected the header generator docstring to start "
+            f"with {generate_header_text!r}, "
+            f"but got: {generate_header_doc}"
+        )
+
+    suffix_module_doc = module_doc[len(generate_code_text) :]
+    suffix_generate_header_doc = generate_header_doc[len(generate_header_text) :]
+
+    if not suffix_generate_header_doc.startswith(suffix_module_doc):
+        raise ValueError(
+            f"Expected the header generator docstring "
+            f"to include the part of the module docstring, "
+            f"but got: {generate_header_doc!r} and "
+            f"the module docstring was {module_doc!r}"
+        )
+
+
+def assert_module_docstring_and_generate_implementation_consistent(
+    module_doc: str, generate_implementation_doc: str
+) -> None:
+    """Check that the two docstrings are consistent and raise an exception otherwise."""
+    generate_code_text = "Generate code "
+    if not module_doc.startswith(generate_code_text):
+        raise ValueError(
+            f"Expected the module docstring to start "
+            f"with {generate_code_text!r}, but got: {module_doc}"
+        )
+
+    generate_implementation_text = "Generate implementation "
+    if not generate_implementation_doc.startswith(generate_implementation_text):
+        raise ValueError(
+            f"Expected the implementation generator docstring to start "
+            f"with {generate_implementation_text!r}, "
+            f"but got: {generate_implementation_doc}"
+        )
+
+    suffix_module_doc = module_doc[len(generate_code_text) :]
+    suffix_generate_implementation_doc = generate_implementation_doc[
+        len(generate_implementation_text) :
+    ]
+
+    if not suffix_generate_implementation_doc.startswith(suffix_module_doc):
+        raise ValueError(
+            f"Expected the implementation generator docstring "
+            f"to include the part of the module docstring, "
+            f"but got: {generate_implementation_doc!r} and "
+            f"the module docstring was {module_doc!r}"
+        )

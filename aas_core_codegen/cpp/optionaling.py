@@ -157,7 +157,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_comparison(self, node: parse_tree.Comparison) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for operand in (node.left, node.right):
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -201,7 +201,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         for arg in node.args:
             error = self.transform(arg)
 
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -258,7 +258,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         for arg in node.args:
             error = self.transform(arg)
 
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -346,7 +346,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_and(self, node: parse_tree.And) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for value in node.values:
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -364,7 +364,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_or(self, node: parse_tree.Or) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for value in node.values:
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -382,7 +382,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_add(self, node: parse_tree.Add) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for operand in (node.left, node.right):
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -400,7 +400,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_sub(self, node: parse_tree.Sub) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for operand in (node.left, node.right):
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -431,7 +431,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
             if isinstance(value, str):
                 continue
 
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -486,7 +486,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         for value in (node.start, node.end):
             error = self.transform(value)
 
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.

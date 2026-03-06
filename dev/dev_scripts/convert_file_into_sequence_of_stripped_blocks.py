@@ -3,6 +3,7 @@
 import argparse
 import enum
 import pathlib
+import re
 import sys
 from typing import List
 
@@ -128,11 +129,21 @@ def main() -> int:
     blocks = _split_in_blocks(text, indention=indention)
 
     for block in blocks:
-        block = block.replace("\\", "\\\\").replace("{", "{{").replace("}", "}}")
+        lines = block.split("\n")
+
+        needs_f = any(
+            re.match(r"^.*{\s+[a-zA-Z_0-9]+\s*}", line) is not None
+            or line.startswith(indention)
+            for line in lines
+        )
+
+        block = block.replace("\\", "\\\\")
+
+        if needs_f:
+            block = block.replace("{", "{{").replace("}", "}}")
 
         # NOTE (mristin):
         # We replace indentation with {I}, {II}, etc. placeholders.
-        lines = block.split("\n")
         processed_lines = []
 
         for line in lines:
@@ -157,10 +168,12 @@ def main() -> int:
 
         block = "\n".join(processed_lines)
 
+        maybe_f = "f" if needs_f else ""
+
         print(
             f"""\
 Stripped(
-    f'''\\
+    {maybe_f}'''\\
 {block}'''
 ),"""
         )

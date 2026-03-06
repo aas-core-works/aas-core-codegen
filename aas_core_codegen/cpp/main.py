@@ -1,38 +1,17 @@
 """Generate C++ code to handle models based on the meta-model."""
-from typing import TextIO
+import pathlib
+from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import run, intermediate, specific_implementations
-from aas_core_codegen.common import Stripped
-from aas_core_codegen.cpp import (
-    aas_common as cpp_aas_common,
-    constants as cpp_constants,
-    enhancing as cpp_enhancing,
-    iteration as cpp_iteration,
-    jsonization as cpp_jsonization,
-    pattern as cpp_pattern,
-    revm as cpp_revm,
-    stringification as cpp_stringification,
-    structure as cpp_structure,
-    verification as cpp_verification,
-    visitation as cpp_visitation,
-    xmlization as cpp_xmlization,
-    wstringification as cpp_wstringification,
-)
+from aas_core_codegen.common import Stripped, Error
+from aas_core_codegen.cpp import lib as cpp_lib, tests as cpp_tests
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    verified_ir_table, errors = cpp_structure.verify(symbol_table=context.symbol_table)
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to verify the intermediate symbol table "
-            f"for generation of C++ code"
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+    verified_ir_table, errors = cpp_lib.verify_for_types(
+        symbol_table=context.symbol_table
+    )
 
     assert verified_ir_table is not None
 
@@ -83,7 +62,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         stderr.write(f"The namespace snippet is missing: {namespace_key}\n")
         return 1
 
-    namespace = Stripped(namespace_text.strip())
+    library_namespace = Stripped(namespace_text.strip())
 
     # endregion
 
@@ -95,600 +74,441 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    # region Common
-    pth = context.output_dir / "common.hpp"
-    try:
-        pth.write_text(
-            cpp_aas_common.generate_header(library_namespace=namespace),
-            encoding="utf-8",
-        )
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the header of the common C++ code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
+    src_dir = pathlib.Path("src")
+    assert not src_dir.is_absolute()
 
-    pth = context.output_dir / "common.cpp"
-    try:
-        pth.write_text(
-            cpp_aas_common.generate_implementation(library_namespace=namespace),
-            encoding="utf-8",
-        )
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the common C++ code to {pth}"
+    include_dir = pathlib.Path("include") / library_namespace.replace("::", "/")
+    assert not include_dir.is_absolute()
+
+    test_dir = pathlib.Path("test")
+    assert not test_dir.is_absolute()
+
+    rel_paths_generators: Sequence[
+        Tuple[pathlib.Path, Callable[[], Tuple[Optional[str], Optional[List[Error]]]]]
+    ] = [
+        (
+            include_dir / "common.hpp",
+            lambda: (
+                cpp_lib.generate_common_header(library_namespace=library_namespace),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Constants
-    code, errors = cpp_constants.generate_header(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the header for the constants in the C++ "
-                f"based on {context.model_path}"
+        ),
+        (
+            src_dir / "common.cpp",
+            lambda: (
+                cpp_lib.generate_common_implementation(
+                    library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "constants.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the header for the constants in the C++ to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_constants.generate_implementation(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the constants in the C++ "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "constants.hpp",
+            lambda: cpp_lib.generate_constants_header(
+                symbol_table=context.symbol_table, library_namespace=library_namespace
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "constants.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of constants in the C++ to {pth}"
+        ),
+        (
+            src_dir / "constants.cpp",
+            lambda: cpp_lib.generate_constants_implementation(
+                symbol_table=context.symbol_table, library_namespace=library_namespace
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Enhancing
-    code, errors = cpp_enhancing.generate_header(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the header of the enhancing C++ code "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "enhancing.hpp",
+            lambda: cpp_lib.generate_enhancing_header(
+                symbol_table=context.symbol_table, library_namespace=library_namespace
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "enhancing.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the header of the enhancing C++ code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Iteration
-    code, errors = cpp_iteration.generate_header(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the header of the C++ iteration "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "iteration.hpp",
+            lambda: cpp_lib.generate_iteration_header(
+                symbol_table=context.symbol_table, library_namespace=library_namespace
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "iteration.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header of the iteration C++ code " f"to {pth}"
+        ),
+        (
+            src_dir / "iteration.cpp",
+            lambda: cpp_lib.generate_iteration_implementation(
+                symbol_table=context.symbol_table, library_namespace=library_namespace
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_iteration.generate_implementation(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the C++ iteration "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "jsonization.hpp",
+            lambda: (
+                cpp_lib.generate_jsonization_header(
+                    symbol_table=verified_ir_table, library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "iteration.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ iteration " f"to {pth}"
+        ),
+        (
+            src_dir / "jsonization.cpp",
+            lambda: cpp_lib.generate_jsonization_implementation(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                library_namespace=library_namespace,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Jsonization
-    code = cpp_jsonization.generate_header(
-        symbol_table=verified_ir_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "jsonization.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header for the C++ jsonization code " f"to {pth}"
+        ),
+        (
+            include_dir / "pattern.hpp",
+            lambda: (
+                cpp_lib.generate_pattern_header(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_jsonization.generate_implementation(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        library_namespace=namespace,
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the C++ jsonization code "
-                f"based on {context.model_path}"
+        ),
+        (
+            src_dir / "pattern.cpp",
+            lambda: cpp_lib.generate_pattern_implementation(
+                symbol_table=context.symbol_table,
+                library_namespace=library_namespace,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "jsonization.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ jsonization code "
-                f"to {pth}"
+        ),
+        (
+            include_dir / "revm.hpp",
+            lambda: (
+                cpp_lib.generate_revm_header(library_namespace=library_namespace),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Pattern
-    code = cpp_pattern.generate_header(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "pattern.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(f"Failed to write the header for the C++ pattern code to {pth}"),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_pattern.generate_implementation(
-        symbol_table=context.symbol_table,
-        library_namespace=namespace,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the C++ pattern code "
-                f"based on {context.model_path}"
+        ),
+        (
+            src_dir / "revm.cpp",
+            lambda: (
+                cpp_lib.generate_revm_implementation(
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "pattern.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ pattern code to {pth}"
+        ),
+        (
+            include_dir / "stringification.hpp",
+            lambda: (
+                cpp_lib.generate_stringification_header(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region REVM
-    code = cpp_revm.generate_header(library_namespace=namespace)
-
-    pth = context.output_dir / "revm.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(f"Failed to write the header for the C++ REVM code to {pth}"),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code = cpp_revm.generate_implementation(
-        library_namespace=namespace,
-    )
-
-    pth = context.output_dir / "revm.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ REVM code to {pth}"
+        ),
+        (
+            src_dir / "stringification.cpp",
+            lambda: (
+                cpp_lib.generate_stringification_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Stringification
-    code = cpp_stringification.generate_header(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "stringification.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header of the stringification C++ code "
-                f"to {pth}"
+        ),
+        (
+            include_dir / "types.hpp",
+            lambda: cpp_lib.generate_types_header(
+                symbol_table=verified_ir_table,
+                library_namespace=library_namespace,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code = cpp_stringification.generate_implementation(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "stringification.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the stringification C++ code "
-                f"to {pth}"
+        ),
+        (
+            src_dir / "types.cpp",
+            lambda: cpp_lib.generate_types_implementation(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                library_namespace=library_namespace,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Types
-    code, errors = cpp_structure.generate_header(
-        symbol_table=verified_ir_table,
-        spec_impls=context.spec_impls,
-        library_namespace=namespace,
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the header for the C++ data structures "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "verification.hpp",
+            lambda: cpp_lib.generate_verification_header(
+                symbol_table=verified_ir_table,
+                spec_impls=context.spec_impls,
+                library_namespace=library_namespace,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "types.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header for the C++ data structures " f"to {pth}"
+        ),
+        (
+            src_dir / "verification.cpp",
+            lambda: cpp_lib.generate_verification_implementation(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                library_namespace=library_namespace,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_structure.generate_implementation(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        library_namespace=namespace,
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the C++ data structures "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "visitation.hpp",
+            lambda: (
+                cpp_lib.generate_visitation_header(
+                    symbol_table=verified_ir_table, library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "types.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ data structures "
-                f"to {pth}"
+        ),
+        (
+            src_dir / "visitation.cpp",
+            lambda: (
+                cpp_lib.generate_visitation_implementation(
+                    symbol_table=verified_ir_table, library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Verification
-    code, errors = cpp_verification.generate_header(
-        symbol_table=verified_ir_table,
-        spec_impls=context.spec_impls,
-        library_namespace=namespace,
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the header for the C++ verification code "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "wstringification.hpp",
+            lambda: (
+                cpp_lib.generate_wstringification_header(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "verification.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header for the C++ verification code " f"to {pth}"
+        ),
+        (
+            src_dir / "wstringification.cpp",
+            lambda: (
+                cpp_lib.generate_wstringification_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_verification.generate_implementation(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        library_namespace=namespace,
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the C++ verification code "
-                f"based on {context.model_path}"
+        ),
+        (
+            include_dir / "xmlization.hpp",
+            lambda: (
+                cpp_lib.generate_xmlization_header(
+                    symbol_table=verified_ir_table, library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "verification.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ verification code "
-                f"to {pth}"
+        ),
+        (
+            src_dir / "xmlization.cpp",
+            lambda: cpp_lib.generate_xmlization_implementation(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+                library_namespace=library_namespace,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Visitation
-    pth = context.output_dir / "visitation.hpp"
-    try:
-        pth.write_text(
-            cpp_visitation.generate_header(
-                symbol_table=verified_ir_table, library_namespace=namespace
+        ),
+        (
+            test_dir / "common.hpp",
+            lambda: (
+                cpp_tests.generate_common_header(library_namespace=library_namespace),
+                None,
             ),
-            encoding="utf-8",
-        )
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the header of the visitation C++ code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    pth = context.output_dir / "visitation.cpp"
-    try:
-        pth.write_text(
-            cpp_visitation.generate_implementation(
-                symbol_table=verified_ir_table, library_namespace=namespace
+        ),
+        (
+            test_dir / "common.cpp",
+            lambda: (
+                cpp_tests.generate_common_implementation(
+                    library_namespace=library_namespace
+                ),
+                None,
             ),
-            encoding="utf-8",
-        )
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the visitation C++ code "
-                f"to {pth}"
+        ),
+        (
+            test_dir / "common_examples.hpp",
+            lambda: (
+                cpp_tests.generate_common_examples_header(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Xmlization
-    code = cpp_xmlization.generate_header(
-        symbol_table=verified_ir_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "xmlization.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header for the C++ xmlization code " f"to {pth}"
+        ),
+        (
+            test_dir / "common_examples.cpp",
+            lambda: (
+                cpp_tests.generate_common_examples_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code, errors = cpp_xmlization.generate_implementation(
-        symbol_table=context.symbol_table,
-        spec_impls=context.spec_impls,
-        library_namespace=namespace,
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=(
-                f"Failed to generate the implementation of the C++ xmlization code "
-                f"based on {context.model_path}"
+        ),
+        (
+            test_dir / "common_jsonization.hpp",
+            lambda: (
+                cpp_tests.generate_common_jsonization_header(
+                    library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-    assert code is not None
-
-    pth = context.output_dir / "xmlization.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the C++ xmlization code "
-                f"to {pth}"
+        ),
+        (
+            test_dir / "common_jsonization.cpp",
+            lambda: (
+                cpp_tests.generate_common_jsonization_implementation(
+                    library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
-
-    # region Wstringification
-    code = cpp_wstringification.generate_header(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "wstringification.hpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the header of the wstringification C++ code "
-                f"to {pth}"
+        ),
+        (
+            test_dir / "common_xmlization.hpp",
+            lambda: (
+                cpp_tests.generate_common_xmlization_header(
+                    library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    code = cpp_wstringification.generate_implementation(
-        symbol_table=context.symbol_table, library_namespace=namespace
-    )
-
-    pth = context.output_dir / "wstringification.cpp"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=(
-                f"Failed to write the implementation of the wstringification C++ code "
-                f"to {pth}"
+        ),
+        (
+            test_dir / "common_xmlization.cpp",
+            lambda: (
+                cpp_tests.generate_common_xmlization_implementation(
+                    library_namespace=library_namespace
+                ),
+                None,
             ),
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-    # endregion
+        ),
+        (
+            test_dir / "test_descent_and_descent_once.cpp",
+            lambda: (
+                cpp_tests.generate_test_descent_and_descent_once_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_jsonization_dispatch.cpp",
+            lambda: (
+                cpp_tests.generate_test_jsonization_dispatch_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_jsonization_of_concrete_classes.cpp",
+            lambda: (
+                cpp_tests.generate_test_jsonization_of_concrete_classes_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_revm.cpp",
+            lambda: (
+                cpp_tests.generate_test_revm_implementation(
+                    library_namespace=library_namespace
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_stringification_base64.cpp",
+            lambda: (
+                cpp_tests.generate_test_stringification_base64_implementation(
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_stringification_of_enums.cpp",
+            lambda: (
+                cpp_tests.generate_test_stringification_of_enums_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_verification.cpp",
+            lambda: (
+                cpp_tests.generate_test_verification_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_wstringification_of_enums.cpp",
+            lambda: (
+                cpp_tests.generate_test_wstringification_of_enums_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_xmlization_dispatch.cpp",
+            lambda: (
+                cpp_tests.generate_test_xmlization_dispatch_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_xmlization_of_concrete_classes.cpp",
+            lambda: (
+                cpp_tests.generate_test_xmlization_of_concrete_classes_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "test_x_or_default.cpp",
+            lambda: (
+                cpp_tests.generate_test_x_or_default_implementation(
+                    symbol_table=context.symbol_table,
+                    library_namespace=library_namespace,
+                ),
+                None,
+            ),
+        ),
+    ]
+
+    for rel_path, generator_func in rel_paths_generators:
+        assert not rel_path.is_absolute()
+
+        code, errors = generator_func()
+
+        if errors is not None:
+            run.write_error_report(
+                message=f"Failed to generate {rel_path} "
+                f"based on {context.model_path}",
+                errors=[
+                    context.lineno_columner.error_message(error) for error in errors
+                ],
+                stderr=stderr,
+            )
+            return 1
+
+        assert code is not None
+
+        pth = context.output_dir / rel_path
+
+        try:
+            pth.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to create the directory {pth.parent}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
+
+        try:
+            pth.write_text(code, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0

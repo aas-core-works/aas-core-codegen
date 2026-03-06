@@ -93,7 +93,7 @@ def _determine_which_to_wstring(
         )
 
 
-# NOTE (mristin, 2023-07-01):
+# NOTE (mristin):
 # We have to implement a very similar function for generating type annotations to
 # ``aas_core_codegen.cpp.common.generate_type`` since we can not simply pass
 # ``intermediate_type_inference.TypeAnnotationUnion`` to
@@ -122,7 +122,7 @@ def generate_type(
 
     If ``types_namespace`` is specified, it is prepended to all our types.
 
-    (mristin, 2023-07-01): We do not handle all the type annotations from
+    (mristin): We do not handle all the type annotations from
     :py:mod:`aas_core_codegen.intermediate.type_inference` as that would be
     YAGNI (*e.g.*, verification functions, built-in functions *etc.*).
     If we do not know how to generate the type in C++, we return an error message.
@@ -146,7 +146,7 @@ def generate_type(
         elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            # NOTE (mristin, 2023-07-01):
+            # NOTE (mristin):
             # We always refer to interfaces even in cases of concrete classes without
             # concrete descendants since we want to allow enhancing.
             interface_name = cpp_naming.interface_name(our_type.name)
@@ -191,7 +191,7 @@ def generate_type(
 
     else:
         return None, (
-            f"(mristin, 2023-06-01): We do not handle "
+            f"(mristin): We do not handle "
             f"the type annotation {type_annotation} from "
             "aas_core_codegen.intermediate.type_inference as that was, "
             "at this time point, YAGNI (*e.g.*, verification functions, "
@@ -208,7 +208,7 @@ def determine_whether_referencable(
     """
     Return ``True`` if the type annotation denotes a referencable value.
 
-    (mristin, 2023-10-19): We do not handle all the type annotations from
+    (mristin): We do not handle all the type annotations from
     :py:mod:`aas_core_codegen.intermediate.type_inference` as that would be
     YAGNI (*e.g.*, verification functions, built-in functions *etc.*).
     If we do not know how to generate the type in C++, we return an error message.
@@ -240,7 +240,7 @@ def determine_whether_referencable(
 
     else:
         return None, (
-            f"(mristin, 2023-06-01): We do not handle "
+            f"(mristin): We do not handle "
             f"the type annotation {type_annotation} from "
             "aas_core_codegen.intermediate.type_inference as that was, "
             "at this time point, YAGNI (*e.g.*, verification functions, "
@@ -261,7 +261,7 @@ def generate_type_with_const_ref_if_applicable(
 
     If ``types_namespace`` is specified, it is prepended to all our types.
 
-    (mristin, 2023-10-19): We do not handle all the type annotations from
+    (mristin): We do not handle all the type annotations from
     :py:mod:`aas_core_codegen.intermediate.type_inference` as that would be
     YAGNI (*e.g.*, verification functions, built-in functions *etc.*).
     If we do not know how to generate the type in C++, we return an error message.
@@ -322,7 +322,7 @@ class Transpiler(
         )
         self._types_namespace = types_namespace
 
-        # NOTE (mristin, 2023-06-30):
+        # NOTE (mristin):
         # Keep track whenever we define a variable name, so that we can know how to
         # resolve it as a name in the C++ code.
         #
@@ -391,7 +391,7 @@ class Transpiler(
         if isinstance(
             instance_type_beneath, intermediate_type_inference.OurTypeAnnotation
         ) and isinstance(instance_type_beneath.our_type, intermediate.Enumeration):
-            # NOTE (mristin, 2023-06-30):
+            # NOTE (mristin):
             # This member denotes an enumeration literal of an enumeration.
             # In C++, enumeration literals are mere constants. Hence, we can not
             # "de-reference" the enumeration literals from an enumeration, but
@@ -427,7 +427,7 @@ class Transpiler(
             intermediate_type_inference.EnumerationAsTypeTypeAnnotation,
         ):
             if node.name in instance_type_beneath.enumeration.literals_by_name:
-                # NOTE (mristin, 2023-06-30):
+                # NOTE (mristin):
                 # The member denotes an enumeration literal of an enumeration.
                 # In C++, enumeration literals are mere constants. Hence, we can not
                 # "de-reference" the enumeration literals from an enumeration, but
@@ -714,7 +714,7 @@ common::{contains_function}(
                 node.original_node, "Failed to transpile the function call", errors
             )
 
-        # NOTE (mristin, 2023-06-30):
+        # NOTE (mristin):
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
         # have to test for argument arity here.
@@ -923,7 +923,7 @@ common::{contains_function}(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (mristin, 2023-06-30):
+                # NOTE (mristin):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into C++ code. However, at this
                 # point, we lack time for more sophisticated reformatting approaches.
@@ -1049,7 +1049,7 @@ common::{contains_function}(
             text = "".join(node.values)  # type: ignore
             return cpp_common.wstring_literal(text), None
 
-        # NOTE (mristin, 2023-06-30):
+        # NOTE (mristin):
         # We need the interpolation if we got so far.
 
         args = []  # type: List[str]
@@ -1210,7 +1210,7 @@ common::{concat}(
             else:
                 source = iteration
 
-            # NOTE (mristin, 2023-07-01):
+            # NOTE (mristin):
             # We implicitly capture all the variables by reference,
             # see: https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture.
 
@@ -1278,7 +1278,7 @@ common::{qualifier_function}(
         if isinstance(node.target, parse_tree.Name):
             target_type = self._environment.find(identifier=node.target.identifier)
             if target_type is None:
-                # NOTE (mristin, 2023-07-01):
+                # NOTE (mristin):
                 # This is a variable definition as we did not specify the identifier
                 # in the environment.
 
@@ -1323,7 +1323,7 @@ common::{qualifier_function}(
         ):
             value, error = self._transform_and_value_if_necessary(node.value)
         else:
-            # NOTE (mristin, 2023-07-01):
+            # NOTE (mristin):
             # This is the case covering (target non-optional, value non-optional) and
             # (target optional, value non-optional).
             value, error = self.transform(node.value)
@@ -1334,7 +1334,7 @@ common::{qualifier_function}(
 
         maybe_definition_prefix = "" if not is_definition else "auto "
 
-        # NOTE (mristin, 2022-07-12):
+        # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
         if "\n" in value or len(value) > 50:
@@ -1362,7 +1362,7 @@ common::{qualifier_function}(
 
         assert value is not None
 
-        # NOTE (mristin, 2023-06-30):
+        # NOTE (mristin):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
         if "\n" in value or len(value) > 50:

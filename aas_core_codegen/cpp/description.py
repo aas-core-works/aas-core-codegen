@@ -95,7 +95,7 @@ class _IsSingleParagrapher(intermediate_doc.DocutilsElementTransformer[bool]):
         self, children: Sequence[docutils.nodes.Element]
     ) -> bool:
         for child in children:
-            # NOTE (mristin, 2023-06-28):
+            # NOTE (mristin):
             # We have to handle ``docutils.nodes.paragraph`` differently,
             # outside ``transform``, as a single paragraph with non-block children
             # is still OK.
@@ -200,7 +200,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 element.our_type,
                 (intermediate.AbstractClass, intermediate.ConcreteClass),
             ):
-                # NOTE (mristin, 2023-06-28):
+                # NOTE (mristin):
                 # We always refer to interfaces even in cases of concrete classes without
                 # concrete descendants since we want to allow enhancing.
                 name = cpp_naming.interface_name(element.our_type.name)
@@ -214,7 +214,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 result = f"{cpp_common.TYPES_NAMESPACE}::{name}"
 
         elif isinstance(element.our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin, 2022-09-08):
+            # NOTE (mristin):
             # We do not generate a class for constrained primitives, but we
             # leave it here as a literal.
 
@@ -286,7 +286,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
     def transform_literal(
         self, element: docutils.nodes.literal
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        # NOTE (mristin, 2023-06-28):
+        # NOTE (mristin):
         # We fail here catastrophically if there are backticks as there is no easy way
         # to escape them in doxygen. However, since our meta-model is written in
         # Python, this assertion will almost always pass as we can not escape backticks
@@ -387,7 +387,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
             writer.write("* ")
 
-            # NOTE (mristin, 2023-06-28):
+            # NOTE (mristin):
             # This has a potentially exponential complexity w.r.t. indention level.
             # However, as the indention level is thus far limited to only a single
             # level, we ignore this pitfall for the moment.
