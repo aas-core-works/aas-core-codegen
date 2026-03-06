@@ -1,4 +1,4 @@
-"""Generate Golang code for enhancing model classes."""
+"""Generate code for wrapping model classes with custom enhancements."""
 
 import io
 from typing import Tuple, Optional, List, Sequence
@@ -24,7 +24,7 @@ from aas_core_codegen.cpp.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 def _generate_wrap_forward_declarations(
     symbol_table: intermediate.SymbolTable,
@@ -377,6 +377,7 @@ that->{setter_name}(
 );"""
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert isinstance(
@@ -431,6 +432,7 @@ that->{setter_name}(
 }}"""
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
 
@@ -503,6 +505,7 @@ if (that->{getter_name}().has_value()) {{
 }}"""
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert isinstance(
@@ -556,6 +559,7 @@ if (that->{getter_name}().has_value()) {{
 }}"""
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
 
@@ -882,7 +886,7 @@ def generate_header(
     symbol_table: intermediate.SymbolTable,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ code for wrapping model classes with custom enhancements."""
+    """Generate header for wrapping model classes with custom enhancements."""
     namespace = Stripped(f"{library_namespace}::enhancing")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -991,3 +995,10 @@ void AssertNotEnhanced(
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)

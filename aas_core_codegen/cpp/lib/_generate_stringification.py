@@ -1,4 +1,4 @@
-"""Generate C++ code to de/stringify enumerations and primitives."""
+"""Generate code to de/stringify enumerations and primitives."""
 
 import io
 from typing import List
@@ -19,7 +19,7 @@ from aas_core_codegen.cpp.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 def _generate_model_type_from_string_definition() -> List[Stripped]:
     """Generate the definition of translation of a model type from string."""
@@ -831,7 +831,7 @@ common::expected<
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ header code for stringification."""
+    """Generate header to de/stringify enumerations and primitives."""
     namespace = Stripped(f"{library_namespace}::stringification")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -905,7 +905,7 @@ namespace stringification {"""
 def generate_implementation(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ code for stringification."""
+    """Generate implementation to de/stringify enumerations and primitives."""
     namespace = Stripped(f"{library_namespace}::stringification")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -953,3 +953,14 @@ def generate_implementation(
     writer.write("\n")
 
     return writer.getvalue()
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

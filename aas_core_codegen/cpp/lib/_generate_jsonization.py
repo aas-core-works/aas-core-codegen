@@ -1,4 +1,4 @@
-"""Generate C++ code for de/serialization of instances from JSON."""
+"""Generate code for de/serialization of instances from and to JSON."""
 
 import io
 import itertools
@@ -22,6 +22,7 @@ from aas_core_codegen.cpp.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 
 def _generate_deserialization_definitions(
@@ -69,7 +70,7 @@ common::expected<
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ header code for JSON de/serialization."""
+    """Generate header for de/serialization of instances from and to JSON."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.JSONIZATION_NAMESPACE}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -1298,6 +1299,7 @@ def _generate_deserialize_property(
             code = _generate_deserialize_instance_property(prop=prop, ok_type=ok_type)
 
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert isinstance(
@@ -1313,6 +1315,7 @@ def _generate_deserialize_property(
 
         code = _generate_deserialize_list_property(prop=prop, ok_type=ok_type)
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -2099,7 +2102,6 @@ result[{json_prop_name_literal}] = {getter_expr};"""
         )
 
     elif primitive_type is intermediate.PrimitiveType.STR:
-        serialized_var = cpp_naming.variable_name(Identifier(f"json_{property_name}"))
         return Stripped(
             f"""\
 result[{json_prop_name_literal}] = SerializeWstring(
@@ -2115,6 +2117,7 @@ result[{json_prop_name_literal}] = stringification::Base64Encode(
 );"""
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(primitive_type)
 
 
@@ -2190,6 +2193,7 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
 );"""
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert isinstance(
@@ -2266,6 +2270,7 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
 );"""
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
     assert code is not None
@@ -2479,7 +2484,7 @@ def generate_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ implementation of the de/serialization functions."""
+    """Generate implementation for de/serialization of instances from and to JSON."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.JSONIZATION_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -2617,3 +2622,14 @@ struct SerializationError {{
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

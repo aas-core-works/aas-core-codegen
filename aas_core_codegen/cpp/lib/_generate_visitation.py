@@ -1,4 +1,4 @@
-"""Generate C++ visitors to iterate over instances."""
+"""Generate code of visitors to iterate over instances."""
 
 import io
 from typing import (
@@ -25,7 +25,7 @@ from aas_core_codegen.cpp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 # region Generation
 
@@ -151,7 +151,7 @@ class PassThroughVisitor
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ header code of the visitors."""
+    """Generate header of visitors to iterate over instances."""
     namespace = Stripped(f"{library_namespace}::visitation")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -339,6 +339,7 @@ Visit(
 );"""
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert isinstance(
@@ -368,6 +369,7 @@ for (
         )
 
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
     if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -475,7 +477,7 @@ void PassThroughVisitor::{method_name}(
 def generate_implementation(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ implementation code of the visitors."""
+    """Generate implementation of visitors to iterate over instances."""
     namespace = Stripped(f"{library_namespace}::visitation")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -519,3 +521,14 @@ def generate_implementation(
 
 
 # endregion
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

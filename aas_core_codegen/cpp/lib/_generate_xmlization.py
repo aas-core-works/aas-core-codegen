@@ -1,4 +1,4 @@
-"""Generate C++ code for de/serialization of instances from XML."""
+"""Generate code for de/serialization of instances from XML."""
 
 import io
 from typing import List, Tuple, Optional, Sequence
@@ -23,7 +23,7 @@ from aas_core_codegen.cpp.common import (
     INDENT6 as IIIIII,
     INDENT7 as IIIIIII,
 )
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 def _generate_deserialize_definitions(
     symbol_table: intermediate.SymbolTable,
@@ -88,7 +88,7 @@ common::expected<
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ header code for JSON de/serialization."""
+    """Generate header for de/serialization of instances from XML."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XMLIZATION_NAMESPACE}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -5134,7 +5134,7 @@ def generate_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ implementation of the de/serialization functions."""
+    """Generate implementation for de/serialization of instances from XML."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XMLIZATION_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -5371,3 +5371,14 @@ common::optional<SerializationError> CheckOstreamState(
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

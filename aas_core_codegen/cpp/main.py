@@ -4,35 +4,15 @@ from typing import TextIO
 from aas_core_codegen import run, intermediate, specific_implementations
 from aas_core_codegen.common import Stripped
 from aas_core_codegen.cpp import (
-    aas_common as cpp_aas_common,
-    constants as cpp_constants,
-    enhancing as cpp_enhancing,
-    iteration as cpp_iteration,
-    jsonization as cpp_jsonization,
-    pattern as cpp_pattern,
-    revm as cpp_revm,
-    stringification as cpp_stringification,
-    structure as cpp_structure,
-    verification as cpp_verification,
-    visitation as cpp_visitation,
-    xmlization as cpp_xmlization,
-    wstringification as cpp_wstringification,
+    lib as cpp_lib
 )
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
-    verified_ir_table, errors = cpp_structure.verify(symbol_table=context.symbol_table)
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to verify the intermediate symbol table "
-            f"for generation of C++ code"
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+    verified_ir_table, errors = cpp_lib.verify_for_types(
+        symbol_table=context.symbol_table
+    )
 
     assert verified_ir_table is not None
 
@@ -94,6 +74,10 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             f"Failed to create the output directory {context.output_dir}: {exception}"
         )
         return 1
+
+    # TODO: continue here -- generate all the files src_dir and include_dir
+    src_dir = context.output_dir / "src"
+    include_dir = context.output_dir / "include"
 
     # region Common
     pth = context.output_dir / "common.hpp"

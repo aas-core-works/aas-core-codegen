@@ -1,4 +1,5 @@
-"""Generate the C++ data structures from the intermediate representation."""
+"""Generate code of the data structures representing the meta-model."""
+
 import io
 import itertools
 import textwrap
@@ -34,7 +35,7 @@ from aas_core_codegen.cpp.common import (
     INDENT4 as IIII,
 )
 from aas_core_codegen.intermediate import construction as intermediate_construction
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 # region Checks
 
@@ -70,6 +71,7 @@ def _human_readable_identifier(
     elif isinstance(something, intermediate.ConcreteClass):
         result = f"meta-model concrete class {something.name!r}"
     else:
+        # noinspection PyTypeChecker
         assert_never(something)
 
     return result
@@ -188,6 +190,7 @@ def _verify_intra_structure_collisions(
                 )
 
     else:
+        # noinspection PyTypeChecker
         assert_never(our_type)
 
     if len(errors) > 0:
@@ -219,6 +222,7 @@ def _verify_structure_name_collisions(
 
     # region Inter-structure collisions
 
+    # noinspection PyTypeChecker
     for enum_or_cls in itertools.chain(symbol_table.enumerations, symbol_table.classes):
         names: List[Identifier]
 
@@ -232,6 +236,7 @@ def _verify_structure_name_collisions(
                 cpp_naming.class_name(enum_or_cls.name),
             ]
         else:
+            # noinspection PyTypeChecker
             assert_never(enum_or_cls)
 
         for name in names:
@@ -601,6 +606,7 @@ virtual void {setter_name}(
         if method.specified_for is not cls:
             continue
 
+        # noinspection PyTypeChecker
         returns = (
             cpp_common.generate_type(method.returns)
             if method.returns is not None
@@ -817,6 +823,7 @@ void {setter_name}(
         public_members.append(Stripped("// endregion"))
 
     for method in cls.methods:
+        # noinspection PyTypeChecker
         returns = (
             cpp_common.generate_type(method.returns)
             if method.returns is not None
@@ -930,10 +937,9 @@ bool {function_name}(
 # fmt: on
 def generate_header(
     symbol_table: VerifiedIntermediateSymbolTable,
-    spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ header code of the structures based on the symbol table."""
+    """Generate header of the data structures representing the meta-model."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.TYPES_NAMESPACE}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -1114,6 +1120,7 @@ if ({arg_name}.has_value()) {{
                     )
                 )
             else:
+                # noinspection PyTypeChecker
                 assert_never(stmt.default)
 
         else:
@@ -1269,6 +1276,7 @@ def _generate_method_implementation(
             "the developers if you need this feature.",
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(method)
 
     assert body is not None
@@ -1428,7 +1436,7 @@ def generate_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ implementation code for data structure."""
+    """Generate implementation of the data structures representing the meta-model."""
     namespace = Stripped(f"{library_namespace}::types")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -1501,3 +1509,14 @@ def generate_implementation(
 
 
 # endregion
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

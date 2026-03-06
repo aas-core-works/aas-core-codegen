@@ -1,4 +1,4 @@
-"""Generate C++ code of common functions by including the code directly."""
+"""Generate code of common functions used across other modules."""
 
 # pylint: disable=line-too-long
 
@@ -20,6 +20,7 @@ from aas_core_codegen.cpp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 
 def _generate_concatenate_definitions_for_2_parts_and_above() -> List[Stripped]:
@@ -151,7 +152,7 @@ def _generate_concatenate_implementations_for_2_parts_and_above() -> List[Stripp
 )
 # fmt: on
 def generate_header(library_namespace: Stripped) -> str:
-    """Generate the C++ header code for common functions."""
+    """Generate header of common functions used across other modules."""
     namespace = Stripped(f"{library_namespace}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -216,13 +217,16 @@ std::unique_ptr<T> make_unique(
 #include <utility>
 #pragma warning(pop)
 
+// NOTE (mristin):
 // See: https://stackoverflow.com/questions/2324658/how-to-determine-the-version-of-the-c-standard-used-by-the-compiler
 #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
+// NOTE (mristin):
 // Standard library provides std::optional in C++17 and above.
 #pragma warning(push, 0)
 #include <optional>
 #pragma warning(pop)
 #else
+// NOTE (mristin):
 // We rely on https://github.com/TartanLlama/optional for optional structure.
 #pragma warning(push, 0)
 #include <tl/optional.hpp>
@@ -240,6 +244,7 @@ std::unique_ptr<T> make_unique(
 #include <expected>
 #pragma warning(pop)
 #else
+// NOTE (mristin):
 // We rely on https://github.com/TartanLlama/expected for expected structure.
 #pragma warning(push, 0)
 #include <tl/expected.hpp>
@@ -482,7 +487,7 @@ std::wstring Utf8ToWstring(const std::string& utf8_text);"""
 )
 # fmt: on
 def generate_implementation(library_namespace: Stripped) -> str:
-    """Generate the C++ code for common functions."""
+    """Generate implementation of common functions used across other modules."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.COMMON_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -711,3 +716,13 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
     writer.write("\n")
 
     return writer.getvalue()
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

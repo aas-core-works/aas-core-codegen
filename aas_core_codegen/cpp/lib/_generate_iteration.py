@@ -1,4 +1,4 @@
-"""Generate the C++ functions to iterate over instances."""
+"""Generate code of functions to iterate over instances."""
 
 import io
 from typing import (
@@ -35,7 +35,7 @@ from aas_core_codegen.cpp.common import (
 )
 from aas_core_codegen.intermediate import construction as intermediate_construction
 from aas_core_codegen.yielding import flow as yielding_flow
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 # region Check
 
@@ -149,7 +149,7 @@ enum class {property_enum} : std::uint32_t {{
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ header code of the iteration functions and structures."""
+    """Generate header of functions to iterate over instances."""
     collision_errors = _verify_that_property_enum_literals_do_not_collide(
         symbol_table=symbol_table
     )
@@ -1980,6 +1980,7 @@ if ({arg_name}.has_value()) {{
                     )
                 )
             else:
+                # noinspection PyTypeChecker
                 assert_never(stmt.default)
 
         else:
@@ -2233,7 +2234,7 @@ const std::vector<types::{enum_name}> {over_enum} = {{
 def generate_implementation(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ implementation of the iteration functions and structures."""
+    """Generate implementation of functions to iterate over instances."""
     namespace = Stripped(f"{library_namespace}::iteration")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -2330,3 +2331,13 @@ def generate_implementation(
 
 
 # endregion
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

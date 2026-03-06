@@ -1,4 +1,4 @@
-"""Generate the C++ verification functions."""
+"""Generate code of verification logic."""
 import io
 from typing import (
     Optional,
@@ -39,9 +39,8 @@ from aas_core_codegen.cpp.common import (
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.yielding import flow as yielding_flow
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
-
-# region Generation
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -209,7 +208,7 @@ def generate_header(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ header for the verification code."""
+    """Generate header of verification logic."""
     namespace = Stripped(f"{library_namespace}::verification")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -2871,7 +2870,7 @@ def generate_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ implementation of the verification code.."""
+    """Generate implementation of verification logic."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.VERIFICATION_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -3070,4 +3069,12 @@ def generate_implementation(
     return writer.getvalue(), None
 
 
-# endregion
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

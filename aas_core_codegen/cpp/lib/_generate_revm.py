@@ -1,4 +1,4 @@
-"""Generate C++ code of a virtual machine for matching regular expressions."""
+"""Generate code of a virtual machine for matching regular expressions."""
 
 import io
 
@@ -18,7 +18,7 @@ from aas_core_codegen.cpp.common import (
     INDENT7 as IIIIIII,
     INDENT8 as IIIIIIII,
 )
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 # fmt: off
 @ensure(
@@ -28,7 +28,7 @@ from aas_core_codegen.cpp.common import (
 )
 # fmt: on
 def generate_header(library_namespace: Stripped) -> str:
-    """Generate the C++ header of a virtual machine for matching regexes."""
+    """Generate header of a virtual machine for matching regular expressions."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.REVM_NAMESPACE}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -271,7 +271,7 @@ bool Match(
 def generate_implementation(
     library_namespace: Stripped,
 ) -> str:
-    """Generate the C++ implementation of a virtual machine for matching regexes."""
+    """Generate implementation of a virtual machine for matching regular expressions."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.REVM_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -1147,3 +1147,15 @@ bool Match(
     writer.write("\n")
 
     return writer.getvalue()
+
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)

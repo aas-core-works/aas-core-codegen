@@ -1,4 +1,4 @@
-"""Generate C++ code of a virtual machine for matching regular expressions."""
+"""Generate code to specify regular expressions."""
 import io
 from typing import Tuple, Optional, Union, List, Mapping, TextIO
 
@@ -20,7 +20,7 @@ from aas_core_codegen.cpp.common import (
 )
 from aas_core_codegen.intermediate import revm as intermediate_revm
 from aas_core_codegen.parse import retree as parse_retree, tree as parse_tree
-
+from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 # fmt: off
 @ensure(
@@ -32,7 +32,7 @@ from aas_core_codegen.parse import retree as parse_retree, tree as parse_tree
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate the C++ header of a virtual machine for matching regexes."""
+    """Generate header to specify regular expressions."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.PATTERN_NAMESPACE}")
 
     fully_qualified_match_function = Stripped(
@@ -225,6 +225,7 @@ program.emplace_back({maybe_label_comment}
             ):
                 instruction_cls = Stripped("InstructionNotSet")
             else:
+                # noinspection PyTypeChecker
                 assert_never(node_or_leaf.instruction)
 
             instruction_code = Stripped(
@@ -281,6 +282,7 @@ program.emplace_back({maybe_label_comment}
             )
 
         else:
+            # noinspection PyTypeChecker
             assert_never(node_or_leaf.instruction)
 
         writer.write(
@@ -316,6 +318,7 @@ program.emplace_back({maybe_label_comment}
 
             writer.write(f"{whitespace}}}  {re_node_comment}")
     else:
+        # noinspection PyTypeChecker
         assert_never(node_or_leaf)
 
 
@@ -440,7 +443,7 @@ def generate_implementation(
     symbol_table: intermediate.SymbolTable,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the C++ implementation of a virtual machine for matching regexes."""
+    """Generate implementation to specify regular expressions."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.PATTERN_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -507,3 +510,14 @@ const std::vector<
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate_header.__doc__ is not None
+cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+    module_doc=__doc__,
+    generate_header_doc=generate_header.__doc__
+)
+cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+    module_doc=__doc__,
+    generate_implementation_doc=generate_implementation.__doc__
+)
