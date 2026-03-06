@@ -23,7 +23,6 @@ generate_constants_header = _generate_constants.generate_header
 generate_constants_implementation = _generate_constants.generate_implementation
 
 generate_enhancing_header = _generate_enhancing.generate_header
-generate_enhancing_implementation = _generate_enhancing.generate_implementation
 
 generate_iteration_header = _generate_iteration.generate_header
 generate_iteration_implementation = _generate_iteration.generate_implementation
@@ -38,7 +37,9 @@ generate_revm_header = _generate_revm.generate_header
 generate_revm_implementation = _generate_revm.generate_implementation
 
 generate_stringification_header = _generate_stringification.generate_header
-generate_stringification_implementation = _generate_stringification.generate_implementation
+generate_stringification_implementation = (
+    _generate_stringification.generate_implementation
+)
 
 generate_types_header = _generate_types.generate_header
 generate_types_implementation = _generate_types.generate_implementation
@@ -50,7 +51,9 @@ generate_visitation_header = _generate_visitation.generate_header
 generate_visitation_implementation = _generate_visitation.generate_implementation
 
 generate_wstringification_header = _generate_wstringification.generate_header
-generate_wstringification_implementation = _generate_wstringification.generate_implementation
+generate_wstringification_implementation = (
+    _generate_wstringification.generate_implementation
+)
 
 generate_xmlization_header = _generate_xmlization.generate_header
 generate_xmlization_implementation = _generate_xmlization.generate_implementation

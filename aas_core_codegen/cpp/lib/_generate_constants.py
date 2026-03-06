@@ -28,8 +28,8 @@ from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 
 def _generate_documentation_comment_for_constant(
-        description: intermediate.DescriptionOfConstant,
-        context: cpp_description.Context,
+    description: intermediate.DescriptionOfConstant,
+    context: cpp_description.Context,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given constant."""
     # fmt: off
@@ -50,7 +50,7 @@ def _generate_documentation_comment_for_constant(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_primitive_definition(
-        constant: intermediate.ConstantPrimitive,
+    constant: intermediate.ConstantPrimitive,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant primitive."""
     writer = io.StringIO()
@@ -99,7 +99,7 @@ def _generate_constant_primitive_definition(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_primitive_implementation(
-        constant: intermediate.ConstantPrimitive,
+    constant: intermediate.ConstantPrimitive,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the implementation of a constant primitive."""
     constant_name = cpp_naming.constant_name(constant.name)
@@ -113,7 +113,7 @@ def _generate_constant_primitive_implementation(
     elif constant.a_type is intermediate.PrimitiveType.INT:
         assert isinstance(constant.value, int)
 
-        if constant.value > 2 ** 63 - 1 or constant.value < -(2 ** 63):
+        if constant.value > 2**63 - 1 or constant.value < -(2**63):
             return None, Error(
                 constant.parsed.node,
                 f"The value of the constant {constant.name!r} overflows "
@@ -169,7 +169,7 @@ const std::vector<std::uint_8> {constant_name} = (
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_primitives_definition(
-        constant: intermediate.ConstantSetOfPrimitives,
+    constant: intermediate.ConstantSetOfPrimitives,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant set of primitives."""
     errors = []  # type: List[Error]
@@ -229,7 +229,7 @@ extern const {set_type} {constant_name};"""
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_primitives_implementation(
-        constant: intermediate.ConstantSetOfPrimitives,
+    constant: intermediate.ConstantSetOfPrimitives,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the implementation of a constant set of primitives."""
     literal_codes = []  # type: List[str]
@@ -301,7 +301,7 @@ const {set_type} {constant_name} = {{
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_enumeration_literals_definition(
-        constant: intermediate.ConstantSetOfEnumerationLiterals,
+    constant: intermediate.ConstantSetOfEnumerationLiterals,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant set of enumeration literals."""
     writer = io.StringIO()
@@ -337,7 +337,7 @@ def _generate_constant_set_of_enumeration_literals_definition(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_enumeration_literals_implementation(
-        constant: intermediate.ConstantSetOfEnumerationLiterals,
+    constant: intermediate.ConstantSetOfEnumerationLiterals,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant set of enumeration literals."""
 
@@ -373,8 +373,8 @@ const std::unordered_set<types::{enum_name}> {constant_name} = {{
 )
 # fmt: on
 def generate_header(
-        symbol_table: intermediate.SymbolTable,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate header of constants based on the constants of the meta-model."""
     errors = []  # type: List[Error]
@@ -484,8 +484,8 @@ struct HashBytes {{
 )
 # fmt: on
 def generate_implementation(
-        symbol_table: intermediate.SymbolTable,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate implementation of constants based on the constants of the meta-model."""
     errors = []  # type: List[Error]
@@ -571,10 +571,10 @@ std::size_t HashBytes::operator()(
 
 assert generate_header.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
-    module_doc=__doc__,
-    generate_header_doc=generate_header.__doc__
+    module_doc=__doc__, generate_header_doc=generate_header.__doc__
 )
+
+assert generate_implementation.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
-    module_doc=__doc__,
-    generate_implementation_doc=generate_implementation.__doc__
+    module_doc=__doc__, generate_implementation_doc=generate_implementation.__doc__
 )

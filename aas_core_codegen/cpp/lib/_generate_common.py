@@ -717,12 +717,13 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
 
     return writer.getvalue()
 
+
 assert generate_header.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
-    module_doc=__doc__,
-    generate_header_doc=generate_header.__doc__
+    module_doc=__doc__, generate_header_doc=generate_header.__doc__
 )
+
+assert generate_implementation.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
-    module_doc=__doc__,
-    generate_implementation_doc=generate_implementation.__doc__
+    module_doc=__doc__, generate_implementation_doc=generate_implementation.__doc__
 )

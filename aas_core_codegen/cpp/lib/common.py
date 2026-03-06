@@ -2,8 +2,7 @@
 
 
 def assert_module_docstring_and_generate_header_consistent(
-        module_doc: str,
-        generate_header_doc: str
+    module_doc: str, generate_header_doc: str
 ) -> None:
     """Check that the two docstrings are consistent and raise an exception otherwise."""
     generate_code_text = "Generate code "
@@ -21,12 +20,10 @@ def assert_module_docstring_and_generate_header_consistent(
             f"but got: {generate_header_doc}"
         )
 
-    suffix_module_doc = module_doc[len(generate_code_text):]
-    suffix_generate_header_doc = generate_header_doc[
-        len(generate_header_text):
-    ]
+    suffix_module_doc = module_doc[len(generate_code_text) :]
+    suffix_generate_header_doc = generate_header_doc[len(generate_header_text) :]
 
-    if suffix_generate_header_doc.startswith(suffix_module_doc):
+    if not suffix_generate_header_doc.startswith(suffix_module_doc):
         raise ValueError(
             f"Expected the header generator docstring "
             f"to include the part of the module docstring, "
@@ -36,8 +33,7 @@ def assert_module_docstring_and_generate_header_consistent(
 
 
 def assert_module_docstring_and_generate_implementation_consistent(
-        module_doc: str,
-        generate_implementation_doc: str
+    module_doc: str, generate_implementation_doc: str
 ) -> None:
     """Check that the two docstrings are consistent and raise an exception otherwise."""
     generate_code_text = "Generate code "
@@ -55,12 +51,12 @@ def assert_module_docstring_and_generate_implementation_consistent(
             f"but got: {generate_implementation_doc}"
         )
 
-    suffix_module_doc = module_doc[len(generate_code_text):]
+    suffix_module_doc = module_doc[len(generate_code_text) :]
     suffix_generate_implementation_doc = generate_implementation_doc[
-        len(generate_implementation_text):
+        len(generate_implementation_text) :
     ]
 
-    if suffix_generate_implementation_doc.startswith(suffix_module_doc):
+    if not suffix_generate_implementation_doc.startswith(suffix_module_doc):
         raise ValueError(
             f"Expected the implementation generator docstring "
             f"to include the part of the module docstring, "

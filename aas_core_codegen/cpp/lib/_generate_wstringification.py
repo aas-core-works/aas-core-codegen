@@ -21,6 +21,7 @@ from aas_core_codegen.cpp.common import (
 )
 from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
+
 def _generate_model_type_from_wstring_definition() -> List[Stripped]:
     """Generate the definition of translation of a model type from wstring."""
     enum_name = cpp_naming.enum_name(Identifier("Model_type"))
@@ -588,10 +589,10 @@ def generate_implementation(
 
 assert generate_header.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
-    module_doc=__doc__,
-    generate_header_doc=generate_header.__doc__
+    module_doc=__doc__, generate_header_doc=generate_header.__doc__
 )
+
+assert generate_implementation.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
-    module_doc=__doc__,
-    generate_implementation_doc=generate_implementation.__doc__
+    module_doc=__doc__, generate_implementation_doc=generate_implementation.__doc__
 )

@@ -25,6 +25,7 @@ from aas_core_codegen.cpp.common import (
 )
 from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
+
 def _generate_deserialize_definitions(
     symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
@@ -3146,12 +3147,14 @@ def _generate_deserialize_property(
                 prop=prop,
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         return _generate_deserialize_list_property(
             prop=prop,
         )
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
 
@@ -4586,6 +4589,7 @@ if (writer.error()) {{
                 cls=type_anno.our_type, var_name=var_name
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
@@ -4594,6 +4598,7 @@ if (writer.error()) {{
         )
 
     else:
+        # noinspection PyTypeChecker
         assert_never(type_anno)
 
     blocks.append(code)
@@ -5375,10 +5380,10 @@ common::optional<SerializationError> CheckOstreamState(
 
 assert generate_header.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
-    module_doc=__doc__,
-    generate_header_doc=generate_header.__doc__
+    module_doc=__doc__, generate_header_doc=generate_header.__doc__
 )
+
+assert generate_implementation.__doc__ is not None
 cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
-    module_doc=__doc__,
-    generate_implementation_doc=generate_implementation.__doc__
+    module_doc=__doc__, generate_implementation_doc=generate_implementation.__doc__
 )
