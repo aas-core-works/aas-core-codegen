@@ -214,7 +214,7 @@ TEST_CASE("Test the round-trip of an expected {cls_name}") {{
             )
         )
 
-        # TODO: continue here -- the unexpected directory needs to be changed!
+        # TODO: continue here
 
         blocks.append(
             Stripped(
@@ -224,7 +224,6 @@ TEST_CASE("Test the de-serialization failure on an unexpected {cls_name}") {{
 {II}const std::filesystem::path& causeDir
 {II}: test::common::ListSubdirectories(
 {III}DetermineJsonDir()
-{IIII}/ {cpp_common.string_literal(model_type)},
 {IIII}/ "Unexpected"
 {IIII}/ "Unserializable"
 {II})
