@@ -39,7 +39,6 @@ from aas_core_codegen.cpp.common import (
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen.yielding import flow as yielding_flow
-from aas_core_codegen.cpp.lib import common as cpp_lib_common
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -3069,11 +3068,11 @@ def generate_implementation(
 
 
 assert generate_header.__doc__ is not None
-cpp_lib_common.assert_module_docstring_and_generate_header_consistent(
+cpp_common.assert_module_docstring_and_generate_header_consistent(
     module_doc=__doc__, generate_header_doc=generate_header.__doc__
 )
 
 assert generate_implementation.__doc__ is not None
-cpp_lib_common.assert_module_docstring_and_generate_implementation_consistent(
+cpp_common.assert_module_docstring_and_generate_implementation_consistent(
     module_doc=__doc__, generate_implementation_doc=generate_implementation.__doc__
 )
