@@ -1,4 +1,4 @@
-"""Generate Java code for enhancing model classes."""
+"""Generate code for enhancing model classes."""
 
 import io
 import textwrap
@@ -781,9 +781,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the Java code for enhancing model classes with custom wraps.
-
-    The ``package`` defines the root Java package.
+    Generate code for enhancing model classes.
     """
 
     errors = []  # type: List[Error]
@@ -818,3 +816,7 @@ def generate(
         return None, errors
 
     return java_files, None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

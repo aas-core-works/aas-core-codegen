@@ -1,4 +1,4 @@
-"""Generate Java code for de/serialization based on the intermediate representation."""
+"""Generate the code for de/serialization of enumerations."""
 
 import io
 from typing import Tuple, Optional, List
@@ -176,9 +176,7 @@ def generate(
     symbol_table: intermediate.SymbolTable, package: java_common.PackageIdentifier
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Java code for the general serialization.
-
-    The ``package`` defines the root Java package.
+    Generate the code for de/serialization of enumerations.
     """
     stringification_blocks = []  # type: List[Stripped]
 
@@ -210,3 +208,7 @@ public class Stringification {{
     )
 
     return f"{code}\n", None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

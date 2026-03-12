@@ -1,4 +1,5 @@
-"""Generate Java code for XML-ization based on the intermediate representation."""
+"""Generate the code for XML de/serialization."""
+
 import io
 import textwrap
 
@@ -731,7 +732,7 @@ def _generate_deserialize_property(
                 _generate_deserialize_enumeration_property(prop=prop, cls=cls)
             )
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (empwilli, 2023-12-18):
+            # NOTE (empwilli):
             # The constrained primitives are only verified, but not represented as
             # separate classes in the XSD.
             blocks.append(_generate_deserialize_primitive_property(prop=prop, cls=cls))
@@ -776,7 +777,7 @@ def _generate_deserialize_impl_cls_from_sequence(
  */"""
     )
 
-    # NOTE (empwilli, 2023-12-18):
+    # NOTE (empwilli):
     # Hard-wire for the case when no sequence is read
     if len(cls.constructor.arguments) == 0:
         return (
@@ -969,7 +970,7 @@ if ({target_var} == null) {{
     for i, arg in enumerate(cls.constructor.arguments):
         prop = cls.properties_by_name[arg.name]
 
-        # NOTE (empwilli, 2023-12-18):
+        # NOTE (empwilli):
         # The argument to the constructor may be optional while the property might
         # be required, since we can set the default value in the body of the
         # constructor. However, we can not have an optional property and a required
@@ -1221,11 +1222,11 @@ def _generate_deserialize_impl(
 
     errors = []  # type: List[Error]
 
-    # NOTE (empwilli, 2023-12-18):
+    # NOTE (empwilli):
     # Enumerations are going to be directly deserialized using
     # ``Stringification``.
 
-    # NOTE (empwilli, 2023-12-18):
+    # NOTE (empwilli):
     # Constrained primitives are only verified, but do not represent a C# type.
 
     for cls in symbol_table.classes:
@@ -1364,10 +1365,10 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the public class ``Deserialize``."""
     blocks = []  # type: List[Stripped]
 
-    # NOTE (empwilli, 2023-12-18):
+    # NOTE (empwilli):
     # We use stringification for de-serialization of enumerations.
 
-    # NOTE (empwilli, 2023-12-18):
+    # NOTE (empwilli):
     # Constrained primitives are not handled as separate classes, but as
     # primitives, and only verified in the verification.
 
@@ -2112,9 +2113,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Java code for the general serialization.
-
-    The ``package`` defines the root Java package.
+    Generate the code for XML de/serialization.
     """
     errors = []  # type: List[Error]
 
@@ -2272,3 +2271,7 @@ public class Xmlization {{
 
 
 # endregion
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

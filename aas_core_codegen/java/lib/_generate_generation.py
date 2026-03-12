@@ -1,4 +1,4 @@
-"""Generate builders for the AAS data structures."""
+"""Generate the code for the builders for the AAS data structures."""
 
 import io
 import textwrap
@@ -248,9 +248,7 @@ def generate(
     package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the Java code of the structures based on the symbol table.
-
-    The ``package`` defines the root Java package.
+    Generate the code for the builders for the AAS data structures.
     """
 
     files = []  # type: List[java_common.JavaFile]
@@ -283,3 +281,7 @@ def generate(
         return None, errors
 
     return files, None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

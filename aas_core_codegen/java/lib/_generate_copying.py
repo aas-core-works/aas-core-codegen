@@ -1,4 +1,4 @@
-"""Generate Java code for copying in memory based on the intermediate representation."""
+"""Generate code for copying instances in memory."""
 
 import io
 import textwrap
@@ -379,9 +379,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Java code for copying instances in memory.
-
-    The ``namespace`` defines the AAS Java namespace.
+    Generate code for copying instances in memory.
     """
     errors = []  # type: List[Error]
 
@@ -394,7 +392,7 @@ def generate(
         Stripped(f"import {package}.types.model.*;"),
     ]  # type: List[Stripped]
 
-    # NOTE (empwilli, 2023-12-14):
+    # NOTE (empwilli):
     # We wrap the shallow and deep copying in generic methods to allow for easier
     # enforcement of runtime type safety for the client. Otherwise, if we directly
     # provided the transformer, the client would always need to make the casts, which
@@ -500,3 +498,7 @@ public class Copying
 
 
 # endregion
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

@@ -1,28 +1,20 @@
-"""Generate Java code based on the meta-model."""
+"""Generate asset administration shells handling based on the meta-model."""
 
 from typing import TextIO
 
 from aas_core_codegen import specific_implementations, run, java
 from aas_core_codegen.java import (
     common as java_common,
-    constants as java_constants,
-    copying as java_copying,
-    enhancing as java_enhancing,
-    generation as java_generation,
-    jsonization as java_jsonization,
-    reporting as java_reporting,
-    stringification as java_stringification,
-    structure as java_structure,
-    verification as java_verification,
-    visitation as java_visitation,
-    xmlization as java_xmlization,
+    lib as java_lib,
 )
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
 
-    verified_ir_table, errors = java_structure.verify(symbol_table=context.symbol_table)
+    verified_ir_table, errors = java_lib.verify_for_types(
+        symbol_table=context.symbol_table
+    )
 
     if errors is not None:
         run.write_error_report(
@@ -56,7 +48,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Structure
 
-    source_files, errors = java_structure.generate(
+    source_files, errors = java_lib.generate_types(
         symbol_table=verified_ir_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -99,7 +91,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Visitation
 
-    source_files, errors = java_visitation.generate(
+    source_files, errors = java_lib.generate_visitation(
         symbol_table=context.symbol_table, package=package
     )
 
@@ -132,7 +124,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Constants
 
-    code, errors = java_constants.generate(
+    code, errors = java_lib.generate_constants(
         symbol_table=context.symbol_table,
         package=package,
     )
@@ -165,7 +157,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Verification
 
-    verify_errors = java_verification.verify(
+    verify_errors = java_lib.verify_for_verification(
         spec_impls=context.spec_impls,
         verification_functions=verified_ir_table.verification_functions,
     )
@@ -178,7 +170,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    code, errors = java_verification.generate(
+    code, errors = java_lib.generate_verification(
         symbol_table=verified_ir_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -212,7 +204,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Reporting
 
-    code = java_reporting.generate(package=package)
+    code = java_lib.generate_reporting(package=package)
 
     pth = context.output_dir / "reporting" / "Reporting.java"
     pth.parent.mkdir(exist_ok=True, parents=True)
@@ -231,7 +223,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Stringification
 
-    code, errors = java_stringification.generate(
+    code, errors = java_lib.generate_stringification(
         symbol_table=context.symbol_table, package=package
     )
 
@@ -263,7 +255,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Xmlization
 
-    code, errors = java_xmlization.generate(
+    code, errors = java_lib.generate_xmlization(
         symbol_table=context.symbol_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -297,7 +289,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Jsonization
 
-    code, errors = java_jsonization.generate(
+    code, errors = java_lib.generate_jsonization(
         symbol_table=context.symbol_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -331,7 +323,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Copying
 
-    code, errors = java_copying.generate(
+    code, errors = java_lib.generate_copying(
         symbol_table=context.symbol_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -366,7 +358,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Enhancing
 
-    source_files, errors = java_enhancing.generate(
+    source_files, errors = java_lib.generate_enhancing(
         symbol_table=context.symbol_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -402,7 +394,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Generation
 
-    source_files, errors = java_generation.generate(
+    source_files, errors = java_lib.generate_generation(
         symbol_table=context.symbol_table,
         package=package,
     )

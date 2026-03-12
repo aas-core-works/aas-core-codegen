@@ -1,4 +1,4 @@
-"""Generate Java code for JSON-ization based on the intermediate representation."""
+"""Generate code for JSON de/serialization."""
 
 import io
 import textwrap
@@ -352,7 +352,7 @@ if (node == null || !node.isObject()) {{
             assert case_body is not None
             json_name = naming.json_property(arg.name)
 
-            # NOTE (empwilli, 2024-01-18):
+            # NOTE (empwilli):
             # We put ``if (currentNode.getValue() == null)`` here instead of the outer loop
             # since we want to detect the unexpected additional properties even
             # though their value can be set to null.
@@ -502,7 +502,7 @@ if ({arg_var} == null) {{
         for i, arg in enumerate(cls.constructor.arguments):
             prop = cls.properties_by_name[arg.name]
 
-            # NOTE (empwilli, 2024-01-18):
+            # NOTE (empwilli):
             # The argument to the constructor may be optional while the property
             # might be required, since we can set the default value in the body of
             # the constructor. However, we can not have an optional property and a
@@ -976,7 +976,7 @@ def _generate_transform_property(
             type_annotation=type_anno, source_expr=source_expr
         )
 
-        # NOTE (empwilli, 2024-02-06):
+        # NOTE (empwilli):
         # We have to use ObjectNode.put for Strings but the function is deprecated for JsonObjects.
         if type_anno.a_type == intermediate.PrimitiveType.STR:
             stmts.append(Stripped(f"result.put({prop_literal}, {conversion_expr});"))
@@ -1284,9 +1284,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Java code for the general serialization.
-
-    The ``package`` defines the AAS Java package.
+    Generate code for JSON de/serialization.
     """
     errors = []  # type: List[Error]
 
@@ -1470,3 +1468,7 @@ public class Jsonization {
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

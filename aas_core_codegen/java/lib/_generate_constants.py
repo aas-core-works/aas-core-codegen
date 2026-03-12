@@ -1,4 +1,5 @@
-"""Generate the Java constants corresponding to the constants of the meta-model."""
+"""Generate constants corresponding to the constants of the meta-model."""
+
 import io
 import textwrap
 from typing import (
@@ -24,8 +25,6 @@ from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
 )
-
-# region Generation
 
 
 def _byte_array_as_expr(value: bytearray) -> Stripped:
@@ -68,7 +67,7 @@ def _generate_constant_primitive(
         literal = Stripped(str(constant.value))
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
-        # NOTE (empwilli, 2023-12-14):
+        # NOTE (empwilli):
         # We assume that the float constants are not meant to be all to precise.
         # Therefore, we use a string representation here. However, beware that we
         # might have to use a more precise representation in the future if the spec
@@ -128,7 +127,7 @@ public static final Set<{java_type}> {constant_name} = Stream.of(
                 writer.write("\n")
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
-        # NOTE (empwilli, 2023-12-14):
+        # NOTE (empwilli):
         # We assume that the float constants are not meant to be all to precise.
         # Therefore, we use a string representation here. However, beware that we
         # might have to use a more precise representation in the future if the spec
@@ -182,7 +181,7 @@ def _generate_constant_set_of_enumeration_literals(
 
     writer = io.StringIO()
 
-    # NOTE (empwilli, 2023-12-14):
+    # NOTE (empwilli):
     # We make the sets of enumeration literals work on nullables to avoid checking
     # nullability all the time in the code. This gives a bit less performant code,
     # but a much more readable one.
@@ -221,9 +220,7 @@ def generate(
     package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Java code of the constants based on the symbol table.
-
-    The ``package`` defines the root Java package.
+    Generate constants corresponding to the constants of the meta-model.
     """
     enum_imports = set()  # type: Set[Stripped]
 
@@ -331,4 +328,5 @@ class ImmutableCollector {{
     return out.getvalue(), None
 
 
-# endregion
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

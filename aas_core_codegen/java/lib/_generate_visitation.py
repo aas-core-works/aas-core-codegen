@@ -1,4 +1,4 @@
-"""Generate the visitor classes based on the intermediate representation."""
+"""Generate the code for the visitor classes."""
 
 import io
 import textwrap
@@ -38,7 +38,7 @@ def _generate_ivisitor(
     # Abstract classes have no particular implementation, so we do not visit
     # them.
     for cls in symbol_table.concrete_classes:
-        # NOTE (empwilli, 2023-12-14):
+        # NOTE (empwilli):
         # Operate on interfaces instead of classes We operate on *interfaces*
         # instead of concrete classes to allow for custom extensions and
         # wrappers around our model classes.
@@ -624,9 +624,7 @@ def generate(
     symbol_table: intermediate.SymbolTable, package: java_common.PackageIdentifier
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the java code of the visitors based on the intermediate representation
-
-    The ``package`` defines the root Java package.
+    Generate the code for the visitor classes.
     """
 
     files = [
@@ -687,3 +685,7 @@ def generate(
 
 
 # endregion
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

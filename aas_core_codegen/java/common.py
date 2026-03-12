@@ -1,6 +1,7 @@
 """Provide common functions shared among different Java code generation modules."""
-import re
+
 from typing import List, cast, Optional
+import re
 
 from icontract import ensure, require
 

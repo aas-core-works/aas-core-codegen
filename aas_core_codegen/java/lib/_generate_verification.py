@@ -1,4 +1,5 @@
-"""Generate the invariant verifiers from the intermediate representation."""
+"""Generate the invariant verifiers."""
+
 import io
 import textwrap
 from typing import (
@@ -756,7 +757,7 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
         )
     )
 
-    # NOTE (empwilli, 2024-01-22):
+    # NOTE (empwilli):
     # We need to wrap the description in multiple literals as a single long
     # string literal is often too much for the readability.
     invariant_description_lines = wrap_text_into_lines(invariant.description)
@@ -795,7 +796,7 @@ def _generate_transform_property(
     prop: intermediate.Property,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the snippet to transform a property to errors."""
-    # NOTE (empwilli, 2024-01-19):
+    # NOTE (empwilli):
     # Instead of writing here a complex but general solution with unrolling we choose
     # to provide a simple, but limited, solution. First, the meta-model is quite
     # limited itself at the moment, so the complexity of the general solution is not
@@ -882,7 +883,7 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
             "see the note above in the code."
         )
 
-        # NOTE (empwilli, 2024-01-19):
+        # NOTE (empwilli):
         # We only descend into our classes here.
         if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
             return Stripped(""), None
@@ -1168,7 +1169,7 @@ def _generate_verify_constrained_primitive(
             )
         )
 
-    # NOTE (empwilli, 2024-01-22):
+    # NOTE (empwilli):
     # Constrained primitives are not really classes, but we simply use the naming
     # for classes here since we need to pick *something*.
     name = java_naming.class_name(constrained_primitive.name)
@@ -1215,9 +1216,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Java code of the structures based on the symbol table.
-
-    The ``package`` defines the root Java package.
+    Generate the invariant verifiers.
     """
 
     imports = [
@@ -1533,4 +1532,8 @@ public class Verification {
     return f"{code}\n", None
 
 
-# endregion
+# endregion+
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

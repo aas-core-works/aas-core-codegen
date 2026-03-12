@@ -1,4 +1,4 @@
-"""Generate Java code for reporting errors by including the code directly."""
+"""Generate the code for reporting errors."""
 
 import io
 import textwrap
@@ -30,9 +30,7 @@ from aas_core_codegen.csharp.common import (
 # fmt: on
 def generate(package: java_common.PackageIdentifier) -> str:
     """
-    Generate the Java code for reporting errors.
-
-    The ``package`` defines the root Java package.
+    Generate the code for reporting errors.
     """
 
     blocks = [
@@ -246,3 +244,7 @@ public class Reporting
     writer.write("\n")
 
     return writer.getvalue()
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

@@ -1,4 +1,5 @@
-"""Generate the Java data structures from the intermediate representation."""
+"""Generate the code of the data structures."""
+
 import io
 import textwrap
 from typing import (
@@ -1062,7 +1063,7 @@ def _generate_class(
     package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
-    Generate Java code for the class ``cls``.
+    Generate the class ``cls``.
 
     The ``package`` defines the root Java package.
     """
@@ -1407,7 +1408,7 @@ def _generate_enum(
     enum: intermediate.Enumeration, package: java_common.PackageIdentifier
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
-    Generate Java code for the enumeration `enum`.
+    Generate the enumeration `enum`.
 
     The ``package`` defines the root Java package.
     """
@@ -1587,7 +1588,7 @@ def _generate_structure(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[Error]]:
     """
-    Generate the Java code for a single structure.
+    Generate a single structure.
 
     The ``package`` defines the root Java package.
     """
@@ -1730,9 +1731,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the Java code of the structures based on the symbol table.
-
-    The ``package`` defines the root Java package.
+    Generate the code of the data structures.
     """
 
     files = []  # type: List[java_common.JavaFile]
@@ -1765,3 +1764,7 @@ def generate(
 
 
 # endregion
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())
