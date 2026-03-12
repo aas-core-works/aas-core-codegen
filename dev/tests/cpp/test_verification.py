@@ -4,7 +4,11 @@ import unittest
 from typing import List
 
 from aas_core_codegen.common import Stripped, Identifier
-from aas_core_codegen.cpp.verification import _generate as cpp_verification_generate
+
+# noinspection PyProtectedMember
+from aas_core_codegen.cpp.lib import (
+    _generate_verification as cpp_lib_generate_verification,
+)
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from tests import common as tests_common
 
@@ -67,7 +71,7 @@ __xml_namespace__ = "https://dummy.com"
             (
                 condition_expr,
                 error,
-            ) = cpp_verification_generate._transpile_class_invariant(
+            ) = cpp_lib_generate_verification._transpile_class_invariant(
                 invariant=invariant, symbol_table=symbol_table, environment=environment
             )
             assert error is None, (
@@ -155,7 +159,7 @@ __xml_namespace__ = "https://dummy.com"
             (
                 condition_expr,
                 error,
-            ) = cpp_verification_generate._transpile_class_invariant(
+            ) = cpp_lib_generate_verification._transpile_class_invariant(
                 invariant=invariant, symbol_table=symbol_table, environment=environment
             )
             assert error is None, (

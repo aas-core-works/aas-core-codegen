@@ -3,7 +3,7 @@
 import unittest
 
 from aas_core_codegen.parse import retree as parse_retree
-from aas_core_codegen.cpp import pattern as cpp_pattern
+from aas_core_codegen.cpp.lib import _generate_pattern as cpp_lib_generate_pattern
 
 
 class TestForRealWorldPatterns(unittest.TestCase):
@@ -14,7 +14,9 @@ class TestForRealWorldPatterns(unittest.TestCase):
         assert error is None, f"{error=}"
         assert regex is not None
 
-        code = cpp_pattern._generate._generate_program_definition_for_regex(regex=regex)
+        code = cpp_lib_generate_pattern._generate_program_definition_for_regex(
+            regex=regex
+        )
         self.assertEqual(
             """\
 std::vector<std::unique_ptr<revm::Instruction> > program;
