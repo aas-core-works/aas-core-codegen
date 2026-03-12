@@ -21,14 +21,7 @@ from aas_core_codegen.csharp.common import (
 )
 
 
-# fmt: off
-@ensure(
-    lambda result:
-    result.endswith('\n'),
-    "Trailing newline mandatory for valid end-of-files"
-)
-# fmt: on
-def generate(package: java_common.PackageIdentifier) -> str:
+def generate(package: java_common.PackageIdentifier) -> List[java_common.JavaFile]:
     """
     Generate the code for reporting errors.
     """
@@ -243,7 +236,7 @@ public class Reporting
 
     writer.write("\n")
 
-    return writer.getvalue()
+    return [java_common.JavaFile("Reporting.java", writer.getvalue())]
 
 
 assert generate.__doc__ is not None

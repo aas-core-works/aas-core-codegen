@@ -1,6 +1,7 @@
 """Generate asset administration shells handling based on the meta-model."""
 
-from typing import TextIO
+import pathlib
+from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import specific_implementations, run, java
 from aas_core_codegen.java import (
@@ -28,134 +29,59 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert verified_ir_table is not None
 
-    _ = context
-    _ = stderr
+    unsupported_contracts_errors = (
+        intermediate.errors_if_contracts_for_functions_or_methods_defined(
+            verified_ir_table
+        )
+    )
+    if unsupported_contracts_errors is not None:
+        run.write_error_report(
+            message=f"We do not support pre and post-conditions and snapshots "
+            f"at the moment. Please notify the developers if you need this "
+            f"feature (based on meta-model {context.model_path})",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in unsupported_contracts_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
+
+    unsupported_methods_errors = (
+        intermediate.errors_if_non_implementation_specific_methods(verified_ir_table)
+    )
+    if unsupported_methods_errors is not None:
+        run.write_error_report(
+            message=f"We added some support for understood methods already and keep "
+            f"maintaining it as it is only a matter of time when we will "
+            f"introduce their transpilation. Introducing them after the fact "
+            f"would have been much more difficult.\n"
+            f"\n"
+            f"At the given moment, however, we deliberately focus only on "
+            f"implementation-specific methods. "
+            f"(based on meta-model {context.model_path})",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in unsupported_methods_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
 
     package_key = specific_implementations.ImplementationKey("package.txt")
     package_text = context.spec_impls.get(package_key, None)
     if package_text is None:
-        stderr.write(f"The namespace snippet is missing: {package_key}\n")
+        stderr.write(f"The package snippet is missing: {package_key}\n")
         return 1
 
     if not java_common.PACKAGE_IDENTIFIER_RE.fullmatch(package_text):
         stderr.write(
             f"The text from the snippet {package_key} "
-            f"is not a valid namespace identifier: {package_text!r}\n"
+            f"is not a valid package identifier: {package_text!r}\n"
         )
         return 1
 
     package = java_common.PackageIdentifier(package_text)
-
-    # region Structure
-
-    source_files, errors = java_lib.generate_types(
-        symbol_table=verified_ir_table,
-        package=package,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the structures in the Java code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert source_files is not None
-
-    (context.output_dir / "types" / java_common.CLASS_PKG).mkdir(
-        exist_ok=True, parents=True
-    )
-    (context.output_dir / "types" / java_common.INTERFACE_PKG).mkdir(
-        exist_ok=True, parents=True
-    )
-    (context.output_dir / "types" / java_common.ENUM_PKG).mkdir(
-        exist_ok=True, parents=True
-    )
-
-    for source_file in source_files:
-        pth = context.output_dir / "types" / source_file.name
-        try:
-            pth.write_text(source_file.content, encoding="utf-8")
-        except Exception as exception:
-            run.write_error_report(
-                message=f"Failed to write the Java structures to {pth}",
-                errors=[str(exception)],
-                stderr=stderr,
-            )
-            return 1
-
-    # endregion
-
-    # region Visitation
-
-    source_files, errors = java_lib.generate_visitation(
-        symbol_table=context.symbol_table, package=package
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the Java code for visitation "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert source_files is not None
-
-    (context.output_dir / "visitation").mkdir(exist_ok=True, parents=True)
-
-    for source_file in source_files:
-        pth = context.output_dir / "visitation" / source_file.name
-        try:
-            pth.write_text(source_file.content, encoding="utf-8")
-        except Exception as exception:
-            run.write_error_report(
-                message=f"Failed to write the visitation Java code to {pth}",
-                errors=[str(exception)],
-                stderr=stderr,
-            )
-            return 1
-
-    # endregion
-
-    # region Constants
-
-    code, errors = java_lib.generate_constants(
-        symbol_table=context.symbol_table,
-        package=package,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the constants in the Java code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "constants" / "Constants.java"
-    pth.parent.mkdir(exist_ok=True, parents=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the constants in the Java code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Verification
 
     verify_errors = java_lib.verify_for_verification(
         spec_impls=context.spec_impls,
@@ -164,268 +90,144 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     if verify_errors is not None:
         run.write_error_report(
-            message="Failed to verify for generation of Java verification code",
+            message="Failed to verify the verification functions for code generation",
             errors=verify_errors,
             stderr=stderr,
         )
         return 1
 
-    code, errors = java_lib.generate_verification(
-        symbol_table=verified_ir_table,
-        package=package,
-        spec_impls=context.spec_impls,
-    )
+    project_rel_path = pathlib.Path(package)
+    assert not project_rel_path.is_absolute()
 
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the verification Java code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+    rel_paths_generators: Sequence[
+        Tuple[
+            pathlib.Path,
+            Callable[
+                [], Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]
+            ],
+        ]
+    ] = [
+        (
+            project_rel_path / "constants",
+            lambda: java_lib.generate_constants(
+                symbol_table=context.symbol_table, package=package
+            ),
+        ),
+        (
+            project_rel_path / "copying",
+            lambda: java_lib.generate_copying(
+                symbol_table=context.symbol_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "enhancing",
+            lambda: java_lib.generate_enhancing(
+                symbol_table=context.symbol_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "generation",
+            lambda: java_lib.generate_generation(
+                symbol_table=context.symbol_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "jsonization",
+            lambda: java_lib.generate_jsonization(
+                symbol_table=context.symbol_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "reporting",
+            lambda: (java_lib.generate_reporting(package=package), None),
+        ),
+        (
+            project_rel_path / "stringification",
+            lambda: java_lib.generate_stringification(
+                symbol_table=context.symbol_table, package=package
+            ),
+        ),
+        (
+            project_rel_path / "types",
+            lambda: java_lib.generate_types(
+                symbol_table=verified_ir_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "verification",
+            lambda: java_lib.generate_verification(
+                symbol_table=verified_ir_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
+            project_rel_path / "visitation",
+            lambda: java_lib.generate_visitation(
+                symbol_table=context.symbol_table, package=package
+            ),
+        ),
+        (
+            project_rel_path / "xmlization",
+            lambda: java_lib.generate_xmlization(
+                symbol_table=context.symbol_table,
+                package=package,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+    ]
 
-    assert code is not None
+    for rel_path, generator_func in rel_paths_generators:
+        assert not rel_path.is_absolute()
 
-    pth = context.output_dir / "verification" / "Verification.java"
-    pth.parent.mkdir(exist_ok=True, parents=True)
+        java_files, errors = generator_func()
 
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the verification Java code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Reporting
-
-    code = java_lib.generate_reporting(package=package)
-
-    pth = context.output_dir / "reporting" / "Reporting.java"
-    pth.parent.mkdir(exist_ok=True, parents=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the reporting Java code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Stringification
-
-    code, errors = java_lib.generate_stringification(
-        symbol_table=context.symbol_table, package=package
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the stringification Java code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "stringification" / "Stringification.java"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the stringification Java code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Xmlization
-
-    code, errors = java_lib.generate_xmlization(
-        symbol_table=context.symbol_table,
-        package=package,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the xmlization Java code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "xmlization" / "Xmlization.java"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the xmlization Java code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Jsonization
-
-    code, errors = java_lib.generate_jsonization(
-        symbol_table=context.symbol_table,
-        package=package,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the jsonization Java code "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "jsonization" / "Jsonization.java"
-    pth.parent.mkdir(exist_ok=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the jsonization Java code to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Copying
-
-    code, errors = java_lib.generate_copying(
-        symbol_table=context.symbol_table,
-        package=package,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the Java code for shallow and deep copying "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert code is not None
-
-    pth = context.output_dir / "copying" / "Copying.java"
-    pth.parent.mkdir(exist_ok=True, parents=True)
-
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the Java code for shallow and deep copying "
-            f"to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
-
-    # endregion
-
-    # region Enhancing
-
-    source_files, errors = java_lib.generate_enhancing(
-        symbol_table=context.symbol_table,
-        package=package,
-        spec_impls=context.spec_impls,
-    )
-
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the Java code for enhancing "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
-
-    assert source_files is not None
-
-    (context.output_dir / "enhancing").mkdir(exist_ok=True, parents=True)
-
-    for source_file in source_files:
-        pth = context.output_dir / "enhancing" / source_file.name
-
-        try:
-            pth.write_text(source_file.content, encoding="utf-8")
-        except Exception as exception:
+        if errors is not None:
             run.write_error_report(
-                message=f"Failed to write the Java code for enhancing to {pth}",
-                errors=[str(exception)],
+                message=f"Failed to generate {rel_path} "
+                f"based on {context.model_path}",
+                errors=[
+                    context.lineno_columner.error_message(error) for error in errors
+                ],
                 stderr=stderr,
             )
             return 1
 
-    # endregion
+        assert java_files is not None
 
-    # region Generation
+        for java_file in java_files:
+            pth = context.output_dir / rel_path / java_file.name
 
-    source_files, errors = java_lib.generate_generation(
-        symbol_table=context.symbol_table,
-        package=package,
-    )
+            try:
+                pth.parent.mkdir(parents=True, exist_ok=True)
+            except Exception as exception:
+                run.write_error_report(
+                    message=f"Failed to create the directory {pth.parent}",
+                    errors=[str(exception)],
+                    stderr=stderr,
+                )
+                return 1
 
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to generate the Java code for generation "
-            f"based on {context.model_path}",
-            errors=[context.lineno_columner.error_message(error) for error in errors],
-            stderr=stderr,
-        )
-        return 1
+            try:
+                pth.write_text(java_file.content, encoding="utf-8")
+            except Exception as exception:
+                run.write_error_report(
+                    message=f"Failed to write to {pth}",
+                    errors=[str(exception)],
+                    stderr=stderr,
+                )
+                return 1
 
-    assert source_files is not None
-
-    (context.output_dir / "generation").mkdir(exist_ok=True, parents=True)
-
-    for source_file in source_files:
-        pth = context.output_dir / "generation" / source_file.name
-
-        try:
-            pth.write_text(source_file.content, encoding="utf-8")
-        except Exception as exception:
-            run.write_error_report(
-                message=f"Failed to write the Java code for generation to {pth}",
-                errors=[str(exception)],
-                stderr=stderr,
-            )
-            return 1
-
-    # endregion
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0

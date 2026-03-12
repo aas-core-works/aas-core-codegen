@@ -166,15 +166,10 @@ public static Optional<{name}> {from_str_name}(String text)
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-@ensure(
-    lambda result:
-    not (result[0] is not None) or result[0].endswith('\n'),
-    "Trailing newline mandatory for valid end-of-files"
-)
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable, package: java_common.PackageIdentifier
-) -> Tuple[Optional[str], Optional[List[Error]]]:
+) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
     Generate the code for de/serialization of enumerations.
     """
@@ -207,7 +202,7 @@ public class Stringification {{
 {java_common.WARNING}"""
     )
 
-    return f"{code}\n", None
+    return [java_common.JavaFile("Stringification.java", f"{code}\n")], None
 
 
 assert generate.__doc__ is not None

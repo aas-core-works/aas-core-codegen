@@ -101,7 +101,7 @@ public abstract class Enhanced<EnhancementT> {{
     code = "\n\n".join(blocks)
 
     return java_common.JavaFile(
-        Stripped("Enhanced.java"),
+        "Enhanced.java",
         f"{code}\n",
     )
 
@@ -170,7 +170,7 @@ public class Unwrapper<EnhancementT> {{
     code = "\n\n".join(blocks)
 
     return java_common.JavaFile(
-        Stripped("Unwrapper.java"),
+        "Unwrapper.java",
         f"{code}\n",
     )
 
@@ -247,7 +247,7 @@ public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
     code = "\n\n".join(blocks)
 
     return java_common.JavaFile(
-        Stripped("Enhancer.java"),
+        "Enhancer.java",
         f"{code}\n",
     )
 

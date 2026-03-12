@@ -2101,17 +2101,12 @@ public static class Serialize
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-@ensure(
-    lambda result:
-    not (result[0] is not None) or result[0].endswith('\n'),
-    "Trailing newline mandatory for valid end-of-files"
-)
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[str], Optional[List[Error]]]:
+) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
     Generate the code for XML de/serialization.
     """
@@ -2267,7 +2262,7 @@ public class Xmlization {{
 
     code = "\n\n".join(blocks)
 
-    return f"{code}\n", None
+    return [java_common.JavaFile("Xmlization.java", f"{code}\n")], None
 
 
 # endregion
