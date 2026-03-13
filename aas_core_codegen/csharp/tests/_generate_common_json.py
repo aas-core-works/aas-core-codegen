@@ -1,4 +1,4 @@
-"""Generate the C# code for shared JSON functionality across unit tests."""
+"""Generate code for shared JSON functionality across unit tests."""
 
 from typing import List
 
@@ -25,7 +25,7 @@ from aas_core_codegen.csharp.common import (
 # fmt: on
 def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
     """
-    Generate the C# code for shared JSON functionality across unit tests.
+    Generate code for shared JSON functionality across unit tests.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

@@ -1,1 +1,1 @@
-"""Generate Java code based on the intermediate meta-model."""
+"""Generate Java code based on the meta-model."""

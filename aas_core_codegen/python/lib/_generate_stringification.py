@@ -1,4 +1,4 @@
-"""Generate Python code for de-serialization of enumerations."""
+"""Generate code for string de/serialization of enumerations."""
 
 import io
 from typing import Tuple, Optional, List
@@ -93,7 +93,7 @@ def generate(
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Python code for the de-serialization of strings.
+    Generate code for string de/serialization of enumerations.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
@@ -130,3 +130,7 @@ import {qualified_module_name}.types as aas_types"""
     out.write("\n")
 
     return out.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

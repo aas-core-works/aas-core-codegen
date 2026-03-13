@@ -1,4 +1,4 @@
-"""Generate the visitor classes based on the intermediate representation."""
+"""Generate code of visitors to iterate over instances."""
 
 import io
 import textwrap
@@ -519,7 +519,7 @@ def generate(
     symbol_table: intermediate.SymbolTable, namespace: csharp_common.NamespaceIdentifier
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code of the visitors based on the intermediate representation
+    Generate code of visitors to iterate over instances.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -571,3 +571,7 @@ def generate(
     out.write("\n")
 
     return out.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

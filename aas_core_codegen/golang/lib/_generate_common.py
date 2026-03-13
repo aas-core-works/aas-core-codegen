@@ -1,4 +1,4 @@
-"""Generate common functions used across other packages."""
+"""Generate code of common functionality."""
 
 import io
 
@@ -21,7 +21,7 @@ from aas_core_codegen.golang.common import INDENT as I, INDENT2 as II, INDENT3 a
 )
 # fmt: on
 def generate() -> str:
-    """Generate common functions used across other packages."""
+    """Generate code of common functionality."""
     blocks = [
         Stripped(
             """\

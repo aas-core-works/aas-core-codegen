@@ -1,4 +1,4 @@
-"""Generate the shared code used across the xmlization unit tests."""
+"""Generate code for common XML de/serialization shared across the tests."""
 
 import io
 
@@ -22,7 +22,7 @@ from aas_core_codegen.python.common import (
 )
 def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
     """
-    Generate the shared code used across the xmlization unit tests.
+    Generate code for common XML de/serialization shared across the tests.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

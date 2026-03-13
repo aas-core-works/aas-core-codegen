@@ -1,4 +1,4 @@
-"""Generate the common functions to de/serialize instances of a class."""
+"""Generate code for common JSON de/serialization shared across the tests."""
 
 import io
 from typing import List
@@ -25,7 +25,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the common functions to de/serialize instances of a class."""
+    """Generate code for common JSON de/serialization shared across the tests."""
     blocks = [
         Stripped(
             """\

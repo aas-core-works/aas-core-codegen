@@ -1,4 +1,4 @@
-"""Generate TypeScript code of the index file which import all the other modules."""
+"""Generate code of the index file which import all the other modules."""
 
 import io
 from typing import Tuple, Optional, List
@@ -26,7 +26,7 @@ from aas_core_codegen.typescript import (
 def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate TypeScript code of the index file which import all the other modules."""
+    """Generate code of the index file which import all the other modules."""
     key = specific_implementations.ImplementationKey("package_documentation.txt")
 
     text = spec_impls.get(key, None)

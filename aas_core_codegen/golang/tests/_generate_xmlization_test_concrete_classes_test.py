@@ -1,4 +1,4 @@
-"""Generate the code to test the xmlization of concrete classes."""
+"""Generate code to test the XML de/serialization of concrete classes."""
 
 import io
 from typing import List
@@ -186,7 +186,7 @@ func {test_name}(t *testing.T) {{
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to test the xmlization of concrete classes."""
+    """Generate code to test the XML de/serialization of concrete classes."""
     blocks = [
         Stripped("package xmlization_test"),
         golang_common.WARNING,

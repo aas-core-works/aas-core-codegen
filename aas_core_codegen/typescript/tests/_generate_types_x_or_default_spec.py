@@ -1,4 +1,4 @@
-"""Generate the test code for the ``xOrDefault`` methods."""
+"""Generate code to test the ``xOrDefault`` methods."""
 
 import io
 from typing import List, Optional
@@ -26,7 +26,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the test code for the ``xOrDefault`` methods."""
+    """Generate code to test the ``xOrDefault`` methods."""
     blocks = [
         Stripped(
             """\

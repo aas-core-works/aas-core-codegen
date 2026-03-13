@@ -1,7 +1,8 @@
-"""Generate Java code to handle asset administration shells based on the meta-model."""
+"""Generate Java code based on the meta-model."""
+
 from typing import TextIO
 
-from aas_core_codegen import specific_implementations, run
+from aas_core_codegen import specific_implementations, run, java
 from aas_core_codegen.java import (
     common as java_common,
     constants as java_constants,
@@ -436,3 +437,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
+
+
+assert java.__doc__ == __doc__

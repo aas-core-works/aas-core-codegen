@@ -1,4 +1,4 @@
-"""Generate the test code for the ``DescendOnce`` methods."""
+"""Generate code to test the ``DescendOnce`` methods."""
 
 from typing import List
 
@@ -26,7 +26,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the test code for the ``DescendOnce`` methods.
+    Generate code to test the ``DescendOnce`` methods.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

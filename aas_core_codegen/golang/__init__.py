@@ -1,1 +1,1 @@
-"""Generate Golang code based on the intermediate meta-model."""
+"""Generate Golang code based on the meta-model."""

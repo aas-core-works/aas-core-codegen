@@ -1,4 +1,4 @@
-"""Generate the test code for the xmlization errors."""
+"""Generate code to test the xmlization errors."""
 
 from typing import List
 
@@ -26,7 +26,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the test code for the xmlization errors.
+    Generate code to test the xmlization errors.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

@@ -1,4 +1,4 @@
-"""Generate the invariant verifiers from the intermediate representation."""
+"""Generate code of verification logic."""
 import io
 import textwrap
 from typing import (
@@ -1218,7 +1218,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code of the structures based on the symbol table.
+    Generate code of verification logic.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -1455,3 +1455,6 @@ namespace {namespace}
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

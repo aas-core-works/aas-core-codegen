@@ -1,4 +1,4 @@
-"""Generate C# code for copying in memory based on the intermediate representation."""
+"""Generate code for copying instances in memory."""
 
 import io
 import textwrap
@@ -367,7 +367,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code for copying instances in memory.
+    Generate code for copying instances in memory.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -498,3 +498,7 @@ namespace {namespace}
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

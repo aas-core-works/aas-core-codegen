@@ -1,4 +1,4 @@
-"""Generate TypeScript constants corresponding to the constants of the meta-model."""
+"""Generate code to define the constants of the meta-model."""
 import io
 from typing import (
     Optional,
@@ -286,7 +286,7 @@ export const {constant_name} = new Set<AasTypes.{enum_name}>([
 def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate TypeScript constants corresponding to the constants of the meta-model."""
+    """Generate code to define the constants of the meta-model."""
     errors = []  # type: List[Error]
 
     blocks = [

@@ -1,4 +1,4 @@
-"""Generate code to de/wstringify enumerations and primitives."""
+"""Generate code for wstring de/serialization of enumerations."""
 
 import io
 from typing import List
@@ -467,7 +467,7 @@ std::wstring to_wstring(
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate header to de/wstringify enumerations and primitives."""
+    """Generate header for wstring de/serialization of enumerations."""
     namespace = Stripped(f"{library_namespace}::wstringification")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -543,7 +543,7 @@ namespace wstringification {"""
 def generate_implementation(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate implementation to de/wstringify enumerations and primitives."""
+    """Generate implementation for wstring de/serialization of enumerations."""
     namespace = Stripped(f"{library_namespace}::wstringification")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)

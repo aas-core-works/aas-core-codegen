@@ -1,4 +1,4 @@
-"""Generate the code to test JSON de/serialization of classes with descendants."""
+"""Generate code to test JSON de/serialization of classes with descendants."""
 
 import io
 from typing import List
@@ -99,7 +99,7 @@ def generate(
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
-    Generate the code to test JSON de/serialization of classes with descendants.
+    Generate code to test JSON de/serialization of classes with descendants.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

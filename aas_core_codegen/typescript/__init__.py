@@ -1,1 +1,1 @@
-"""Generate TypeScript code based on the intermediate meta-model."""
+"""Generate TypeScript code based on the meta-model."""

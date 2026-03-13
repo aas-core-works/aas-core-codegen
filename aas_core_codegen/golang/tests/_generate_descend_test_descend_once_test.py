@@ -1,4 +1,4 @@
-"""Generate the code to test ``DescendOnce*`` functions."""
+"""Generate code to test ``DescendOnce*`` functions."""
 
 import io
 from typing import List
@@ -64,7 +64,7 @@ func {test_function_name}(
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to test ``DescendOnce*`` functions."""
+    """Generate code to test ``DescendOnce*`` functions."""
     blocks = [
         Stripped("package types_descend_test"),
         golang_common.WARNING,

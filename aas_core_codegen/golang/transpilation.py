@@ -210,7 +210,7 @@ class Transpiler(
         self, enumeration_name: Identifier, literal_name: Identifier
     ) -> Stripped:
         """
-        Generate the code to represent an enumeration literal.
+        Generate code to represent an enumeration literal.
 
         In Go, enumeration literals are mere constants. Hence, we can not
         "de-reference" the enumeration literals from an enumeration, but

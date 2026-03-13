@@ -1,4 +1,4 @@
-"""Generate TypeScript code of common functions."""
+"""Generate code of common functionality."""
 
 import io
 
@@ -27,7 +27,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate() -> str:
-    """Generate TypeScript code of common functions."""
+    """Generate code of common functionality."""
     blocks = [
         Stripped(
             """\

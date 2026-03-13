@@ -1,4 +1,4 @@
-"""Generate the invariant verifiers."""
+"""Generate code of verification logic."""
 
 import io
 import textwrap
@@ -1331,16 +1331,16 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the invariant verifiers."""
+    """Generate code of verification logic."""
     errors = []  # type: List[Error]
 
-    aasconstants_url_literal = golang_common.string_literal(f"{repo_url}/constants")
+    constants_url_literal = golang_common.string_literal(f"{repo_url}/constants")
 
-    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+    common_url_literal = golang_common.string_literal(f"{repo_url}/common")
 
-    aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
+    reporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
 
-    aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
+    types_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [
         Stripped(
@@ -1363,10 +1363,10 @@ import (
 {I}"regexp"
 {I}"strconv"
 {I}"strings"
-{I}aascommon {aascommon_url_literal}
-{I}aasconstants {aasconstants_url_literal}
-{I}aasreporting {aasreporting_url_literal}
-{I}aastypes {aastypes_url_literal}
+{I}aascommon {common_url_literal}
+{I}aasconstants {constants_url_literal}
+{I}aasreporting {reporting_url_literal}
+{I}aastypes {types_url_literal}
 )"""
         ),
         Stripped(

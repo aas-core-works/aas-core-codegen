@@ -1,4 +1,5 @@
-"""Generate the TypeScript data structures."""
+"""Generate code of the data structures representing the meta-model."""
+
 import io
 import textwrap
 from typing import (
@@ -233,7 +234,7 @@ class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
 def verify(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
-    """Verify that TypeScript code can be generated from the ``symbol_table``."""
+    """Verify that code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
 
     structure_name_collisions = _verify_structure_name_collisions(
@@ -382,7 +383,7 @@ def _generate_comment_for_cls_or_enum(
 def _generate_enum(
     enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the TypeScript code for the enum."""
+    """Generate code for the enum."""
     writer = io.StringIO()
 
     errors = []  # type: List[Error]
@@ -463,7 +464,7 @@ def _generate_enum(
 
 
 def _generate_over_enum(enum: intermediate.Enumeration) -> Stripped:
-    """Generate the TypeScript code for the function to iterate over the literals."""
+    """Generate code for the function to iterate over the literals."""
     name = typescript_naming.enum_name(enum.name)
     function_name = typescript_naming.function_name(Identifier(f"over_{enum.name}"))
 
@@ -495,7 +496,7 @@ export function *{function_name}(
 
 
 class _DescendBodyUnroller(typescript_unrolling.AbstractUnroller):
-    """Generate the code that unrolls descent into an element."""
+    """Generate code that unrolls descent into an element."""
 
     #: If set, generates the code with unrolled yields.
     #: Otherwise, we do not unroll recursively.
@@ -719,7 +720,7 @@ def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
 def _generate_default_value(
     default: intermediate.Default,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the TypeScript code representing the default value of an argument."""
+    """Generate code representing the default value of an argument."""
     code: str
 
     if isinstance(default, intermediate.DefaultPrimitive):
@@ -914,7 +915,7 @@ def _generate_comment_for_property(
 def _generate_interface(
     interface: intermediate.Interface,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate TypeScript code for the given ``interface``."""
+    """Generate code for the given ``interface``."""
     # Code blocks separated by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
@@ -1145,7 +1146,7 @@ def _generate_class(
     concrete_cls_index: int,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
-    Generate TypeScript code for the given concrete class ``cls``.
+    Generate code for the given concrete class ``cls``.
 
     ``concrete_cls_index`` refers to the number of the concrete class in
     the ``concrete_classes`` of the symbol table.
@@ -1492,7 +1493,7 @@ export class {name}
 
 
 def _generate_abstract_visitor(symbol_table: intermediate.SymbolTable) -> Stripped:
-    """Generate the code for the abstract visitor."""
+    """Generate code for the abstract visitor."""
     blocks = [
         Stripped(
             f"""\
@@ -1547,7 +1548,7 @@ export abstract class AbstractVisitor {
 def _generate_abstract_visitor_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the abstract visitor with context."""
+    """Generate code for the abstract visitor with context."""
     blocks = [
         Stripped(
             f"""\
@@ -1612,7 +1613,7 @@ export abstract class AbstractVisitorWithContext<ContextT> {
 
 
 def _generate_pass_through_visitor(symbol_table: intermediate.SymbolTable) -> Stripped:
-    """Generate the code for the pass-through visitor."""
+    """Generate code for the pass-through visitor."""
     blocks = []  # type: List[Stripped]
 
     for cls in symbol_table.concrete_classes:
@@ -1665,7 +1666,7 @@ export class PassThroughVisitor extends AbstractVisitor {
 def _generate_pass_through_visitor_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the pass-through visitor with context."""
+    """Generate code for the pass-through visitor with context."""
     blocks = [
         Stripped(
             f"""\
@@ -1734,7 +1735,7 @@ export class PassThroughVisitorWithContext<ContextT>
 
 
 def _generate_abstract_transformer(symbol_table: intermediate.SymbolTable) -> Stripped:
-    """Generate the code for the abstract transformer."""
+    """Generate code for the abstract transformer."""
     blocks = [
         Stripped(
             f"""\
@@ -1795,7 +1796,7 @@ export abstract class AbstractTransformer<T> {
 def _generate_abstract_transformer_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the abstract transformer with context."""
+    """Generate code for the abstract transformer with context."""
     blocks = [
         Stripped(
             f"""\
@@ -1866,7 +1867,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
 def _generate_transformer_with_default(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the transformer with default transformation."""
+    """Generate code for the transformer with default transformation."""
     blocks = [
         Stripped(
             """\
@@ -1945,7 +1946,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
 def _generate_transformer_with_default_and_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the transformer with default transformation and context."""
+    """Generate code for the transformer with default transformation and context."""
     blocks = [
         Stripped(
             """\
@@ -2173,7 +2174,7 @@ def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the TypeScript data structures."""
+    """Generate code of the data structures representing the meta-model."""
     errors = []  # type: List[Error]
 
     blocks = []  # type: List[Stripped]

@@ -1,4 +1,5 @@
-"""Generate the C# constants corresponding to the constants of the meta-model."""
+"""Generate code to define the constants of the meta-model."""
+
 import io
 import textwrap
 from typing import (
@@ -276,7 +277,7 @@ def generate(
     namespace: csharp_common.NamespaceIdentifier,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code of the constants based on the symbol table.
+    Generate code to define the constants of the meta-model.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -401,3 +402,7 @@ namespace {namespace}
     out.write("\n")
 
     return out.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__)

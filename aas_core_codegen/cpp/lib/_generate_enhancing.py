@@ -1,4 +1,4 @@
-"""Generate code for wrapping model classes with custom enhancements."""
+"""Generate code for enhancing model classes."""
 
 import io
 from typing import Tuple, Optional, List, Sequence
@@ -886,7 +886,7 @@ def generate_header(
     symbol_table: intermediate.SymbolTable,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate header for wrapping model classes with custom enhancements."""
+    """Generate header for enhancing model classes."""
     namespace = Stripped(f"{library_namespace}::enhancing")
 
     include_guard_var = cpp_common.include_guard_var(namespace)

@@ -1,4 +1,4 @@
-"""Generate code to test the verification of the pos. and neg. cases."""
+"""Generate code to test the verification of pos. and neg. cases."""
 
 import io
 from typing import List
@@ -30,7 +30,7 @@ from aas_core_codegen.cpp.common import (
 def generate_implementation(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate implementation to test the verification of the pos. and neg. cases."""
+    """Generate implementation to test the verification of pos. and neg. cases."""
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
     blocks = [

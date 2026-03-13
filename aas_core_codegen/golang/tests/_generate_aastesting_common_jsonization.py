@@ -1,4 +1,4 @@
-"""Generate the code to load minimal and maximal examples."""
+"""Generate code to load minimal and maximal examples."""
 
 import io
 from typing import List
@@ -26,7 +26,7 @@ from aas_core_codegen.golang.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to load minimal and maximal examples."""
+    """Generate code to load minimal and maximal examples."""
     blocks = [
         Stripped("package aastesting"),
         golang_common.WARNING,

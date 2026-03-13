@@ -390,7 +390,7 @@ AasCommon.at(
     def _generate_len(
         self, node: parse_tree.Expression
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """Generate the code to get the length of a container."""
+        """Generate code to get the length of a container."""
         collection, error = self.transform(node)
         if error is not None:
             return None, error

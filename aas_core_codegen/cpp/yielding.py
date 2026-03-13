@@ -137,7 +137,7 @@ def generate_execute_body(
     flow: Sequence[yielding_flow.Node], state_member: Identifier
 ) -> Stripped:
     """
-    Generate the code of the ``Execute()`` method which executes the flow with yields.
+    Generate code of the ``Execute()`` method which executes the flow with yields.
 
     The member that holds the state to be executed is indicated by ``state_member``.
     Both the state member and the ``Execute()`` method are usually private.

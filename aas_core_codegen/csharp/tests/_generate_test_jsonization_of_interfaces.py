@@ -1,4 +1,4 @@
-"""Generate the test code for the JSON de/serialization of interfaces."""
+"""Generate code to test the JSON de/serialization of interfaces."""
 
 from typing import List
 
@@ -21,7 +21,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the test code for the JSON de/serialization of interfaces.
+    Generate code to test the JSON de/serialization of interfaces.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

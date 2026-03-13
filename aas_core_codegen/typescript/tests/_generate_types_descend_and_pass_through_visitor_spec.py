@@ -1,4 +1,4 @@
-"""Generate the test code for the ``descend`` methods and ``PassThroughVisitor``."""
+"""Generate code to test the ``descend`` methods and ``PassThroughVisitor``."""
 
 import io
 from typing import List
@@ -26,7 +26,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the test code for the ``descend`` methods and ``PassThroughVisitor``."""
+    """Generate code to test the ``descend`` methods and ``PassThroughVisitor``."""
     blocks = [
         Stripped(
             """\

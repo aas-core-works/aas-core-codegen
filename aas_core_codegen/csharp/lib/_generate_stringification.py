@@ -1,4 +1,4 @@
-"""Generate C# code for de/serialization based on the intermediate representation."""
+"""Generate code for string de/serialization of enumerations."""
 
 import io
 import textwrap
@@ -176,7 +176,7 @@ def generate(
     symbol_table: intermediate.SymbolTable, namespace: csharp_common.NamespaceIdentifier
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code for the general serialization.
+    Generate code for string de/serialization of enumerations.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -241,3 +241,7 @@ namespace {namespace}
     out.write("\n")
 
     return out.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

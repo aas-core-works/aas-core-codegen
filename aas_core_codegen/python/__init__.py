@@ -1,1 +1,1 @@
-"""Generate Python code based on the intermediate meta-model."""
+"""Generate Python code based on the meta-model."""

@@ -1,4 +1,4 @@
-"""Generate the code to test ``*OrDefault`` functions."""
+"""Generate code to test ``*OrDefault`` functions."""
 
 
 import io
@@ -28,7 +28,7 @@ from aas_core_codegen.golang.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to test ``*OrDefault`` functions."""
+    """Generate code to test ``*OrDefault`` functions."""
     blocks = [
         Stripped("package types_xxx_or_default_test"),
         golang_common.WARNING,

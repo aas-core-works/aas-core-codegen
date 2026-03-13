@@ -1,14 +1,15 @@
 """Generate TypeScript code based on the meta-model."""
+
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
-from aas_core_codegen import run, intermediate
+from aas_core_codegen import run, intermediate, typescript
 from aas_core_codegen.common import Error
 from aas_core_codegen.typescript import lib as typescript_lib, tests as typescript_tests
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
-    """Generate the code."""
+    """Generate code."""
     verified_ir_table, errors = typescript_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
@@ -299,3 +300,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
+
+
+assert typescript.__doc__ == __doc__

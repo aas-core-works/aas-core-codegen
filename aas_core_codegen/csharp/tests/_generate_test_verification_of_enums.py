@@ -1,4 +1,4 @@
-"""Generate the test code for the verification of enums."""
+"""Generate code to test the verification of enums."""
 
 from typing import List
 
@@ -24,7 +24,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the test code for the verification of enums.
+    Generate code to test the verification of enums.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

@@ -1,4 +1,4 @@
-"""Generate Python code for XML-ization based on the intermediate representation."""
+"""Generate code for XML de/serialization."""
 
 import io
 import textwrap
@@ -1501,7 +1501,7 @@ def _count_required_properties(cls: intermediate.Class) -> int:
 def _generate_snippet_for_writing_concrete_cls_prop(
     prop: intermediate.Property,
 ) -> Stripped:
-    """Generate the code snippet to write a class property as a sequence."""
+    """Generate code snippet to write a class property as a sequence."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.OurTypeAnnotation)
 
@@ -2299,7 +2299,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Python code for the general XML de/serialization.
+    Generate code for XML de/serialization.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
@@ -3027,3 +3027,7 @@ def to_str(that: aas_types.Class) -> str:
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

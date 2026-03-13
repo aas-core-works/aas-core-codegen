@@ -1,4 +1,4 @@
-"""Generate the test code for the ``typesMatch`` function."""
+"""Generate code to test the ``typesMatch`` function."""
 
 import io
 from typing import List
@@ -24,7 +24,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the test code for the ``typesMatch`` function."""
+    """Generate code to test the ``typesMatch`` function."""
     blocks = [
         Stripped(
             """\

@@ -1,4 +1,4 @@
-"""Generate the code for de/serialization of enumerations."""
+"""Generate code for string de/serialization of enumerations."""
 
 import io
 from typing import Tuple, Optional, List
@@ -355,7 +355,7 @@ func {must_to_str_name}(
 def generate(
     symbol_table: intermediate.SymbolTable, repo_url: Stripped
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the code for de/serialization of enumerations."""
+    """Generate code for string de/serialization of enumerations."""
     aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [

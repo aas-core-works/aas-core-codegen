@@ -1,4 +1,4 @@
-"""Generate the C# data structures from the intermediate representation."""
+"""Generate code of the data structures representing the meta-model."""
 import io
 import textwrap
 from typing import (
@@ -267,7 +267,7 @@ def verify(
 def _generate_enum(
     enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the C# code for the enum."""
+    """Generate code for the enum."""
     writer = io.StringIO()
 
     if enum.description is not None:
@@ -334,7 +334,7 @@ def _generate_enum(
 def _generate_interface(
     cls: intermediate.ClassUnion,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate C# interface for the given class ``cls``."""
+    """Generate interface for the given class ``cls``."""
     writer = io.StringIO()
 
     if cls.description is not None:
@@ -731,7 +731,7 @@ public IEnumerable<IClass> Descend()
 
 
 def _generate_default_value(default: intermediate.Default) -> Stripped:
-    """Generate the C# code representing the default value of an argument."""
+    """Generate code representing the default value of an argument."""
     code = None  # type: Optional[str]
 
     if default is not None:
@@ -871,7 +871,7 @@ def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate C# code for the given concrete class ``cls``."""
+    """Generate code for the given concrete class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
@@ -1152,7 +1152,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code of the structures based on the symbol table.
+    Generate code of the data structures representing the meta-model.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -1339,3 +1339,6 @@ namespace {namespace}
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

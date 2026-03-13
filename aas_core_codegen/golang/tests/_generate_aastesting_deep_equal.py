@@ -1,4 +1,4 @@
-"""Generate the code to perform a comparison of deep equality on instances."""
+"""Generate code to perform a comparison of deep equality on instances."""
 
 import io
 from typing import List, Optional
@@ -24,7 +24,7 @@ from aas_core_codegen.golang.common import (
 
 
 def _generate_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the code for the deep equality function for ``cls``."""
+    """Generate code for the deep equality function for ``cls``."""
     blocks = []  # type: List[Stripped]
 
     for prop in cls.properties:
@@ -258,7 +258,7 @@ func DeepEqual(
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to perform a comparison of deep equality on instances."""
+    """Generate code to perform a comparison of deep equality on instances."""
     blocks = [
         Stripped("package aastesting"),
         golang_common.WARNING,

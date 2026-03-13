@@ -1,4 +1,4 @@
-"""Generate constants corresponding to the constants of the meta-model."""
+"""Generate code to define the constants of the meta-model."""
 import io
 from typing import (
     Optional,
@@ -271,7 +271,7 @@ var {constant_name} = map[aastypes.{enum_name}]struct{{}} {{
 def generate(
     symbol_table: intermediate.SymbolTable, repo_url: Stripped
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate constants corresponding to the constants of the meta-model."""
+    """Generate code to define the constants of the meta-model."""
     errors = []  # type: List[Error]
 
     aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")

@@ -1,4 +1,4 @@
-"""Generate the shared code used across the unit tests."""
+"""Generate code for common functionality shared across the tests."""
 import io
 
 from icontract import ensure
@@ -23,7 +23,7 @@ from aas_core_codegen.python.common import (
 # fmt: on
 def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
     """
-    Generate the Python code shared across unit tests.
+    Generate code for common functionality shared across the tests.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

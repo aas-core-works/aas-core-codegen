@@ -1,4 +1,4 @@
-"""Generate TypeScript code for JSON de/serialization."""
+"""Generate code for JSON de/serialization."""
 
 import io
 import textwrap
@@ -1214,7 +1214,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate TypeScript code for JSON de/serialization."""
+    """Generate code for JSON de/serialization."""
     blocks = [
         typescript_description.documentation_comment(
             Stripped(

@@ -1,4 +1,4 @@
-"""Generate code for de/serialization of instances from and to JSON."""
+"""Generate code for JSON de/serialization."""
 
 import io
 import itertools
@@ -69,7 +69,7 @@ common::expected<
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate header for de/serialization of instances from and to JSON."""
+    """Generate header for JSON de/serialization."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.JSONIZATION_NAMESPACE}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -2121,7 +2121,7 @@ result[{json_prop_name_literal}] = stringification::Base64Encode(
 
 
 def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
-    """Generate the code snippet to serialize the property ``prop``."""
+    """Generate code snippet to serialize the property ``prop``."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
     code = None  # type: Optional[Stripped]
@@ -2483,7 +2483,7 @@ def generate_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate implementation for de/serialization of instances from and to JSON."""
+    """Generate implementation for JSON de/serialization."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.JSONIZATION_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)

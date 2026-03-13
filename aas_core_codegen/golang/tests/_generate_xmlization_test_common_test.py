@@ -1,4 +1,4 @@
-"""Generate the functions used across XML de/serialization tests."""
+"""Generate code for common XML de/serialization shared across the tests."""
 
 import io
 from typing import List
@@ -25,7 +25,7 @@ from aas_core_codegen.golang.common import (
 )
 # fmt: on
 def generate(repo_url: Stripped) -> str:
-    """Generate the functions used across XML de/serialization tests."""
+    """Generate code for common XML de/serialization shared across the tests."""
     blocks = [
         Stripped(
             """\

@@ -1,4 +1,4 @@
-"""Generate code of constants based on the constants of the meta-model."""
+"""Generate code to define the constants of the meta-model."""
 import io
 from typing import (
     Optional,
@@ -375,7 +375,7 @@ def generate_header(
     symbol_table: intermediate.SymbolTable,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate header of constants based on the constants of the meta-model."""
+    """Generate header to define the constants of the meta-model."""
     errors = []  # type: List[Error]
 
     namespace = Stripped(f"{library_namespace}::{cpp_common.CONSTANTS_NAMESPACE}")
@@ -486,7 +486,7 @@ def generate_implementation(
     symbol_table: intermediate.SymbolTable,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate implementation of constants based on the constants of the meta-model."""
+    """Generate implementation to define the constants of the meta-model."""
     errors = []  # type: List[Error]
 
     namespace = Stripped(f"{library_namespace}::constants")

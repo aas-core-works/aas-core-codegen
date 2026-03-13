@@ -631,7 +631,7 @@ def generate_include_prefix_path(library_namespace: Stripped) -> Stripped:
 
 def generate_namespace_opening(library_namespace: Stripped) -> Stripped:
     """
-    Generate the code to open the nested library namespace.
+    Generate code to open the nested library namespace.
 
     >>> generate_namespace_opening(Stripped("some::name::space"))
     'namespace some {\\nnamespace name {\\nnamespace space {'
@@ -642,7 +642,7 @@ def generate_namespace_opening(library_namespace: Stripped) -> Stripped:
 
 def generate_namespace_closing(library_namespace: Stripped) -> Stripped:
     """
-    Generate the code to close the nested library namespace.
+    Generate code to close the nested library namespace.
 
     >>> generate_namespace_closing(Stripped("some::name::space"))
     '}  // namespace space\\n}  // namespace name\\n}  // namespace some'

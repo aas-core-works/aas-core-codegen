@@ -1,4 +1,4 @@
-"""Generate the code for XML de/serialization."""
+"""Generate code for XML de/serialization."""
 
 import io
 from typing import Tuple, Optional, List
@@ -32,7 +32,7 @@ from aas_core_codegen.golang.common import (
 
 
 def _generate_deserialization_error_and_its_methods() -> List[Stripped]:
-    """Generate the code to represent the deserialization error."""
+    """Generate code to represent the deserialization error."""
     return [
         Stripped(
             f"""\
@@ -2309,7 +2309,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the code for XML de/serialization."""
+    """Generate code for XML de/serialization."""
     aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
