@@ -1,4 +1,4 @@
-"""Generate Python code for JSON-ization based on the intermediate representation."""
+"""Generate code for JSON de/serialization."""
 
 import io
 import textwrap
@@ -1109,7 +1109,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Python code for the general serialization.
+    Generate code for JSON de/serialization.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
@@ -1388,3 +1388,7 @@ def to_jsonable(that: aas_types.Class) -> MutableJsonable:
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

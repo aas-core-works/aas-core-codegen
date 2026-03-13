@@ -1,14 +1,15 @@
-"""Generate C++ code to handle models based on the meta-model."""
+"""Generate C++ code based on the meta-model."""
+
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
-from aas_core_codegen import run, intermediate, specific_implementations
+from aas_core_codegen import run, intermediate, specific_implementations, cpp
 from aas_core_codegen.common import Stripped, Error
 from aas_core_codegen.cpp import lib as cpp_lib, tests as cpp_tests
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
-    """Generate the code."""
+    """Generate code."""
     verified_ir_table, errors = cpp_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
@@ -512,3 +513,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
+
+
+assert cpp.__doc__ == __doc__

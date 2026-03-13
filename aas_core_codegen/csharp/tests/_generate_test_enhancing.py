@@ -1,4 +1,4 @@
-"""Generate the test code for enhancing the model instances."""
+"""Generate code to test enhancing the model instances."""
 
 from typing import List
 
@@ -27,7 +27,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the test code for enhancing the model instances.
+    Generate code to test enhancing the model instances.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

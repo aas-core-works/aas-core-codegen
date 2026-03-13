@@ -1,4 +1,4 @@
-"""Generate the code shared across the unit tests."""
+"""Generate code for common functionality shared across the tests."""
 
 import io
 import re
@@ -28,7 +28,7 @@ from aas_core_codegen.typescript.common import (
 def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the code shared across the unit tests."""
+    """Generate code for common functionality shared across the tests."""
     package_identifier_key = specific_implementations.ImplementationKey(
         "package_identifier.txt"
     )

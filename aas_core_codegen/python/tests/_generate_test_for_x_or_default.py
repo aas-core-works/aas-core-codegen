@@ -1,4 +1,4 @@
-"""Generate the test code for the ``X_or_default`` methods."""
+"""Generate code to test the ``X_or_default`` methods."""
 
 import io
 from typing import List, Optional
@@ -102,7 +102,7 @@ def generate(
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
-    Generate the test code for the ``X_or_default`` methods.
+    Generate code to test the ``X_or_default`` methods.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

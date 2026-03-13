@@ -1,4 +1,4 @@
-"""Generate the C# code shared across unit tests."""
+"""Generate code for common functionality shared across the tests."""
 import re
 
 from icontract import ensure
@@ -47,7 +47,7 @@ def _namespace_to_upper_snake(
 # fmt: on
 def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
     """
-    Generate the C# code shared across unit tests.
+    Generate code for common functionality shared across the tests.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

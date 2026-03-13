@@ -268,7 +268,7 @@ switch (that->model_type()) {{
 def _generate_mutating_abstract_visitor_implementation(
     symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
-    """Generate C++ implementation of the visitor's method(s)."""
+    """Generate implementation of the visitor's method(s)."""
     switch_stmt = _generate_dispatching_visit_switch_statement(
         symbol_table=symbol_table
     )
@@ -422,7 +422,7 @@ def _generate_pass_through_visit_body_for_class(
 def _generate_mutating_pass_through_visitor_implementation(
     symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
-    """Generate C++ implementation of the visitor's method(s)."""
+    """Generate implementation of the visitor's method(s)."""
     blocks = [
         Stripped("// region PassThroughVisitor"),
     ]

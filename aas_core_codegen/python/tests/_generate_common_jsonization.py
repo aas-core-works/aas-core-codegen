@@ -1,4 +1,4 @@
-"""Generate the shared code used across the jsonization unit tests."""
+"""Generate code for common JSON de/serialization shared across the tests."""
 import io
 from typing import List
 
@@ -78,7 +78,7 @@ def generate(
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
-    Generate the shared code used across the jsonization unit tests.
+    Generate code for common JSON de/serialization shared across the tests.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

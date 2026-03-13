@@ -332,7 +332,7 @@ class Transpiler(
     def _transform_enumeration_literal(
         self, enumeration_name: Identifier, literal_name: Identifier
     ) -> Stripped:
-        """Generate the code to represent an enumeration literal."""
+        """Generate code to represent an enumeration literal."""
         cpp_enum_name = cpp_naming.enum_name(enumeration_name)
         cpp_literal_name = cpp_naming.enum_literal_name(literal_name)
         if self._types_namespace is not None:

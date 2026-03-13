@@ -1,4 +1,4 @@
-"""Generate C# code for JSON-ization based on the intermediate representation."""
+"""Generate code for JSON de/serialization."""
 
 import io
 import textwrap
@@ -1509,7 +1509,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code for the general serialization.
+    Generate code for JSON de/serialization.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -1628,3 +1628,7 @@ using System.Collections.Generic;  // can't alias"""
     writer.write("\n")
 
     return writer.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

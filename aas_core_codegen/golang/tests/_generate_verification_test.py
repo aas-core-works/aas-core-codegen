@@ -1,4 +1,4 @@
-"""Generate the code to test the verification."""
+"""Generate code to test the verification."""
 
 import io
 from typing import List
@@ -185,7 +185,7 @@ func {test_name}(t *testing.T) {{
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to test the verification."""
+    """Generate code to test the verification."""
     blocks = [
         Stripped("package verification_test"),
         golang_common.WARNING,

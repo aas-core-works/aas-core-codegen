@@ -1,4 +1,4 @@
-"""Generate the test code for the ``XOrDefault`` methods."""
+"""Generate code to test the ``XOrDefault`` methods."""
 
 from typing import List, Optional
 
@@ -26,7 +26,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the test code for the ``XOrDefault`` methods.
+    Generate code to test the ``XOrDefault`` methods.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

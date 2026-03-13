@@ -1,4 +1,5 @@
-"""Generate the Python data structures from the intermediate representation."""
+"""Generate code of the data structures representing the meta-model."""
+
 import io
 import itertools
 import textwrap
@@ -295,7 +296,7 @@ def _generate_enum(
     enum: intermediate.Enumeration,
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the Python code for the enum."""
+    """Generate code for the enum."""
     writer = io.StringIO()
 
     errors = []  # type: List[Error]
@@ -380,7 +381,7 @@ def _generate_enum(
 
 
 class _DescendBodyUnroller(python_unrolling.AbstractUnroller):
-    """Generate the code that unrolls descent into an element."""
+    """Generate code that unrolls descent into an element."""
 
     #: If set, generates the code with unrolled yields.
     #: Otherwise, we do not unroll recursively.
@@ -608,7 +609,7 @@ def descend(self) -> Iterator[Class]:
 
 
 def _generate_default_value(default: intermediate.Default) -> Stripped:
-    """Generate the Python code representing the default value of an argument."""
+    """Generate code representing the default value of an argument."""
     code: str
 
     if isinstance(default, intermediate.DefaultPrimitive):
@@ -1108,7 +1109,7 @@ def transform_with_context(
 
 
 def _generate_abstract_visitor(symbol_table: intermediate.SymbolTable) -> Stripped:
-    """Generate the code for the abstract visitor."""
+    """Generate code for the abstract visitor."""
     blocks = [
         Stripped(
             f"""\
@@ -1158,7 +1159,7 @@ class AbstractVisitor:
 def _generate_abstract_visitor_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the abstract visitor with context."""
+    """Generate code for the abstract visitor with context."""
     blocks = [
         Stripped(
             f"""\
@@ -1210,7 +1211,7 @@ class AbstractVisitorWithContext(Generic[ContextT]):
 
 
 def _generate_pass_through_visitor(symbol_table: intermediate.SymbolTable) -> Stripped:
-    """Generate the code for the pass-through visitor."""
+    """Generate code for the pass-through visitor."""
     blocks = [
         Stripped(
             f"""\
@@ -1265,7 +1266,7 @@ class PassThroughVisitor(AbstractVisitor):
 def _generate_pass_through_visitor_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the pass-through visitor with context."""
+    """Generate code for the pass-through visitor with context."""
     blocks = [
         Stripped(
             f"""\
@@ -1324,7 +1325,7 @@ class PassThroughVisitorWithContext(
 
 
 def _generate_abstract_transformer(symbol_table: intermediate.SymbolTable) -> Stripped:
-    """Generate the code for the abstract transformer."""
+    """Generate code for the abstract transformer."""
     blocks = [
         Stripped(
             f"""\
@@ -1375,7 +1376,7 @@ class AbstractTransformer(Generic[T]):
 def _generate_abstract_transformer_with_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the abstract transformer with context."""
+    """Generate code for the abstract transformer with context."""
     blocks = [
         Stripped(
             f"""\
@@ -1432,7 +1433,7 @@ class AbstractTransformerWithContext(
 def _generate_transformer_with_default(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the transformer with default transformation."""
+    """Generate code for the transformer with default transformation."""
     blocks = [
         Stripped(
             """\
@@ -1498,7 +1499,7 @@ class TransformerWithDefault(AbstractTransformer[T]):
 def _generate_transformer_with_default_and_context(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
-    """Generate the code for the transformer with default transformation and context."""
+    """Generate code for the transformer with default transformation and context."""
     blocks = [
         Stripped(
             """\
@@ -1603,7 +1604,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Python code of the structures based on the symbol table.
+    Generate code of the data structures representing the meta-model.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
@@ -1812,3 +1813,6 @@ class Class(abc.ABC):
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

@@ -1,4 +1,4 @@
-"""Generate the code to test JSON de/serialization of enumerations."""
+"""Generate code to test the JSON de/serialization of enumerations."""
 
 import io
 from typing import List
@@ -61,7 +61,7 @@ def generate(
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> str:
     """
-    Generate the code to test JSON de/serialization of enumerations.
+    Generate code to test the JSON de/serialization of enumerations.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

@@ -1,4 +1,4 @@
-"""Generate code of common functions used across other modules."""
+"""Generate code of common functionality."""
 
 # pylint: disable=line-too-long
 
@@ -151,7 +151,7 @@ def _generate_concatenate_implementations_for_2_parts_and_above() -> List[Stripp
 )
 # fmt: on
 def generate_header(library_namespace: Stripped) -> str:
-    """Generate header of common functions used across other modules."""
+    """Generate header of common functionality."""
     namespace = Stripped(f"{library_namespace}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -486,7 +486,7 @@ std::wstring Utf8ToWstring(const std::string& utf8_text);"""
 )
 # fmt: on
 def generate_implementation(library_namespace: Stripped) -> str:
-    """Generate implementation of common functions used across other modules."""
+    """Generate implementation of common functionality."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.COMMON_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)

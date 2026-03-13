@@ -1,4 +1,4 @@
-"""Generate the code to test descend and pass-through visitor jointly."""
+"""Generate code to test descend and pass-through visitor jointly."""
 
 import io
 
@@ -20,7 +20,7 @@ from aas_core_codegen.python.common import (
 )
 def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
     """
-    Generate the code to test descend and pass-through visitor jointly.
+    Generate code to test descend and pass-through visitor jointly.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """

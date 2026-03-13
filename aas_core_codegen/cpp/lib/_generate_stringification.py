@@ -1,4 +1,4 @@
-"""Generate code to de/stringify enumerations and primitives."""
+"""Generate code for string de/serialization of enumerations."""
 
 import io
 from typing import List
@@ -831,7 +831,7 @@ common::expected<
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate header to de/stringify enumerations and primitives."""
+    """Generate header for string de/serialization of enumerations."""
     namespace = Stripped(f"{library_namespace}::stringification")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -905,7 +905,7 @@ namespace stringification {"""
 def generate_implementation(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate implementation to de/stringify enumerations and primitives."""
+    """Generate implementation for string de/serialization of enumerations."""
     namespace = Stripped(f"{library_namespace}::stringification")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)

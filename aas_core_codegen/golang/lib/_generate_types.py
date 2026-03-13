@@ -1,4 +1,4 @@
-"""Generate the code of the data structures."""
+"""Generate code of the data structures representing the meta-model."""
 import io
 import itertools
 import textwrap
@@ -1341,7 +1341,7 @@ def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the code of the data structures."""
+    """Generate code of the data structures representing the meta-model."""
     errors = []  # type: List[Error]
 
     blocks = []  # type: List[Stripped]

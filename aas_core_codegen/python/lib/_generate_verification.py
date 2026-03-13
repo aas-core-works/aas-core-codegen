@@ -1,4 +1,4 @@
-"""Generate the invariant verifiers from the intermediate representation."""
+"""Generate code of verification logic."""
 import io
 import textwrap
 from typing import (
@@ -1211,7 +1211,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Python code for verification based on the symbol table.
+    Generate code of verification logic.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
@@ -1471,3 +1471,6 @@ def verify(
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

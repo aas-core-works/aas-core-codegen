@@ -1,4 +1,4 @@
-"""Generate the test code for the ``modelType()`` methods."""
+"""Generate code to test the ``modelType()`` methods."""
 
 
 import io
@@ -25,7 +25,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the test code for the ``modelType()`` methods."""
+    """Generate code to test the ``modelType()`` methods."""
     blocks = [
         Stripped(
             """\

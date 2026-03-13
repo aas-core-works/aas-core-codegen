@@ -1,4 +1,4 @@
-"""Generate C# code for reporting errors by including the code directly."""
+"""Generate code for reporting errors."""
 
 import io
 import textwrap
@@ -31,7 +31,7 @@ from aas_core_codegen.csharp.common import (
 # fmt: on
 def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
     """
-    Generate the C# code for reporting errors.
+    Generate code for reporting errors.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -264,3 +264,7 @@ using System.Collections.Generic;  // can't alias"""
     writer.write("\n")
 
     return writer.getvalue()
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

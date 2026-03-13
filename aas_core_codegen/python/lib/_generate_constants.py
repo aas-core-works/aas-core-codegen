@@ -1,4 +1,4 @@
-"""Generate the Python constants corresponding to the constants of the meta-model."""
+"""Generate code to define the constants of the meta-model."""
 import io
 import textwrap
 from typing import (
@@ -320,7 +320,7 @@ def generate(
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the Python code of the constants based on the symbol table.
+    Generate code to define the constants of the meta-model.
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
@@ -381,3 +381,6 @@ import {qualified_module_name}.types as aas_types"""
 
 
 # endregion
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

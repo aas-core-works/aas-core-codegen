@@ -1,4 +1,4 @@
-"""Generate Python code of common functions by including the code directly."""
+"""Generate code of common functionality."""
 
 import io
 
@@ -23,7 +23,7 @@ from aas_core_codegen.python.common import (
 )
 # fmt: on
 def generate() -> str:
-    """Generate the Python code for common functions."""
+    """Generate code of common functionality."""
     blocks = [
         Stripped('"""Provide common functions shared among the modules."""'),
         python_common.WARNING,
@@ -57,3 +57,7 @@ def assert_never(value: NoReturn) -> NoReturn:
     writer.write("\n")
 
     return writer.getvalue()
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

@@ -1,8 +1,9 @@
-"""Generate Python code to handle AAS models based on the meta-model."""
+"""Generate Python code based on the meta-model."""
+
 import pathlib
 from typing import TextIO, Sequence, Callable, Tuple, Optional, List
 
-from aas_core_codegen import specific_implementations, run, intermediate
+from aas_core_codegen import specific_implementations, run, intermediate, python
 from aas_core_codegen.common import Error
 from aas_core_codegen.python import (
     common as python_common,
@@ -12,7 +13,7 @@ from aas_core_codegen.python import (
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
-    """Generate the code."""
+    """Generate code."""
     verified_ir_table, errors = python_lib.verify_for_types(
         symbol_table=context.symbol_table
     )
@@ -328,3 +329,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
+
+
+assert python.__doc__ == __doc__

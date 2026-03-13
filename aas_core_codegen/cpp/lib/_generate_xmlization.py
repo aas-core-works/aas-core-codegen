@@ -1,4 +1,4 @@
-"""Generate code for de/serialization of instances from XML."""
+"""Generate code for XML de/serialization."""
 
 import io
 from typing import List, Tuple, Optional, Sequence
@@ -88,7 +88,7 @@ common::expected<
 def generate_header(
     symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
-    """Generate header for de/serialization of instances from XML."""
+    """Generate header for XML de/serialization."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XMLIZATION_NAMESPACE}")
 
     include_guard_var = cpp_common.include_guard_var(namespace)
@@ -4440,7 +4440,7 @@ if (writer.error().has_value()) {{
 def _generate_serialize_instance(
     cls: intermediate.ClassUnion, var_name: Identifier
 ) -> Stripped:
-    """Generate the code to serialize an instance at ``var_name``."""
+    """Generate code to serialize an instance at ``var_name``."""
     serialize_function: Identifier
     if len(cls.concrete_descendants) == 0:
         serialize_function = cpp_naming.function_name(
@@ -4511,7 +4511,7 @@ for (size_t i = 0; i < {var_name}.size(); ++i) {{
 
 
 def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
-    """Generate the code to serialize a property."""
+    """Generate code to serialize a property."""
     blocks = []  # type: List[Stripped]
 
     getter_name = cpp_naming.getter_name(prop.name)
@@ -5138,7 +5138,7 @@ def generate_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate implementation for de/serialization of instances from XML."""
+    """Generate implementation for XML de/serialization."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XMLIZATION_NAMESPACE}")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)

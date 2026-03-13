@@ -1,4 +1,4 @@
-"""Generate C# code for enhancing model classes."""
+"""Generate code for enhancing model classes."""
 
 import io
 import textwrap
@@ -442,7 +442,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
-    Generate the C# code for enhancing model classes with custom wraps.
+    Generate code for enhancing model classes.
 
     The ``namespace`` defines the AAS C# namespace.
     """
@@ -665,3 +665,7 @@ namespace {namespace}
     out.write("\n")
 
     return out.getvalue(), None
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

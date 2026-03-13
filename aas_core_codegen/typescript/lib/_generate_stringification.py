@@ -1,4 +1,4 @@
-"""Generate TypeScript code for de/serialization of enumerations."""
+"""Generate code for string de/serialization of enumerations."""
 
 import io
 from typing import Tuple, Optional, List
@@ -335,7 +335,7 @@ export function {must_to_str_name}(
 def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate TypeScript code for de/serialization of enumerations."""
+    """Generate code for string de/serialization of enumerations."""
     blocks = [
         Stripped(
             """\

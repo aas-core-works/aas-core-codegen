@@ -1,4 +1,4 @@
-"""Generate the C# code to test copying."""
+"""Generate code to test copying."""
 
 import io
 import textwrap
@@ -295,7 +295,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> str:
     """
-    Generate the C# code to test copying.
+    Generate code to test copying.
 
     The ``namespace`` indicates the fully-qualified name of the base project.
     """

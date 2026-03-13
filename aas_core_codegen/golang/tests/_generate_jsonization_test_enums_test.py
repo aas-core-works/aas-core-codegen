@@ -1,4 +1,4 @@
-"""Generate the code to test de/serialization of enumeration literals."""
+"""Generate code to test the JSON de/serialization of enumerations."""
 
 import io
 from typing import List
@@ -159,7 +159,7 @@ func {test_name}(t *testing.T) {{
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
-    """Generate the code to test de/serialization of enumeration literals."""
+    """Generate code to test the JSON de/serialization of enumerations."""
     blocks = [
         Stripped("package jsonization_test"),
         golang_common.WARNING,

@@ -1,4 +1,4 @@
-"""Generate the invariant verifiers from the intermediate representation."""
+"""Generate code of verification logic."""
 import io
 import textwrap
 from typing import (
@@ -1309,7 +1309,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """Generate the invariant verifiers from the intermediate representation."""
+    """Generate code of verification logic."""
     errors = []  # type: List[Error]
 
     module_docstring, module_docstring_error = _generate_module_comment(

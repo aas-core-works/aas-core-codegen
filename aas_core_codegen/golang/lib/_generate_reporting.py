@@ -1,4 +1,4 @@
-"""Generate the code for reporting errors."""
+"""Generate code for reporting errors."""
 
 from icontract import ensure
 
@@ -25,7 +25,7 @@ from aas_core_codegen.golang.common import (
 )
 # fmt: on
 def generate() -> str:
-    """Generate the code for reporting errors."""
+    """Generate code for reporting errors."""
     blocks = [
         Stripped(
             """\

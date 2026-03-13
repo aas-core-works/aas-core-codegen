@@ -1,8 +1,9 @@
-"""Generate C# code to handle asset administration shells based on the meta-model."""
+"""Generate C# code based on the meta-model."""
+
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
-from aas_core_codegen import specific_implementations, run, intermediate
+from aas_core_codegen import specific_implementations, run, intermediate, csharp
 from aas_core_codegen.common import Error
 from aas_core_codegen.csharp import (
     common as csharp_common,
@@ -353,3 +354,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
+
+
+assert csharp.__doc__ == __doc__

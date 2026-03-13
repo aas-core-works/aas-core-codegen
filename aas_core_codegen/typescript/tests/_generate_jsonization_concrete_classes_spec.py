@@ -1,4 +1,4 @@
-"""Generate the test code for the JSON de/serialization of classes."""
+"""Generate code to test the JSON de/serialization of concrete classes."""
 
 import io
 from typing import List
@@ -27,7 +27,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the test code for the JSON de/serialization of classes."""
+    """Generate code to test the JSON de/serialization of concrete classes."""
     blocks = [
         Stripped(
             """\

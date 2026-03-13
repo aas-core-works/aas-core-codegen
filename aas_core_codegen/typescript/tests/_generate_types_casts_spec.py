@@ -1,4 +1,4 @@
-"""Generate the test code for the ``as*`` and ``is*`` functions."""
+"""Generate code to test the ``as*`` and ``is*`` functions."""
 
 import io
 from typing import List
@@ -23,7 +23,7 @@ from aas_core_codegen.typescript.common import (
 )
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
-    """Generate the test code for the ``as*`` and ``is*`` functions."""
+    """Generate code to test the ``as*`` and ``is*`` functions."""
     blocks = [
         Stripped(
             """\
