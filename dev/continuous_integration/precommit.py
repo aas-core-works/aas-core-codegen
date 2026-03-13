@@ -115,11 +115,11 @@ def main() -> int:
             "dev/test_data",
         ]
 
-        # NOTE (mristin, 2022-10-29):
+        # NOTE (mristin):
         # We exclude the snippets and the expected output from the formatting as
         # this causes too many unpredictable results and thus makes the generator
         # harder to debug.
-        exclude = ["dev/test_data/python", "dev/test_data/python_protobuf"]
+        exclude = ["dev/test_data/main"]
 
         if overwrite:
             exit_code = call_and_report(

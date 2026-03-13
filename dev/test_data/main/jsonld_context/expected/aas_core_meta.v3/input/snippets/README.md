@@ -1,0 +1,1 @@
+This directory is intentionally empty as jsonld_context does not require any snippets.
