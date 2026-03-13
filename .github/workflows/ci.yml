@@ -71,26 +71,24 @@ jobs:
           # is not reparsed again and again across the tests
           AAS_CORE_CODEGEN_TESTS_CACHE_MAIN_MODELS: 1
 
-# NOTE (mristin, 2026-02-27):
-# The coveralls.io has been down for days so we disable it to avoid errors in CI.
-#      - name: Upload Coverage
-#        run: coveralls --service=github
-#        if: github.event.repository.fork == false
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
-#          COVERALLS_PARALLEL: true
+      - name: Upload Coverage
+        run: coveralls --service=github
+        if: github.event.repository.fork == false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
+          COVERALLS_PARALLEL: true
 
-#  Finish-Coveralls:
-#    name: Finish Coveralls
-#    needs: Execute-continuous-integration
-#    runs-on: ubuntu-latest
-#    container: python:3-slim
-#    if: github.event.repository.fork == false
-#    steps:
-#      - name: Finish Coveralls
-#        run: |
-#          pip3 install --upgrade coveralls
-#          coveralls --finish --service=github
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  Finish-Coveralls:
+    name: Finish Coveralls
+    needs: Execute-continuous-integration
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    if: github.event.repository.fork == false
+    steps:
+      - name: Finish Coveralls
+        run: |
+          pip3 install --upgrade coveralls
+          coveralls --finish --service=github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
