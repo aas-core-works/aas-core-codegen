@@ -7,6 +7,7 @@ from aas_core_codegen import specific_implementations, run, java
 from aas_core_codegen.java import (
     common as java_common,
     lib as java_lib,
+    tests as java_tests,
 )
 
 
@@ -99,6 +100,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     project_rel_path = pathlib.Path(package)
     assert not project_rel_path.is_absolute()
 
+    tests_rel_path = pathlib.Path("test/java")
+    assert not tests_rel_path.is_absolute()
+
     rel_paths_generators: Sequence[
         Tuple[
             pathlib.Path,
@@ -185,6 +189,131 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 spec_impls=context.spec_impls,
             ),
         ),
+        (
+            tests_rel_path,
+            lambda: (java_tests.generate_common(package=package), None),
+        ),
+        (
+            tests_rel_path,
+            lambda: (java_tests.generate_common_json(package=package), None),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_common_jsonization(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_copying(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_descend_and_visitor_through(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_descend_once(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_enhancing(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_jsonization_of_concrete_classes(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_jsonization_of_enums(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_jsonization_of_interfaces(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_over_x_or_empty(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_verification_of_enums(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_x_or_default(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_xmlization_of_concrete_classes(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
+        (
+            tests_rel_path,
+            lambda: (
+                java_tests.generate_test_xmlization_of_interfaces(
+                    package=package, symbol_table=context.symbol_table
+                ),
+                None,
+            ),
+        ),
     ]
 
     for rel_path, generator_func in rel_paths_generators:
@@ -227,7 +356,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                     stderr=stderr,
                 )
                 return 1
-
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0

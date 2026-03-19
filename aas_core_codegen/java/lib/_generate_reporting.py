@@ -4,8 +4,6 @@ import io
 import textwrap
 from typing import List
 
-from icontract import ensure
-
 from aas_core_codegen.common import (
     Stripped,
 )

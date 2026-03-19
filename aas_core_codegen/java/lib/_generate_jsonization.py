@@ -1284,12 +1284,12 @@ def generate(
     errors = []  # type: List[Error]
 
     imports = [
-        Stripped("import aas_core.aas3_0.reporting.Reporting;"),
-        Stripped("import aas_core.aas3_0.types.enums.*;"),
-        Stripped("import aas_core.aas3_0.types.impl.*;"),
-        Stripped("import aas_core.aas3_0.types.model.*;"),
-        Stripped("import aas_core.aas3_0.stringification.Stringification;"),
-        Stripped("import aas_core.aas3_0.visitation.AbstractTransformer;"),
+        Stripped(f"import {package}.reporting.Reporting;"),
+        Stripped(f"import {package}.types.enums.*;"),
+        Stripped(f"import {package}.types.impl.*;"),
+        Stripped(f"import {package}.types.model.*;"),
+        Stripped(f"import {package}.stringification.Stringification;"),
+        Stripped(f"import {package}.visitation.AbstractTransformer;"),
         Stripped("import com.fasterxml.jackson.databind.JsonNode;"),
         Stripped("import com.fasterxml.jackson.databind.node.ArrayNode;"),
         Stripped("import com.fasterxml.jackson.databind.node.JsonNodeFactory;"),

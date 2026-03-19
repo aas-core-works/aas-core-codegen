@@ -139,6 +139,10 @@ INDENT3 = INDENT * 3
 INDENT4 = INDENT * 4
 INDENT5 = INDENT * 5
 INDENT6 = INDENT * 6
+INDENT7 = INDENT * 7
+INDENT8 = INDENT * 8
+INDENT9 = INDENT * 9
+INDENT10 = INDENT * 10
 
 
 INTERFACE_PKG = "model"
@@ -162,7 +166,7 @@ def enum_package_path(name: Stripped) -> Stripped:
 
 
 # noinspection RegExpSimplifiable
-PACKAGE_IDENTIFIER_RE = re.compile(r"[a-z][a-z_0-9]*(\.[a-z][a-z_0-9]*)*")
+PACKAGE_IDENTIFIER_RE = re.compile(r"[a-z_0-9]*(\.[a-z][a-z_0-9]*)*")
 
 
 class PackageIdentifier(str):

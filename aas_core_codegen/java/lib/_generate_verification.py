@@ -1231,11 +1231,15 @@ def generate(
         Stripped("import java.util.stream.IntStream;"),
         Stripped("import java.util.stream.Stream;"),
         Stripped("import java.util.stream.StreamSupport;"),
-        Stripped("import aas_core.aas3_0.constants.*;"),
-        Stripped("import aas_core.aas3_0.reporting.Reporting;"),
-        Stripped("import aas_core.aas3_0.types.enums.*;"),
-        Stripped("import aas_core.aas3_0.types.model.*;"),
-        Stripped("import aas_core.aas3_0.visitation.AbstractTransformer;"),
+        Stripped(f"import {package}.constants.*;"),
+        Stripped(f"import {package}.reporting.Reporting;"),
+        Stripped(f"import {package}.types.enums.*;"),
+        Stripped(f"import {package}.types.model.*;"),
+        Stripped(f"import {package}.visitation.AbstractTransformer;"),
+        Stripped(f"import {package}.reporting.Reporting;"),
+        Stripped(f"import {package}.types.enums.*;"),
+        Stripped(f"import {package}.types.model.*;"),
+        Stripped(f"import {package}.visitation.AbstractTransformer;"),
     ]  # type: List[Stripped]
 
     verification_blocks = []  # type: List[Stripped]
