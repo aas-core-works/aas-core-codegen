@@ -32,11 +32,11 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp_dir:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent.parent
 
-        parent_case_dir = repo_dir / "dev" / "test_data" / "csharp" / "test_main"
-        assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
+        expected_dir = repo_dir / "dev" / "test_data" / "main" / "csharp" / "expected"
+        assert expected_dir.exists() and expected_dir.is_dir(), expected_dir
 
         for model_pth in tests.common.REAL_META_MODEL_PATHS:
-            case_dir = parent_case_dir / model_pth.stem
+            case_dir = expected_dir / model_pth.stem
             assert case_dir.is_dir(), case_dir
 
             snippets_dir = case_dir / "input/snippets"

@@ -29,19 +29,24 @@ assert aas_core_codegen.__doc__ == __doc__
 class Target(enum.Enum):
     """List available target implementations."""
 
-    CSHARP = "csharp"
     CPP = "cpp"
+    CSHARP = "csharp"
     GOLANG = "golang"
     JAVA = "java"
-    JSONSCHEMA = "jsonschema"
-    PYTHON = "python"
-    TYPESCRIPT = "typescript"
-    RDF_SHACL = "rdf_shacl"
-    XSD = "xsd"
     JSONLD_CONTEXT = "jsonld_context"
-    PROTOBUF = "protobuf"
-    PYTHON_PROTOBUF = "python_protobuf"
+    JSONSCHEMA = "jsonschema"
     OPCUA = "opcua"
+    PROTOBUF = "protobuf"
+    PYTHON = "python"
+    PYTHON_PROTOBUF = "python_protobuf"
+    RDF_SHACL = "rdf_shacl"
+    TYPESCRIPT = "typescript"
+    XSD = "xsd"
+
+
+assert [target.name for target in Target] == sorted(
+    another_target.name for another_target in Target
+), f"{[target.name for target in Target]=}, {sorted(another_target.name for another_target in Target)=}"
 
 
 class Parameters:
