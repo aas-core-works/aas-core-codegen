@@ -195,13 +195,13 @@ def test_cases_from_real_world_models(
     ]
 
 
-def _repo_root() -> pathlib.Path:
-    return pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
+_REPO_ROOT: Final[pathlib.Path] = pathlib.Path(
+    os.path.realpath(__file__)
+).parent.parent.parent
 
-
-REAL_META_MODEL_PATHS: Final[Sequence[pathlib.Path]] = [
-    _repo_root() / "dev/test_data/real_meta_models/aas_core_meta.v3.py"
-]
+COMMON_META_MODEL_PATHS: Final[Sequence[pathlib.Path]] = sorted(
+    (_REPO_ROOT / "dev/test_data/common_meta_models").glob("*.py")
+)
 
 
 @require(lambda output_dir: output_dir.is_dir())
