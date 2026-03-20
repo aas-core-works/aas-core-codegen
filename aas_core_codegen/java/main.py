@@ -3,7 +3,8 @@
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
-from aas_core_codegen import specific_implementations, run, java
+from aas_core_codegen import specific_implementations, run, java, intermediate
+from aas_core_codegen.common import Error
 from aas_core_codegen.java import (
     common as java_common,
     lib as java_lib,
@@ -97,10 +98,10 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    project_rel_path = pathlib.Path(package)
+    project_rel_path = pathlib.Path("src") / "main" / "java" / package.replace(".", "/")
     assert not project_rel_path.is_absolute()
 
-    tests_rel_path = pathlib.Path("test/java")
+    tests_rel_path = pathlib.Path("src") / "test" / "java"
     assert not tests_rel_path.is_absolute()
 
     rel_paths_generators: Sequence[

@@ -1236,10 +1236,6 @@ def generate(
         Stripped(f"import {package}.types.enums.*;"),
         Stripped(f"import {package}.types.model.*;"),
         Stripped(f"import {package}.visitation.AbstractTransformer;"),
-        Stripped(f"import {package}.reporting.Reporting;"),
-        Stripped(f"import {package}.types.enums.*;"),
-        Stripped(f"import {package}.types.model.*;"),
-        Stripped(f"import {package}.visitation.AbstractTransformer;"),
     ]  # type: List[Stripped]
 
     verification_blocks = []  # type: List[Stripped]
