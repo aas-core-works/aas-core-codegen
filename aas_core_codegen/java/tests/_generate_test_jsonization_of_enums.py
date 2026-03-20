@@ -1,4 +1,4 @@
-"""Generate the test code for the JSON de/serialization of enums."""
+"""Generate code to test the JSON de/serialization of enumerations."""
 
 import json
 from typing import List
@@ -17,7 +17,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> List[java_common.JavaFile]:
     """
-    Generate the test code for the JSON de/serialization of enums.
+    Generate code to test the JSON de/serialization of enumerations.
     """
     blocks = []  # type: List[Stripped]
 

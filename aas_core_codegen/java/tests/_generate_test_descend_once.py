@@ -1,4 +1,4 @@
-"""Generate the test code for the ``DescendOnce`` methods."""
+"""Generate code to test the ``DescendOnce`` methods."""
 
 from typing import List
 
@@ -19,7 +19,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> List[java_common.JavaFile]:
     """
-    Generate the test code for the ``DescendOnce`` methods.
+    Generate code to test the ``DescendOnce`` methods.
     """
     blocks = [
         Stripped(

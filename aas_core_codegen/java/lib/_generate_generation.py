@@ -1,4 +1,4 @@
-"""Generate the code for the builders for the AAS data structures."""
+"""Generate the code for builders for model classes."""
 
 import io
 import textwrap
@@ -250,7 +250,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the code for the builders for the AAS data structures.
+    Generate the code for builders for model classes.
     """
 
     files = []  # type: List[java_common.JavaFile]

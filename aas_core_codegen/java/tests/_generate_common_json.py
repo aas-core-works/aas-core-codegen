@@ -1,4 +1,4 @@
-"""Generate the Java code for shared JSON functionality across unit tests."""
+"""Generate code for shared JSON functionality across unit tests."""
 
 from typing import List
 
@@ -16,7 +16,7 @@ from aas_core_codegen.java.common import (
 
 def generate(package: java_common.PackageIdentifier) -> List[java_common.JavaFile]:
     """
-    Generate the Java code for shared JSON functionality across unit tests.
+    Generate code for shared JSON functionality across unit tests.
     """
     blocks = [
         Stripped(

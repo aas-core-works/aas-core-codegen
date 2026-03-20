@@ -1,4 +1,4 @@
-"""Generate asset administration shells handling based on the meta-model."""
+"""Generate Java code based on the meta-model."""
 
 import pathlib
 from typing import TextIO, Sequence, Tuple, Callable, Optional, List

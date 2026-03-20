@@ -1,4 +1,4 @@
-"""Generate constants corresponding to the constants of the meta-model."""
+"""Generate code to define the constants of the meta-model."""
 
 import io
 import textwrap
@@ -215,7 +215,7 @@ def generate(
     package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate constants corresponding to the constants of the meta-model.
+    Generate code to define the constants of the meta-model.
     """
     enum_imports = set()  # type: Set[Stripped]
 

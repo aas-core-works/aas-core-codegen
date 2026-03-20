@@ -1,4 +1,4 @@
-"""Generate the common functions to de/serialize instances of a class."""
+"""Generate the Java code for shared JSON functionality across unit tests."""
 
 from typing import List
 
@@ -12,7 +12,7 @@ def generate(
     package: java_common.PackageIdentifier, symbol_table: intermediate.SymbolTable
 ) -> List[java_common.JavaFile]:
     """
-    Generate the common functions to de/serialize instances of a class.
+    Generate the Java code for shared JSON functionality across unit tests.
     """
     blocks = []  # type: List[str]
 

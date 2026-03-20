@@ -1,4 +1,4 @@
-"""Generate the code for the visitor classes."""
+"""Generate code of visitors to iterate over instances."""
 
 import io
 import textwrap
@@ -624,7 +624,7 @@ def generate(
     symbol_table: intermediate.SymbolTable, package: java_common.PackageIdentifier
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the code for the visitor classes.
+    Generate code of visitors to iterate over instances.
     """
 
     files = [

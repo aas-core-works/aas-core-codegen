@@ -1,4 +1,4 @@
-"""Generate the test code for the ``XOrDefault`` methods."""
+"""Generate code to test the ``XOrDefault`` methods."""
 
 from typing import List, Optional
 
@@ -18,7 +18,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> List[java_common.JavaFile]:
     """
-    Generate the test code for the ``XOrDefault`` methods.
+    Generate code to test the ``XOrDefault`` methods.
     """
     blocks = [
         Stripped(

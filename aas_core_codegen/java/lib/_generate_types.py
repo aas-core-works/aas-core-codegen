@@ -1,4 +1,4 @@
-"""Generate the code of the data structures."""
+"""Generate code of the data structures representing the meta-model."""
 
 import io
 import textwrap
@@ -1731,7 +1731,7 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
-    Generate the code of the data structures.
+    Generate code of the data structures representing the meta-model.
     """
 
     files = []  # type: List[java_common.JavaFile]

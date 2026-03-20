@@ -1,4 +1,4 @@
-"""Generate the test code for the de/serialization of instances in XML."""
+"""Generate code to test the XML de/serialization of concrete classes."""
 
 from typing import List
 
@@ -24,7 +24,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> List[java_common.JavaFile]:
     """
-    Generate the test code for the de/serialization of instances in XML.
+    Generate code to test the XML de/serialization of concrete classes.
     """
     blocks = [
         Stripped(

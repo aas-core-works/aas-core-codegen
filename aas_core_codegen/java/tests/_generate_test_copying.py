@@ -1,4 +1,4 @@
-"""Generate the test code for copying."""
+"""Generate code to test copying."""
 
 import io
 import textwrap
@@ -259,7 +259,7 @@ def generate(
     symbol_table: intermediate.SymbolTable,
 ) -> List[java_common.JavaFile]:
     """
-    Generate the test code for copying.
+    Generate code to test copying.
     """
     blocks = [
         _generate_deep_equals_transformer(symbol_table=symbol_table),

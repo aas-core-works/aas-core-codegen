@@ -1,4 +1,4 @@
-"""Generate the C# code shared across unit tests."""
+"""Generate code for common functionality shared across the tests."""
 
 import re
 from typing import List
@@ -38,7 +38,7 @@ def _package_to_upper_snake(
 
 
 def generate(package: java_common.PackageIdentifier) -> List[java_common.JavaFile]:
-    """Generate the C# code shared across unit tests."""
+    """Generate code for common functionality shared across the tests."""
     blocks = [
         Stripped(
             f"""\
