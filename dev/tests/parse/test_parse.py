@@ -452,14 +452,14 @@ class Test_against_recorded(unittest.TestCase):
                         f"{case_dir=}, {error=}",
                     )
 
-    def test_real_meta_models(self) -> None:
+    def test_common_meta_models(self) -> None:
         repo_root = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent.parent
-        test_cases_dir = repo_root / "dev/test_data/parse/real_meta_models"
+        test_cases_dir = repo_root / "dev/test_data/parse/common_meta_models"
 
         assert test_cases_dir.exists(), f"{test_cases_dir=}"
         assert test_cases_dir.is_dir(), f"{test_cases_dir=}"
 
-        for meta_model_pth in tests.common.REAL_META_MODEL_PATHS:
+        for meta_model_pth in tests.common.COMMON_META_MODEL_PATHS:
             case_dir = test_cases_dir / meta_model_pth.stem
 
             try:

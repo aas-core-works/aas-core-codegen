@@ -18,8 +18,8 @@ import tests.common
 
 _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
-_REAL_META_MODEL_STEM_TO_PATH = {
-    model_path.stem: model_path for model_path in tests.common.REAL_META_MODEL_PATHS
+_COMMON_META_MODEL_STEM_TO_PATH = {
+    model_path.stem: model_path for model_path in tests.common.COMMON_META_MODEL_PATHS
 }
 
 
@@ -36,7 +36,7 @@ class _TestCase(unittest.TestCase):
 
         meta_model_path = case_dir / "meta_model.py"
         if not meta_model_path.exists():
-            real_meta_model_path = _REAL_META_MODEL_STEM_TO_PATH.get(case_name, None)
+            real_meta_model_path = _COMMON_META_MODEL_STEM_TO_PATH.get(case_name, None)
 
             if real_meta_model_path is None:
                 raise RuntimeError(
@@ -44,7 +44,7 @@ class _TestCase(unittest.TestCase):
                     f"and case {case_name}. Neither {meta_model_path} exists "
                     f"nor is there a real meta-model corresponding to it. "
                     f"The real meta-model paths "
-                    f"are: {tests.common.REAL_META_MODEL_PATHS}."
+                    f"are: {tests.common.COMMON_META_MODEL_PATHS}."
                 )
             else:
                 meta_model_path = real_meta_model_path

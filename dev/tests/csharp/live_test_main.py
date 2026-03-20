@@ -35,7 +35,7 @@ def main() -> int:
         expected_dir = repo_dir / "dev" / "test_data" / "main" / "csharp" / "expected"
         assert expected_dir.exists() and expected_dir.is_dir(), expected_dir
 
-        for model_pth in tests.common.REAL_META_MODEL_PATHS:
+        for model_pth in tests.common.COMMON_META_MODEL_PATHS:
             case_dir = expected_dir / model_pth.stem
             assert case_dir.is_dir(), case_dir
 
