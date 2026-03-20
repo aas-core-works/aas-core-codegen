@@ -139,7 +139,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[List[_Token]]
             name = java_naming.class_name(element.our_type.name)
             reference = Stripped(f"@{{code {name}}}")
         elif isinstance(element.our_type, intermediate.AbstractClass):
-            # NOTE (empwilli, 2023-12-14):
+            # NOTE (empwilli):
             # We do not generate Java code for abstract classes, so we have to refer
             # to the interface.
             name = java_naming.interface_name(element.our_type.name)
@@ -147,7 +147,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[List[_Token]]
                 f"{{@link {self.context.root_package}.types.model.{name}}}"
             )
         elif isinstance(element.our_type, intermediate.ConcreteClass):
-            # NOTE (empwilli, 2023-12-14):
+            # NOTE (empwilli):
             # Though a concrete class can have multiple descendants and the writer
             # might actually want to refer to the *interface* instead of
             # the concrete class, we do the best effort here and resolve it to the
@@ -172,13 +172,13 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[List[_Token]]
 
             base: Stripped
             if isinstance(element.reference.cls, intermediate.AbstractClass):
-                # NOTE (empwilli, 2023-12-14):
+                # NOTE (empwilli):
                 # We do not generate Java code for abstract classes, so we have to refer
                 # to the interface.
                 interface_name = java_naming.interface_name(element.reference.cls.name)
                 base = Stripped(f"types.model.{interface_name}")
             elif isinstance(element.reference.cls, intermediate.ConcreteClass):
-                # NOTE (empwilli, 2023-12-14):
+                # NOTE (empwilli):
                 # Though a concrete class can have multiple descendants and the writer
                 # might actually want to refer to the *interface* instead of
                 # the concrete class, we do the best effort here and resolve it to the

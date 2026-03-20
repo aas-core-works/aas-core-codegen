@@ -1,0 +1,371 @@
+"""Generate code to test the XML de/serialization of concrete classes."""
+
+from typing import List
+
+from aas_core_codegen import intermediate, naming
+from aas_core_codegen.common import Stripped, indent_but_first_line
+from aas_core_codegen.java import common as java_common, naming as java_naming
+from aas_core_codegen.java.common import (
+    INDENT as I,
+    INDENT2 as II,
+    INDENT3 as III,
+    INDENT4 as IIII,
+    INDENT5 as IIIII,
+    INDENT6 as IIIIII,
+    INDENT7 as IIIIIII,
+    INDENT8 as IIIIIIII,
+    INDENT9 as IIIIIIIII,
+    INDENT10 as IIIIIIIIII,
+)
+
+
+def generate(
+    package: java_common.PackageIdentifier,
+    symbol_table: intermediate.SymbolTable,
+) -> List[java_common.JavaFile]:
+    """
+    Generate code to test the XML de/serialization of concrete classes.
+    """
+    blocks = [
+        Stripped(
+            f"""\
+public static Optional<Reporting.Error> checkElementsEqual(
+{I}XMLEvent expected, String expectedContent, Map<XMLEvent, String> outputMap) {{
+{I}switch (expected.getEventType()) {{
+{II}case XMLStreamConstants.START_ELEMENT:
+{III}{{
+{IIII}final String expectedName = expected.asStartElement().getName().getLocalPart();
+{IIII}final Optional<Map.Entry<XMLEvent, String>> got =
+{IIIII}outputMap.entrySet().stream()
+{IIIIII}.filter(
+{IIIIIII}entry ->
+{IIIIIIII}entry.getKey().isStartElement()
+{IIIIIIIII}&& entry
+{IIIIIIIIII}.getKey()
+{IIIIIIIIII}.asStartElement()
+{IIIIIIIIII}.getName()
+{IIIIIIIIII}.getLocalPart()
+{IIIIIIIIII}.equals(expectedName))
+{IIIIII}.filter(entry -> entry.getValue().equals(expectedContent))
+{IIIIIII}.findAny();
+{IIII}if (!got.isPresent()) {{
+{IIIII}final Reporting.Error error =
+{IIIIII}new Reporting.Error(
+{IIIIIII}"Missing start element "
+{IIIIIIII}+ expectedName
+{IIIIIIII}+ " in with content: "
+{IIIIIIII}+ expectedContent);
+{IIIII}return Optional.of(error);
+{IIII}}}
+{IIII}outputMap.remove(got.get().getKey());
+{IIII}return Optional.empty();
+{III}}}
+{II}case XMLStreamConstants.END_ELEMENT:
+{III}{{
+{IIII}final String expectedName = expected.asEndElement().getName().getLocalPart();
+{IIII}final Optional<Map.Entry<XMLEvent, String>> got =
+{IIIII}outputMap.entrySet().stream()
+{IIIIII}.filter(
+{IIIIIII}entry ->
+{IIIIIIII}entry.getKey().isEndElement()
+{IIIIIIIII}&& entry
+{IIIIIIIIII}.getKey()
+{IIIIIIIIII}.asEndElement()
+{IIIIIIIIII}.getName()
+{IIIIIIIIII}.getLocalPart()
+{IIIIIIIIII}.equals(expectedName))
+{IIIIII}.findAny();
+{IIII}if (!got.isPresent()) {{
+{IIIII}final Reporting.Error error =
+{IIIIII}new Reporting.Error("Missing end element " + expectedName);
+{IIIII}return Optional.of(error);
+{IIII}}}
+{IIII}outputMap.remove(got.get().getKey());
+{IIII}return Optional.empty();
+{III}}}
+{II}default:
+{III}{{
+{IIII}throw new IllegalStateException("Unexpected event type in check elements equal.");
+{III}}}
+{I}}}
+}}"""
+        ),
+        Stripped(
+            f"""\
+private static String readContent(XMLEventReader reader) throws XMLStreamException {{
+{I}final StringBuilder content = new StringBuilder();
+{I}while (reader.hasNext() && reader.peek().isCharacters()
+{III}&& !reader.peek().asCharacters().isWhiteSpace()
+{III}|| reader.peek().getEventType() == XMLStreamConstants.COMMENT) {{
+
+{II}if (reader.peek().isCharacters()) {{
+{III}content.append(reader.peek().asCharacters().getData());
+{II}}}
+{II}reader.nextEvent();
+{I}}}
+{I}return content.toString();
+}}"""
+        ),
+        Stripped(
+            f"""\
+private static Map<XMLEvent, String> buildElementsMap(XMLEventReader reader) throws XMLStreamException {{
+{I}final Map<XMLEvent, String> result = new LinkedHashMap<>();
+{I}while (reader.hasNext()) {{
+{II}final XMLEvent current = reader.nextEvent();
+{II}if (current.isStartElement()) {{
+{III}result.put(current, readContent(reader));
+{II}}} else if (current.isEndElement()) {{
+{III}result.put(current, "");
+{II}}}
+{I}}}
+{I}return result;
+}}"""
+        ),
+        Stripped(
+            f"""\
+private static void assertSerializeDeserializeEqualsOriginal(IClass instance, Path path)
+{I}throws XMLStreamException, IOException {{
+{I}// Serialize
+{I}final StringWriter stringOut = new StringWriter();
+{I}final XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+{I}final XMLStreamWriter xmlStreamWriter = outputFactory.createXMLStreamWriter(stringOut);
+
+{I}Xmlization.Serialize.to(instance, xmlStreamWriter);
+
+{I}final String outputText = stringOut.toString();
+
+// Compare expected == output
+final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+final XMLEventReader outputReader =
+{I}xmlInputFactory.createXMLEventReader(new StringReader(outputText));
+final Map<XMLEvent, String> outputMap = buildElementsMap(outputReader);
+
+// check output for aas-name-space
+for (XMLEvent event : outputMap.keySet()) {{
+{I}if (event.isStartElement()) {{
+{II}assertEquals(Xmlization.AAS_NAME_SPACE, event.asStartElement().getName().getNamespaceURI());
+{I}}}
+{I}if (event.isEndElement()) {{
+{II}assertEquals(Xmlization.AAS_NAME_SPACE, event.asEndElement().getName().getNamespaceURI());
+{I}}}
+}}
+
+final XMLEventReader expectedReader =
+{I}xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+final Map<XMLEvent, String> expectedMap = buildElementsMap(expectedReader);
+
+if (expectedMap.size() != outputMap.size()) {{
+{I}fail(
+{II}"Mismatch in element size expected "
+{III}+ expectedMap.size()
+{III}+ " but got "
+{III}+ outputMap.size());
+}}
+
+expectedMap.forEach(
+{I}(xmlEvent, content) -> {{
+{II}final Optional<Reporting.Error> inequalityError =
+{IIII}checkElementsEqual(xmlEvent, content, outputMap);
+{II}inequalityError.ifPresent(
+{III}error ->
+{IIII}fail(
+{IIIII}"The original XML from "
+{IIIIII} + path
+{IIIIII} + " is unequal the serialized XML: "
+{IIIIII} + error.getCause()));
+{I}}});
+}}"""
+        ),
+        Stripped(
+            f"""\
+private static void assertEqualsExpectedOrRerecordDeserializationException(
+{I}Xmlization.DeserializeException exception,
+{I}Path path) throws IOException {{
+{I}if (exception == null) {{
+{II}fail("Expected a Xmlization exception when de-serializing " + path + ", but got none.");
+{I}}} else {{
+{II}final Path exceptionPath = Paths.get(path + ".exception");
+{II}final String got = exception.getMessage();
+{II}if (Common.RECORD_MODE) {{
+{III}Files.write(exceptionPath, got.getBytes(StandardCharsets.UTF_8));
+{II}}} else {{
+{III}if (!Files.exists(exceptionPath)) {{
+{IIII}throw new FileNotFoundException(
+{IIIII}"The file with the recorded exception does not exist: "
+{IIIII}+ exceptionPath
+{IIIII}+ "; maybe you want to set the environment variable"
+{IIIII}+ Common.RECORD_MODE_ENVIRONMENT_VARIABLE_NAME
+{IIIII}+ "?");
+{III}}}
+
+{III}final String expected = String.join("\\n", Files.readAllLines(exceptionPath));
+{III}assertEquals(
+{IIII}expected.replace("\\n", ""),
+{IIII}got.replace("\\n", ""),
+{IIII}"The expected exception does not match the actual one for the file " + path);
+{II}}}
+{I}}}
+}}"""
+        ),
+    ]  # type: List[Stripped]
+
+    for concrete_cls in symbol_table.concrete_classes:
+        cls_name_java = java_naming.class_name(concrete_cls.name)
+        cls_name_xml = naming.xml_class_name(concrete_cls.name)
+
+        blocks.append(
+            Stripped(
+                f"""\
+@Test
+public void test{cls_name_java}Ok() throws IOException, XMLStreamException {{
+{I}final Path searchPath =
+{II}Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", {java_common.string_literal(cls_name_xml)});
+{I}final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+{I}for (Path path : paths) {{
+{II}final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+{II}final XMLEventReader xmlReader =
+{III}xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+{II}final {cls_name_java} instance =
+{III}Xmlization.Deserialize.deserialize{cls_name_java}(xmlReader);
+
+{II}final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+{II}final List<Reporting.Error> errors = Common.asList(errorIter);
+{II}Common.assertNoVerificationErrors(errors, path);
+
+{II}assertSerializeDeserializeEqualsOriginal(instance, path);
+{I}}}
+}} // public void test{cls_name_java}Ok"""
+            )
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+@Test
+public void test{cls_name_java}DeserializationFail() throws IOException, XMLStreamException {{
+{I}for (
+{II}Path causeDir :
+{II}Common.findDirs(
+{III}Paths.get(
+{IIII}Common.TEST_DATA_DIR,
+{IIII}"Xml",
+{IIII}"Unexpected",
+{IIII}"Unserializable"))) {{
+{II}final Path clsDir =
+{III}causeDir.resolve({java_common.string_literal(cls_name_xml)});
+
+{II}if (!Files.exists(clsDir)) {{
+{III}// No examples of {cls_name_java} for the failure cause.
+{III}continue;
+{II}}}
+
+{II}final List<Path> paths = Common.findPaths(clsDir, ".xml");
+{II}for (Path path : paths) {{
+{III}final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+{III}final XMLEventReader xmlReader =
+{IIII}xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+{III}Xmlization.DeserializeException exception = null;
+
+{III}try {{
+{IIII}Xmlization.Deserialize.deserialize{cls_name_java}(xmlReader);
+{III}}} catch (Xmlization.DeserializeException observedException) {{
+{IIII}exception = observedException;
+{III}}}
+
+{III}assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+{II}}}
+{I}}}
+}}  // public void test{cls_name_java}DeserializationFail"""
+            )
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+@Test
+public void test{cls_name_java}VerificationFail() throws IOException, XMLStreamException {{
+{I}for (
+{II}Path causeDir :
+{II}Common.findDirs(
+{III}Paths.get(
+{IIII}Common.TEST_DATA_DIR,
+{IIII}"Xml",
+{IIII}"Unexpected",
+{IIII}"Invalid"))) {{
+{II}final Path clsDir = causeDir.resolve(
+{III}{java_common.string_literal(cls_name_xml)});
+
+{II}if (!Files.exists(clsDir)) {{
+{III}// No examples of {cls_name_java} for the failure cause.
+{III}continue;
+{II}}}
+
+{II}final List<Path> paths = Common.findPaths(clsDir, ".xml");
+{II}for (Path path : paths) {{
+{III}final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+{III}final XMLEventReader xmlReader =
+{IIII}xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+{III}final {cls_name_java} instance =
+{IIII}Xmlization.Deserialize.deserialize{cls_name_java}(xmlReader);
+
+{III}final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+{III}final List<Reporting.Error> errors = Common.asList(errorIter);
+{III}Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+{II}}}
+{I}}}
+}} // public void test{cls_name_java}VerificationFail"""
+            )
+        )
+
+    blocks_joined = "\n\n".join(blocks)
+
+    return [
+        java_common.JavaFile(
+            "TestXmlizationOfConcreteClasses.java",
+            f"""\
+{java_common.WARNING}
+
+package {package}.tests;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import {package}.reporting.Reporting;
+import {package}.types.impl.*;
+import {package}.types.model.IClass;
+import {package}.verification.Verification;
+import {package}.xmlization.Xmlization;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.xml.stream.*;
+import javax.xml.stream.events.XMLEvent;
+import org.junit.jupiter.api.Test;
+
+public class TestXmlizationOfConcreteClasses {{
+{I}{indent_but_first_line(blocks_joined, I)}
+}} // class TestXmlizationOfConcreteClasses
+
+// package {package}.tests
+
+{java_common.WARNING}
+""",
+        )
+    ]
+
+
+assert generate.__doc__ is not None
+assert generate.__doc__.strip().startswith(__doc__.strip())

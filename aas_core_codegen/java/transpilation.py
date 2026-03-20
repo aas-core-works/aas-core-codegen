@@ -32,7 +32,7 @@ from aas_core_codegen.intermediate import type_inference as intermediate_type_in
 from aas_core_codegen.parse import tree as parse_tree
 
 
-# NOTE (empwilli, 2024-01-19):
+# NOTE (empwilli):
 # We have to implement a very similar function for generating type annotations to
 # aas_core_codegen.golang.common.generate_type since we can not simply pass
 # intermediate_type_inference.TypeAnnotationUnion to
@@ -56,7 +56,7 @@ def generate_type(
 
     If ``types_package`` is specified, it is prepended to all our types.
 
-    (empwilli, 2024-01-19): We do not handle all the type annotations from
+    (empwilli): We do not handle all the type annotations from
     :py:mod:`aas_core_codegen.intermediate.type_inference` as that would be
     YAGNI (*e.g.*, verification functions, built-in functions *etc.*).
     If we do not know how to generate the type in Java, we return an error message.
@@ -76,7 +76,7 @@ def generate_type(
         elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            # NOTE (empwilli, 2024-01-19):
+            # NOTE (empwilli):
             # We always refer to interfaces even in cases of concrete classes without
             # concrete descendants since we want to allow enhancing.
 
@@ -97,7 +97,7 @@ def generate_type(
     else:
         return None, Error(
             None,
-            f"(empwilli, 2024-01-19): We do not handle "
+            f"(empwilli): We do not handle "
             f"the type annotation {type_annotation} from "
             "aas_core_codegen.intermediate.type_inference as that was, "
             "at this time point, YAGNI (*e.g.*, verification functions, "
@@ -365,7 +365,7 @@ class Transpiler(
         if isinstance(node.antecedent, no_parentheses_types_in_this_context):
             not_antecedent = f"!{antecedent}"
         else:
-            # NOTE (empwilli, 2023-12-14):
+            # NOTE (empwilli):
             # This is a very rudimentary heuristic for breaking the lines, and can be
             # greatly improved by rendering into Java code. However, at this point, we
             # lack time for more sophisticated reformatting approaches.
@@ -378,7 +378,7 @@ class Transpiler(
                 not_antecedent = f"!({antecedent})"
 
         if not isinstance(node.consequent, no_parentheses_types_in_this_context):
-            # NOTE (empwilli, 2023-12-14):
+            # NOTE (empwilli):
             # This is a very rudimentary heuristic for breaking the lines, and can be
             # greatly improved by rendering into Java code. However, at this point, we
             # lack time for more sophisticated reformatting approaches.
@@ -453,7 +453,7 @@ class Transpiler(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        # NOTE (empwilli, 2023-12-14):
+        # NOTE (empwilli):
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
         # have to test for argument arity here.
@@ -708,7 +708,7 @@ class Transpiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (empwilli, 2023-12-14):
+                # NOTE (empwilli):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into Java code. However, at this point,
                 # we lack time for more sophisticated reformatting approaches.
@@ -763,7 +763,7 @@ class Transpiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (empwilli, 2023-12-14):
+                # NOTE (empwilli):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into Java code. However, at this point,
                 # we lack time for more sophisticated reformatting approaches.
@@ -1036,7 +1036,7 @@ IntStream.range(
         if isinstance(node.target, parse_tree.Name):
             type_anno = self._environment.find(identifier=node.target.identifier)
             if type_anno is None:
-                # NOTE (empwilli, 2023-12-14):
+                # NOTE (empwilli):
                 # This is a variable definition as we did not specify the identifier
                 # in the environment.
 
@@ -1064,7 +1064,7 @@ IntStream.range(
         assert target is not None
         assert value is not None
 
-        # NOTE (empwilli, 2023-12-14):
+        # NOTE (empwilli):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
         if "\n" not in value and len(value) > 50:
@@ -1091,7 +1091,7 @@ IntStream.range(
 
         assert value is not None
 
-        # NOTE (empwilli, 2023-12-14):
+        # NOTE (empwilli):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
         if "\n" not in value and len(value) > 50:

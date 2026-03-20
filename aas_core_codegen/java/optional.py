@@ -157,7 +157,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         for arg in node.args:
             error = self.transform(arg)
 
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -214,7 +214,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         for arg in node.args:
             error = self.transform(arg)
 
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -305,7 +305,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_and(self, node: parse_tree.And) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for value in node.values:
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -323,7 +323,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_or(self, node: parse_tree.Or) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for value in node.values:
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -341,7 +341,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_add(self, node: parse_tree.Add) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for operand in (node.left, node.right):
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -359,7 +359,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
     def transform_sub(self, node: parse_tree.Sub) -> Optional[Error]:
         last_error = None  # type: Optional[Error]
         for operand in (node.left, node.right):
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -389,7 +389,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         for value in node.values:
             if isinstance(value, str):
                 continue
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
@@ -444,7 +444,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         for value in (node.start, node.end):
             error = self.transform(value)
 
-            # NOTE (empwilli, 2024-01-29):
+            # NOTE (empwilli):
             # Do not immediately return so that other arguments are processed as well.
             # This way we get a longer list of errors which the caller can report
             # using :py:prop:`errors`.
