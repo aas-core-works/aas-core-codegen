@@ -116,9 +116,11 @@ def must_translate_source_to_intermediate(
     return symbol_table
 
 
+RERECORD_ENVIRONMENT_VARIABLE_NAME = "AAS_CORE_CODEGEN_TESTS_RERECORD"
+
 #: If set, this environment variable indicates that the golden files should be
 #: re-recorded instead of checked against.
-RERECORD = os.environ.get("AAS_CORE_CODEGEN_TESTS_RERECORD", "").lower() in (
+RERECORD = os.environ.get(RERECORD_ENVIRONMENT_VARIABLE_NAME, "").lower() in (
     "1",
     "true",
     "on",
