@@ -1,14 +1,14 @@
 """Generate XML Schema Definition (XSD) corresponding to the meta-model."""
 
 import re
-import xml.etree.ElementTree as ET
 
 # noinspection PyUnresolvedReferences
 import xml.dom.minidom
+import xml.etree.ElementTree as ET
 from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence, Any
 
-from icontract import ensure, require
 import greenery
+from icontract import ensure, require
 
 import aas_core_codegen.xsd
 from aas_core_codegen import (
@@ -19,8 +19,8 @@ from aas_core_codegen import (
     infer_for_schema,
 )
 from aas_core_codegen.common import Error, assert_never, Identifier
-from aas_core_codegen.xsd import naming as xsd_naming
 from aas_core_codegen.parse import retree as parse_retree
+from aas_core_codegen.xsd import naming as xsd_naming
 
 assert aas_core_codegen.xsd.__doc__ == __doc__
 
@@ -374,9 +374,9 @@ def _generate_xs_element_for_a_list_property(
     """Generate the ``xs:element`` for a list property."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    # NOTE (mristin, 2022-03-30):
+    # NOTE (mristin):
     # Specify the ``type_anno`` here with assert instead of specifying it
-    # in the pre-condition to help mypy a bit
+    # in the pre-condition to help mypy a bit.
     assert isinstance(type_anno, intermediate.ListTypeAnnotation)
 
     min_occurs = "0"
@@ -390,8 +390,30 @@ def _generate_xs_element_for_a_list_property(
 
     xs_element: ET.Element
 
-    if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-        # NOTE (mristin, 2021-11-13):
+    if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+        xs_element_inner = ET.Element(
+            "xs:element",
+            {
+                # NOTE (mristin):
+                # We simply pick ``v`` as there is currently no specification for
+                # the list of primitives in XML.
+                "name": "v",
+                "type": _PRIMITIVE_MAP[type_anno.items.a_type],
+                "minOccurs": min_occurs,
+                "maxOccurs": max_occurs,
+            },
+        )
+        xs_sequence = ET.Element("xs:sequence")
+        xs_sequence.append(xs_element_inner)
+
+        xs_complex_type = ET.Element("xs:complexType")
+        xs_complex_type.append(xs_sequence)
+
+        xs_element = ET.Element("xs:element", {"name": naming.xml_property(prop.name)})
+        xs_element.append(xs_complex_type)
+
+    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
         # We need to nest the elements in the tag element to separate them in the
         # sequence.
 
@@ -416,7 +438,7 @@ def _generate_xs_element_for_a_list_property(
         elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            # NOTE (mristin, 2022-05-26):
+            # NOTE (mristin):
             # We need to check for the concrete descendants. If there are no concrete
             # descendants, there is no choice group either. Notably, this not only
             # applies to concrete classes, but there is no choice group for the abstract
@@ -477,7 +499,8 @@ def _generate_xs_element_for_a_list_property(
             prop.parsed.node,
             f"We do not know how to specify the list "
             f"for the property {prop.name!r} of {prop.specified_for.name!r} "
-            f"in the XSD with the type: {type_anno}",
+            f"in the XSD with the type: {type_anno}. "
+            f"If you need this feature, please contact the developers.",
         )
 
     return xs_element, None
