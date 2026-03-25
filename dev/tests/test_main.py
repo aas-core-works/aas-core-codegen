@@ -249,6 +249,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_primitive_types(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="primitive_types"
+        )
+
 
 class Test_csharp(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:

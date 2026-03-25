@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<something xmlns="https://dummy.com"><someBool>true</someBool><someInt>1234</someInt><someFloat>34.230000</someFloat><someString>hello world</someString><someBytes>SGVsbG8gV29ybGQ=</someBytes></something>
