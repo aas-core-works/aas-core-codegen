@@ -69,9 +69,14 @@ class _TestCase(unittest.TestCase):
 
                 expected_output_dir.mkdir(exist_ok=True, parents=True)
             else:
-                assert (
-                    expected_output_dir.exists() and expected_output_dir.is_dir()
-                ), expected_output_dir
+                assert expected_output_dir.exists() and expected_output_dir.is_dir(), (
+                    f"The environment variable "
+                    f"{tests.common.RERECORD_ENVIRONMENT_VARIABLE_NAME} has not been "
+                    f"set, so no output will be re-recorded and has to be tested "
+                    f"against the golden previously recorded output, but the directory "
+                    f"to the expected output either does not exist or "
+                    f"is not a directory: {expected_output_dir}"
+                )
 
                 # pylint: disable=consider-using-with
                 tmp_dir = tempfile.TemporaryDirectory()
@@ -278,6 +283,18 @@ class Test_jsonschema(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_list_of_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="list_of_primitives",
+        )
+
+    def test_expected_list_of_primitives_with_invariants(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="list_of_primitives_with_invariants",
         )
 
     def test_expected_regression_when_len_constraints_on_inherited_property(

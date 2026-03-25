@@ -1,0 +1,7 @@
+{
+  "someBools": [true],
+  "someInts": [1],
+  "someFloats": [1.0],
+  "someStrings": ["ok"],
+  "someBytes": ["AA=="]
+}
