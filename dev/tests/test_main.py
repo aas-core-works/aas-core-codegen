@@ -487,6 +487,17 @@ class Test_xsd(_TestCase):
             target=aas_core_codegen.main.Target.XSD, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_list_of_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="list_of_primitives"
+        )
+
+    def test_expected_list_of_primitives_with_invariants(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_primitives_with_invariants",
+        )
+
 
 class _CaseSpec:
     """Specify a single test."""

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something xmlns="https://dummy.com">
+  <someBools>
+    <v>true</v>
+  </someBools>
+  <someInts>
+    <v>1</v>
+  </someInts>
+  <someFloats>
+    <v>1.0</v>
+  </someFloats>
+  <someStrings>
+    <v>ok</v>
+  </someStrings>
+  <someBytes>
+    <v>AA==</v>
+  </someBytes>
+</something>

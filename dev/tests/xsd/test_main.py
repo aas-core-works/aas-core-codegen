@@ -1,6 +1,9 @@
 # pylint: disable=missing-docstring
-
+import os
+import pathlib
 import unittest
+
+import xmlschema
 
 from aas_core_codegen.xsd import main as xsd_main
 
@@ -92,6 +95,31 @@ class Test_translate_pattern(unittest.TestCase):
             assert fixed is not None, identifier
 
             self.assertEqual(expected, fixed, identifier)
+
+
+class Test_examples(unittest.TestCase):
+    def test_examples_comply_with_schema(self) -> None:
+        repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent.parent
+
+        expected_dir = repo_dir / "dev" / "test_data" / "main" / "xsd" / "expected"
+        assert expected_dir.exists() and expected_dir.is_dir(), expected_dir
+
+        for case_dir in sorted(expected_dir.iterdir()):
+            assert case_dir.is_dir(), case_dir
+
+            schema_pth = case_dir / "expected_output" / "schema.xsd"
+
+            schema = xmlschema.XMLSchema(str(schema_pth))
+
+            for data_pth in sorted(
+                (case_dir / "examples" / "expected").glob("**/*.xml")
+            ):
+                try:
+                    schema.validate(str(data_pth))
+                except xmlschema.XMLSchemaException as err:
+                    raise AssertionError(
+                        f"Failed to validate {data_pth} against {schema_pth}"
+                    ) from err
 
 
 if __name__ == "__main__":

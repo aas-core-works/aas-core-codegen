@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="something">
+    <xs:sequence>
+      <xs:element name="someBools">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:boolean" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="someInts">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:long" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="someFloats">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:double" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="someStrings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="someBytes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="v" type="xs:base64Binary" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:simpleType name="valueDataType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="something_t">
+    <xs:sequence>
+      <xs:group ref="something"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="something" type="something_t"/>
+</xs:schema>
