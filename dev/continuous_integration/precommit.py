@@ -111,6 +111,7 @@ def main() -> int:
             "dev/continuous_integration",
             "dev/dev_scripts",
             "dev/integration_tests",
+            "dev/live_tests",
             "dev/tests",
             "dev/test_data",
         ]
@@ -154,6 +155,7 @@ def main() -> int:
             "dev/continuous_integration",
             "dev/dev_scripts",
             "dev/tests",
+            "dev/live_tests",
         ]
 
         if overwrite:
@@ -194,6 +196,7 @@ def main() -> int:
             "dev/tests",
             "dev/continuous_integration",
             "dev/dev_scripts",
+            "dev/live_tests",
         ]
         config_file = pathlib.Path("dev/continuous_integration") / "mypy.ini"
 
@@ -222,6 +225,7 @@ def main() -> int:
             "dev/tests",
             "dev/continuous_integration",
             "dev/dev_scripts",
+            "dev/live_tests",
         ]
         rcfile = pathlib.Path("dev/continuous_integration") / "pylint.rc"
 
