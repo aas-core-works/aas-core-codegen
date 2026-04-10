@@ -1,0 +1,7 @@
+{
+  "some_bool": "invalid",
+  "some_int": 1234,
+  "some_float": 34.23,
+  "some_string": "hello world",
+  "some_bytes": "SGVsbG8gV29ybGQ="
+}
