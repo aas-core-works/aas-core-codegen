@@ -287,37 +287,6 @@ std::wstring TraceMark(
   const std::wstring model_type = aas::wstringification::to_wstring(
     that.model_type()
   );
-
-  if (aas_core::aas_3_0::types::IsIdentifiable(that)) {
-    const auto& identifiable(
-      dynamic_cast<const aas::types::IIdentifiable&>(that)
-    );
-
-    return aas::common::Concat(
-      model_type,
-      L" with ID ",
-      identifiable.id()
-    );
-  }
-
-  if (aas_core::aas_3_0::types::IsReferable(that)) {
-    const auto& referable(
-      dynamic_cast<const aas::types::IReferable&>(that)
-    );
-
-    if (referable.id_short().has_value()) {
-      return aas::common::Concat(
-        model_type,
-        L" with ID-short ",
-        *(referable.id_short())
-      );
-    }
-    return aas::common::Concat(
-      model_type,
-      L" with unspecified ID-short"
-    );
-  }
-
   return model_type;
 }
 
