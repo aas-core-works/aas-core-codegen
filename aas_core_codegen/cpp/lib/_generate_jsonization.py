@@ -2091,7 +2091,7 @@ if (error.has_value()) {{
 }}
 
 result[{json_prop_name_literal}] = std::move(
-{I}{serialized_var}
+{I}{serialized_var}.value()
 );"""
         )
     elif primitive_type is intermediate.PrimitiveType.FLOAT:
