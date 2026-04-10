@@ -6,14 +6,14 @@ import json
 import os
 import pathlib
 import re
-import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Optional, Pattern, Sequence
+from typing import Optional, Pattern
 
 from aas_core_codegen.common import Stripped
+from live_tests import common as live_tests_common
 
 
 def _cmake_project_name(namespace: Stripped) -> Stripped:
@@ -454,10 +454,6 @@ def _generate_vcpkg_json(namespace: Stripped) -> Stripped:
     )
 
 
-def _escape_and_join_command(command: Sequence[str]) -> str:
-    return " ".join(shlex.quote(part) for part in command)
-
-
 def _environment_variable_prefix(namespace: Stripped) -> Stripped:
     """
     Generate the prefix for the environment variables.
@@ -483,13 +479,6 @@ def main() -> int:
         "--select",
         help="Run only the test cases which match the regular expression",
         type=str,
-    )
-    parser.add_argument(
-        "--rerecord_test_data",
-        help=(
-            "Run the tests with re-recording and replace the golden test data "
-            "in the live tests in the repository"
-        ),
     )
     args = parser.parse_args()
 
@@ -595,7 +584,7 @@ def main() -> int:
             expected_output_dir = case_dir / "expected_output"
 
             print(
-                f"Copying all the files from {expected_output_dir} to {output_dir} ..."
+                f"Copying all the files from {expected_output_dir} to {project_dir} ..."
             )
             for path in sorted(
                 path
@@ -628,11 +617,17 @@ def main() -> int:
                 "-S.",
                 "-Bbuild",
             ]
-            print(f"Running {_escape_and_join_command(cmd)} from {project_dir} ...")
+            print(
+                f"Running {live_tests_common.escape_and_join_command(cmd)} "
+                f"from {project_dir} ..."
+            )
             subprocess.check_call(cmd, cwd=project_dir)
 
             cmd = ["cmake", "--build", "build", "-j", "8"]
-            print(f"Running {_escape_and_join_command(cmd)} from {project_dir} ...")
+            print(
+                f"Running {live_tests_common.escape_and_join_command(cmd)} "
+                f"from {project_dir} ..."
+            )
             subprocess.check_call(cmd, cwd=project_dir)
 
             case_test_data_dir = live_tests_cpp_dir / "test_data" / case_dir.name
@@ -673,7 +668,7 @@ def main() -> int:
                     f"={env.get(env_var_test_data_dir)} "
                     f"{env_var_test_record_mode}"
                     f"={env.get(env_var_test_record_mode)} "
-                    f"{_escape_and_join_command(cmd)} "
+                    f"{live_tests_common.escape_and_join_command(cmd)} "
                     f"from {build_dir}"
                 )
                 subprocess.check_call(cmd, cwd=build_dir, env=env)
