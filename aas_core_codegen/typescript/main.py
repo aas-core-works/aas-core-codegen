@@ -111,6 +111,13 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            src_rel_path / "xmlization.ts",
+            lambda: typescript_lib.generate_xmlization(
+                symbol_table=context.symbol_table,
+                spec_impls=context.spec_impls,
+            ),
+        ),
+        (
             src_rel_path / "stringification.ts",
             lambda: typescript_lib.generate_stringification(
                 symbol_table=context.symbol_table
@@ -158,6 +165,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            test_rel_path / "commonXmlization.ts",
+            lambda: (
+                typescript_tests.generate_common_xmlization(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
             test_rel_path / "jsonization.concreteClasses.spec.ts",
             lambda: (
                 typescript_tests.generate_jsonization_concrete_classes_spec(
@@ -179,6 +195,33 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             test_rel_path / "jsonization.interfaces.spec.ts",
             lambda: (
                 typescript_tests.generate_jsonization_interfaces_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "xmlization.concreteClasses.spec.ts",
+            lambda: (
+                typescript_tests.generate_xmlization_concrete_classes_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "xmlization.enums.spec.ts",
+            lambda: (
+                typescript_tests.generate_xmlization_enums_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "xmlization.interfaces.spec.ts",
+            lambda: (
+                typescript_tests.generate_xmlization_interfaces_spec(
                     symbol_table=verified_ir_table,
                 ),
                 None,

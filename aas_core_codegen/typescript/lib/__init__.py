@@ -5,6 +5,7 @@ from aas_core_codegen.typescript.lib import (
     _generate_constants,
     _generate_index,
     _generate_jsonization,
+    _generate_xmlization,
     _generate_stringification,
     _generate_types,
     _generate_verification,
@@ -17,6 +18,8 @@ generate_constants = _generate_constants.generate
 generate_index = _generate_index.generate
 
 generate_jsonization = _generate_jsonization.generate
+
+generate_xmlization = _generate_xmlization.generate
 
 generate_stringification = _generate_stringification.generate
 
