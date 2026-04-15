@@ -53,7 +53,7 @@ def main() -> int:
 
     assert main_python_expected_dir.exists() and main_python_expected_dir.is_dir()
 
-    live_tests_python_dir = repo_root / "dev" / "test_data" / "live_tests" / "golang"
+    live_tests_python_dir = repo_root / "dev" / "test_data" / "live_tests" / "python"
     assert (
         live_tests_python_dir.exists() and live_tests_python_dir.is_dir()
     ), live_tests_python_dir
