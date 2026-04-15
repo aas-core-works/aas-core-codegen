@@ -1,6 +1,7 @@
 """Provide functions shared among different TypeScript code generation modules."""
 import io
 import math
+import re
 from typing import List, Tuple, Optional, Union
 
 from icontract import require
@@ -338,3 +339,22 @@ CONSTANTS_MODULE = Identifier("constants")
 
 #: Name of the module where all the verification logic resides
 VERIFICATION_MODULE = Identifier("verification")
+
+
+def environment_variable_prefix(package_identifier: Stripped) -> Stripped:
+    """
+    Generate the prefix for environment variables used in the package.
+
+    >>> environment_variable_prefix(Stripped('@dummy-works/dummy'))
+    'DUMMY'
+
+    >>> environment_variable_prefix(Stripped('@aas-core-works/aas-core3.0-typescript'))
+    'AAS_CORE3_0_TYPESCRIPT'
+    """
+    package_identifier_after_slash = (
+        package_identifier.partition("/")[2] or package_identifier
+    )
+
+    return Stripped(
+        re.sub("[^a-zA-Z_0-9]", "_", package_identifier_after_slash).upper()
+    )
