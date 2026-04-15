@@ -25,7 +25,6 @@ class Step(enum.Enum):
     DOCTEST = "doctest"
     CHECK_INIT_AND_PYPROJECT_CONSISTENT = "check-init-and-pyproject-consistent"
     CHECK_HELP_IN_README = "check-help-in-readme"
-    INTEGRATION_TEST = "integration-test"
 
 
 def call_and_report(
@@ -110,7 +109,6 @@ def main() -> int:
             "aas_core_codegen",
             "dev/continuous_integration",
             "dev/dev_scripts",
-            "dev/integration_tests",
             "dev/live_tests",
             "dev/tests",
             "dev/test_data",
@@ -273,25 +271,10 @@ def main() -> int:
     else:
         print("Skipped testing.")
 
-    if Step.INTEGRATION_TEST in selects and Step.INTEGRATION_TEST not in skips:
-        print("Integration testing...")
-        exit_code = call_and_report(
-            verb="execute unit tests",
-            cmd=[
-                sys.executable,
-                "dev/integration_tests/main.py",
-            ],
-            cwd=repo_root,
-        )
-        if exit_code != 0:
-            return 1
-    else:
-        print("Skipped integration testing.")
-
     if Step.DOCTEST in selects and Step.DOCTEST not in skips:
         print("Doctest'ing...")
 
-        # BEFORE-RELEASE (mristin, 2021-12-13):
+        # BEFORE-RELEASE (mristin):
         #  Add ``{repo_root}/docs/source/**/*.rst`` as well here
         doc_files = ["README.rst"]
 
