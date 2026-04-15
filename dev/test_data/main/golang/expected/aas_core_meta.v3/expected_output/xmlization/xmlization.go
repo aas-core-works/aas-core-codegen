@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	aascommon "github.com/aas-core-works/aas-core3.0-golang/common"
 	aasreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
 	aasstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
 	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
@@ -250,6 +251,33 @@ func readTextAsLong(
 	return
 }
 
+func constructXsDoubleRe() *regexp.Regexp {
+	doubleRep := "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)"
+	pattern := aascommon.Concat(
+		"^",
+		doubleRep,
+		"$",
+	)
+
+	return regexp.MustCompile(
+		pattern,
+	)
+}
+
+var xsDoubleRe = constructXsDoubleRe()
+
+// Check that text conforms to the pattern of an `xs:double`.
+//
+// See: https://www.w3.org/TR/xmlschema-2/#double
+//
+//   - `text`: Text to be checked
+//   - Return True if the text conforms to the pattern
+func isValidXsDouble(text string) bool {
+	return xsDoubleRe.MatchString(
+		text,
+	)
+}
+
 // Consume the text tokens (char data) as a representation of a `xs:double`.
 //
 // Any comment tokens are skipped.
@@ -272,7 +300,7 @@ func readTextAsDouble(
 	// strconv.ParseFloat is too permissive. For example, it accepts "nan"
 	// although only "NaN" is valid.
 	// See: https://www.w3.org/TR/xmlschema-2/#double
-	if !aasverification.MatchesXsDouble(text) {
+	if !isValidXsDouble(text) {
 		err = newDeserializationError(
 			fmt.Sprintf(
 				"Expected a value as xs:double, but got: %s",
@@ -11741,7 +11769,6 @@ func writeLongProperty(
 	encoder *xml.Encoder,
 	local string,
 	value int64,
-	withNamespace bool,
 ) (err error) {
 	err = writeStartElement(
 		encoder,

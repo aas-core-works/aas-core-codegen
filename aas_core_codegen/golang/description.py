@@ -330,7 +330,15 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
 
 def documentation_comment(text: Stripped) -> Stripped:
-    """Generate the documentation comment with the given ``text``."""
+    """
+    Generate the documentation comment with the given ``text``.
+
+    >>> documentation_comment(Stripped('hello world'))
+    '// hello world'
+
+    >>> documentation_comment(Stripped('hello\\nworld'))
+    '// hello\\n// world'
+    """
     commented_lines = []  # type: List[str]
     for line in text.splitlines():
         if len(line.strip()) == 0:

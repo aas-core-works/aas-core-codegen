@@ -22,6 +22,7 @@ dependencies = [
     "ssort==0.12.3",
     "requests==2.32.4",
     "types-requests==2.32.4.20250913",
+    "more-itertools==10.8.0; python_version<='3.11'"
 ]
 
 [tool.setuptools]

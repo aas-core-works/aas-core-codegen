@@ -944,7 +944,7 @@ def _generate_interface(
                 )
             )
         else:
-            blocks.append(Stripped(f"func {getter_name}() {prop_type};"))
+            blocks.append(Stripped(f"{getter_name}() {prop_type};"))
 
         setter_name = golang_naming.setter_name(prop.name)
         blocks.append(
@@ -1346,6 +1346,13 @@ def generate(
 
     blocks = []  # type: List[Stripped]
 
+    package_description_comment = golang_description.documentation_comment(
+        Stripped(
+            """\
+Package types provides the data structures corresponding to the meta-model."""
+        )
+    )
+
     if symbol_table.meta_model.description is not None:
         # fmt: off
         comment, comment_errors = (
@@ -1362,12 +1369,20 @@ def generate(
             blocks.append(
                 Stripped(
                     f"""\
-// Package types provides the data structures corresponding to the meta-model.
+{package_description_comment}
 //
 {comment}
 package types"""
                 )
             )
+    else:
+        blocks.append(
+            Stripped(
+                f"""\
+{package_description_comment}
+package types"""
+            )
+        )
 
     model_type_getter = golang_naming.getter_name(Identifier("model_type"))
     model_type_enum = golang_naming.enum_name(Identifier("Model_type"))

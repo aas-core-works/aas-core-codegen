@@ -129,18 +129,18 @@ def main() -> int:
     blocks = _split_in_blocks(text, indention=indention)
 
     for block in blocks:
-        lines = block.split("\n")
-
         needs_f = any(
             re.match(r"^.*{\s+[a-zA-Z_0-9]+\s*}", line) is not None
             or line.startswith(indention)
-            for line in lines
+            for line in block.splitlines()
         )
 
         block = block.replace("\\", "\\\\")
 
         if needs_f:
             block = block.replace("{", "{{").replace("}", "}}")
+
+        lines = block.split("\n")
 
         # NOTE (mristin):
         # We replace indentation with {I}, {II}, etc. placeholders.

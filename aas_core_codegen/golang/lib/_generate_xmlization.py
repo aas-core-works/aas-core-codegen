@@ -297,6 +297,51 @@ func readTextAsLong(
     )
 
 
+def _generate_is_valid_xs_double() -> List[Stripped]:
+    """
+    Generate regular expression to check ``xs:double`` values.
+
+    While there might be a function in the meta-model itself with the same name in
+    the verification, we provide a separate function here so that it works for all
+    meta-models.
+    """
+    return [
+        Stripped(
+            f"""\
+func constructXsDoubleRe() *regexp.Regexp {{
+{I}doubleRep := "((\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|-?INF|NaN)"
+{I}pattern := aascommon.Concat(
+{II}"^",
+{II}doubleRep,
+{II}"$",
+{I})
+
+{I}return regexp.MustCompile(
+{II}pattern,
+{I})
+}}"""
+        ),
+        Stripped(
+            """\
+var xsDoubleRe = constructXsDoubleRe()"""
+        ),
+        Stripped(
+            f"""\
+// Check that text conforms to the pattern of an `xs:double`.
+//
+// See: https://www.w3.org/TR/xmlschema-2/#double
+//
+//   - `text`: Text to be checked
+//   - Return True if the text conforms to the pattern
+func isValidXsDouble(text string) bool {{
+{I}return xsDoubleRe.MatchString(
+{II}text,
+{I})
+}}"""
+        ),
+    ]
+
+
 def _generate_read_text_as_double() -> Stripped:
     return Stripped(
         f"""\
@@ -322,7 +367,7 @@ func readTextAsDouble(
 {I}// strconv.ParseFloat is too permissive. For example, it accepts "nan"
 {I}// although only "NaN" is valid.
 {I}// See: https://www.w3.org/TR/xmlschema-2/#double
-{I}if !aasverification.MatchesXsDouble(text) {{
+{I}if !isValidXsDouble(text) {{
 {II}err = newDeserializationError(
 {III}fmt.Sprintf(
 {IIII}"Expected a value as xs:double, but got: %s",
@@ -1582,7 +1627,6 @@ func writeLongProperty(
 {I}encoder *xml.Encoder,
 {I}local string,
 {I}value int64,
-{I}withNamespace bool,
 ) (err error) {{
 {I}err = writeStartElement(
 {II}encoder,
@@ -2310,6 +2354,8 @@ def generate(
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code for XML de/serialization."""
+    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+
     aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
@@ -2348,6 +2394,7 @@ import (
 {I}"strconv"
 {I}"strings"
 {I}"unicode"
+{I}aascommon {aascommon_url_literal}
 {I}aasreporting {aasreporting_url_literal}
 {I}aasstringification {aasstringification_url_literal}
 {I}aastypes {aastypes_url_literal}
@@ -2372,6 +2419,7 @@ type eof struct{}"""
             _generate_read_text(),
             _generate_read_text_as_boolean(),
             _generate_read_text_as_long(),
+            *_generate_is_valid_xs_double(),
             _generate_read_text_as_double(),
             _generate_read_text_as_base64_encoded_bytes(),
             Stripped(
