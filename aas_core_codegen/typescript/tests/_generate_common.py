@@ -1,13 +1,13 @@
 """Generate code for common functionality shared across the tests."""
 
 import io
-import re
 from typing import List, Optional, Tuple
 
 from icontract import ensure
 
 from aas_core_codegen import specific_implementations
 from aas_core_codegen.common import Stripped, Error
+from aas_core_codegen.typescript import common as typescript_common
 from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
@@ -45,13 +45,9 @@ def generate(
 
     assert package_identifier is not None
 
-    package_identifier_after_slash = (
-        package_identifier.partition("/")[2] or package_identifier
+    environment_variable_prefix = typescript_common.environment_variable_prefix(
+        package_identifier
     )
-
-    package_identifier_as_var = re.sub(
-        "[^a-zA-Z_0-9]", "_", package_identifier_after_slash
-    ).upper()
 
     blocks = [
         Stripped(
@@ -80,7 +76,7 @@ import { Path } from "../src/jsonization";"""
 // to steer the automatic recording. We intentionally inter-twine the recording code with the test code
 // to keep them close to each other so that they are easier to maintain.
 export const RECORD_MODE_ENVIRONMENT_VARIABLE_NAME =
-{I}"{package_identifier_as_var}_TEST_RECORD_MODE";"""
+{I}"{environment_variable_prefix}_TEST_RECORD_MODE";"""
         ),
         Stripped(
             f"""\
@@ -92,7 +88,7 @@ export const RECORD_MODE: boolean =
         Stripped(
             f"""\
 export const TEST_DATA_DIR = process.env[
-{I}"{package_identifier_as_var}_TEST_DATA_DIR"
+{I}"{environment_variable_prefix}_TEST_DATA_DIR"
 ];
 if (TEST_DATA_DIR === null || TEST_DATA_DIR === undefined) {{
 {I}throw new Error(
