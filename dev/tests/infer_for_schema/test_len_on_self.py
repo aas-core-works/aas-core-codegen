@@ -371,7 +371,7 @@ Constraints(
             text,
         )
 
-    def test_inheritance_between_constrained_primitives_by_default(self) -> None:
+    def test_inheritance_between_constrained_primitives(self) -> None:
         source = textwrap.dedent(
             """\
             @invariant(

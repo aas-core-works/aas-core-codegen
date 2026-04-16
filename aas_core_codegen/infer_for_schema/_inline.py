@@ -22,9 +22,6 @@ from aas_core_codegen.infer_for_schema._types import (
 )
 
 
-# TODO: than go over constrained primitives -- and use merge on constraints
-# TODO: then go over all the type annotations -- stack them for class
-# TODO: then handle inheritance
 def _min_or_none(
         that: Optional[float],
         other: Optional[float]
@@ -370,7 +367,10 @@ def _infer_constraints_by_constrained_primitive(
         # NOTE (mristin):
         # The topological order ensures that we have processed the parents already.
         for parent in constrained_primitive.inheritances:
-            constraints = _merge_constraints(constraints, mapping.get(parent, None))
+            # NOTE (mristin):
+            # The constrained primitive inherits all the constraints from the parent,
+            # and then it might tighten them some more.
+            constraints = _merge_constraints(mapping.get(parent, None), constraints)
 
         if constraints is not None:
             mapping[constrained_primitive] = constraints
@@ -378,13 +378,6 @@ def _infer_constraints_by_constrained_primitive(
     return mapping, None
 
 
-# TODO: remove once implemented in the main method
-#
-#     pattern_verifications_by_name = (
-#         infer_for_schema_pattern.map_pattern_verifications_by_name(
-#             verifications=symbol_table.verification_functions
-#         )
-#     )
 
 def _over_non_optional_type_annotations(
         type_annotation: intermediate.TypeAnnotationUnion
@@ -635,15 +628,15 @@ def infer_constraints_by_class(
         that_constraints_by_value = mapping[cls]
 
         for parent in cls.inheritances:
-            other_constraints_by_value = mapping[parent]
+            parent_constraints_by_value = mapping[parent]
 
             # NOTE (mristin):
             # The class inherits all the constraints from the parent, and then it might
             # tighten them some more.
-            for type_anno, other_constraints in other_constraints_by_value.items():
+            for type_anno, parent_constraints in parent_constraints_by_value.items():
                 that_constraints_by_value[type_anno] = _merge_constraints(
+                    parent_constraints,
                     that_constraints_by_value.get(type_anno, None),
-                    other_constraints,
                 )
 
     return mapping, None
