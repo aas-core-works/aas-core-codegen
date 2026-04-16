@@ -4649,6 +4649,101 @@ def _assert_self_not_in_concrete_descendants(symbol_table: SymbolTable) -> None:
             assert_never(our_type)
 
 
+def _over_type_annotation_and_nested_type_annotations(
+    type_annotation: TypeAnnotationUnion,
+) -> Iterator[TypeAnnotationUnion]:
+    yield type_annotation
+
+    if isinstance(type_annotation, OptionalTypeAnnotation):
+        yield from _over_type_annotation_and_nested_type_annotations(
+            type_annotation.value
+        )
+
+    elif isinstance(type_annotation, ListTypeAnnotation):
+        yield from _over_type_annotation_and_nested_type_annotations(
+            type_annotation.items
+        )
+
+    else:
+        pass
+
+
+def _over_type_annotations_in_class(cls: ClassUnion) -> Iterator[TypeAnnotationUnion]:
+    """
+    Iterate over the type annotations defined in this class.
+
+    Inherited properties and methods are cross-references to parent classes, so
+    we exclude them in the iteration here.
+    """
+    for prop in cls.properties:
+        if prop.specified_for is not cls:
+            continue
+
+        yield from _over_type_annotation_and_nested_type_annotations(
+            prop.type_annotation
+        )
+
+    for constructor_arg in cls.constructor.arguments:
+        yield from _over_type_annotation_and_nested_type_annotations(
+            constructor_arg.type_annotation
+        )
+
+    for method in cls.methods:
+        if method.specified_for is not cls:
+            continue
+
+        for arg in method.arguments:
+            yield from _over_type_annotation_and_nested_type_annotations(
+                arg.type_annotation
+            )
+
+
+def _assert_all_type_annotations_are_unique_instances(
+    symbol_table: SymbolTable,
+) -> None:
+    """
+    Assert that all type annotations are independent, *i.e.*, no cross-references.
+
+    This is important so that we can represent individual values in the nested
+    data structures with the respective type annotation (*e.g.*, items of a list).
+    This allows us to perform different kinds of inference on the values such as
+    inference of schema constraints.
+    """
+    class_by_id = {id(cls): cls for cls in symbol_table.classes}
+
+    type_anno_id_to_cls_id: MutableMapping[int, int] = dict()
+    observed_set_of_type_anno_ids: Set[int] = set()
+
+    for cls in symbol_table.classes:
+        for type_anno in _over_type_annotations_in_class(cls):
+            type_anno_id = id(type_anno)
+
+            if type_anno_id in observed_set_of_type_anno_ids:
+                other_cls_id = type_anno_id_to_cls_id[type_anno_id]
+                other_cls = class_by_id[other_cls_id]
+
+                if cls is not other_cls:
+                    prolog = (
+                        f"The type annotation {type_anno} is duplicated in "
+                        f"the class {cls.name!r} and {other_cls.name!r}."
+                    )
+                else:
+                    prolog = (
+                        f"The type annotation {type_anno} is duplicated in "
+                        f"the class {cls.name!r}."
+                    )
+
+                raise AssertionError(
+                    f"{prolog} We expect all the type annotations to be unique "
+                    f"instances. This is particularly important for inference of "
+                    f"schema constraints as we stack constraints on a value and "
+                    f"represent values with the respective type annotations."
+                )
+
+            type_anno_id_to_cls_id[type_anno_id] = id(cls)
+            observed_set_of_type_anno_ids.add(type_anno_id)
+
+
 def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Error]:
     """Perform a battery of checks on the consistency of ``symbol_table``."""
     errors = _verify_there_are_no_duplicate_names_of_our_types(
@@ -4713,6 +4808,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     _assert_all_class_inheritances_defined_an_interface(symbol_table=symbol_table)
 
     _assert_self_not_in_concrete_descendants(symbol_table=symbol_table)
+
+    _assert_all_type_annotations_are_unique_instances(symbol_table=symbol_table)
 
     return errors
 
