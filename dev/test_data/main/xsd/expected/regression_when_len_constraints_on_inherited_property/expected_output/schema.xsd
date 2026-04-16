@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="abstractLangString">
+    <xs:sequence>
+      <xs:element name="text">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="10"/>
+            <xs:maxLength value="1024"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="abstractLangString_choice">
+    <xs:choice>
+      <xs:element name="langStringNameType" type="langStringNameType_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="langStringNameType">
+    <xs:sequence>
+      <xs:group ref="abstractLangString"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:simpleType name="valueDataType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="abstractLangString_t">
+    <xs:sequence>
+      <xs:group ref="abstractLangString"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="langStringNameType_t">
+    <xs:sequence>
+      <xs:group ref="langStringNameType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="langStringNameType" type="langStringNameType_t"/>
+</xs:schema>

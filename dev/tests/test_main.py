@@ -354,6 +354,14 @@ class Test_xsd(_TestCase):
             case_name="list_of_primitives_with_invariants",
         )
 
+    def test_expected_regression_when_len_constraints_on_inherited_property(
+        self,
+    ) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="regression_when_len_constraints_on_inherited_property",
+        )
+
 
 class _CaseSpec:
     """Specify a single test."""

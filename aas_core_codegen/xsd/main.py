@@ -5,7 +5,7 @@ import re
 # noinspection PyUnresolvedReferences
 import xml.dom.minidom
 import xml.etree.ElementTree as ET
-from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence, Any
+from typing import TextIO, MutableMapping, Optional, Tuple, List, Any, Mapping
 
 import greenery
 from icontract import ensure, require
@@ -179,8 +179,7 @@ def _translate_pattern(pattern: str) -> Tuple[Optional[str], Optional[str]]:
 
 def _generate_xs_restriction(
     base_type: intermediate.PrimitiveType,
-    len_constraint: Optional[infer_for_schema.LenConstraint],
-    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    constraints: Optional[infer_for_schema.Constraints],
 ) -> Tuple[Optional[ET.Element], Optional[str]]:
     """
     Generate the ``xs:restriction`` for the given primitive.
@@ -188,14 +187,17 @@ def _generate_xs_restriction(
     Return the restriction element (if any length or pattern constraints), or
     an error.
     """
-    if len_constraint is None and (
-        pattern_constraints is None or (len(pattern_constraints) == 0)
+    if constraints is None:
+        return None, None
+
+    if constraints.len_constraint is None and (
+        constraints.patterns is None or (len(constraints.patterns) == 0)
     ):
         return None, None
 
     restriction = ET.Element("xs:restriction", {"base": _PRIMITIVE_MAP[base_type]})
 
-    # NOTE (mristin, 2023-02-27):
+    # NOTE (mristin):
     # We skip the general XML character pattern. It makes greenery
     # unbearably slow since it instantiates *each* character in
     # the character range. Since XML engines can not deal with the special
@@ -203,10 +205,10 @@ def _generate_xs_restriction(
     # the XSD pattern restrictions.
     patterns_relevant_for_xsd: Optional[List[infer_for_schema.PatternConstraint]] = None
 
-    if pattern_constraints is not None:
+    if constraints.patterns is not None:
         patterns_relevant_for_xsd = [
             pattern_constraint
-            for pattern_constraint in pattern_constraints
+            for pattern_constraint in constraints.patterns
             if pattern_constraint.pattern
             != (
                 "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD"
@@ -229,7 +231,7 @@ def _generate_xs_restriction(
             merger = None  # type: Optional[Any]
             for pattern_constraint in patterns_relevant_for_xsd:
                 # NOTE (mristin, 2023-02-27):
-                # Greenery expects the characters to be in unicode and not escaped.
+                # Greenery expects the characters to be in Unicode and not escaped.
                 translated_for_greenery = _undo_escaping_backslash_x_u_and_U_in_pattern(
                     pattern_constraint.pattern
                 )
@@ -270,16 +272,16 @@ def _generate_xs_restriction(
 
         restriction.append(pattern)
 
-    if len_constraint is not None:
-        if len_constraint.min_value is not None:
+    if constraints.len_constraint is not None:
+        if constraints.len_constraint.min_value is not None:
             min_length = ET.Element(
-                "xs:minLength", {"value": str(len_constraint.min_value)}
+                "xs:minLength", {"value": str(constraints.len_constraint.min_value)}
             )
             restriction.append(min_length)
 
-        if len_constraint.max_value is not None:
+        if constraints.len_constraint.max_value is not None:
             max_length = ET.Element(
-                "xs:maxLength", {"value": str(len_constraint.max_value)}
+                "xs:maxLength", {"value": str(constraints.len_constraint.max_value)}
             )
             restriction.append(max_length)
 
@@ -288,9 +290,7 @@ def _generate_xs_restriction(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_xs_element_for_a_primitive_property(
-    prop: intermediate.Property,
-    len_constraint: Optional[infer_for_schema.LenConstraint],
-    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    prop: intermediate.Property, constraints: Optional[infer_for_schema.Constraints]
 ) -> Tuple[Optional[ET.Element], Optional[Error]]:
     """
     Generate the ``xs:element`` for a primitive property.
@@ -323,7 +323,7 @@ def _generate_xs_element_for_a_primitive_property(
             None,
         )
 
-    # NOTE (mristin, 2022-03-30):
+    # NOTE (mristin):
     # Specify the type of the ``type_anno`` here with assert instead of specifying it
     # in the pre-condition to help mypy a bit.
 
@@ -334,9 +334,7 @@ def _generate_xs_element_for_a_primitive_property(
     ), f"Expected a primitive or a constrained primitive, but got: {type_anno}"
 
     xs_restriction, error = _generate_xs_restriction(
-        base_type=base_type,
-        len_constraint=len_constraint,
-        pattern_constraints=pattern_constraints,
+        base_type=base_type, constraints=constraints
     )
     if error is not None:
         return None, Error(
@@ -368,8 +366,7 @@ def _generate_xs_element_for_a_primitive_property(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_xs_element_for_a_list_property(
-    prop: intermediate.Property,
-    len_constraint: Optional[infer_for_schema.LenConstraint],
+    prop: intermediate.Property, constraints: Optional[infer_for_schema.Constraints]
 ) -> Tuple[Optional[ET.Element], Optional[Error]]:
     """Generate the ``xs:element`` for a list property."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
@@ -381,12 +378,13 @@ def _generate_xs_element_for_a_list_property(
 
     min_occurs = "0"
     max_occurs = "unbounded"
-    if len_constraint is not None:
-        if len_constraint.min_value is not None:
-            min_occurs = str(len_constraint.min_value)
+    if constraints is not None:
+        if constraints.len_constraint is not None:
+            if constraints.len_constraint.min_value is not None:
+                min_occurs = str(constraints.len_constraint.min_value)
 
-        if len_constraint.max_value is not None:
-            max_occurs = str(len_constraint.max_value)
+            if constraints.len_constraint.max_value is not None:
+                max_occurs = str(constraints.len_constraint.max_value)
 
     xs_element: ET.Element
 
@@ -508,9 +506,7 @@ def _generate_xs_element_for_a_list_property(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_xs_element_for_a_property(
-    prop: intermediate.Property,
-    len_constraint: Optional[infer_for_schema.LenConstraint],
-    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    prop: intermediate.Property, constraints: Optional[infer_for_schema.Constraints]
 ) -> Tuple[Optional[ET.Element], Optional[Error]]:
     """Generate the definition of an ``xs:element`` for a property."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
@@ -519,9 +515,7 @@ def _generate_xs_element_for_a_property(
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         xs_element, error = _generate_xs_element_for_a_primitive_property(
-            prop=prop,
-            len_constraint=len_constraint,
-            pattern_constraints=pattern_constraints,
+            prop=prop, constraints=constraints
         )
         if error is not None:
             return None, error
@@ -541,9 +535,7 @@ def _generate_xs_element_for_a_property(
 
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             xs_element, error = _generate_xs_element_for_a_primitive_property(
-                prop=prop,
-                len_constraint=len_constraint,
-                pattern_constraints=pattern_constraints,
+                prop=prop, constraints=constraints
             )
             if error is not None:
                 return None, error
@@ -588,7 +580,7 @@ def _generate_xs_element_for_a_property(
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         xs_element, error = _generate_xs_element_for_a_list_property(
-            prop=prop, len_constraint=len_constraint
+            prop=prop, constraints=constraints
         )
         if error is not None:
             return None, error
@@ -609,28 +601,41 @@ def _generate_xs_element_for_a_property(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_properties(
     cls: intermediate.ClassUnion,
-    constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    constraints_by_class: Mapping[
+        intermediate.ClassUnion, infer_for_schema.ConstraintsByValue
+    ],
 ) -> Tuple[Optional[List[ET.Element]], Optional[List[Error]]]:
     """Define the properties of the ``cls`` as a sequence of tags."""
     sequence = []  # type: List[ET.Element]
     errors = []  # type: List[Error]
 
+    constraints_by_value = constraints_by_class[cls]
+
     for prop in cls.properties:
+        # NOTE (mristin):
+        # While we allow our classes to tighten the constraints from the parents, XSD
+        # does not allow us to *easily* tighten the constraints in a group.
+        #
+        # Instead of making it really complicated, we simply ignore the tightening
+        # of the constraints in the children classes.
+        #
+        # If we ever want to implement this feature, we have to define three intermediate
+        # structures:
+        # 1) Abstract parent class,
+        # 2) Restricted class, only tightening the elements with
+        #    ``<xs:restriction base="...">``, and
+        # 3) Extended class which includes properties specified only for the class with
+        #    ``<xs:extension base="...">``.
+
         if prop.specified_for is not cls:
             continue
 
-        len_constraint = constraints_by_property.len_constraints_by_property.get(
-            prop, None
-        )
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        pattern_constraints = constraints_by_property.patterns_by_property.get(
-            prop, None
-        )
+        constraints = constraints_by_value.get(type_anno, None)
 
         xs_element, error = _generate_xs_element_for_a_property(
-            prop=prop,
-            len_constraint=len_constraint,
-            pattern_constraints=pattern_constraints,
+            prop=prop, constraints=constraints
         )
         if error is not None:
             errors.append(error)
@@ -646,11 +651,13 @@ def _define_properties(
 
 def _generate_xs_group_for_class(
     cls: intermediate.ClassUnion,
-    constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    constraints_by_class: Mapping[
+        intermediate.ClassUnion, infer_for_schema.ConstraintsByValue
+    ],
 ) -> Tuple[Optional[ET.Element], Optional[Error]]:
     """Generate the ``xs:group`` representation of the class properties."""
     properties, properties_errors = _define_properties(
-        cls=cls, constraints_by_property=constraints_by_property
+        cls=cls, constraints_by_class=constraints_by_class
     )
 
     if properties_errors is not None:
@@ -680,7 +687,9 @@ def _generate_xs_group_for_class(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_class(
     cls: intermediate.ClassUnion,
-    constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    constraints_by_class: Mapping[
+        intermediate.ClassUnion, infer_for_schema.ConstraintsByValue
+    ],
 ) -> Tuple[Optional[List[ET.Element]], Optional[Error]]:
     """
     Generate the definitions for the class ``cls``.
@@ -693,7 +702,7 @@ def _define_for_class(
     # See: https://stackoverflow.com/questions/1198755/xml-schemas-with-multiple-inheritance
 
     xs_group, xs_group_error = _generate_xs_group_for_class(
-        cls=cls, constraints_by_property=constraints_by_property
+        cls=cls, constraints_by_class=constraints_by_class
     )
     if xs_group_error is not None:
         return None, xs_group_error
@@ -1100,7 +1109,7 @@ def _generate(
                 our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
             ):
                 elements, definition_error = _define_for_class(
-                    cls=our_type, constraints_by_property=constraints_by_class[our_type]
+                    cls=our_type, constraints_by_class=constraints_by_class
                 )
 
                 if definition_error is not None:

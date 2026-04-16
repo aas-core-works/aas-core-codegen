@@ -157,19 +157,6 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
 
     assert constraints_by_class is not None
 
-    _, error = infer_for_schema.merge_constraints_with_ancestors(
-        symbol_table=ir_symbol_table, constraints_by_class=constraints_by_class
-    )
-    if errors is not None:
-        run.write_error_report(
-            message=f"Failed to merge the constraints with ancestors for the schemas "
-            f"based on {model_path}",
-            errors=[lineno_columner.error_message(error)],
-            stderr=stderr,
-        )
-
-        return 1
-
     errors = _smoke_transpile_to_csharp(symbol_table=ir_symbol_table)
 
     if len(errors) > 0:

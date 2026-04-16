@@ -1,9 +1,15 @@
 """Provide data structures for the constraint inferences."""
-from typing import Mapping, Sequence, Optional
+import sys
+from typing import Mapping, Sequence, Optional, Final, MutableMapping
 
-from icontract import require
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
-from aas_core_codegen import intermediate
+from icontract import require  # pylint: disable=wrong-import-position
+
+from aas_core_codegen import intermediate  # pylint: disable=wrong-import-position
 
 
 class LenConstraint:
@@ -12,6 +18,9 @@ class LenConstraint:
 
     Both bounds are inclusive: ``min_value ≤ len ≤ max_value``.
     """
+
+    min_value: Final[Optional[int]]
+    max_value: Final[Optional[int]]
 
     # fmt: off
     @require(
@@ -25,9 +34,12 @@ class LenConstraint:
         self.min_value = min_value
         self.max_value = max_value
 
-    def copy(self) -> "LenConstraint":
-        """Create a copy of the self."""
-        return LenConstraint(min_value=self.min_value, max_value=self.max_value)
+    def equals(self, other: Optional["LenConstraint"]) -> bool:
+        """Return true if the other constraint equals semantically ours."""
+        if other is None:
+            return False
+
+        return self.min_value == other.min_value and self.max_value == other.max_value
 
     def __str__(self) -> str:
         return (
@@ -39,9 +51,18 @@ class LenConstraint:
 class PatternConstraint:
     """Constrain a string to comply to a regular expression."""
 
+    pattern: Final[str]
+
     def __init__(self, pattern: str) -> None:
         """Initialize with the given values."""
         self.pattern = pattern
+
+    def equals(self, other: Optional["PatternConstraint"]) -> bool:
+        """Return true if the other constraint equals semantically ours."""
+        if other is None:
+            return False
+
+        return self.pattern == other.pattern
 
     def __repr__(self) -> str:
         """Represent the constraint with the pattern."""
@@ -53,6 +74,9 @@ class PatternConstraint:
 
 class SetOfPrimitivesConstraint:
     """Constrain a primitive value to be a member of a pre-defined set of values."""
+
+    a_type: Final[intermediate.PrimitiveType]
+    literals: Final[Sequence[intermediate.PrimitiveSetLiteral]]
 
     # fmt: off
     @require(
@@ -72,6 +96,20 @@ class SetOfPrimitivesConstraint:
         self.a_type = a_type
         self.literals = literals
 
+    def equals(self, other: Optional["SetOfPrimitivesConstraint"]) -> bool:
+        """Return true if the other constraint equals semantically ours."""
+        if other is None:
+            return False
+
+        return (
+            self.a_type == other.a_type
+            and len(self.literals) == len(other.literals)
+            and all(
+                id(that_literal) == id(other_literal)
+                for that_literal, other_literal in zip(self.literals, other.literals)
+            )
+        )
+
     def __repr__(self) -> str:
         """Represent the constraint with the pattern."""
         return f"<{self.__class__.__name__} at 0x{id(self):x}>"
@@ -79,6 +117,9 @@ class SetOfPrimitivesConstraint:
 
 class SetOfEnumerationLiteralsConstraint:
     """Constrain a value to be a member of a pre-defined set of values."""
+
+    enumeration: Final[intermediate.Enumeration]
+    literals: Final[Sequence[intermediate.EnumerationLiteral]]
 
     # fmt: off
     @require(
@@ -98,38 +139,73 @@ class SetOfEnumerationLiteralsConstraint:
         self.enumeration = enumeration
         self.literals = literals
 
+    @require(
+        lambda self, other: not (other is not None)
+        or (other.enumeration is self.enumeration),
+        "Both self and other must refer to the same enumeration for "
+        "an equality comparison to make sense.",
+    )
+    def equals(self, other: Optional["SetOfEnumerationLiteralsConstraint"]) -> bool:
+        """Return true if the other constraint equals semantically ours."""
+        if other is None:
+            return False
+
+        return len(self.literals) == len(other.literals) and all(
+            id(that_literal) == id(other_literal)
+            for that_literal, other_literal in zip(self.literals, other.literals)
+        )
+
     def __repr__(self) -> str:
         """Represent the constraint with the pattern."""
         return f"<{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class ConstraintsByProperty:
+class Constraints:
     """
-    Represent all the inferred property constraints of one of our types.
+    Represent all the inferred constraints for a value.
 
     The constraints coming from the constrained primitives are in-lined and hence also
     included in this representation.
     """
 
+    len_constraint: Final[Optional[LenConstraint]]
+    patterns: Final[Optional[Sequence[PatternConstraint]]]
+    set_of_primitives: Final[Optional[SetOfPrimitivesConstraint]]
+    set_of_enumeration_literals: Final[Optional[SetOfEnumerationLiteralsConstraint]]
+
+    @require(lambda patterns: not (patterns is not None) or len(patterns) > 0)
     def __init__(
         self,
-        len_constraints_by_property: Mapping[intermediate.Property, LenConstraint],
-        patterns_by_property: Mapping[
-            intermediate.Property, Sequence[PatternConstraint]
-        ],
-        set_of_primitives_by_property: Mapping[
-            intermediate.Property, SetOfPrimitivesConstraint
-        ],
-        set_of_enumeration_literals_by_property: Mapping[
-            intermediate.Property, SetOfEnumerationLiteralsConstraint
-        ],
+        len_constraint: Optional[LenConstraint] = None,
+        patterns: Optional[Sequence[PatternConstraint]] = None,
+        set_of_primitives: Optional[SetOfPrimitivesConstraint] = None,
+        set_of_enumeration_literals: Optional[
+            SetOfEnumerationLiteralsConstraint
+        ] = None,
     ) -> None:
         """Initialize with the given values."""
-        self.len_constraints_by_property = len_constraints_by_property
-        self.patterns_by_property = patterns_by_property
-        self.set_of_primitives_by_property = set_of_primitives_by_property
+        self.len_constraint = len_constraint
+        self.patterns = patterns
+        self.set_of_primitives = set_of_primitives
         # fmt: off
-        self.set_of_enumeration_literals_by_property = (
-            set_of_enumeration_literals_by_property
+        self.set_of_enumeration_literals = (
+            set_of_enumeration_literals
         )
         # fmt: on
+
+    def is_empty(self) -> bool:
+        """Return True if no constraints are set."""
+        return (
+            self.len_constraint is None
+            and self.patterns is None
+            and self.set_of_primitives is None
+            and self.set_of_enumeration_literals is None
+        )
+
+
+#: Represent the constraints inferred for the given value in a class.
+ConstraintsByValue: TypeAlias = Mapping[intermediate.TypeAnnotationUnion, Constraints]
+
+MutableConstraintsByValue: TypeAlias = MutableMapping[
+    intermediate.TypeAnnotationUnion, Constraints
+]

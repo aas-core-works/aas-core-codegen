@@ -41,19 +41,11 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
-        self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
-            text,
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
+
+        assert constraints is None
 
     def test_min_value_constant_left(self) -> None:
         source = textwrap.dedent(
@@ -91,20 +83,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=11,
-                      max_value=None)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=11,
+    max_value=None),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -144,20 +137,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=11,
-                      max_value=None)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=11,
+    max_value=None),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -197,20 +191,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=None,
-                      max_value=9)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=None,
+    max_value=9),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -250,20 +245,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=None,
-                      max_value=9)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=None,
+    max_value=9),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -303,20 +299,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=10,
-                      max_value=10)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=10,
+    max_value=10),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -356,24 +353,25 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=10,
-                      max_value=10)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=10,
+    max_value=10),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
-    def test_inheritance_between_constrained_primitives_by_default(self) -> None:
+    def test_inheritance_between_constrained_primitives(self) -> None:
         source = textwrap.dedent(
             """\
             @invariant(
@@ -404,10 +402,6 @@ class Test_expected(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-05-15):
-        # In contrast to class, we do inherit the constraints among the constrained
-        # primitives as we in-line them later in the schema classes.
-
         # fmt: off
         (
             _,
@@ -421,20 +415,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={
-                    'some_property': LenConstraint(
-                      min_value=4,
-                      max_value=5)},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=LenConstraint(
+    min_value=4,
+    max_value=5),
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 

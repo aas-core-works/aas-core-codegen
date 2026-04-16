@@ -2,11 +2,10 @@
 
 import textwrap
 import unittest
-from typing import Optional, MutableMapping
 
 import tests.common
 import tests.infer_for_schema.common
-from aas_core_codegen import infer_for_schema, intermediate
+from aas_core_codegen import infer_for_schema
 
 
 class Test_expected(unittest.TestCase):
@@ -38,19 +37,11 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
-        self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
-            text,
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
+
+        assert constraints is None
 
     def test_single_pattern(self) -> None:
         source = textwrap.dedent(
@@ -90,20 +81,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -152,22 +144,23 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
+
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$'),
-                      PatternConstraint(
-                        pattern='^.*acme.*$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$'),
+    PatternConstraint(
+      pattern='^.*acme.*$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -196,11 +189,6 @@ class Test_expected(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-01-02):
-        # We infer only the constraints as specified in the class itself, and
-        # ignore the constraints of the ancestors in *this particular kind of
-        # inference*.
-
         # fmt: off
         (
             _,
@@ -214,94 +202,21 @@ class Test_expected(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
-        self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
-            text,
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
 
-    def test_no_inheritance_by_default(self) -> None:
-        source = textwrap.dedent(
+        text = infer_for_schema.dump(constraints)
+
+        self.assertEqual(
             """\
-            @verification
-            def matches_something(text: str) -> bool:
-                return match("^something-[a-zA-Z]+$", text) is not None
-
-            @verification
-            def matches_acme(text: str) -> bool:
-                return match("^.*acme.*$", text) is not None
-
-            @invariant(
-                lambda self: matches_something(self.some_property),
-                "Some property must match something."
-            )
-            class Parent:
-                some_property: str
-
-                def __init__(self, some_property: str) -> None:
-                    self.some_property = some_property
-
-
-            @invariant(
-                lambda self: matches_acme(self.some_property),
-                "Some property must match acme."
-            )
-            class Something(Parent):
-                def __init__(self, some_property: str) -> None:
-                    Parent.__init__(self, some_property=some_property)
-
-
-            __version__ = "dummy"
-            __xml_namespace__ = "https://dummy.com"
-            """
-        )
-
-        # NOTE (mristin, 2022-01-02):
-        # We infer only the constraints as specified in the class itself, and
-        # ignore the constraints of the ancestors in *this particular kind of
-        # inference*.
-        #
-        # This is necessary as we want to use these constraints to generate schemas
-        # whereas it is the job of the schema engine to stack the constraints together.
-
-        # fmt: off
-        (
-            _,
-            something_cls,
-            constraints_by_class,
-        ) = (
-            tests.infer_for_schema.common
-            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-                source=source
-            )
-        )
-        # fmt: on
-
-        constraints_by_props = constraints_by_class[something_cls]
-        text = infer_for_schema.dump(constraints_by_props)
-        self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^.*acme.*$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -332,17 +247,9 @@ class Test_stacking(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-05-18):
-        # This definition here is necessary for mypy.
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None
-
         # fmt: off
         (
-            symbol_table,
+            _,
             something_cls,
             constraints_by_class,
         ) = (
@@ -353,27 +260,21 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -402,17 +303,9 @@ class Test_stacking(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-05-18):
-        # This definition here is necessary for mypy.
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None
-
         # fmt: off
         (
-            symbol_table,
+            _,
             something_cls,
             constraints_by_class,
         ) = (
@@ -423,27 +316,21 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -483,17 +370,9 @@ class Test_stacking(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-05-18):
-        # This definition here is necessary for mypy.
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None
-
         # fmt: off
         (
-            symbol_table,
+            _,
             something_cls,
             constraints_by_class,
         ) = (
@@ -504,29 +383,23 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^.*acme.*$'),
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$'),
+    PatternConstraint(
+      pattern='^.*acme.*$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -561,17 +434,9 @@ class Test_stacking(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-05-18):
-        # This definition here is necessary for mypy.
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None
-
         # fmt: off
         (
-            symbol_table,
+            _,
             something_cls,
             constraints_by_class,
         ) = (
@@ -582,27 +447,21 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -636,17 +495,9 @@ class Test_stacking(unittest.TestCase):
             """
         )
 
-        # NOTE (mristin, 2022-05-18):
-        # This definition here is necessary for mypy.
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None
-
         # fmt: off
         (
-            symbol_table,
+            _,
             something_cls,
             constraints_by_class,
         ) = (
@@ -657,27 +508,21 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={
-                    'some_property': [
-                      PatternConstraint(
-                        pattern='^something-[a-zA-Z]+$')]},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
+            """\
+Constraints(
+  len_constraint=None,
+  patterns=[
+    PatternConstraint(
+      pattern='^something-[a-zA-Z]+$')],
+  set_of_primitives=None,
+  set_of_enumeration_literals=None)""",
             text,
         )
 
