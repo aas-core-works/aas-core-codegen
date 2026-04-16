@@ -9,11 +9,13 @@ from icontract import invariant
 class AbstractItem:
     pass
 
+
 class SomeItem(AbstractItem):
     name: str
 
     def __init__(self, name: str) -> None:
         self.name = name
+
 
 class AnotherItem(AbstractItem):
     serial_number: int
@@ -21,11 +23,13 @@ class AnotherItem(AbstractItem):
     def __init__(self, serial_number: int) -> None:
         self.serial_number = serial_number
 
+
 class Something:
     some_items: List[AbstractItem]
 
     def __init__(self, some_items: List[AbstractItem]) -> None:
         self.some_items = some_items
+
 
 __version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"
