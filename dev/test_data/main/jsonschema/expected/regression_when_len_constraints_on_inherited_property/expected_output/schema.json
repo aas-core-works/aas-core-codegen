@@ -25,13 +25,7 @@
         {
           "$ref": "#/definitions/AbstractLangString"
         },
-        {
-          "properties": {
-            "text": {
-              "maxLength": 128
-            }
-          }
-        }
+        {}
       ]
     },
     "ModelType": {

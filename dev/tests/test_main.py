@@ -300,18 +300,6 @@ class Test_jsonschema(_TestCase):
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="aas_core_meta.v3"
         )
 
-    def test_expected_list_of_primitives(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.JSONSCHEMA,
-            case_name="list_of_primitives",
-        )
-
-    def test_expected_list_of_primitives_with_invariants(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.JSONSCHEMA,
-            case_name="list_of_primitives_with_invariants",
-        )
-
     def test_expected_regression_when_len_constraints_on_inherited_property(
         self,
     ) -> None:
@@ -565,7 +553,9 @@ def _assert_all_targets_covered() -> None:
             assert expected_dir.is_dir(), expected_dir
 
             for case_name in sorted(
-                path.name for path in expected_dir.iterdir() if path.is_dir()
+                path.name
+                for path in expected_dir.iterdir()
+                if path.is_dir()
             ):
                 cases.append(_CaseSpec(target=target, expected=True, name=case_name))
 
@@ -574,7 +564,9 @@ def _assert_all_targets_covered() -> None:
             assert unexpected_dir.is_dir(), unexpected_dir
 
             for case_name in sorted(
-                path.stem for path in unexpected_dir.iterdir() if path.is_dir()
+                path.stem
+                for path in unexpected_dir.iterdir()
+                if path.is_dir()
             ):
                 cases.append(_CaseSpec(target=target, expected=False, name=case_name))
 

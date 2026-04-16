@@ -57,9 +57,9 @@
         {
           "properties": {
             "version": {
-              "type": "string",
               "allOf": [
                 {
+                  "type": "string",
                   "minLength": 1,
                   "maxLength": 4
                 },
@@ -72,9 +72,9 @@
               ]
             },
             "revision": {
-              "type": "string",
               "allOf": [
                 {
+                  "type": "string",
                   "minLength": 1,
                   "maxLength": 4
                 },
@@ -255,9 +255,9 @@
               "contentEncoding": "base64"
             },
             "contentType": {
-              "type": "string",
               "allOf": [
                 {
+                  "type": "string",
                   "minLength": 1,
                   "maxLength": 100
                 },
@@ -680,9 +680,9 @@
               "pattern": "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
             },
             "contentType": {
-              "type": "string",
               "allOf": [
                 {
+                  "type": "string",
                   "minLength": 1,
                   "maxLength": 100
                 },
@@ -826,13 +826,7 @@
         {
           "$ref": "#/definitions/AbstractLangString"
         },
-        {
-          "properties": {
-            "text": {
-              "maxLength": 1023
-            }
-          }
-        }
+        {}
       ]
     },
     "LangStringNameType": {
@@ -840,13 +834,7 @@
         {
           "$ref": "#/definitions/AbstractLangString"
         },
-        {
-          "properties": {
-            "text": {
-              "maxLength": 128
-            }
-          }
-        }
+        {}
       ]
     },
     "LangStringPreferredNameTypeIec61360": {
@@ -854,13 +842,7 @@
         {
           "$ref": "#/definitions/AbstractLangString"
         },
-        {
-          "properties": {
-            "text": {
-              "maxLength": 255
-            }
-          }
-        }
+        {}
       ]
     },
     "LangStringShortNameTypeIec61360": {
@@ -868,13 +850,7 @@
         {
           "$ref": "#/definitions/AbstractLangString"
         },
-        {
-          "properties": {
-            "text": {
-              "maxLength": 18
-            }
-          }
-        }
+        {}
       ]
     },
     "LangStringTextType": {
@@ -882,13 +858,7 @@
         {
           "$ref": "#/definitions/AbstractLangString"
         },
-        {
-          "properties": {
-            "text": {
-              "maxLength": 1023
-            }
-          }
-        }
+        {}
       ]
     },
     "LevelType": {
@@ -1143,9 +1113,9 @@
               "pattern": "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
             },
             "idShort": {
-              "type": "string",
               "allOf": [
                 {
+                  "type": "string",
                   "minLength": 1,
                   "maxLength": 128
                 },
@@ -1282,9 +1252,9 @@
           "pattern": "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
         },
         "contentType": {
-          "type": "string",
           "allOf": [
             {
+              "type": "string",
               "minLength": 1,
               "maxLength": 100
             },

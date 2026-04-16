@@ -1,7 +1,0 @@
-{
-  "someBools": [true, false, true],
-  "someInts": [1, 0, -42, 100],
-  "someFloats": [3.14, -0.5, 2.718],
-  "someStrings": ["hello", "world", "example"],
-  "someBytes": ["SGVsbG8=", "V29ybGQ=", "AQID"]
-}

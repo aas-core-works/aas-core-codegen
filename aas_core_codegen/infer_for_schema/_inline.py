@@ -665,13 +665,31 @@ def infer_constraints_by_class(
 
     return mapping, None
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def merge_constraints_with_ancestors(
-        symbol_table: intermediate.SymbolTable,
-        constraints_by_class: Mapping[intermediate.ClassUnion, ConstraintsByValue],
-) -> Tuple[
-    Optional[MutableMapping[intermediate.ClassUnion, ConstraintsByValue]],
-    Optional[Error],
-]:
-    # TODO: implement
-    raise NotImplementedError(f"{merge_constraints_with_ancestors.__name__} should be removed!")
+
+def edit_steps_for_other_to_that_constraint(
+        that: Constraints,
+        other: Optional[Constraints]
+) -> Optional[Constraints]:
+    """Identify constraints to be updated to go from ``other`` to ``that``."""
+    if other is None:
+        return that
+
+    update = Constraints(
+        len_constraint=(
+            that.len_constraint
+            if (
+                    that.len_constraint is not None
+                    and not that.len_constraint.equals(other.len_constraint)
+            )
+            else None
+        ),
+        patterns=(
+            that.patterns
+            if (
+                that.patterns is not None
+                and (
+                        other.patterns is None
+                        or not all(pattern)
+            )
+        )
+    )
