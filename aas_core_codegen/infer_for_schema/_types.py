@@ -1,4 +1,5 @@
 """Provide data structures for the constraint inferences."""
+import copy
 from typing import Mapping, Sequence, Optional, Final, TypeAlias
 
 from icontract import require
@@ -13,6 +14,9 @@ class LenConstraint:
     Both bounds are inclusive: ``min_value ≤ len ≤ max_value``.
     """
 
+    min_value: Final[Optional[int]]
+    max_value: Final[Optional[int]]
+
     # fmt: off
     @require(
         lambda min_value, max_value:
@@ -25,10 +29,6 @@ class LenConstraint:
         self.min_value = min_value
         self.max_value = max_value
 
-    def copy(self) -> "LenConstraint":
-        """Create a copy of the self."""
-        return LenConstraint(min_value=self.min_value, max_value=self.max_value)
-
     def __str__(self) -> str:
         return (
             f"{self.__class__.__name__}("
@@ -38,6 +38,8 @@ class LenConstraint:
 
 class PatternConstraint:
     """Constrain a string to comply to a regular expression."""
+
+    pattern: Final[str]
 
     def __init__(self, pattern: str) -> None:
         """Initialize with the given values."""
@@ -53,6 +55,9 @@ class PatternConstraint:
 
 class SetOfPrimitivesConstraint:
     """Constrain a primitive value to be a member of a pre-defined set of values."""
+
+    a_type: Final[intermediate.PrimitiveType]
+    literals: Final[Sequence[intermediate.PrimitiveSetLiteral]]
 
     # fmt: off
     @require(
@@ -79,6 +84,9 @@ class SetOfPrimitivesConstraint:
 
 class SetOfEnumerationLiteralsConstraint:
     """Constrain a value to be a member of a pre-defined set of values."""
+
+    enumeration: Final[intermediate.Enumeration]
+    literals: Final[Sequence[intermediate.EnumerationLiteral]]
 
     # fmt: off
     @require(
@@ -136,6 +144,7 @@ class Constraints:
             set_of_enumeration_literals
         )
         # fmt: on
+
 
 #: Represent the constraints inferred for the given value in a class.
 ConstraintsByValue: TypeAlias = Mapping[

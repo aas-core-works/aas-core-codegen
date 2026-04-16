@@ -1,6 +1,7 @@
 """Merge constrained primitives as property constraints."""
 import collections
-from typing import Tuple, Optional, List, Mapping, MutableMapping, Sequence
+import itertools
+from typing import Tuple, Optional, List, Mapping, MutableMapping, Sequence, Set, Union
 
 from icontract import ensure
 
@@ -19,7 +20,7 @@ from aas_core_codegen.infer_for_schema._types import (
     SetOfEnumerationLiteralsConstraint,
 )
 
-# TODO: continue here -- write min_or_none and max_or_none
+
 # TODO: than go over constrained primitives -- and use merge on constraints
 # TODO: then go over all the type annotations -- stack them for class
 # TODO: then handle inheritance
@@ -28,141 +29,238 @@ def _min_or_none(
         other: Optional[float]
 ) -> Optional[float]:
     """Compute the minimum or return None if both values are None."""
-    if (
-            that is not None
-            and other is not None
-    ):
-        min_value = max(
-            that.len_constraint.min_value,
-            other.len_constraint.min_value
+    if that is not None and other is not None:
+        return min(that, other)
+
+    elif that is None and other is not None:
+        return other
+
+    elif that is not None and other is None:
+        return that
+
+    elif that is None and other is None:
+        return None
+
+    else:
+        raise AssertionError("Unhandled execution path")
+
+
+def _max_or_none(
+        that: Optional[float],
+        other: Optional[float]
+) -> Optional[float]:
+    """Compute the maximum or return None if both values are None."""
+    if that is not None and other is not None:
+        return max(that, other)
+
+    elif that is None and other is not None:
+        return other
+
+    elif that is not None and other is None:
+        return that
+
+    elif that is None and other is None:
+        return None
+
+    else:
+        raise AssertionError("Unhandled execution path")
+
+
+def _merge_len_constraints(
+        that: Optional[LenConstraint],
+        other: Optional[LenConstraint]
+) -> Optional[LenConstraint]:
+    if that is not None and other is not None:
+        return LenConstraint(
+            min_value=_max_or_none(that.min_value, other.min_value),
+            max_value=_min_or_none(that.max_value, other.max_value)
         )
 
-    elif (
-            that.len_constraint.min_value is not None
-            and other.len_constraint.min_value is None
-    ):
-        min_value = that.len_constraint.min_value
+    elif that is not None and other is None:
+        return that
 
-    elif (
-            that.len_constraint.min_value is None
-            and other.len_constraint.min_value is not None
-    ):
-        min_value = other.len_constraint.min_value
+    elif that is None and other is not None:
+        return other
 
-    elif (
-            that.len_constraint.min_value is None
-            and other.len_constraint.min_value is None
-    ):
-        pass
+    elif that is None and other is None:
+        return None
+
+    else:
+        raise AssertionError("Unhandled execution path")
+
+
+def _merge_pattern_constraints(
+        that: Optional[Sequence[PatternConstraint]],
+        other: Optional[Sequence[PatternConstraint]]
+) -> Optional[Sequence[PatternConstraint]]:
+    if that is not None and other is not None:
+        observed_pattern_set: Set[str] = set()
+
+        result: List[PatternConstraint] = []
+
+        for pattern_constraint in itertools.chain(that, other):
+            if pattern_constraint.pattern not in observed_pattern_set:
+                result.append(pattern_constraint)
+                observed_pattern_set.add(pattern_constraint.pattern)
+
+        return result
+
+    elif that is not None and other is None:
+        return that
+
+    elif that is None and other is not None:
+        return other
+
+    elif that is None and other is None:
+        return None
+
+    else:
+        raise AssertionError("Unhandled execution path")
+
+
+def _merge_set_of_primitives_constraints(
+        that: Optional[SetOfPrimitivesConstraint],
+        other: Optional[SetOfPrimitivesConstraint],
+) -> Optional[SetOfPrimitivesConstraint]:
+    if that is not None and other is not None:
+        if that.a_type != other.a_type:
+            raise ValueError(
+                "Constraints on sets of primitives of different primitive types "
+                f"can not be merged together; that primitive type is {that.a_type}, "
+                f"other primitive type is {other.a_type}."
+            )
+
+        observed_value_set: Set[Union[bool, int, float, str, bytearray]] = set()
+
+        literals: List[intermediate.PrimitiveSetLiteral] = []
+
+        for literal in itertools.chain(that.literals, other.literals):
+            if literal.value not in observed_value_set:
+                literals.append(literal)
+                observed_value_set.add(literal.value)
+
+        return SetOfPrimitivesConstraint(
+            # NOTE (mristin):
+            # We simply pick one of the types as we assert before that that.a_type
+            # and other.a_type must be the same.
+            a_type=that.a_type,
+            literal=literals
+        )
+
+    elif that is not None and other is None:
+        return that
+
+    elif that is None and other is not None:
+        return other
+
+    elif that is None and other is None:
+        return None
+
+    else:
+        raise AssertionError("Unhandled execution path")
+
+
+def _merge_set_of_enumeration_literals_constraints(
+        that: Optional[SetOfEnumerationLiteralsConstraint],
+        other: Optional[SetOfEnumerationLiteralsConstraint],
+) -> Optional[SetOfEnumerationLiteralsConstraint]:
+    if that is not None and other is not None:
+        if that.enumeration is not other.enumeration:
+            raise ValueError(
+                "Constraints on sets of enumeration literals of different enumerations "
+                f"can not be merged together; that enumeration is {that.enumeration}, "
+                f"other enumeration is {other.enumeration}."
+            )
+
+        # TODO: remove
+        #     enumeration: Final[intermediate.Enumeration]
+        #     literals: Final[Sequence[intermediate.EnumerationLiteral]]
+
+        observed_literal_id_set: Set[int] = set()
+
+        literals: List[intermediate.EnumerationLiteral] = []
+
+        for literal in itertools.chain(that.literals, other.literals):
+            if id(literal) not in observed_literal_id_set:
+                literals.append(literal)
+                observed_literal_id_set.add(id(literal))
+
+        return SetOfEnumerationLiteralsConstraint(
+            # NOTE (mristin):
+            # We simply pick one of the enumerations as we assert before that
+            # enumeration and other enumeration are one and the same.
+            a_type=that.enumeration,
+            literal=literals
+        )
+
+    elif that is not None and other is None:
+        return that
+
+    elif that is None and other is not None:
+        return other
+
+    elif that is None and other is None:
+        return None
 
     else:
         raise AssertionError("Unhandled execution path")
 
 
 def _merge_constraints(
-        that: Constraints,
-        other: Constraints
-) -> Constraints:
+        that: Optional[Constraints],
+        other: Optional[Constraints]
+) -> Optional[Constraints]:
     """Combine the constraints on tighter bounds."""
-    
-    len_constraint: Optional[LenConstraint] = None
-    if that.len_constraint is not None and other.len_constraint is None:
-        len_constraint = that.len_constraint.copy()
-    
-    elif that.len_constraint is None and other.len_constraint is not None:
-        len_constraint = other.len_constraint.copy()
-        
-    elif that.len_constraint is not None and other.len_constraint is not None:
-        min_value: Optional[float] = None
-        
-
-        max_value: Optional[float] = None
-
-        if (
-                that.len_constraint.max_value is not None
-                and other.len_constraint.max_value is not None
-        ):
-            max_value = min(
-                that.len_constraint.max_value,
-                other.len_constraint.max_value
+    if that is not None and other is not None:
+        return Constraints(
+            len_constraint=_merge_len_constraints(
+                that.len_constraint,
+                other.len_constraint
+            ),
+            patterns=_merge_pattern_constraints(
+                that.patterns,
+                other.patterns
+            ),
+            set_of_primitives=_merge_set_of_primitives_constraints(
+                that.set_of_primitives,
+                other.set_of_primitives
+            ),
+            set_of_enumeration_literals=_merge_set_of_enumeration_literals_constraints(
+                that.set_of_enumeration_literals,
+                other.set_of_enumeration_literals
             )
-
-        elif (
-                that.len_constraint.max_value is not None
-                and other.len_constraint.max_value is None
-        ):
-            max_value = that.len_constraint.max_value
-
-        elif (
-                that.len_constraint.max_value is None
-                and other.len_constraint.max_value is not None
-        ):
-            max_value = other.len_constraint.max_value
-
-        elif (
-                that.len_constraint.max_value is None
-                and other.len_constraint.max_value is None
-        ):
-            pass
-
-        else:
-            raise AssertionError("Unhandled execution path")
-
-
-        len_constraint = LenConstraint(
-            min_value=min_value,
-            max_value=max_value
         )
 
-    elif that.len_constraint is None and other.len_constraint is None:
-        pass
-    
+    elif that is not None and other is None:
+        return that
+
+    elif that is None and other is not None:
+        return other
+
+    elif that is None and other is None:
+        return None
+
     else:
-        raise AssertionError(
-            f"Unhandled execution path: {that.len_constraint=}, {other.len_constraint=}"
-        )
-        
-    #                 if inherited_len_constraint.min_value is not None:
-    #                     len_constraint.min_value = (
-    #                         max(
-    #                             len_constraint.min_value, inherited_len_constraint.min_value
-    #                         )
-    #                         if len_constraint.min_value is not None
-    #                         else inherited_len_constraint.min_value
-    #                     )
-    # 
-    #                 if inherited_len_constraint.max_value is not None:
-    #                     len_constraint.max_value = (
-    #                         min(
-    #                             len_constraint.max_value, inherited_len_constraint.max_value
-    #                         )
-    #                         if len_constraint.max_value is not None
-    #                         else inherited_len_constraint.max_value
-    #                     )
+        raise AssertionError("Unhandled execution path")
 
 
+def _infer_constraints_of_constrained_primitive_without_inheritance(
+        constrained_primitive: intermediate.ConstrainedPrimitive,
+        pattern_verifications_by_name: infer_for_schema_pattern.PatternVerificationsByName,
+) -> Tuple[Optional[Constraints], Optional[List[Error]]]:
+    """
+    Infer the constraints from the invariants on self of the constrained primitive.
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _infer_len_constraints_by_constrained_primitive(
-        symbol_table: intermediate.SymbolTable,
-) -> Tuple[
-    Optional[MutableMapping[intermediate.ConstrainedPrimitive, LenConstraint]],
-    Optional[List[Error]],
-]:
-    """Infer the constraints on ``len(.)`` of the constrained primitives."""
+    We do not go up (or down) the inheritance tree -- the constraints from the parents
+    are not inherited at this step.
 
-    # NOTE (mristin):
-    # We do this inference in two passes. In the first pass, we only infer
-    # the constraints defined for the constrained primitive and ignore the ancestors.
-    # In the second pass, we stack the constraints of the ancestors as well.
-
+    If there are no constraints inferred from the constrained primitive, we return None.
+    """
     errors = []  # type: List[Error]
 
-    first_pass: MutableMapping[
-        intermediate.ConstrainedPrimitive, LenConstraint
-    ] = collections.OrderedDict()
+    len_constraint: Optional[LenConstraint] = None
 
-    for constrained_primitive in symbol_table.constrained_primitives:
+    if constrained_primitive.constrainee in infer_for_schema_len.LENGTHABLE_PRIMITIVES:
         (
             len_constraint,
             len_constraint_errors,
@@ -175,108 +273,40 @@ def _infer_len_constraints_by_constrained_primitive(
         else:
             assert len_constraint is not None
 
-            first_pass[constrained_primitive] = len_constraint
+            # NOTE (mristin):
+            # We do not want to keep dummy constraints.
+            if len_constraint.min_value is None and len_constraint.max_value is None:
+                len_constraint = None
+
+    pattern_constraints: Optional[Sequence[PatternConstraint]] = None
+
+    if constrained_primitive.constrainee is intermediate.PrimitiveType.STR:
+        pattern_constraints = infer_for_schema_pattern.infer_patterns_on_self(
+            constrained_primitive=constrained_primitive,
+            pattern_verifications_by_name=pattern_verifications_by_name,
+        )
+
+        if len(pattern_constraints) == 0:
+            # NOTE (mristin):
+            # We do not want to keep dummy constraints.
+            pattern_constraints = None
 
     if len(errors) > 0:
         return None, errors
 
-    second_pass: MutableMapping[
-        intermediate.ConstrainedPrimitive, LenConstraint
-    ] = collections.OrderedDict()
+    if len_constraint is None and pattern_constraints is None:
+        return None, None
 
-    for our_type in symbol_table.our_types_topologically_sorted:
-        if isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin):
-            # We make the copy in order to avoid bugs when we start processing
-            # the inheritances.
-            len_constraint = first_pass[our_type].copy()
-
-            for inheritance in our_type.inheritances:
-                inherited_len_constraint = second_pass.get(inheritance, None)
-                assert (
-                        inherited_len_constraint is not None
-                ), "Expected topological order"
-
-                if inherited_len_constraint.min_value is not None:
-                    len_constraint.min_value = (
-                        max(
-                            len_constraint.min_value, inherited_len_constraint.min_value
-                        )
-                        if len_constraint.min_value is not None
-                        else inherited_len_constraint.min_value
-                    )
-
-                if inherited_len_constraint.max_value is not None:
-                    len_constraint.max_value = (
-                        min(
-                            len_constraint.max_value, inherited_len_constraint.max_value
-                        )
-                        if len_constraint.max_value is not None
-                        else inherited_len_constraint.max_value
-                    )
-
-            second_pass[our_type] = len_constraint
-
-    assert len(errors) == 0
-    return second_pass, None
-
-
-def _infer_pattern_constraints_by_constrained_primitive(
-        symbol_table: intermediate.SymbolTable,
-        pattern_verifications_by_name: infer_for_schema_pattern.PatternVerificationsByName,
-) -> MutableMapping[intermediate.ConstrainedPrimitive, List[PatternConstraint]]:
-    """Infer the pattern constraints of the constrained strings."""
-    # NOTE (mristin):
-    # We do this inference in two passes. In the first pass, we only infer
-    # the constraints defined for the constrained primitive and ignore the ancestors.
-    # In the second pass, we stack the constraints of the ancestors as well.
-
-    first_pass: MutableMapping[
-        intermediate.ConstrainedPrimitive,
-        List[PatternConstraint],
-    ] = collections.OrderedDict()
-
-    for our_type in symbol_table.our_types:
-        if (
-                isinstance(our_type, intermediate.ConstrainedPrimitive)
-                and our_type.constrainee is intermediate.PrimitiveType.STR
-        ):
-            pattern_constraints = infer_for_schema_pattern.infer_patterns_on_self(
-                constrained_primitive=our_type,
-                pattern_verifications_by_name=pattern_verifications_by_name,
-            )
-
-            first_pass[our_type] = pattern_constraints
-
-    second_pass: MutableMapping[
-        intermediate.ConstrainedPrimitive,
-        List[PatternConstraint],
-    ] = collections.OrderedDict()
-
-    for our_type in first_pass:
+    return Constraints(
+        len_constraint=len_constraint,
+        patterns=pattern_constraints,
         # NOTE (mristin):
-        # We make the copy in order to avoid bugs when we start processing
-        # the inheritances.
-        pattern_constraints = first_pass[our_type][:]
+        # We do not match the set of primitives on the constrained primitives at the
+        # moment, but this could be easily implemented.
+        set_of_primitives=None,
+        set_of_enumeration_literals=None,
+    ), None
 
-        for inheritance in our_type.inheritances:
-            assert inheritance in first_pass, (
-                f"We are processing the constrained primitive {our_type.name!r}. "
-                f"However, its parent, {inheritance.name!r}, has not been processed in "
-                f"the first pass. Something probably went wrong in the first pass."
-            )
-
-            inherited_pattern_constraints = second_pass.get(inheritance, None)
-            assert inherited_pattern_constraints is not None, (
-                f"Expected topological order. However, our type {our_type.name!r} "
-                f"is being processed before one of its parents, {inheritance.name!r}."
-            )
-
-            pattern_constraints = inherited_pattern_constraints + pattern_constraints
-
-        second_pass[our_type] = pattern_constraints
-
-    return second_pass
 
 @ensure(lambda result: not (result[1] is not None) or len(result[1]) > 0)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -292,8 +322,66 @@ def _infer_constraints_by_constrained_primitive(
     If there are no constraints for the given constrained primitive, it is not present
     in the mapping.
     """
-    # TODO: implement
-    raise NotImplementedError()
+    errors: List[Error] = []
+
+    mapping: MutableMapping[intermediate.ConstrainedPrimitive, Constraints] = dict()
+
+    pattern_verifications_by_name = (
+        infer_for_schema_pattern.map_pattern_verifications_by_name(
+            verifications=symbol_table.verification_functions
+        )
+    )
+
+    # NOTE (mristin):
+    # We perform the first pass where we disregard inheritance and return if there are
+    # any errors. We can then be certain that there will be no errors when we stack
+    # the constraints considering the inheritance tree.
+
+    for constrained_primitive in symbol_table.constrained_primitives:
+        constraints, errors_constrained_primitive = (
+            _infer_constraints_of_constrained_primitive_without_inheritance(
+                constrained_primitive=constrained_primitive,
+                pattern_verifications_by_name=pattern_verifications_by_name,
+            )
+        )
+
+        if errors_constrained_primitive is not None:
+            errors.append(
+                Error(
+                    constrained_primitive.parsed.node,
+                    f"Failed to infer the schema constraints "
+                    f"from constrained primitive {constrained_primitive.name!r}",
+                    errors_constrained_primitive
+                )
+            )
+
+        if constraints is not None:
+            mapping[constrained_primitive] = constraints
+
+    if len(errors) > 0:
+        return None, errors
+
+    for our_type in symbol_table.our_types_topologically_sorted:
+        if not isinstance(our_type, intermediate.ConstrainedPrimitive):
+            continue
+
+        # NOTE (mristin):
+        # We rename for clarity when the reader reads the previous code.
+        constrained_primitive = our_type
+
+        constraints = mapping.get(constrained_primitive, None)
+
+        # NOTE (mristin):
+        # The topological order ensures that we have processed the parents already.
+        for parent in constrained_primitive.inheritances:
+            constraints = _merge_constraints(constraints, mapping.get(parent, None))
+
+        if constraints is not None:
+            mapping[constrained_primitive] = constraints
+
+    return mapping, None
+
+
 
 # TODO: rewrite intensively!
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
