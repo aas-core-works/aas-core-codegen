@@ -128,21 +128,37 @@ def _merge_set_of_primitives_constraints(
                 f"other primitive type is {other.a_type}."
             )
 
-        observed_value_set: Set[Union[bool, int, float, str, bytearray]] = set()
+        value_histo: MutableMapping[
+            Union[bool, int, float, str, bytearray],
+            int
+        ] = collections.OrderedDict()
 
-        literals: List[intermediate.PrimitiveSetLiteral] = []
+        literal_by_value: MutableMapping[
+            Union[bool, int, float, str, bytearray],
+            intermediate.PrimitiveSetLiteral
+        ] = {}
 
         for literal in itertools.chain(that.literals, other.literals):
-            if literal.value not in observed_value_set:
-                literals.append(literal)
-                observed_value_set.add(literal.value)
+            if literal.value not in value_histo:
+                value_histo[literal.value] = 1
+            else:
+                value_histo[literal.value] += 1
+
+            literal_by_value[literal.value] = literal
 
         return SetOfPrimitivesConstraint(
             # NOTE (mristin):
             # We simply pick one of the types as we assert before that that.a_type
             # and other.a_type must be the same.
             a_type=that.a_type,
-            literal=literals
+            # NOTE (mristin):
+            # We need to compute the intersection, so we only pick the literals which we
+            # observed twice, once in each list of literals.
+            literals=[
+                literal_by_value[value]
+                for value, count in value_histo.items()
+                if count == 2
+            ]
         )
 
     elif that is not None and other is None:
@@ -170,25 +186,33 @@ def _merge_set_of_enumeration_literals_constraints(
                 f"other enumeration is {other.enumeration}."
             )
 
-        # TODO: remove
-        #     enumeration: Final[intermediate.Enumeration]
-        #     literals: Final[Sequence[intermediate.EnumerationLiteral]]
+        literal_by_id: MutableMapping[int, intermediate.EnumerationLiteral] = dict()
 
-        observed_literal_id_set: Set[int] = set()
-
-        literals: List[intermediate.EnumerationLiteral] = []
+        literal_id_histo: MutableMapping[int, int] = collections.OrderedDict()
 
         for literal in itertools.chain(that.literals, other.literals):
-            if id(literal) not in observed_literal_id_set:
-                literals.append(literal)
-                observed_literal_id_set.add(id(literal))
+            literal_id = id(literal)
+
+            if literal_id not in literal_id_histo:
+                literal_id_histo[literal_id] = 1
+            else:
+                literal_id_histo[literal_id] += 1
+
+            literal_by_id[literal_id] = literal
 
         return SetOfEnumerationLiteralsConstraint(
             # NOTE (mristin):
             # We simply pick one of the enumerations as we assert before that
             # enumeration and other enumeration are one and the same.
-            a_type=that.enumeration,
-            literal=literals
+            enumeration=that.enumeration,
+            # NOTE (mristin):
+            # We need to compute the intersection, so we only pick the literals which we
+            # observed twice, once in each list of literals.
+            literals=[
+                literal_by_id[literal_id]
+                for literal_id, count in literal_id_histo.items()
+                if count == 2
+            ]
         )
 
     elif that is not None and other is None:

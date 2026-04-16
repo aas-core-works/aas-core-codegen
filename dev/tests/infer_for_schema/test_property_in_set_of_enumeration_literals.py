@@ -42,20 +42,11 @@ class Test_property_in_set(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-
-        text = infer_for_schema.dump(constraints_by_props)
-        self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
-            text,
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
+
+        assert constraints is None
 
     def test_property_in_set(self) -> None:
         source = textwrap.dedent(
@@ -99,21 +90,23 @@ class Test_property_in_set(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral A',
-        'Reference to EnumerationLiteral B'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral A',
+      'Reference to EnumerationLiteral B']))""",
             text,
         )
 
@@ -168,20 +161,22 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral B'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral B']))""",
             text,
         )
 
@@ -229,21 +224,23 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral A',
-        'Reference to EnumerationLiteral B'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral A',
+      'Reference to EnumerationLiteral B']))""",
             text,
         )
 
@@ -300,20 +297,22 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral B'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral B']))""",
             text,
         )
 
@@ -374,27 +373,23 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral A',
-        'Reference to EnumerationLiteral B'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral A',
+      'Reference to EnumerationLiteral B']))""",
             text,
         )
 
@@ -463,26 +458,22 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral B'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral B']))""",
             text,
         )
 
@@ -572,26 +563,22 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={},
-  set_of_enumeration_literals_by_property={
-    'some_property': SetOfEnumerationLiteralsConstraint(
-      enumeration='Reference to Enumeration Some_enum',
-      literals=[
-        'Reference to EnumerationLiteral C'])})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=None,
+  set_of_enumeration_literals=SetOfEnumerationLiteralsConstraint(
+    enumeration='Reference to Enumeration Some_enum',
+    literals=[
+      'Reference to EnumerationLiteral C']))""",
             text,
         )
 
