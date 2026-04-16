@@ -38,20 +38,11 @@ class Test_property_in_set(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
-
-        text = infer_for_schema.dump(constraints_by_props)
-        self.assertEqual(
-            textwrap.dedent(
-                """\
-                ConstraintsByProperty(
-                  len_constraints_by_property={},
-                  patterns_by_property={},
-                  set_of_primitives_by_property={},
-                  set_of_enumeration_literals_by_property={})"""
-            ),
-            text,
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
+
+        assert constraints is None
 
     def test_property_in_set(self) -> None:
         source = textwrap.dedent(
@@ -88,27 +79,29 @@ class Test_property_in_set(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='A',
-          a_type='STR',
-          parsed=...),
-        PrimitiveSetLiteral(
-          value='B',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='A',
+        a_type='STR',
+        parsed=...),
+      PrimitiveSetLiteral(
+        value='B',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -151,23 +144,25 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='B',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='B',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -207,27 +202,29 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='A',
-          a_type='STR',
-          parsed=...),
-        PrimitiveSetLiteral(
-          value='B',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='A',
+        a_type='STR',
+        parsed=...),
+      PrimitiveSetLiteral(
+        value='B',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -273,23 +270,25 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_props = constraints_by_class[something_cls]
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
+        )
 
-        text = infer_for_schema.dump(constraints_by_props)
+        text = infer_for_schema.dump(constraints)
+
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='B',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='B',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -341,33 +340,29 @@ class Test_stacking(unittest.TestCase):
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='A',
-          a_type='STR',
-          parsed=...),
-        PrimitiveSetLiteral(
-          value='B',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='A',
+        a_type='STR',
+        parsed=...),
+      PrimitiveSetLiteral(
+        value='B',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -425,29 +420,25 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='B',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='B',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
@@ -498,13 +489,6 @@ ConstraintsByProperty(
             """
         )
 
-        # noinspection PyUnusedLocal
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None  # Necessary for mypy
-
         # fmt: off
         (
             symbol_table,
@@ -518,29 +502,25 @@ ConstraintsByProperty(
         )
         # fmt: on
 
-        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
-            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        constraints = tests.infer_for_schema.common.select_constraints_of_property(
+            something_cls, "some_property", constraints_by_class
         )
-        assert error is None, tests.common.most_underlying_messages(error)
-        assert constraints_by_class is not None
 
-        constraints_by_props = constraints_by_class[something_cls]
+        text = infer_for_schema.dump(constraints)
 
-        text = infer_for_schema.dump(constraints_by_props)
         self.assertEqual(
             """\
-ConstraintsByProperty(
-  len_constraints_by_property={},
-  patterns_by_property={},
-  set_of_primitives_by_property={
-    'some_property': SetOfPrimitivesConstraint(
-      a_type='STR',
-      literals=[
-        PrimitiveSetLiteral(
-          value='C',
-          a_type='STR',
-          parsed=...)])},
-  set_of_enumeration_literals_by_property={})""",
+Constraints(
+  len_constraint=None,
+  patterns=None,
+  set_of_primitives=SetOfPrimitivesConstraint(
+    a_type='STR',
+    literals=[
+      PrimitiveSetLiteral(
+        value='C',
+        a_type='STR',
+        parsed=...)]),
+  set_of_enumeration_literals=None)""",
             text,
         )
 
