@@ -12,24 +12,146 @@ from aas_core_codegen.infer_for_schema import (
     _set as infer_for_schema_set,
 )
 from aas_core_codegen.infer_for_schema._types import (
-    ConstraintsByProperty,
+    Constraints,
     LenConstraint,
     PatternConstraint,
     SetOfPrimitivesConstraint,
     SetOfEnumerationLiteralsConstraint,
 )
 
+# TODO: continue here -- write min_or_none and max_or_none
+# TODO: than go over constrained primitives -- and use merge on constraints
+# TODO: then go over all the type annotations -- stack them for class
+# TODO: then handle inheritance
+def _min_or_none(
+        that: Optional[float],
+        other: Optional[float]
+) -> Optional[float]:
+    """Compute the minimum or return None if both values are None."""
+    if (
+            that is not None
+            and other is not None
+    ):
+        min_value = max(
+            that.len_constraint.min_value,
+            other.len_constraint.min_value
+        )
+
+    elif (
+            that.len_constraint.min_value is not None
+            and other.len_constraint.min_value is None
+    ):
+        min_value = that.len_constraint.min_value
+
+    elif (
+            that.len_constraint.min_value is None
+            and other.len_constraint.min_value is not None
+    ):
+        min_value = other.len_constraint.min_value
+
+    elif (
+            that.len_constraint.min_value is None
+            and other.len_constraint.min_value is None
+    ):
+        pass
+
+    else:
+        raise AssertionError("Unhandled execution path")
+
+
+def _merge_constraints(
+        that: Constraints,
+        other: Constraints
+) -> Constraints:
+    """Combine the constraints on tighter bounds."""
+    
+    len_constraint: Optional[LenConstraint] = None
+    if that.len_constraint is not None and other.len_constraint is None:
+        len_constraint = that.len_constraint.copy()
+    
+    elif that.len_constraint is None and other.len_constraint is not None:
+        len_constraint = other.len_constraint.copy()
+        
+    elif that.len_constraint is not None and other.len_constraint is not None:
+        min_value: Optional[float] = None
+        
+
+        max_value: Optional[float] = None
+
+        if (
+                that.len_constraint.max_value is not None
+                and other.len_constraint.max_value is not None
+        ):
+            max_value = min(
+                that.len_constraint.max_value,
+                other.len_constraint.max_value
+            )
+
+        elif (
+                that.len_constraint.max_value is not None
+                and other.len_constraint.max_value is None
+        ):
+            max_value = that.len_constraint.max_value
+
+        elif (
+                that.len_constraint.max_value is None
+                and other.len_constraint.max_value is not None
+        ):
+            max_value = other.len_constraint.max_value
+
+        elif (
+                that.len_constraint.max_value is None
+                and other.len_constraint.max_value is None
+        ):
+            pass
+
+        else:
+            raise AssertionError("Unhandled execution path")
+
+
+        len_constraint = LenConstraint(
+            min_value=min_value,
+            max_value=max_value
+        )
+
+    elif that.len_constraint is None and other.len_constraint is None:
+        pass
+    
+    else:
+        raise AssertionError(
+            f"Unhandled execution path: {that.len_constraint=}, {other.len_constraint=}"
+        )
+        
+    #                 if inherited_len_constraint.min_value is not None:
+    #                     len_constraint.min_value = (
+    #                         max(
+    #                             len_constraint.min_value, inherited_len_constraint.min_value
+    #                         )
+    #                         if len_constraint.min_value is not None
+    #                         else inherited_len_constraint.min_value
+    #                     )
+    # 
+    #                 if inherited_len_constraint.max_value is not None:
+    #                     len_constraint.max_value = (
+    #                         min(
+    #                             len_constraint.max_value, inherited_len_constraint.max_value
+    #                         )
+    #                         if len_constraint.max_value is not None
+    #                         else inherited_len_constraint.max_value
+    #                     )
+
+
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _infer_len_constraints_by_constrained_primitive(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Tuple[
     Optional[MutableMapping[intermediate.ConstrainedPrimitive, LenConstraint]],
     Optional[List[Error]],
 ]:
     """Infer the constraints on ``len(.)`` of the constrained primitives."""
 
-    # NOTE (mristin, 2022-02-11):
+    # NOTE (mristin):
     # We do this inference in two passes. In the first pass, we only infer
     # the constraints defined for the constrained primitive and ignore the ancestors.
     # In the second pass, we stack the constraints of the ancestors as well.
@@ -64,7 +186,7 @@ def _infer_len_constraints_by_constrained_primitive(
 
     for our_type in symbol_table.our_types_topologically_sorted:
         if isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin, 2022-02-11):
+            # NOTE (mristin):
             # We make the copy in order to avoid bugs when we start processing
             # the inheritances.
             len_constraint = first_pass[our_type].copy()
@@ -72,7 +194,7 @@ def _infer_len_constraints_by_constrained_primitive(
             for inheritance in our_type.inheritances:
                 inherited_len_constraint = second_pass.get(inheritance, None)
                 assert (
-                    inherited_len_constraint is not None
+                        inherited_len_constraint is not None
                 ), "Expected topological order"
 
                 if inherited_len_constraint.min_value is not None:
@@ -100,12 +222,11 @@ def _infer_len_constraints_by_constrained_primitive(
 
 
 def _infer_pattern_constraints_by_constrained_primitive(
-    symbol_table: intermediate.SymbolTable,
-    pattern_verifications_by_name: infer_for_schema_pattern.PatternVerificationsByName,
+        symbol_table: intermediate.SymbolTable,
+        pattern_verifications_by_name: infer_for_schema_pattern.PatternVerificationsByName,
 ) -> MutableMapping[intermediate.ConstrainedPrimitive, List[PatternConstraint]]:
     """Infer the pattern constraints of the constrained strings."""
-
-    # NOTE (mristin, 2022-02-11):
+    # NOTE (mristin):
     # We do this inference in two passes. In the first pass, we only infer
     # the constraints defined for the constrained primitive and ignore the ancestors.
     # In the second pass, we stack the constraints of the ancestors as well.
@@ -117,8 +238,8 @@ def _infer_pattern_constraints_by_constrained_primitive(
 
     for our_type in symbol_table.our_types:
         if (
-            isinstance(our_type, intermediate.ConstrainedPrimitive)
-            and our_type.constrainee is intermediate.PrimitiveType.STR
+                isinstance(our_type, intermediate.ConstrainedPrimitive)
+                and our_type.constrainee is intermediate.PrimitiveType.STR
         ):
             pattern_constraints = infer_for_schema_pattern.infer_patterns_on_self(
                 constrained_primitive=our_type,
@@ -133,7 +254,7 @@ def _infer_pattern_constraints_by_constrained_primitive(
     ] = collections.OrderedDict()
 
     for our_type in first_pass:
-        # NOTE (mristin, 2022-02-11):
+        # NOTE (mristin):
         # We make the copy in order to avoid bugs when we start processing
         # the inheritances.
         pattern_constraints = first_pass[our_type][:]
@@ -157,10 +278,27 @@ def _infer_pattern_constraints_by_constrained_primitive(
 
     return second_pass
 
+@ensure(lambda result: not (result[1] is not None) or len(result[1]) > 0)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _infer_constraints_by_constrained_primitive(
+        symbol_table: intermediate.SymbolTable,
+) -> Tuple[
+    Optional[MutableMapping[intermediate.ConstrainedPrimitive, Constraints]],
+    Optional[List[Error]]
+]:
+    """
+    Infer the constraints from the constrained primitives considering the inheritance.
+    
+    If there are no constraints for the given constrained primitive, it is not present
+    in the mapping.
+    """
+    # TODO: implement
+    raise NotImplementedError()
 
+# TODO: rewrite intensively!
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def infer_constraints_by_class(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Tuple[
     Optional[MutableMapping[intermediate.ClassUnion, ConstraintsByProperty]],
     Optional[List[Error]],
@@ -242,18 +380,19 @@ def infer_constraints_by_class(
             )
 
             if (
-                isinstance(type_anno, intermediate.OurTypeAnnotation)
-                and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
-                # NOTE (mristin, 2023-02-06):
-                # We infer constraints for constrained primitives only for
-                # the class that defines the property, and skip these constraints
-                # in the descendant classes. This is necessary to avoid
-                # unnecessary repetitions of constraints in the schemas.
-                #
-                # In case your schema engine *does not* support inheritance or other
-                # forms of stacking constraints over classes, see the method
-                # ``merge_constraints_with_ancestors``.
-                and prop.specified_for is cls
+                    isinstance(type_anno, intermediate.OurTypeAnnotation)
+                    and isinstance(type_anno.our_type,
+                                   intermediate.ConstrainedPrimitive)
+                    # NOTE (mristin, 2023-02-06):
+                    # We infer constraints for constrained primitives only for
+                    # the class that defines the property, and skip these constraints
+                    # in the descendant classes. This is necessary to avoid
+                    # unnecessary repetitions of constraints in the schemas.
+                    #
+                    # In case your schema engine *does not* support inheritance or other
+                    # forms of stacking constraints over classes, see the method
+                    # ``merge_constraints_with_ancestors``.
+                    and prop.specified_for is cls
             ):
                 len_constraint_from_type = len_constraints_by_constrained_primitive.get(
                     type_anno.our_type, None
@@ -262,34 +401,34 @@ def infer_constraints_by_class(
             # Merge the constraint from the type and from the invariants
 
             if (
-                len_constraint_from_type is None
-                and len_constraint_from_invariants is None
+                    len_constraint_from_type is None
+                    and len_constraint_from_invariants is None
             ):
                 pass
 
             elif (
-                len_constraint_from_type is not None
-                and len_constraint_from_invariants is None
+                    len_constraint_from_type is not None
+                    and len_constraint_from_invariants is None
             ):
                 if (
-                    len_constraint_from_type.min_value is not None
-                    or len_constraint_from_type.max_value is not None
+                        len_constraint_from_type.min_value is not None
+                        or len_constraint_from_type.max_value is not None
                 ):
                     len_constraints_by_property[prop] = len_constraint_from_type
 
             elif (
-                len_constraint_from_type is None
-                and len_constraint_from_invariants is not None
+                    len_constraint_from_type is None
+                    and len_constraint_from_invariants is not None
             ):
                 if (
-                    len_constraint_from_invariants.min_value is not None
-                    or len_constraint_from_invariants.max_value is not None
+                        len_constraint_from_invariants.min_value is not None
+                        or len_constraint_from_invariants.max_value is not None
                 ):
                     len_constraints_by_property[prop] = len_constraint_from_invariants
 
             elif (
-                len_constraint_from_type is not None
-                and len_constraint_from_invariants is not None
+                    len_constraint_from_type is not None
+                    and len_constraint_from_invariants is not None
             ):
                 # NOTE (mristin, 2022-03-02):
                 # We have to make the bounds *stricter* since both
@@ -306,9 +445,9 @@ def infer_constraints_by_class(
                 )
 
                 if (
-                    min_value is not None
-                    and max_value is not None
-                    and min_value > max_value
+                        min_value is not None
+                        and max_value is not None
+                        and min_value > max_value
                 ):
                     errors.append(
                         Error(
@@ -350,18 +489,19 @@ def infer_constraints_by_class(
             )
 
             if (
-                isinstance(type_anno, intermediate.OurTypeAnnotation)
-                and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
-                # NOTE (mristin, 2023-02-06):
-                # We infer constraints for constrained primitives only for
-                # the class that defines the property, and skip these constraints
-                # in the descendant classes. This is necessary to avoid
-                # unnecessary repetitions of constraints in the schemas.
-                #
-                # In case your schema engine *does not* support inheritance or other
-                # forms of stacking constraints over classes, see the method
-                # ``merge_constraints_with_ancestors``.
-                and prop.specified_for is cls
+                    isinstance(type_anno, intermediate.OurTypeAnnotation)
+                    and isinstance(type_anno.our_type,
+                                   intermediate.ConstrainedPrimitive)
+                    # NOTE (mristin, 2023-02-06):
+                    # We infer constraints for constrained primitives only for
+                    # the class that defines the property, and skip these constraints
+                    # in the descendant classes. This is necessary to avoid
+                    # unnecessary repetitions of constraints in the schemas.
+                    #
+                    # In case your schema engine *does not* support inheritance or other
+                    # forms of stacking constraints over classes, see the method
+                    # ``merge_constraints_with_ancestors``.
+                    and prop.specified_for is cls
             ):
                 patterns_from_type = patterns_by_constrained_primitive.get(
                     type_anno.our_type, []
@@ -412,8 +552,8 @@ def infer_constraints_by_class(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def merge_constraints_with_ancestors(
-    symbol_table: intermediate.SymbolTable,
-    constraints_by_class: Mapping[intermediate.ClassUnion, ConstraintsByProperty],
+        symbol_table: intermediate.SymbolTable,
+        constraints_by_class: Mapping[intermediate.ClassUnion, ConstraintsByProperty],
 ) -> Tuple[
     Optional[MutableMapping[intermediate.ClassUnion, ConstraintsByProperty]],
     Optional[Error],
@@ -439,7 +579,7 @@ def merge_constraints_with_ancestors(
 
     for our_type in symbol_table.our_types_topologically_sorted:
         if not isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             continue
 
@@ -503,9 +643,9 @@ def merge_constraints_with_ancestors(
                         max_value = min(len_constraint.max_value, max_value)
 
             if (
-                min_value is not None
-                and max_value is not None
-                and min_value > max_value
+                    min_value is not None
+                    and max_value is not None
+                    and min_value > max_value
             ):
                 return None, Error(
                     our_type.parsed.node,
@@ -669,8 +809,8 @@ def merge_constraints_with_ancestors(
 
     for our_type, constraints_by_property in new_constraints_by_class.items():
         for (
-            prop,
-            set_of_primitives,
+                prop,
+                set_of_primitives,
         ) in constraints_by_property.set_of_primitives_by_property.items():
             if len(set_of_primitives.literals) == 0:
                 return None, Error(
@@ -680,8 +820,8 @@ def merge_constraints_with_ancestors(
                 )
 
         for (
-            prop,
-            set_of_enum_literals,
+                prop,
+                set_of_enum_literals,
         ) in constraints_by_property.set_of_enumeration_literals_by_property.items():
             if len(set_of_enum_literals.literals) == 0:
                 return None, Error(

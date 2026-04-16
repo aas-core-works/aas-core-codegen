@@ -9,6 +9,8 @@ from aas_core_codegen.infer_for_schema import (
     _types,
 )
 
+# TODO: clean up and look for usage
+
 LenConstraint = _types.LenConstraint
 PatternConstraint = _types.PatternConstraint
 ConstraintsByProperty = _types.ConstraintsByProperty

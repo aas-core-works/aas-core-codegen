@@ -1,5 +1,5 @@
 """Provide data structures for the constraint inferences."""
-from typing import Mapping, Sequence, Optional
+from typing import Mapping, Sequence, Optional, Final, TypeAlias
 
 from icontract import require
 
@@ -64,9 +64,9 @@ class SetOfPrimitivesConstraint:
     )
     # fmt: on
     def __init__(
-        self,
-        a_type: intermediate.PrimitiveType,
-        literals: Sequence[intermediate.PrimitiveSetLiteral],
+            self,
+            a_type: intermediate.PrimitiveType,
+            literals: Sequence[intermediate.PrimitiveSetLiteral],
     ) -> None:
         """Initialize with the given values."""
         self.a_type = a_type
@@ -90,9 +90,9 @@ class SetOfEnumerationLiteralsConstraint:
     )
     # fmt: on
     def __init__(
-        self,
-        enumeration: intermediate.Enumeration,
-        literals: Sequence[intermediate.EnumerationLiteral],
+            self,
+            enumeration: intermediate.Enumeration,
+            literals: Sequence[intermediate.EnumerationLiteral],
     ) -> None:
         """Initialize with the given values."""
         self.enumeration = enumeration
@@ -103,33 +103,42 @@ class SetOfEnumerationLiteralsConstraint:
         return f"<{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class ConstraintsByProperty:
+class Constraints:
     """
-    Represent all the inferred property constraints of one of our types.
+    Represent all the inferred constraints for a value.
 
     The constraints coming from the constrained primitives are in-lined and hence also
     included in this representation.
     """
 
+    len_constraint: Final[Optional[LenConstraint]]
+    patterns: Final[Optional[Sequence[PatternConstraint]]]
+    set_of_primitives: Final[Optional[SetOfPrimitivesConstraint]]
+    set_of_enumeration_literals: Final[Optional[SetOfEnumerationLiteralsConstraint]]
+
+    @require(
+        lambda patterns:
+        not (patterns is not None) or len(patterns) > 0
+    )
     def __init__(
-        self,
-        len_constraints_by_property: Mapping[intermediate.Property, LenConstraint],
-        patterns_by_property: Mapping[
-            intermediate.Property, Sequence[PatternConstraint]
-        ],
-        set_of_primitives_by_property: Mapping[
-            intermediate.Property, SetOfPrimitivesConstraint
-        ],
-        set_of_enumeration_literals_by_property: Mapping[
-            intermediate.Property, SetOfEnumerationLiteralsConstraint
-        ],
+            self,
+            len_constraint: Optional[LenConstraint],
+            patterns: Optional[Sequence[PatternConstraint]],
+            set_of_primitives: Optional[SetOfPrimitivesConstraint],
+            set_of_enumeration_literals: Optional[SetOfEnumerationLiteralsConstraint]
     ) -> None:
         """Initialize with the given values."""
-        self.len_constraints_by_property = len_constraints_by_property
-        self.patterns_by_property = patterns_by_property
-        self.set_of_primitives_by_property = set_of_primitives_by_property
+        self.len_constraint = len_constraint
+        self.patterns = patterns
+        self.set_of_primitives = set_of_primitives
         # fmt: off
-        self.set_of_enumeration_literals_by_property = (
-            set_of_enumeration_literals_by_property
+        self.set_of_enumeration_literals = (
+            set_of_enumeration_literals
         )
         # fmt: on
+
+#: Represent the constraints inferred for the given value in a class.
+ConstraintsByValue: TypeAlias = Mapping[
+    intermediate.TypeAnnotationUnion,
+    Constraints
+]
