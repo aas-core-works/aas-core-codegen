@@ -103,9 +103,9 @@ class SetOfEnumerationLiteralsConstraint:
         return f"<{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class ConstraintsByProperty:
+class Constraints:
     """
-    Represent all the inferred property constraints of one of our types.
+    Represent all the inferred constraints for a value.
 
     The constraints coming from the constrained primitives are in-lined and hence also
     included in this representation.
@@ -113,23 +113,13 @@ class ConstraintsByProperty:
 
     def __init__(
         self,
-        len_constraints_by_property: Mapping[intermediate.Property, LenConstraint],
-        patterns_by_property: Mapping[
-            intermediate.Property, Sequence[PatternConstraint]
-        ],
-        set_of_primitives_by_property: Mapping[
-            intermediate.Property, SetOfPrimitivesConstraint
-        ],
-        set_of_enumeration_literals_by_property: Mapping[
-            intermediate.Property, SetOfEnumerationLiteralsConstraint
-        ],
+        len_constraint: Optional[LenConstraint],
+        patterns: Optional[Sequence[PatternConstraint]],
+        set_of_primitives: Optional[SetOfPrimitivesConstraint],
+        set_of_enumeration_literals: Optional[SetOfEnumerationLiteralsConstraint],
     ) -> None:
         """Initialize with the given values."""
-        self.len_constraints_by_property = len_constraints_by_property
-        self.patterns_by_property = patterns_by_property
-        self.set_of_primitives_by_property = set_of_primitives_by_property
-        # fmt: off
-        self.set_of_enumeration_literals_by_property = (
-            set_of_enumeration_literals_by_property
-        )
-        # fmt: on
+        self.len_constraint = len_constraint
+        self.patterns = patterns
+        self.set_of_primitives = set_of_primitives
+        self.set_of_enumeration_literals = set_of_enumeration_literals
