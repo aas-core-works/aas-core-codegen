@@ -558,7 +558,7 @@ def _infer_constraints_of_class_values_without_inheritance(
                 )
             )
 
-            if not constraints.is_empty():
+            if constraints is not None and not constraints.is_empty():
                 mapping[type_anno] = constraints
 
     # endregion
