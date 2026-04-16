@@ -9,8 +9,6 @@ from aas_core_codegen.infer_for_schema import (
     _types,
 )
 
-# TODO: clean up and look for usage
-
 LenConstraint = _types.LenConstraint
 PatternConstraint = _types.PatternConstraint
 SetOfPrimitivesConstraint = _types.SetOfPrimitivesConstraint
@@ -19,9 +17,9 @@ SetOfEnumerationLiteralsConstraint = _types.SetOfEnumerationLiteralsConstraint
 Constraints = _types.Constraints
 ConstraintsByValue = _types.ConstraintsByValue
 
-infer_constraints_by_class = _inline.infer_constraints_by_class
+# TODO: remove once refactored
+ConstraintsByProperty = None
 
-# TODO: remove this one once refactored
-merge_constraints_with_ancestors = _inline.merge_constraints_with_ancestors
+infer_constraints_by_class = _inline.infer_constraints_by_class
 
 dump = _stringify.dump

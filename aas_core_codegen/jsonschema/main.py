@@ -67,14 +67,29 @@ def _define_primitive_type(
 
     return definition
 
-
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_type(
     type_annotation: intermediate.TypeAnnotationExceptOptional,
+    constraints_by_value: infer_for_schema.ConstraintsByValue,
+    fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
-    """Generate the type definition for ``type_annotation``."""
+    """
+    Generate the type definition for ``type_annotation``.
+
+    The constraints-by-value define all the constraints of the class nesting a property
+    of this type.
+
+    The ``fix_pattern`` determines how the pattern should be translated for
+    the regex engine. For example, some JSON schema verification engines expect only
+    characters below Basic Multilingual Plane (BMP), and use surrogate pairs to
+    represent characters above BMP.
+    """
+    # TODO: try primitive here -- then apply all the constraints on primitive
+    # TODO: return immediately
+    # TODO: raise in branches where primitive expected
+
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return _define_primitive_type(type_annotation.a_type), None
+        definition = _define_primitive_type(type_annotation.a_type)
 
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.our_type.name)
@@ -86,7 +101,7 @@ def _define_type(
             )
 
         elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
-            return _define_primitive_type(type_annotation.our_type.constrainee), None
+            definition = _define_primitive_type(type_annotation.our_type.constrainee)
 
         elif isinstance(type_annotation.our_type, intermediate.Class):
             if len(type_annotation.our_type.concrete_descendants) > 0:
@@ -115,7 +130,9 @@ def _define_type(
         )
 
         items_type_definition, items_error = _define_type(
-            type_annotation=type_annotation.items
+            type_annotation=type_annotation.items,
+            constraints_by_value=constraints_by_value,
+            fix_pattern=fix_pattern
         )
 
         if items_error is not None:
@@ -123,22 +140,22 @@ def _define_type(
 
         assert items_type_definition is not None
 
-        return (
-            collections.OrderedDict(
+        definition = collections.OrderedDict(
                 [("type", "array"), ("items", items_type_definition)]
-            ),
-            None,
-        )
+            )
+
+        # TODO: in-line here constraints for array
 
     else:
         raise NotImplementedError(
-            f"(mristin, 2021-11-10):\n"
+            f"(mristin):\n"
             f"We implemented only a subset of possible type annotations "
             f"to be represented in a JSON schema since we lacked more information "
             f"about the context.\n\n"
             f"This feature needs yet to be implemented.\n\n"
             f"{type_annotation=}"
         )
+
 
 
 # NOTE (mristin):
@@ -336,11 +353,13 @@ def _define_constraints(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_properties(
     cls: intermediate.ClassUnion,
-    constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    constraints_by_value: infer_for_schema.ConstraintsByValue,
     fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the definitions of the meta-model properties for the given ``cls``.
+
+    Constraints-by-value are assumed to have been computed for the given ``cls``.
 
     The property ``modelType`` is defined separately as we need to distinguish
     cases where it is set (concrete class) and not (abstract class, or stub of
@@ -358,14 +377,6 @@ def _define_properties(
     for prop in cls.properties:
         prop_name = naming.json_property(prop.name)
 
-        len_constraint = constraints_by_property.len_constraints_by_property.get(
-            prop, None
-        )
-
-        pattern_constraints = constraints_by_property.patterns_by_property.get(
-            prop, None
-        )
-
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
         definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
@@ -376,7 +387,11 @@ def _define_properties(
         # unsatisfiable schema. Therefore, we define the type for a property only
         # at the parent class, where the property is defined for the first time.
         if prop.specified_for is cls:
-            property_definition, error = _define_type(type_annotation=type_anno)
+            property_definition, error = _define_type(
+                type_annotation=type_anno,
+                constraints_by_value=constraints_by_value,
+                fix_pattern=fix_pattern,
+            )
 
             if error is not None:
                 errors.append(error)
@@ -384,6 +399,7 @@ def _define_properties(
                 assert property_definition is not None
                 definition.update(property_definition)
 
+        # TODO: remove _define_constraints -- inline it into _define_type
         constraints_definition, error = _define_constraints(
             type_annotation=type_anno,
             len_constraint=len_constraint,

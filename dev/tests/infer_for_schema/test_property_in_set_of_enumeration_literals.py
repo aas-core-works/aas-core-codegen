@@ -353,13 +353,6 @@ class Test_stacking(unittest.TestCase):
             """
         )
 
-        # noinspection PyUnusedLocal
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None  # Necessary for mypy
-
         # fmt: off
         (
             symbol_table,
@@ -437,13 +430,6 @@ Constraints(
             __xml_namespace__ = "https://dummy.com"
             """
         )
-
-        # noinspection PyUnusedLocal
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None  # Necessary for mypy
 
         # fmt: off
         (
@@ -542,13 +528,6 @@ Constraints(
             __xml_namespace__ = "https://dummy.com"
             """
         )
-
-        # noinspection PyUnusedLocal
-        constraints_by_class: Optional[
-            MutableMapping[
-                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
-            ]
-        ] = None  # Necessary for mypy
 
         # fmt: off
         (
