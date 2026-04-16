@@ -13,18 +13,25 @@
       "type": "string",
       "enum": []
     },
+    "Result": {
+      "type": "string",
+      "enum": [
+        "fail",
+        "ok"
+      ]
+    },
     "Something": {
       "type": "object",
       "properties": {
-        "someInts": {
+        "someResults": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "$ref": "#/definitions/Result"
           }
         }
       },
       "required": [
-        "someInts"
+        "someResults"
       ]
     }
   }

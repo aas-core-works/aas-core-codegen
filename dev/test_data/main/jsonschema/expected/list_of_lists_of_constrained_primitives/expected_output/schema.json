@@ -16,15 +16,19 @@
     "Something": {
       "type": "object",
       "properties": {
-        "someInts": {
+        "listOfListsOfNames": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         }
       },
       "required": [
-        "someInts"
+        "listOfListsOfNames"
       ]
     }
   }

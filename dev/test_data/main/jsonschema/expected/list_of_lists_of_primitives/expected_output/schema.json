@@ -16,15 +16,18 @@
     "Something": {
       "type": "object",
       "properties": {
-        "someInts": {
+        "listOfListsOfInts": {
           "type": "array",
           "items": {
-            "type": "integer"
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
           }
         }
       },
       "required": [
-        "someInts"
+        "listOfListsOfInts"
       ]
     }
   }

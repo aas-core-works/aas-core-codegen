@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "AbstractItem": {
+      "type": "object",
+      "properties": {
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
+    },
+    "AbstractItem_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AnotherItem"
+        },
+        {
+          "$ref": "#/definitions/SomeItem"
+        }
+      ]
+    },
+    "AnotherItem": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/AbstractItem"
+        },
+        {
+          "properties": {
+            "serialNumber": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "AnotherItem"
+            }
+          },
+          "required": [
+            "serialNumber"
+          ]
+        }
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "AnotherItem",
+        "SomeItem"
+      ]
+    },
+    "SomeItem": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/AbstractItem"
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "modelType": {
+              "const": "SomeItem"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "someItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AbstractItem_choice"
+          }
+        }
+      },
+      "required": [
+        "someItems"
+      ]
+    }
+  }
+}
