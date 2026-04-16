@@ -13,7 +13,7 @@ from aas_core_codegen.infer_for_schema import (
 
 LenConstraint = _types.LenConstraint
 PatternConstraint = _types.PatternConstraint
-ConstraintsByProperty = _types.ConstraintsByProperty
+ConstraintsByValue = _types.ConstraintsByValue
 SetOfPrimitivesConstraint = _types.SetOfPrimitivesConstraint
 SetOfEnumerationLiteralsConstraint = _types.SetOfEnumerationLiteralsConstraint
 

@@ -130,10 +130,12 @@ class Constraints:
     )
     def __init__(
             self,
-            len_constraint: Optional[LenConstraint],
-            patterns: Optional[Sequence[PatternConstraint]],
-            set_of_primitives: Optional[SetOfPrimitivesConstraint],
-            set_of_enumeration_literals: Optional[SetOfEnumerationLiteralsConstraint]
+            len_constraint: Optional[LenConstraint] = None,
+            patterns: Optional[Sequence[PatternConstraint]] = None,
+            set_of_primitives: Optional[SetOfPrimitivesConstraint] = None,
+            set_of_enumeration_literals: Optional[
+                SetOfEnumerationLiteralsConstraint
+            ] = None
     ) -> None:
         """Initialize with the given values."""
         self.len_constraint = len_constraint
@@ -145,6 +147,14 @@ class Constraints:
         )
         # fmt: on
 
+    def is_empty(self) -> bool:
+        """Return True if no constraints are set."""
+        return (
+            self.len_constraint is None
+            and self.patterns is None
+            and self.set_of_primitives is None
+            and self.set_of_enumeration_literals is None
+        )
 
 #: Represent the constraints inferred for the given value in a class.
 ConstraintsByValue: TypeAlias = Mapping[

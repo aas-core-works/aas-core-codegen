@@ -28,7 +28,7 @@ def parse_to_symbol_table_and_something_cls_and_constraints_by_class(
 ) -> Tuple[
     intermediate.SymbolTable,
     intermediate.ClassUnion,
-    MutableMapping[intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty],
+    MutableMapping[intermediate.ClassUnion, infer_for_schema.ConstraintsByValue],
 ]:
     """
     Parse the ``source``.
