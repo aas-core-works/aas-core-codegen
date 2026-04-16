@@ -427,7 +427,7 @@ def _over_non_optional_type_annotations(
             )
     )
 )
-@ensure(lambda result: not (result[1] is not None) or len(result[1]) > 1)
+@ensure(lambda result: not (result[1] is not None) or len(result[1]) >= 1)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _infer_constraints_of_class_values_without_inheritance(
         cls: intermediate.ClassUnion,
@@ -647,7 +647,6 @@ def infer_constraints_by_class(
                 )
 
     return mapping, None
-
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def merge_constraints_with_ancestors(

@@ -7,7 +7,8 @@ from aas_core_codegen.infer_for_schema._types import (
     LenConstraint,
     PatternConstraint,
     SetOfPrimitivesConstraint,
-    SetOfEnumerationLiteralsConstraint, ConstraintsByValue, Constraints,
+    SetOfEnumerationLiteralsConstraint,
+    Constraints,
 )
 
 
@@ -83,7 +84,7 @@ def _stringify_constraints(that: Constraints) -> stringify.Entity:
         name=that.__class__.__name__,
         properties=[
             stringify.Property(
-                "len_constraints",
+                "len_constraint",
                 _stringify_len_constraint(that.len_constraint)
                 if that.len_constraint is not None
                 else None
@@ -101,7 +102,7 @@ def _stringify_constraints(that: Constraints) -> stringify.Entity:
                 else None
             ),
             stringify.Property(
-                "set_of_enumeration_literals_by_property",
+                "set_of_enumeration_literals",
                 _stringify_set_of_enumeration_literals_constraint(
                     that.set_of_enumeration_literals
                 )
