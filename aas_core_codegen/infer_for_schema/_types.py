@@ -138,14 +138,20 @@ class SetOfEnumerationLiteralsConstraint:
         """Represent the constraint with the pattern."""
         return f"<{self.__class__.__name__} at 0x{id(self):x}>"
 
-    def equals(self, other: Optional["SetOfPrimitivesConstraint"]) -> bool:
+    @require(
+        lambda self, other:
+        not (other is not None)
+        or (other.enumeration is self.enumeration),
+        "Both self and other must refer to the same enumeration for "
+        "an equality comparison to make sense."
+    )
+    def equals(self, other: Optional["SetOfEnumerationLiteralsConstraint"]) -> bool:
         """Return true if the other constraint equals semantically ours."""
         if other is None:
             return False
 
         return (
-                self.a_type == other.a_type
-                and len(self.literals) == len(other.literals)
+                len(self.literals) == len(other.literals)
                 and all(
             id(that_literal) == id(other_literal)
             for that_literal, other_literal in zip(self.literals, other.literals)
@@ -197,43 +203,6 @@ class Constraints:
                 and self.set_of_primitives is None
                 and self.set_of_enumeration_literals is None
         )
-
-    def update_steps_to(self, other: "Constraint") -> "Constraint":
-        """
-        Identify what would need to be changed in self to equal ``other``.
-
-        We assume that None on any of the constraints means no change.
-
-        If a constraint is set in ``other``, but not available in ``self``, we
-        raise a ValueError.
-        """
-        len_constraint: Optional[LenConstraint] = None
-
-        if other.len_constraint is not None and self.len_constraint is not None:
-            if not self.len_constraint.equals(other.len_constraint):
-                len_constraint = self.len_constraint
-
-        elif other.len_constraint is not None and self.len_constraint is None:
-            raise ValueError(
-                "This instance of constraints specifies no length constraint, while "
-                f"the other does: {other.len_constraint}; we can not compute the "
-                f"update steps this way."
-            )
-
-        elif other.len_constraint is None and self.len_constraint is not None:
-            len_constraint = self.len_constraint
-
-        elif other.len_constraint is None and self.len_constraint is None:
-            pass
-
-        else:
-            raise AssertionError("Unexpected execution path")
-
-        # TODO: implement this for all the other constraints -- then go back to json schema generator
-        # TODO:  and fix it -- we need to handle the regression_when_len_constraints_on_inherited_property
-        # TODO:  --> we ignore the constraints which are tightened in the child class!
-        # TODO:  --> hence we need to check which constraints from the parent differ in the child.
-
 
 #: Represent the constraints inferred for the given value in a class.
 ConstraintsByValue: TypeAlias = Mapping[

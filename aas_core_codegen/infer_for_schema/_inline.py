@@ -4,7 +4,7 @@ import itertools
 from typing import Tuple, Optional, List, Mapping, MutableMapping, Sequence, Set, Union, \
     Iterator
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Error, assert_never
@@ -666,30 +666,173 @@ def infer_constraints_by_class(
     return mapping, None
 
 
-def edit_steps_for_other_to_that_constraint(
+def tightening_steps_from_other_to_that_constraints(
         that: Constraints,
         other: Optional[Constraints]
 ) -> Optional[Constraints]:
-    """Identify constraints to be updated to go from ``other`` to ``that``."""
+    """
+    Identify constraints to be updated to go from ``other`` to ``that``.
+
+    This function is used to spot tightening of the constraints in the children
+    classes which override the parents' constraints.
+
+    We assume that the in-lining and merging of the constraints has been already
+    performed before. Any constraints in the ``other`` which differs from ``that``
+    constraint is assumed to be "overridden" (*i.e.*, tightened) by ``that`` constraint.
+
+    You can think of the resulting constraint list as all the constraints that a child
+    class (corresponding to ``that``) imposes in addition to constraints that are already
+    imposed by the parent class (corresponding to ``other``).
+    """
     if other is None:
         return that
 
-    update = Constraints(
-        len_constraint=(
-            that.len_constraint
-            if (
-                    that.len_constraint is not None
-                    and not that.len_constraint.equals(other.len_constraint)
-            )
-            else None
-        ),
-        patterns=(
-            that.patterns
-            if (
-                that.patterns is not None
-                and (
-                        other.patterns is None
-                        or not all(pattern)
-            )
+    len_constraint: Optional[LenConstraint] = None
+
+    if other.len_constraint is not None:
+        assert that.len_constraint is not None, (
+            "The ``other``, corresponding to a parent class, defines a length constraint, "
+            "but the child class, corresponding to ``that``, relaxes the constraint and "
+            "defines no length constraints. This breaks the behavioral subtyping. "
+            "Have the constraints been properly merged and inlined?\n"
+            f"{other.len_constraint=}"
         )
+
+        len_constraint = (
+            that.len_constraint
+            if not that.len_constraint.equals(other.len_constraint)
+            else None
+        )
+    else:
+        len_constraint = that.len_constraint
+
+    patterns: Optional[Sequence[PatternConstraint]] = None
+
+    if other.patterns is not None:
+        assert that.patterns is not None, (
+            "The ``other``, corresponding to a parent class, defines patterns, "
+            "but the child class, corresponding to ``that``, relaxes the constraint and "
+            "defines no patterns. This breaks the behavioral subtyping. "
+            "Have the constraints been properly merged and inlined?\n"
+            f"{other.patterns=}, {that.patterns=}"
+        )
+
+        other_pattern_set = set(
+            pattern_constraint.pattern
+            for pattern_constraint in other.patterns
+        )
+
+        that_pattern_set = set(
+            pattern_constraint.pattern
+            for pattern_constraint in that.patterns
+        )
+
+        assert other_pattern_set.intersection(that_pattern_set) == other_pattern_set, (
+            "The ``other``, corresponding to a parent class, defines more patterns "
+            "than the child class, corresponding to ``that`` -- this amounts to relaxing "
+            "constraints. This breaks the behavioral subtyping. "
+            "Have the constraints been properly merged and inlined?\n"
+            f"{other.patterns=}, {that.patterns=}"
+        )
+
+        # NOTE (mristin):
+        # We select only patterns which are not already defined in ``other``, as
+        # the ``other`` corresponds to the parent class.
+        patterns = [
+            pattern_constraint
+            for pattern_constraint in that.patterns
+            if pattern_constraint.pattern not in other_pattern_set
+        ]
+
+        if len(patterns) == 0:
+            patterns = None
+    else:
+        patterns = that.patterns
+
+    set_of_primitives: Optional[SetOfPrimitivesConstraint] = None
+
+    if other.set_of_primitives is not None:
+        assert that.set_of_primitives is not None, (
+            "The ``other``, corresponding to a parent class, defines set of primitives, "
+            "but the child class, corresponding to ``that``, relaxes the constraint and "
+            "defines no set of primitives. This breaks the behavioral subtyping. "
+            "Have the constraints been properly merged and inlined?\n"
+            f"{other.set_of_primitives=}"
+        )
+
+        other_set_of_primitives = set(
+            literal.value
+            for literal in other.set_of_primitives.literals
+        )
+
+        that_set_of_primitives = set(
+            literal.value
+            for literal in that.set_of_primitives.literals
+        )
+
+        assert (
+                that_set_of_primitives.intersection(other_set_of_primitives)
+                == that_set_of_primitives
+        ), (
+            "The ``that``, corresponding to a child class, can only tighten the set of "
+            "allowed primitives from ``other``, which corresponds to the parent class. "
+            "However, ``that`` defines more literals -- this breaks the behavioral "
+            "subtyping. Have the constraints been properly merged and inlined?\n"
+            f"{other.set_of_primitives=}, {that.set_of_primitives=}"
+        )
+
+        if not that.set_of_primitives.equals(other.set_of_primitives):
+            set_of_primitives = that.set_of_primitives
+
+    else:
+        set_of_primitives = that.set_of_primitives
+
+    set_of_enumeration_literals: Optional[SetOfEnumerationLiteralsConstraint] = None
+
+    if other.set_of_enumeration_literals is not None:
+        assert that.set_of_enumeration_literals is not None, (
+            "The ``other``, corresponding to a parent class, defines set of "
+            "enumeration literals, but the child class, corresponding to ``that``, "
+            "relaxes the constraint and defines no set of enumeration literals. This "
+            "breaks the behavioral subtyping. Have the constraints been properly merged "
+            "and inlined?\n"
+            f"{other.set_of_enumeration_literals=}"
+        )
+
+        other_set_of_enumeration_literals = set(
+            literal.value
+            for literal in other.set_of_enumeration_literals.literals
+        )
+
+        that_set_of_enumeration_literals = set(
+            literal.value
+            for literal in that.set_of_enumeration_literals.literals
+        )
+
+        assert (
+                that_set_of_enumeration_literals.intersection(
+                    other_set_of_enumeration_literals
+                )
+                == that_set_of_enumeration_literals
+        ), (
+            "The ``that``, corresponding to a child class, can only tighten the set of "
+            "allowed enumeration literals from ``other``, which corresponds to "
+            "the parent class. However, ``that`` defines more literals -- this breaks "
+            "the behavioral subtyping. Have the constraints been properly merged and "
+            "inlined?\n"
+            f"{other.set_of_enumeration_literals=}, {that.set_of_enumeration_literals=}"
+        )
+
+        if not that.set_of_enumeration_literals.equals(other.set_of_enumeration_literals):
+            set_of_enumeration_literals = that.set_of_enumeration_literals
+    else:
+        set_of_enumeration_literals = that.set_of_enumeration_literals
+
+    tightening = Constraints(
+        len_constraint=len_constraint,
+        patterns=patterns,
+        set_of_primitives=set_of_primitives,
+        set_of_enumeration_literals=set_of_enumeration_literals,
     )
+
+    return tightening

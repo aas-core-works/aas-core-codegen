@@ -315,7 +315,8 @@ def _define_properties(
             # However, children classes can tighten constraints, so we have to reflect
             # that here. While we could theoretically check for all the constraints
             # deep into the nested type annotations, we currently limit ourselves to
-            # check only if the constraints differ at the property level.
+            # check only if the constraints differ at the property level due to
+            # the lack of time.
 
             constraints = constraints_by_value.get(type_anno, None)
             if constraints is None:
@@ -326,9 +327,13 @@ def _define_properties(
 
                 # NOTE (mristin):
                 # We leverage here the fact that we do not make additional copies
-                # when merging the constraints in case where one of the constraints
-                # is none.
-                if parent_constraints is None or constraints is not parent_constraints:
+                # when merging the constraints in case where one of the constraints is
+                # none (see ``infer_for_schema._inline._merge_*`` functions).
+                if parent_constraints is not None:
+                    # TODO: implement -- use infer_for_schema._inline.tighten_Xxx function,
+                    #  see what survives the parents.
+                    # TODO: constraints = tighten_*(parent_constraints
+                    raise NotImplementedError()
 
 
 
