@@ -501,7 +501,10 @@ def _define_all_of_for_inheritance(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_inheritable_definition(
     cls: intermediate.ClassUnion,
-    constraints_by_value: infer_for_schema.ConstraintsByValue,
+        constraints_by_class: Mapping[
+            intermediate.ClassUnion,
+            infer_for_schema.ConstraintsByValue
+        ],
     fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
@@ -518,7 +521,7 @@ def _generate_inheritable_definition(
 
     properties, properties_error = _define_properties(
         cls=cls,
-        constraints_by_value=constraints_by_value,
+        constraints_by_class=constraints_by_class,
         fix_pattern=fix_pattern,
     )
     if properties_error is not None:
@@ -599,7 +602,10 @@ def _generate_choice_definition(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_concrete_definition(
     cls: intermediate.ClassUnion,
-    constraints_by_value: infer_for_schema.ConstraintsByValue,
+    constraints_by_class: Mapping[
+        intermediate.ClassUnion,
+        infer_for_schema.ConstraintsByValue
+    ],
     fix_pattern: Callable[[str], str],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
@@ -644,7 +650,7 @@ def _generate_concrete_definition(
 
     properties, properties_error = _define_properties(
         cls=cls,
-        constraints_by_value=constraints_by_value,
+        constraints_by_class=constraints_by_class,
         fix_pattern=fix_pattern,
     )
     if properties_error is not None:
@@ -893,7 +899,7 @@ def generate(
                     # region Inheritable
                     inheritable, definition_errors = _generate_inheritable_definition(
                         cls=our_type,
-                        constraints_by_value=constraints_by_class[our_type],
+                        constraints_by_class=constraints_by_class,
                         fix_pattern=fix_pattern,
                     )
 
@@ -925,7 +931,7 @@ def generate(
                 if isinstance(our_type, intermediate.ConcreteClass):
                     definition, definition_errors = _generate_concrete_definition(
                         cls=our_type,
-                        constraints_by_value=constraints_by_class[our_type],
+                        constraints_by_class=constraints_by_class,
                         fix_pattern=fix_pattern,
                     )
                     if definition_errors is not None:
