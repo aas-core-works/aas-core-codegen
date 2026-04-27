@@ -22,4 +22,8 @@ ConstraintsByProperty = None
 
 infer_constraints_by_class = _inline.infer_constraints_by_class
 
+tightening_steps_from_other_to_that_constraints = (
+    _inline.tightening_steps_from_other_to_that_constraints
+)
+
 dump = _stringify.dump

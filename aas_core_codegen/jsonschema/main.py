@@ -1,5 +1,6 @@
 """Generate JSON schema corresponding to the meta-model."""
 import collections
+import itertools
 import json
 from typing import (
     TextIO,
@@ -10,7 +11,7 @@ from typing import (
     List,
     Sequence,
     Mapping,
-    Callable, Iterator,
+    Callable, Iterator, Final, cast,
 )
 
 from icontract import ensure, require
@@ -55,6 +56,107 @@ _PRIMITIVE_MAP = {
 }
 assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
+class _AllOf:
+    """Represent a sequence of JSON schema declarations."""
+    subschemas: Final[Sequence[Mapping[str, Any]]]
+
+    @require(lambda subschemas: len(subschemas) > 0)
+    def __init__(self, subschemas: Sequence[Mapping[str, Any]]) -> None:
+        self.subschemas = subschemas
+
+
+def _translate_constraints(
+        type_annotation: intermediate.TypeAnnotationExceptOptional,
+        constraints: infer_for_schema.Constraints,
+        fix_pattern: Callable[[str], str]
+) -> Optional[_AllOf]:
+    """
+    Translate the constraints for a value into JSON schema.
+
+    If none of the constraints could be translated, return None.
+    """
+    primitive_type = intermediate.try_primitive_type(
+        type_annotation
+    )
+
+    base_subschema: MutableMapping[str, Any] = collections.OrderedDict()
+
+    additional_subschemas: List[MutableMapping[str, Any]] = []
+
+    if primitive_type is not None:
+        if (
+                primitive_type
+                in (intermediate.PrimitiveType.STR,
+                    intermediate.PrimitiveType.BYTEARRAY)
+                and constraints.len_constraint is not None
+        ):
+            if constraints.len_constraint.min_value is not None:
+                base_subschema["minLength"] = constraints.len_constraint.min_value
+
+            if constraints.len_constraint.max_value is not None:
+                base_subschema["maxLength"] = constraints.len_constraint.max_value
+
+        if (
+                primitive_type == intermediate.PrimitiveType.STR
+                and constraints.patterns is not None
+                and len(constraints.patterns) > 0
+        ):
+            if len(constraints.patterns) == 1:
+                base_subschema["pattern"] = fix_pattern(
+                    constraints.patterns[0].pattern
+                )
+            else:
+                iterator = iter(constraints.patterns)
+
+                first_pattern = next(iterator)
+
+                base_subschema["pattern"] = fix_pattern(first_pattern.pattern)
+
+                for pattern_constraint in iterator:
+                    additional_subschema: MutableMapping[str, Any] = (
+                        collections.OrderedDict()
+                    )
+
+                    additional_subschema["pattern"] = (
+                        fix_pattern(pattern_constraint.pattern)
+                    )
+
+                    additional_subschemas.append(additional_subschema)
+
+    if isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        if constraints.len_constraint is not None:
+            if constraints.len_constraint.min_value is not None:
+                base_subschema["minItems"] = constraints.len_constraint.min_value
+
+            if constraints.len_constraint.max_value is not None:
+                base_subschema["maxItems"] = constraints.len_constraint.max_value
+
+    assert not (len(base_subschema) == 0) or len(additional_subschemas) == 0, (
+        "If base subschema is empty, no additional subschemas are expected."
+    )
+
+    if len(base_subschema) == 0:
+        return None
+
+    return _AllOf([base_subschema] + additional_subschemas)
+
+
+
+def _all_of_as_jsonable_mapping(all_of: _AllOf) -> MutableMapping[str, Any]:
+    """
+    Render the instance of AllOf JSON schema construct to a JSON-able mapping.
+
+    If it consists of just one subschema, that schema is simply returned.
+    """
+    if len(all_of.subschemas) == 1:
+        return cast(MutableMapping, all_of.subschemas[0])
+
+    mapping: MutableMapping[str, Any] = collections.OrderedDict()
+    mapping["allOf"] = all_of.subschemas
+
+    return mapping
+
+
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_type(
@@ -87,116 +189,93 @@ def _define_type(
         if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
             definition["contentEncoding"] = "base64"
 
-        if constraints is not None:
-            if (
-                    primitive_type
-                    in (intermediate.PrimitiveType.STR,
-                        intermediate.PrimitiveType.BYTEARRAY)
-                    and constraints.len_constraint is not None
-            ):
-                if constraints.len_constraint.min_value is not None:
-                    definition["minLength"] = constraints.len_constraint.min_value
-
-                if constraints.len_constraint.max_value is not None:
-                    definition["maxLength"] = constraints.len_constraint.max_value
-
-            if (
-                    primitive_type == intermediate.PrimitiveType.STR
-                    and constraints.patterns is not None
-                    and len(constraints.patterns) > 0
-            ):
-                if len(constraints.patterns) == 1:
-                    definition["pattern"] = fix_pattern(constraints.patterns[0].pattern)
-                else:
-                    all_of = [definition]  # type: List[MutableMapping[str, Any]]
-
-                    for pattern_constraint in constraints.patterns:
-                        all_of.append(
-                            collections.OrderedDict(
-                                [
-                                    (
-                                        "pattern",
-                                        fix_pattern(pattern_constraint.pattern),
-                                    )
-                                ]
-                            )
-                        )
-
-                    definition = collections.OrderedDict([("allOf", all_of)])
-
-        return definition, None
-
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        raise AssertionError(
-            f"Expected to handle this path before with try_primitive_type: "
-            f"{type_annotation=}, {primitive_type}"
-        )
-
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        model_type = naming.json_model_type(type_annotation.our_type.name)
-
-        if isinstance(type_annotation.our_type, intermediate.Enumeration):
-            return (
-                collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
-                None,
-            )
-
-        elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
+    else:
+        if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
             raise AssertionError(
-                "Expected to handle this path before with try_primitive_type"
+                f"Expected to handle this path before with try_primitive_type: "
+                f"{type_annotation=}, {primitive_type}"
             )
 
-        elif isinstance(type_annotation.our_type, intermediate.Class):
-            if len(type_annotation.our_type.concrete_descendants) > 0:
-                return (
-                    collections.OrderedDict(
-                        [("$ref", f"#/definitions/{model_type}_choice")]
-                    ),
-                    None,
-                )
-            else:
+        elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+            model_type = naming.json_model_type(type_annotation.our_type.name)
+
+            if isinstance(type_annotation.our_type, intermediate.Enumeration):
                 return (
                     collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
                     None,
                 )
 
+            elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
+                raise AssertionError(
+                    "Expected to handle this path before with try_primitive_type"
+                )
+
+            elif isinstance(type_annotation.our_type, intermediate.Class):
+                if len(type_annotation.our_type.concrete_descendants) > 0:
+                    return (
+                        collections.OrderedDict(
+                            [("$ref", f"#/definitions/{model_type}_choice")]
+                        ),
+                        None,
+                    )
+                else:
+                    return (
+                        collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
+                        None,
+                    )
+
+            else:
+                assert_never(type_annotation.our_type)
+
+        elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+            assert not isinstance(
+                type_annotation.items, intermediate.OptionalTypeAnnotation
+            ), (
+                "NOTE (mristin): Lists of optional values were not expected "
+                "at the time when we implemented this. Please contact the developers "
+                "if you need this functionality."
+            )
+
+            items_type_definition, items_error = _define_type(
+                type_annotation=type_annotation.items,
+                constraints_by_value=constraints_by_value,
+                fix_pattern=fix_pattern
+            )
+
+            if items_error is not None:
+                return None, items_error
+
+            assert items_type_definition is not None
+
+            definition["type"] = "array"
+            definition["items"] = items_type_definition
+
         else:
-            assert_never(type_annotation.our_type)
+            assert_never(type_annotation)
 
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        assert not isinstance(
-            type_annotation.items, intermediate.OptionalTypeAnnotation
-        ), (
-            "NOTE (mristin, 2023-02-06): Lists of optional values were not expected "
-            "at the time when we implemented this. Please contact the developers "
-            "if you need this functionality."
-        )
-
-        items_type_definition, items_error = _define_type(
-            type_annotation=type_annotation.items,
-            constraints_by_value=constraints_by_value,
+    if constraints is None:
+        return definition, None
+    else:
+        all_of = _translate_constraints(
+            type_annotation=type_annotation,
+            constraints=constraints,
             fix_pattern=fix_pattern
         )
 
-        if items_error is not None:
-            return None, items_error
+        if all_of is None:
+            return definition, None
 
-        assert items_type_definition is not None
+        base_subschema = all_of.subschemas[0]
 
-        definition["type"] = "array"
-        definition["items"] = items_type_definition
+        # NOTE (mristin):
+        # We put the type definitions first for readability.
+        definition.update(base_subschema)
 
-        if constraints.len_constraint is not None:
-            if constraints.len_constraint.min_value is not None:
-                definition["minItems"] = constraints.len_constraint.min_value
-
-            if constraints.len_constraint.max_value is not None:
-                definition["maxItems"] = constraints.len_constraint.max_value
-
-        return definition, None
-
-    else:
-        assert_never(type_annotation)
+        return _all_of_as_jsonable_mapping(
+            _AllOf(
+                [definition, *itertools.islice(all_of.subschemas, 1, None)]
+            )
+        ), None
 
 
 
@@ -291,10 +370,10 @@ def _define_properties(
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
+        definition: Optional[MutableMapping[str, Any]] = None
 
         if prop.specified_for is cls:
-            property_definition, error = _define_type(
+            maybe_definition, error = _define_type(
                 type_annotation=type_anno,
                 constraints_by_value=constraints_by_value,
                 fix_pattern=fix_pattern,
@@ -303,8 +382,8 @@ def _define_properties(
             if error is not None:
                 errors.append(error)
             else:
-                assert property_definition is not None
-                definition = property_definition
+                assert maybe_definition is not None
+                definition = maybe_definition
         else:
             # NOTE (mristin):
             # The properties are inherited through ``allOf``. We can not change the type
@@ -330,29 +409,26 @@ def _define_properties(
                 # when merging the constraints in case where one of the constraints is
                 # none (see ``infer_for_schema._inline._merge_*`` functions).
                 if parent_constraints is not None:
-                    # TODO: implement -- use infer_for_schema._inline.tighten_Xxx function,
-                    #  see what survives the parents.
-                    # TODO: constraints = tighten_*(parent_constraints
-                    raise NotImplementedError()
+                    constraints = (
+                        infer_for_schema
+                        .tightening_steps_from_other_to_that_constraints(
+                            that=constraints,
+                            other=parent_constraints,
+                        )
+                    )
 
+            all_of = _translate_constraints(
+                type_annotation=type_anno,
+                constraints=constraints,
+                fix_pattern=fix_pattern,
+            )
 
-
-
-            # TODO: go over all the parents -- for each parent:
-            #  use _over_non_optional_type_annotations
-            #  build the constraints in parallel this class - parent class
-            #  see if we can spot the differences.
-            #
-            # For e
-
-
-            # TODO: implement
-            raise NotImplementedError()
-
+            if all_of is not None:
+                definition = _all_of_as_jsonable_mapping(all_of)
 
         # NOTE (mristin):
         # We do not want to pollute the schema with empty definitions.
-        if len(definition) > 0:
+        if definition is not None and len(definition) > 0:
             properties[prop_name] = definition
 
     if len(errors) > 0:
