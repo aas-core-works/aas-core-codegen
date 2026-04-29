@@ -15,8 +15,6 @@ import aas_core_codegen.jsonschema.main as jsonschema_main
 import aas_core_codegen.python.main as python_main
 import aas_core_codegen.typescript.main as typescript_main
 import aas_core_codegen.xsd.main as xsd_main
-import aas_core_codegen.protobuf.main as protobuf_main
-import aas_core_codegen.python_protobuf.main as python_protobuf_main
 from aas_core_codegen import run, specific_implementations
 from aas_core_codegen.common import LinenoColumner, assert_never
 
@@ -31,9 +29,7 @@ class Target(enum.Enum):
     GOLANG = "golang"
     JAVA = "java"
     JSONSCHEMA = "jsonschema"
-    PROTOBUF = "protobuf"
     PYTHON = "python"
-    PYTHON_PROTOBUF = "python_protobuf"
     TYPESCRIPT = "typescript"
     XSD = "xsd"
 
@@ -166,12 +162,6 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     elif params.target is Target.XSD:
         return xsd_main.execute(context=run_context, stdout=stdout, stderr=stderr)
-
-    elif params.target is Target.PROTOBUF:
-        return protobuf_main.execute(run_context, stdout=stdout, stderr=stderr)
-
-    elif params.target is Target.PYTHON_PROTOBUF:
-        return python_protobuf_main.execute(run_context, stdout=stdout, stderr=stderr)
 
     else:
         assert_never(params.target)

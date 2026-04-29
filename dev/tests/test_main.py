@@ -313,43 +313,6 @@ class Test_jsonschema(_TestCase):
         )
 
 
-class Test_protobuf(_TestCase):
-    def test_expected_aas_core_meta_v3(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PROTOBUF, case_name="aas_core_meta.v3"
-        )
-
-    def test_expected_abstract_and_concrete_classes(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PROTOBUF,
-            case_name="abstract_and_concrete_classes",
-        )
-
-    def test_expected_concrete_class_with_descendants(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PROTOBUF,
-            case_name="concrete_class_with_descendants",
-        )
-
-    def test_expected_concrete_class_with_enum(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PROTOBUF,
-            case_name="concrete_class_with_enum",
-        )
-
-    def test_expected_concrete_class_with_list_of_instances(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PROTOBUF,
-            case_name="concrete_class_with_list_of_instances",
-        )
-
-    def test_expected_concrete_class_with_primitive_attributes(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PROTOBUF,
-            case_name="concrete_class_with_primitive_attributes",
-        )
-
-
 class Test_python(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
@@ -359,44 +322,6 @@ class Test_python(_TestCase):
     def test_expected_primitive_types(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="primitive_types"
-        )
-
-
-class Test_python_protobuf(_TestCase):
-    def test_expected_aas_core_meta_v3(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
-            case_name="aas_core_meta.v3",
-        )
-
-    def test_expected_abstract_and_concrete_classes(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
-            case_name="abstract_and_concrete_classes",
-        )
-
-    def test_expected_concrete_class_with_descendant(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
-            case_name="concrete_class_with_descendant",
-        )
-
-    def test_expected_concrete_class_with_enum(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
-            case_name="concrete_class_with_enum",
-        )
-
-    def test_expected_concrete_class_with_list_of_instances(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
-            case_name="concrete_class_with_list_of_instances",
-        )
-
-    def test_expected_concrete_class_with_primitive_attributes(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
-            case_name="concrete_class_with_primitive_attributes",
         )
 
 
