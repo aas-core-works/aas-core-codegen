@@ -19,7 +19,6 @@ def main() -> int:
         "tests.intermediate.test_translate.Test_against_recorded",
         "tests.java.test_main.Test_against_recorded",
         "tests.our_jsonschema.test_main.Test_against_recorded",
-        "tests.rdf_shacl.test_main.Test_against_recorded",
         "tests.parse.test_parse.Test_against_recorded",
         "tests.parse.test_retree.Test_against_recorded",
         "tests.python.test_main.Test_against_recorded",

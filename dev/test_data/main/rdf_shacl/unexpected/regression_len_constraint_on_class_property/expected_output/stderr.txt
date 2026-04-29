@@ -1,3 +1,0 @@
-Failed to translate the parsed symbol table to intermediate symbol table:
-* At line 1 and column 1: Failed to translate the parsed symbol table to an intermediate symbol table
-    At line 56 and column 25: Expected the optional constructor argument 'value' of class 'Something' to default to ``None``, but no default has been set.

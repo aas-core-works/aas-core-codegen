@@ -286,14 +286,6 @@ class Test_java(_TestCase):
         )
 
 
-class Test_jsonld_context(_TestCase):
-    def test_expected_aas_core_meta_v3(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.JSONLD_CONTEXT,
-            case_name="aas_core_meta.v3",
-        )
-
-
 class Test_jsonschema(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
@@ -464,33 +456,6 @@ class Test_python_protobuf(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON_PROTOBUF,
             case_name="concrete_class_with_primitive_attributes",
-        )
-
-
-class Test_rdf_shacl(_TestCase):
-    def test_expected_aas_core_meta_v3(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.RDF_SHACL, case_name="aas_core_meta.v3"
-        )
-
-    def test_expected_regression_when_lang_string_class_is_missing(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.RDF_SHACL,
-            case_name="regression_when_lang_string_class_is_missing",
-        )
-
-    def test_expected_regression_when_len_constraints_on_inherited_property(
-        self,
-    ) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.RDF_SHACL,
-            case_name="regression_when_len_constraints_on_inherited_property",
-        )
-
-    def test_unexpected_regression_len_constraint_on_class_property(self) -> None:
-        self._run_unexpected_test(
-            target=aas_core_codegen.main.Target.RDF_SHACL,
-            case_name="regression_len_constraint_on_class_property",
         )
 
 

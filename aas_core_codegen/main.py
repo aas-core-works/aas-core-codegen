@@ -13,10 +13,8 @@ import aas_core_codegen.golang.main as golang_main
 import aas_core_codegen.java.main as java_main
 import aas_core_codegen.jsonschema.main as jsonschema_main
 import aas_core_codegen.python.main as python_main
-import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
 import aas_core_codegen.typescript.main as typescript_main
 import aas_core_codegen.xsd.main as xsd_main
-import aas_core_codegen.jsonld.main as jsonld_main
 import aas_core_codegen.protobuf.main as protobuf_main
 import aas_core_codegen.python_protobuf.main as python_protobuf_main
 import aas_core_codegen.opcua.main as opcua_main
@@ -33,13 +31,11 @@ class Target(enum.Enum):
     CSHARP = "csharp"
     GOLANG = "golang"
     JAVA = "java"
-    JSONLD_CONTEXT = "jsonld_context"
     JSONSCHEMA = "jsonschema"
     OPCUA = "opcua"
     PROTOBUF = "protobuf"
     PYTHON = "python"
     PYTHON_PROTOBUF = "python_protobuf"
-    RDF_SHACL = "rdf_shacl"
     TYPESCRIPT = "typescript"
     XSD = "xsd"
 
@@ -170,14 +166,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
             context=run_context, stdout=stdout, stderr=stderr
         )
 
-    elif params.target is Target.RDF_SHACL:
-        return rdf_shacl_main.execute(context=run_context, stdout=stdout, stderr=stderr)
-
     elif params.target is Target.XSD:
         return xsd_main.execute(context=run_context, stdout=stdout, stderr=stderr)
-
-    elif params.target is Target.JSONLD_CONTEXT:
-        return jsonld_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target is Target.PROTOBUF:
         return protobuf_main.execute(run_context, stdout=stdout, stderr=stderr)
