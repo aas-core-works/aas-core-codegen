@@ -139,7 +139,7 @@ Call the generator with the appropriate target:
 
     usage: aas-core-codegen [-h] --model_path MODEL_PATH --snippets_dir
                             SNIPPETS_DIR --output_dir OUTPUT_DIR --target
-                            {cpp,csharp,golang,java,jsonschema,opcua,protobuf,python,python_protobuf,typescript,xsd}
+                            {cpp,csharp,golang,java,jsonschema,protobuf,python,python_protobuf,typescript,xsd}
                             [--cache_model] [--version]
 
     Generate implementations and schemas based on an AAS meta-model.
@@ -153,7 +153,7 @@ Call the generator with the appropriate target:
                             specific code snippets
       --output_dir OUTPUT_DIR
                             path to the generated code
-      --target {cpp,csharp,golang,java,jsonschema,opcua,protobuf,python,python_protobuf,typescript,xsd}
+      --target {cpp,csharp,golang,java,jsonschema,protobuf,python,python_protobuf,typescript,xsd}
                             target language or schema
       --cache_model         If set, cache the parsed meta-model in the temporary
                             directory of your OS. This makes the repeated runs

@@ -313,65 +313,6 @@ class Test_jsonschema(_TestCase):
         )
 
 
-class Test_opcua(_TestCase):
-    def test_expected_aas_core_meta_v3(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA, case_name="aas_core_meta.v3"
-        )
-
-    def test_expected_abstract_and_concrete_classes(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="abstract_and_concrete_classes",
-        )
-
-    def test_expected_classes_with_invariants(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="classes_with_invariants",
-        )
-
-    def test_expected_concrete_class_with_descendant(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="concrete_class_with_descendant",
-        )
-
-    def test_expected_concrete_class_with_enum(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="concrete_class_with_enum",
-        )
-
-    def test_expected_concrete_class_with_list_of_instances(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="concrete_class_with_list_of_instances",
-        )
-
-    def test_expected_concrete_class_with_primitive_attributes(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="concrete_class_with_primitive_attributes",
-        )
-
-    def test_expected_concrete_class_with_string(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA,
-            case_name="concrete_class_with_string",
-        )
-
-    def test_expected_constrained_primitive(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA, case_name="constrained_primitive"
-        )
-
-    def test_expected_multiple_inheritance(self) -> None:
-        self._run_expected_test(
-            target=aas_core_codegen.main.Target.OPCUA, case_name="multiple_inheritance"
-        )
-
-
 class Test_protobuf(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
