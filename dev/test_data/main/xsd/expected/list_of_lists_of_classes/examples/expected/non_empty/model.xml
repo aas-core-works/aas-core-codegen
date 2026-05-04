@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something xmlns="https://dummy.com">
+    <listOfListsOfItems>
+        <v>
+            <someItem>
+                <name>First Item</name>
+            </someItem>
+            <anotherItem>
+                <serialNumber>1001</serialNumber>
+            </anotherItem>
+        </v>
+
+        <v>
+            <anotherItem>
+                <serialNumber>2002</serialNumber>
+            </anotherItem>
+        </v>
+
+        <v>
+            <someItem>
+                <name>Third Item</name>
+            </someItem>
+        </v>
+    </listOfListsOfItems>
+</something>

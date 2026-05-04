@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something xmlns="https://dummy.com">
+    <someItems>
+        <someItem>
+            <name>Widget</name>
+        </someItem>
+
+        <anotherItem>
+            <serialNumber>1001</serialNumber>
+        </anotherItem>
+
+        <someItem>
+            <name>Gadget</name>
+        </someItem>
+    </someItems>
+
+    <listOfParentlessAndChildless>
+        <parentlessAndChildless>
+            <identifier>ID-001</identifier>
+        </parentlessAndChildless>
+
+        <parentlessAndChildless>
+            <identifier>ID-002</identifier>
+        </parentlessAndChildless>
+
+        <parentlessAndChildless>
+            <identifier>ID-003</identifier>
+        </parentlessAndChildless>
+    </listOfParentlessAndChildless>
+</something>

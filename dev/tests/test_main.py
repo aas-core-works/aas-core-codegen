@@ -391,6 +391,52 @@ class Test_xsd(_TestCase):
             target=aas_core_codegen.main.Target.XSD, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_list_of_classes(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="list_of_classes"
+        )
+
+    def test_expected_list_of_classes_with_invariants(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_classes_with_invariants",
+        )
+
+    def test_expected_list_of_constrained_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_constrained_primitives",
+        )
+
+    def test_expected_list_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="list_of_enums"
+        )
+
+    def test_expected_list_of_lists_of_classes(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_lists_of_classes",
+        )
+
+    def test_expected_list_of_lists_of_constrained_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_lists_of_constrained_primitives",
+        )
+
+    def test_expected_list_of_lists_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_lists_of_enums",
+        )
+
+    def test_expected_list_of_lists_of_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="list_of_lists_of_primitives",
+        )
+
     def test_expected_list_of_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="list_of_primitives"
