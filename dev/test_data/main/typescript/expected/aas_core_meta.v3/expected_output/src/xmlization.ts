@@ -427,7 +427,7 @@ function parseBase64EncodedBytesText(
   );
 }
 
-function parseClassValueInProperty(
+function parsePropertyAsClassInstance(
   cursor: XmlCursor,
   propertyStartTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
@@ -736,13 +736,6 @@ function parseExtensionFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "extension") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "extension", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theSemanticId: AasTypes.Reference | null = null;
   let theSupplementalSemanticIds: Array<AasTypes.Reference> | null = null;
   let theName: string | null = null;
@@ -794,7 +787,7 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -1134,13 +1127,6 @@ function parseAdministrativeInformationFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "administrativeInformation") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "administrativeInformation", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theEmbeddedDataSpecifications: Array<AasTypes.EmbeddedDataSpecification> | null = null;
   let theVersion: string | null = null;
   let theRevision: string | null = null;
@@ -1333,7 +1319,7 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -1436,13 +1422,6 @@ function parseQualifierFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "qualifier") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "qualifier", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theSemanticId: AasTypes.Reference | null = null;
   let theSupplementalSemanticIds: Array<AasTypes.Reference> | null = null;
   let theKind: AasTypes.QualifierKind | null = null;
@@ -1495,7 +1474,7 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -1719,7 +1698,7 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -1808,13 +1787,6 @@ function parseAssetAdministrationShellFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "assetAdministrationShell") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "assetAdministrationShell", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -2193,7 +2165,7 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseAdministrativeInformationFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -2339,7 +2311,7 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -2369,7 +2341,7 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseAssetInformationFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -2552,13 +2524,6 @@ function parseAssetInformationFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "assetInformation") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "assetInformation", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theAssetKind: AasTypes.AssetKind | null = null;
   let theGlobalAssetId: string | null = null;
   let theSpecificAssetIds: Array<AasTypes.SpecificAssetId> | null = null;
@@ -2777,7 +2742,7 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseResourceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -2858,13 +2823,6 @@ function parseResourceFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "resource") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "resource", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let thePath: string | null = null;
   let theContentType: string | null = null;
 
@@ -3012,13 +2970,6 @@ function parseSpecificAssetIdFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "specificAssetId") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "specificAssetId", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theSemanticId: AasTypes.Reference | null = null;
   let theSupplementalSemanticIds: Array<AasTypes.Reference> | null = null;
   let theName: string | null = null;
@@ -3069,7 +3020,7 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -3241,7 +3192,7 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -3328,13 +3279,6 @@ function parseSubmodelFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "submodel") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "submodel", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -3715,7 +3659,7 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseAdministrativeInformationFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -3797,7 +3741,7 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -4246,13 +4190,6 @@ function parseRelationshipElementFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "relationshipElement") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "relationshipElement", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -4631,7 +4568,7 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -4931,7 +4868,7 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -4961,7 +4898,7 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -5054,13 +4991,6 @@ function parseSubmodelElementListFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "submodelElementList") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "submodelElementList", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -5442,7 +5372,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -5768,7 +5698,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -6000,13 +5930,6 @@ function parseSubmodelElementCollectionFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "submodelElementCollection") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "submodelElementCollection", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -6384,7 +6307,7 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -6826,13 +6749,6 @@ function parsePropertyFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "property") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "property", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -7212,7 +7128,7 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -7564,7 +7480,7 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -7652,13 +7568,6 @@ function parseMultiLanguagePropertyFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "multiLanguageProperty") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "multiLanguageProperty", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -8037,7 +7946,7 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -8427,7 +8336,7 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -8510,13 +8419,6 @@ function parseRangeFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "range") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "range", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -8896,7 +8798,7 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -9332,13 +9234,6 @@ function parseReferenceElementFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "referenceElement") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "referenceElement", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -9716,7 +9611,7 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -10016,7 +9911,7 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -10098,13 +9993,6 @@ function parseBlobFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "blob") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "blob", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -10483,7 +10371,7 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -10892,13 +10780,6 @@ function parseFileFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "file") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "file", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -11277,7 +11158,7 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -11686,13 +11567,6 @@ function parseAnnotatedRelationshipElementFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "annotatedRelationshipElement") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "annotatedRelationshipElement", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -12072,7 +11946,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -12372,7 +12246,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -12402,7 +12276,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -12586,13 +12460,6 @@ function parseEntityFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "entity") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "entity", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -12973,7 +12840,7 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -13564,13 +13431,6 @@ function parseEventPayloadFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "eventPayload") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "eventPayload", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theSource: AasTypes.Reference | null = null;
   let theSourceSemanticId: AasTypes.Reference | null = null;
   let theObservableReference: AasTypes.Reference | null = null;
@@ -13624,7 +13484,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -13654,7 +13514,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -13684,7 +13544,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -13714,7 +13574,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -13770,7 +13630,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -13918,13 +13778,6 @@ function parseBasicEventElementFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "basicEventElement") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "basicEventElement", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -14309,7 +14162,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -14609,7 +14462,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -14717,7 +14570,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -14900,13 +14753,6 @@ function parseOperationFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "operation") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "operation", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -15286,7 +15132,7 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -15910,13 +15756,6 @@ function parseOperationVariableFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "operationVariable") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "operationVariable", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theValue: AasTypes.ISubmodelElement | null = null;
 
   cursor.skipIgnorable();
@@ -15963,7 +15802,7 @@ function parseOperationVariableFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -16040,13 +15879,6 @@ function parseCapabilityFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "capability") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "capability", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -16423,7 +16255,7 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -16774,13 +16606,6 @@ function parseConceptDescriptionFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "conceptDescription") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "conceptDescription", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -17157,7 +16982,7 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseAdministrativeInformationFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -17448,13 +17273,6 @@ function parseReferenceFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "reference") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "reference", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theType: AasTypes.ReferenceTypes | null = null;
   let theReferredSemanticId: AasTypes.Reference | null = null;
   let theKeys: Array<AasTypes.Key> | null = null;
@@ -17529,7 +17347,7 @@ function parseReferenceFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -17704,13 +17522,6 @@ function parseKeyFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "key") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "key", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theType: AasTypes.KeyTypes | null = null;
   let theValue: string | null = null;
 
@@ -17864,13 +17675,6 @@ function parseLangStringNameTypeFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "langStringNameType") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "langStringNameType", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -18024,13 +17828,6 @@ function parseLangStringTextTypeFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "langStringTextType") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "langStringTextType", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -18184,13 +17981,6 @@ function parseEnvironmentFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "environment") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "environment", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theAssetAdministrationShells: Array<AasTypes.AssetAdministrationShell> | null = null;
   let theSubmodels: Array<AasTypes.Submodel> | null = null;
   let theConceptDescriptions: Array<AasTypes.ConceptDescription> | null = null;
@@ -18554,13 +18344,6 @@ function parseEmbeddedDataSpecificationFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "embeddedDataSpecification") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "embeddedDataSpecification", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theDataSpecification: AasTypes.Reference | null = null;
   let theDataSpecificationContent: AasTypes.IDataSpecificationContent | null = null;
 
@@ -18608,7 +18391,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -18638,7 +18421,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -18722,13 +18505,6 @@ function parseLevelTypeFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "levelType") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "levelType", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theMin: boolean | null = null;
   let theNom: boolean | null = null;
   let theTyp: boolean | null = null;
@@ -18950,13 +18726,6 @@ function parseValueReferencePairFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "valueReferencePair") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "valueReferencePair", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theValue: string | null = null;
   let theValueId: AasTypes.Reference | null = null;
 
@@ -19030,7 +18799,7 @@ function parseValueReferencePairFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -19114,13 +18883,6 @@ function parseValueListFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "valueList") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "valueList", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theValueReferencePairs: Array<AasTypes.ValueReferencePair> | null = null;
 
   cursor.skipIgnorable();
@@ -19304,13 +19066,6 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "langStringPreferredNameTypeIec61360") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "langStringPreferredNameTypeIec61360", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -19464,13 +19219,6 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "langStringShortNameTypeIec61360") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "langStringShortNameTypeIec61360", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -19624,13 +19372,6 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "langStringDefinitionTypeIec61360") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "langStringDefinitionTypeIec61360", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -19784,13 +19525,6 @@ function parseDataSpecificationIec61360FromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "dataSpecificationIec61360") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "dataSpecificationIec61360", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let thePreferredName: Array<AasTypes.LangStringPreferredNameTypeIec61360> | null = null;
   let theShortName: Array<AasTypes.LangStringShortNameTypeIec61360> | null = null;
   let theUnit: string | null = null;
@@ -20054,7 +19788,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -20278,7 +20012,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseValueListFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -20334,7 +20068,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parseLevelTypeFromOpenTag(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -20742,9 +20476,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -20829,9 +20561,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.creator !== null) {
       const serializedCreator = this.transform(that.creator);
       parts.push(openTag("creator"));
-      parts.push(openTag(serializedCreator.localName));
       parts.push(serializedCreator.innerXml);
-      parts.push(closeTag(serializedCreator.localName));
       parts.push(closeTag("creator"));
     }
 
@@ -20861,9 +20591,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -20901,9 +20629,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.valueId !== null) {
       const serializedValueId = this.transform(that.valueId);
       parts.push(openTag("valueId"));
-      parts.push(openTag(serializedValueId.localName));
       parts.push(serializedValueId.innerXml);
-      parts.push(closeTag(serializedValueId.localName));
       parts.push(closeTag("valueId"));
     }
 
@@ -20972,9 +20698,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.administration !== null) {
       const serializedAdministration = this.transform(that.administration);
       parts.push(openTag("administration"));
-      parts.push(openTag(serializedAdministration.localName));
       parts.push(serializedAdministration.innerXml);
-      parts.push(closeTag(serializedAdministration.localName));
       parts.push(closeTag("administration"));
     }
 
@@ -20996,17 +20720,13 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.derivedFrom !== null) {
       const serializedDerivedFrom = this.transform(that.derivedFrom);
       parts.push(openTag("derivedFrom"));
-      parts.push(openTag(serializedDerivedFrom.localName));
       parts.push(serializedDerivedFrom.innerXml);
-      parts.push(closeTag(serializedDerivedFrom.localName));
       parts.push(closeTag("derivedFrom"));
     }
 
   const serializedAssetInformation = this.transform(that.assetInformation);
     parts.push(openTag("assetInformation"));
-    parts.push(openTag(serializedAssetInformation.localName));
     parts.push(serializedAssetInformation.innerXml);
-    parts.push(closeTag(serializedAssetInformation.localName));
     parts.push(closeTag("assetInformation"));
 
   if (that.submodels !== null) {
@@ -21067,9 +20787,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.defaultThumbnail !== null) {
       const serializedDefaultThumbnail = this.transform(that.defaultThumbnail);
       parts.push(openTag("defaultThumbnail"));
-      parts.push(openTag(serializedDefaultThumbnail.localName));
       parts.push(serializedDefaultThumbnail.innerXml);
-      parts.push(closeTag(serializedDefaultThumbnail.localName));
       parts.push(closeTag("defaultThumbnail"));
     }
 
@@ -21120,9 +20838,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21148,9 +20864,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.externalSubjectId !== null) {
       const serializedExternalSubjectId = this.transform(that.externalSubjectId);
       parts.push(openTag("externalSubjectId"));
-      parts.push(openTag(serializedExternalSubjectId.localName));
       parts.push(serializedExternalSubjectId.innerXml);
-      parts.push(closeTag(serializedExternalSubjectId.localName));
       parts.push(closeTag("externalSubjectId"));
     }
 
@@ -21219,9 +20933,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.administration !== null) {
       const serializedAdministration = this.transform(that.administration);
       parts.push(openTag("administration"));
-      parts.push(openTag(serializedAdministration.localName));
       parts.push(serializedAdministration.innerXml);
-      parts.push(closeTag(serializedAdministration.localName));
       parts.push(closeTag("administration"));
     }
 
@@ -21238,9 +20950,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21353,9 +21063,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21394,16 +21102,12 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
 
   const serializedFirst = this.transform(that.first);
     parts.push(openTag("first"));
-    parts.push(openTag(serializedFirst.localName));
     parts.push(serializedFirst.innerXml);
-    parts.push(closeTag(serializedFirst.localName));
     parts.push(closeTag("first"));
 
   const serializedSecond = this.transform(that.second);
     parts.push(openTag("second"));
-    parts.push(openTag(serializedSecond.localName));
     parts.push(serializedSecond.innerXml);
-    parts.push(closeTag(serializedSecond.localName));
     parts.push(closeTag("second"));
 
   return {
@@ -21471,9 +21175,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21519,9 +21221,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticIdListElement !== null) {
       const serializedSemanticIdListElement = this.transform(that.semanticIdListElement);
       parts.push(openTag("semanticIdListElement"));
-      parts.push(openTag(serializedSemanticIdListElement.localName));
       parts.push(serializedSemanticIdListElement.innerXml);
-      parts.push(closeTag(serializedSemanticIdListElement.localName));
       parts.push(closeTag("semanticIdListElement"));
     }
 
@@ -21611,9 +21311,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21726,9 +21424,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21778,9 +21474,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.valueId !== null) {
       const serializedValueId = this.transform(that.valueId);
       parts.push(openTag("valueId"));
-      parts.push(openTag(serializedValueId.localName));
       parts.push(serializedValueId.innerXml);
-      parts.push(closeTag(serializedValueId.localName));
       parts.push(closeTag("valueId"));
     }
 
@@ -21849,9 +21543,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -21902,9 +21594,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.valueId !== null) {
       const serializedValueId = this.transform(that.valueId);
       parts.push(openTag("valueId"));
-      parts.push(openTag(serializedValueId.localName));
       parts.push(serializedValueId.innerXml);
-      parts.push(closeTag(serializedValueId.localName));
       parts.push(closeTag("valueId"));
     }
 
@@ -21973,9 +21663,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22093,9 +21781,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22135,9 +21821,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.value !== null) {
       const serializedValue = this.transform(that.value);
       parts.push(openTag("value"));
-      parts.push(openTag(serializedValue.localName));
       parts.push(serializedValue.innerXml);
-      parts.push(closeTag(serializedValue.localName));
       parts.push(closeTag("value"));
     }
 
@@ -22206,9 +21890,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22320,9 +22002,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22434,9 +22114,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22475,16 +22153,12 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
 
   const serializedFirst = this.transform(that.first);
     parts.push(openTag("first"));
-    parts.push(openTag(serializedFirst.localName));
     parts.push(serializedFirst.innerXml);
-    parts.push(closeTag(serializedFirst.localName));
     parts.push(closeTag("first"));
 
   const serializedSecond = this.transform(that.second);
     parts.push(openTag("second"));
-    parts.push(openTag(serializedSecond.localName));
     parts.push(serializedSecond.innerXml);
-    parts.push(closeTag(serializedSecond.localName));
     parts.push(closeTag("second"));
 
   if (that.annotations !== null) {
@@ -22563,9 +22237,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22653,33 +22325,25 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
 
   const serializedSource = this.transform(that.source);
     parts.push(openTag("source"));
-    parts.push(openTag(serializedSource.localName));
     parts.push(serializedSource.innerXml);
-    parts.push(closeTag(serializedSource.localName));
     parts.push(closeTag("source"));
 
   if (that.sourceSemanticId !== null) {
       const serializedSourceSemanticId = this.transform(that.sourceSemanticId);
       parts.push(openTag("sourceSemanticId"));
-      parts.push(openTag(serializedSourceSemanticId.localName));
       parts.push(serializedSourceSemanticId.innerXml);
-      parts.push(closeTag(serializedSourceSemanticId.localName));
       parts.push(closeTag("sourceSemanticId"));
     }
 
   const serializedObservableReference = this.transform(that.observableReference);
     parts.push(openTag("observableReference"));
-    parts.push(openTag(serializedObservableReference.localName));
     parts.push(serializedObservableReference.innerXml);
-    parts.push(closeTag(serializedObservableReference.localName));
     parts.push(closeTag("observableReference"));
 
   if (that.observableSemanticId !== null) {
       const serializedObservableSemanticId = this.transform(that.observableSemanticId);
       parts.push(openTag("observableSemanticId"));
-      parts.push(openTag(serializedObservableSemanticId.localName));
       parts.push(serializedObservableSemanticId.innerXml);
-      parts.push(closeTag(serializedObservableSemanticId.localName));
       parts.push(closeTag("observableSemanticId"));
     }
 
@@ -22692,9 +22356,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.subjectId !== null) {
       const serializedSubjectId = this.transform(that.subjectId);
       parts.push(openTag("subjectId"));
-      parts.push(openTag(serializedSubjectId.localName));
       parts.push(serializedSubjectId.innerXml);
-      parts.push(closeTag(serializedSubjectId.localName));
       parts.push(closeTag("subjectId"));
     }
 
@@ -22773,9 +22435,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -22814,9 +22474,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
 
   const serializedObserved = this.transform(that.observed);
     parts.push(openTag("observed"));
-    parts.push(openTag(serializedObserved.localName));
     parts.push(serializedObserved.innerXml);
-    parts.push(closeTag(serializedObserved.localName));
     parts.push(closeTag("observed"));
 
   parts.push(openTag("direction"));
@@ -22836,9 +22494,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.messageBroker !== null) {
       const serializedMessageBroker = this.transform(that.messageBroker);
       parts.push(openTag("messageBroker"));
-      parts.push(openTag(serializedMessageBroker.localName));
       parts.push(serializedMessageBroker.innerXml);
-      parts.push(closeTag(serializedMessageBroker.localName));
       parts.push(closeTag("messageBroker"));
     }
 
@@ -22925,9 +22581,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -23086,9 +22740,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.semanticId !== null) {
       const serializedSemanticId = this.transform(that.semanticId);
       parts.push(openTag("semanticId"));
-      parts.push(openTag(serializedSemanticId.localName));
       parts.push(serializedSemanticId.innerXml);
-      parts.push(closeTag(serializedSemanticId.localName));
       parts.push(closeTag("semanticId"));
     }
 
@@ -23190,9 +22842,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.administration !== null) {
       const serializedAdministration = this.transform(that.administration);
       parts.push(openTag("administration"));
-      parts.push(openTag(serializedAdministration.localName));
       parts.push(serializedAdministration.innerXml);
-      parts.push(closeTag(serializedAdministration.localName));
       parts.push(closeTag("administration"));
     }
 
@@ -23246,9 +22896,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.referredSemanticId !== null) {
       const serializedReferredSemanticId = this.transform(that.referredSemanticId);
       parts.push(openTag("referredSemanticId"));
-      parts.push(openTag(serializedReferredSemanticId.localName));
       parts.push(serializedReferredSemanticId.innerXml);
-      parts.push(closeTag(serializedReferredSemanticId.localName));
       parts.push(closeTag("referredSemanticId"));
     }
 
@@ -23405,9 +23053,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
 
   const serializedDataSpecification = this.transform(that.dataSpecification);
     parts.push(openTag("dataSpecification"));
-    parts.push(openTag(serializedDataSpecification.localName));
     parts.push(serializedDataSpecification.innerXml);
-    parts.push(closeTag(serializedDataSpecification.localName));
     parts.push(closeTag("dataSpecification"));
 
   const serializedDataSpecificationContent = this.transform(that.dataSpecificationContent);
@@ -23473,9 +23119,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
 
   const serializedValueId = this.transform(that.valueId);
     parts.push(openTag("valueId"));
-    parts.push(openTag(serializedValueId.localName));
     parts.push(serializedValueId.innerXml);
-    parts.push(closeTag(serializedValueId.localName));
     parts.push(closeTag("valueId"));
 
   return {
@@ -23625,9 +23269,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.unitId !== null) {
       const serializedUnitId = this.transform(that.unitId);
       parts.push(openTag("unitId"));
-      parts.push(openTag(serializedUnitId.localName));
       parts.push(serializedUnitId.innerXml);
-      parts.push(closeTag(serializedUnitId.localName));
       parts.push(closeTag("unitId"));
     }
 
@@ -23669,9 +23311,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.valueList !== null) {
       const serializedValueList = this.transform(that.valueList);
       parts.push(openTag("valueList"));
-      parts.push(openTag(serializedValueList.localName));
       parts.push(serializedValueList.innerXml);
-      parts.push(closeTag(serializedValueList.localName));
       parts.push(closeTag("valueList"));
     }
 
@@ -23684,9 +23324,7 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   if (that.levelType !== null) {
       const serializedLevelType = this.transform(that.levelType);
       parts.push(openTag("levelType"));
-      parts.push(openTag(serializedLevelType.localName));
       parts.push(serializedLevelType.innerXml);
-      parts.push(closeTag(serializedLevelType.localName));
       parts.push(closeTag("levelType"));
     }
 

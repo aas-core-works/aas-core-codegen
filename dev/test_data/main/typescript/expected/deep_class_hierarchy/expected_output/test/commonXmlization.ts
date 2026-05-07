@@ -206,6 +206,70 @@ export function loadMinimalBlossom(
 }
 
 /**
+ * Load a maximal XML example of {@link types.Something}
+ * from the test data directory.
+ */
+export function loadMaximalSomething(
+): AasTypes.Something {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "something",
+    "maximal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asSomething(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Something in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal XML example of {@link types.Something}
+ * from the test data directory.
+ */
+export function loadMinimalSomething(
+): AasTypes.Something {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "something",
+    "minimal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = AasXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asSomething(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Something in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
  * Load a maximal XML example of {@link types.Container}
  * from the test data directory.
  */

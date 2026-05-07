@@ -3,5 +3,18 @@
     "modelType": "Branch",
     "identifier": "nested-branch-min",
     "description": "nested branch"
+  },
+  "something": {
+    "someChoice": {
+      "modelType": "Leaf",
+      "identifier": "nested-leaf-in-container-min",
+      "description": "nested leaf in container minimal",
+      "value": 11
+    },
+    "somethingWithoutChoice": {
+      "modelType": "Branch",
+      "identifier": "nested-branch-in-container-min",
+      "description": "nested branch in container minimal"
+    }
   }
 }

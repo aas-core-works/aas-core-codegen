@@ -230,6 +230,78 @@ test("Blossom XML deserialization fail", () => {
   }
 });
 
+test("Something XML round-trip OK", () => {
+  const pths = Array.from(
+    TestCommon.findFilesBySuffixRecursively(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Xml",
+        "Expected",
+        "something"
+      ),
+      ".xml"
+    )
+  );
+  pths.sort();
+
+  for (const pth of pths) {
+    const text = fs.readFileSync(pth, "utf-8");
+
+    const instanceOrError = AasXmlization.fromXmlString(text);
+    expect(instanceOrError.error).toBeNull();
+    const instance = instanceOrError.mustValue();
+
+    const casted = AasTypes.asSomething(instance);
+    if (casted === null) {
+      throw new Error(
+        `Expected instance of Something in ${pth}, ` +
+        `but got: ${typeof instance}`
+      );
+    }
+
+    TestCommon.assertNoVerificationErrors(AasVerification.verify(casted), pth);
+
+    const roundTripText = AasXmlization.toXmlString(casted);
+    expect(roundTripText.length).toBeGreaterThan(0);
+  }
+});
+
+test("Something XML deserialization fail", () => {
+  for (
+    const causeDir of
+    TestCommon.findImmediateSubdirectories(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Xml",
+        "Unexpected",
+        "Unserializable"
+      )
+    )
+  ) {
+    const clsDir = path.join(
+      causeDir,
+      "something"
+    );
+    if (!fs.existsSync(clsDir)) {
+      continue;
+    }
+
+    const pths = Array.from(
+      TestCommon.findFilesBySuffixRecursively(
+        clsDir,
+        ".xml"
+      )
+    );
+    pths.sort();
+
+    for (const pth of pths) {
+      const text = fs.readFileSync(pth, "utf-8");
+      const instanceOrError = AasXmlization.fromXmlString(text);
+      expect(instanceOrError.error).not.toBeNull();
+    }
+  }
+});
+
 test("Container XML round-trip OK", () => {
   const pths = Array.from(
     TestCommon.findFilesBySuffixRecursively(

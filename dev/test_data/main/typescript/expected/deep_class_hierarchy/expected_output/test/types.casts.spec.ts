@@ -41,6 +41,13 @@ test("casts over an instance of Branch", () => {
   ).toBeNull();
 
   expect(
+    AasTypes.isSomething(theBranch)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theBranch)
+  ).toBeNull();
+
+  expect(
     AasTypes.isContainer(theBranch)
   ).toStrictEqual(false);
   expect(
@@ -78,6 +85,13 @@ test("casts over an instance of Leaf", () => {
   ).toStrictEqual(false);
   expect(
     AasTypes.asBlossom(theLeaf)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isSomething(theLeaf)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theLeaf)
   ).toBeNull();
 
   expect(
@@ -121,10 +135,64 @@ test("casts over an instance of Blossom", () => {
   ).toStrictEqual(theBlossom);
 
   expect(
+    AasTypes.isSomething(theBlossom)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theBlossom)
+  ).toBeNull();
+
+  expect(
     AasTypes.isContainer(theBlossom)
   ).toStrictEqual(false);
   expect(
     AasTypes.asContainer(theBlossom)
+  ).toBeNull();
+});
+
+test("casts over an instance of Something", () => {
+  const theSomething =
+    TestCommonJsonization.loadMinimalSomething();
+
+  expect(
+    AasTypes.isNode(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asNode(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isBranch(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asBranch(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isLeaf(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asLeaf(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isBlossom(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asBlossom(theSomething)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isSomething(theSomething)
+  ).toStrictEqual(true);
+  expect(
+    AasTypes.asSomething(theSomething)
+  ).toStrictEqual(theSomething);
+
+  expect(
+    AasTypes.isContainer(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asContainer(theSomething)
   ).toBeNull();
 });
 
@@ -158,6 +226,13 @@ test("casts over an instance of Container", () => {
   ).toStrictEqual(false);
   expect(
     AasTypes.asBlossom(theContainer)
+  ).toBeNull();
+
+  expect(
+    AasTypes.isSomething(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    AasTypes.asSomething(theContainer)
   ).toBeNull();
 
   expect(

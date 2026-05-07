@@ -21,6 +21,10 @@ const MODEL_TYPE_FROM_STRING = new Map<string, AasTypes.ModelType>([
     AasTypes.ModelType.Blossom
   ],
   [
+    "Something",
+    AasTypes.ModelType.Something
+  ],
+  [
     "Container",
     AasTypes.ModelType.Container
   ]
@@ -51,6 +55,10 @@ const MODEL_TYPE_TO_STRING = new Map<AasTypes.ModelType, string>([
   [
     AasTypes.ModelType.Blossom,
     "Blossom"
+  ],
+  [
+    AasTypes.ModelType.Something,
+    "Something"
   ],
   [
     AasTypes.ModelType.Container,

@@ -427,7 +427,7 @@ function parseBase64EncodedBytesText(
   );
 }
 
-function parseClassValueInProperty(
+function parsePropertyAsClassInstance(
   cursor: XmlCursor,
   propertyStartTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
@@ -494,13 +494,6 @@ function parseSomethingFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "something") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "something", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theSomeBool: boolean | null = null;
   let theSomeInt: number | null = null;
   let theSomeFloat: number | null = null;

@@ -45,11 +45,22 @@ class Blossom(Leaf, DBC):
         self.details = details
 
 
+class Something(DBC):
+    some_choice: Node
+    something_without_choice: Branch
+
+    def __init__(self, some_choice: Node, something_without_choice: Branch) -> None:
+        self.some_choice = some_choice
+        self.something_without_choice = something_without_choice
+
+
 class Container(DBC):
     node: Node
+    something: Something
 
-    def __init__(self, node: Node) -> None:
+    def __init__(self, node: Node, something: Something) -> None:
         self.node = node
+        self.something = something
 
 
 __version__ = "dummy"

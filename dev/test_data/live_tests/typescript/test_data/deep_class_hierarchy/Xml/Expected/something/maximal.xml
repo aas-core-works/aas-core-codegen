@@ -1,0 +1,16 @@
+<something xmlns="https://dummy.com">
+  <someChoice>
+    <blossom>
+      <identifier>some-choice-blossom-max</identifier>
+      <description>some choice blossom maximal</description>
+      <value>303</value>
+      <details>some choice blossom details</details>
+    </blossom>
+  </someChoice>
+  <somethingWithoutChoice>
+    <branch>
+      <identifier>nested-branch-in-something-max</identifier>
+      <description>nested branch in something maximal</description>
+    </branch>
+  </somethingWithoutChoice>
+</something>

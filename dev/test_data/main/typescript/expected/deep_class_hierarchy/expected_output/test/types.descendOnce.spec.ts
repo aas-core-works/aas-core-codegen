@@ -97,6 +97,20 @@ test("descendOnce of Blossom", () => {
   );
 });
 
+test("descendOnce of Something", () => {
+  const instance = TestCommonJsonization.loadMaximalSomething();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descendOnce",
+      "Something",
+      "maximal.json.trace"
+    )
+  );
+});
+
 test("descendOnce of Container", () => {
   const instance = TestCommonJsonization.loadMaximalContainer();
 

@@ -427,7 +427,7 @@ function parseBase64EncodedBytesText(
   );
 }
 
-function parseClassValueInProperty(
+function parsePropertyAsClassInstance(
   cursor: XmlCursor,
   propertyStartTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
@@ -494,13 +494,6 @@ function parseBranchFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "branch") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "branch", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theIdentifier: string | null = null;
   let theDescription: string | null = null;
 
@@ -654,13 +647,6 @@ function parseLeafFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "leaf") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "leaf", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theIdentifier: string | null = null;
   let theDescription: string | null = null;
   let theValue: number | null = null;
@@ -848,13 +834,6 @@ function parseBlossomFromOpenTag(
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "blossom") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "blossom", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theIdentifier: string | null = null;
   let theDescription: string | null = null;
   let theValue: number | null = null;
@@ -1071,19 +1050,174 @@ function parseBlossomFromOpenTag(
   );
 }
 
+function parseSomethingFromOpenTag(
+  cursor: XmlCursor,
+  startTag: OpenTagToken
+): AasCommon.Either<AasTypes.Class, DeserializationError> {
+  const observedLocalName = localNameOfTag(startTag.tag);
+  let theSomeChoice: AasTypes.INode | null = null;
+  let theSomethingWithoutChoice: AasTypes.Branch | null = null;
+
+  cursor.skipIgnorable();
+  while (true) {
+    const token = cursor.current();
+    if (token === null) {
+      return newDeserializationError<AasTypes.Class>(
+        `Unexpected end of token stream while parsing Something`
+      );
+    }
+
+    if (token instanceof CloseTagToken) {
+      break;
+    }
+
+    if (!(token instanceof OpenTagToken)) {
+      return newDeserializationError<AasTypes.Class>(
+        "Expected an XML property start element or the closing element of " +
+        `Something, but got token kind: ${token.kind}`
+      );
+    }
+
+    const namespaceError = checkExpectedOpenTagNamespace(token);
+    if (namespaceError !== null) {
+      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+        null,
+        namespaceError
+      );
+    }
+
+    const propertyStartTag = token;
+    const propertyLocalName = localNameOfTag(propertyStartTag.tag);
+    cursor.advance();
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      case "someChoice": {
+        if (theSomeChoice !== null) {
+          propertyError = new DeserializationError(
+            "Property " +
+              "someChoice" +
+              " occurred more than once"
+          );
+          break;
+        }
+
+        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
+        if (classOrError.error !== null) {
+          propertyError = classOrError.error;
+          break;
+        }
+
+        const casted = AasTypes.asNode(classOrError.mustValue());
+        if (casted === null) {
+          propertyError = new DeserializationError(
+            "Expected property " +
+              "someChoice" +
+              " to contain an instance of INode"
+          );
+          break;
+        }
+
+        theSomeChoice = casted;
+        break;
+      }
+
+      case "somethingWithoutChoice": {
+        if (theSomethingWithoutChoice !== null) {
+          propertyError = new DeserializationError(
+            "Property " +
+              "somethingWithoutChoice" +
+              " occurred more than once"
+          );
+          break;
+        }
+
+        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
+        if (classOrError.error !== null) {
+          propertyError = classOrError.error;
+          break;
+        }
+
+        const casted = AasTypes.asBranch(classOrError.mustValue());
+        if (casted === null) {
+          propertyError = new DeserializationError(
+            "Expected property " +
+              "somethingWithoutChoice" +
+              " to contain an instance of IBranch"
+          );
+          break;
+        }
+
+        theSomethingWithoutChoice = casted;
+        break;
+      }
+
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new NameSegment(propertyLocalName));
+      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  const closeTag = cursor.current();
+  if (!(closeTag instanceof CloseTagToken)) {
+    return newDeserializationError<AasTypes.Class>(
+      "Expected closing element of " +
+        `Something, but got token kind: ${currentTokenKind(cursor)}`
+    );
+  }
+
+  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  cursor.advance();
+
+  if (theSomeChoice === null) {
+    return newDeserializationError<AasTypes.Class>(
+      "The required property 'someChoice' is missing"
+    );
+  }
+
+  if (theSomethingWithoutChoice === null) {
+    return newDeserializationError<AasTypes.Class>(
+      "The required property 'somethingWithoutChoice' is missing"
+    );
+  }
+
+  const instance = new AasTypes.Something(
+    theSomeChoice,
+    theSomethingWithoutChoice
+  );
+  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+    instance,
+    null
+  );
+}
+
 function parseContainerFromOpenTag(
   cursor: XmlCursor,
   startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {
   const observedLocalName = localNameOfTag(startTag.tag);
-  if (observedLocalName !== "container") {
-    return newDeserializationError<AasTypes.Class>(
-      `Expected root XML element "container", ` +
-      `but got: ${observedLocalName}`
-    );
-  }
-
   let theNode: AasTypes.INode | null = null;
+  let theSomething: AasTypes.Something | null = null;
 
   cursor.skipIgnorable();
   while (true) {
@@ -1129,7 +1263,7 @@ function parseContainerFromOpenTag(
           break;
         }
 
-        const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
@@ -1146,6 +1280,36 @@ function parseContainerFromOpenTag(
         }
 
         theNode = casted;
+        break;
+      }
+
+      case "something": {
+        if (theSomething !== null) {
+          propertyError = new DeserializationError(
+            "Property " +
+              "something" +
+              " occurred more than once"
+          );
+          break;
+        }
+
+        const classOrError = parseSomethingFromOpenTag(cursor, propertyStartTag);
+        if (classOrError.error !== null) {
+          propertyError = classOrError.error;
+          break;
+        }
+
+        const casted = AasTypes.asSomething(classOrError.mustValue());
+        if (casted === null) {
+          propertyError = new DeserializationError(
+            "Expected property " +
+              "something" +
+              " to contain an instance of ISomething"
+          );
+          break;
+        }
+
+        theSomething = casted;
         break;
       }
 
@@ -1192,8 +1356,15 @@ function parseContainerFromOpenTag(
     );
   }
 
+  if (theSomething === null) {
+    return newDeserializationError<AasTypes.Class>(
+      "The required property 'something' is missing"
+    );
+  }
+
   const instance = new AasTypes.Container(
-    theNode
+    theNode,
+    theSomething
   );
   return new AasCommon.Either<AasTypes.Class, DeserializationError>(
     instance,
@@ -1220,6 +1391,10 @@ const ROOT_DISPATCH_BY_LOCAL_NAME =
     [
       "blossom",
       parseBlossomFromOpenTag
+    ],
+    [
+      "something",
+      parseSomethingFromOpenTag
     ],
     [
       "container",
@@ -1469,6 +1644,37 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
    * @param that - instance to be serialized
    * @returns serialized XML element representation
    */
+  transformSomething(
+    that: AasTypes.Something
+  ): SerializedElement {
+  const parts = new Array<string>();
+
+  const serializedSomeChoice = this.transform(that.someChoice);
+    parts.push(openTag("someChoice"));
+    parts.push(openTag(serializedSomeChoice.localName));
+    parts.push(serializedSomeChoice.innerXml);
+    parts.push(closeTag(serializedSomeChoice.localName));
+    parts.push(closeTag("someChoice"));
+
+  const serializedSomethingWithoutChoice = this.transform(that.somethingWithoutChoice);
+    parts.push(openTag("somethingWithoutChoice"));
+    parts.push(openTag(serializedSomethingWithoutChoice.localName));
+    parts.push(serializedSomethingWithoutChoice.innerXml);
+    parts.push(closeTag(serializedSomethingWithoutChoice.localName));
+    parts.push(closeTag("somethingWithoutChoice"));
+
+  return {
+      localName: "something",
+      innerXml: parts.join("")
+    };
+  }
+
+/**
+   * Serialize `that` to an XML element representation.
+   *
+   * @param that - instance to be serialized
+   * @returns serialized XML element representation
+   */
   transformContainer(
     that: AasTypes.Container
   ): SerializedElement {
@@ -1480,6 +1686,11 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
     parts.push(serializedNode.innerXml);
     parts.push(closeTag(serializedNode.localName));
     parts.push(closeTag("node"));
+
+  const serializedSomething = this.transform(that.something);
+    parts.push(openTag("something"));
+    parts.push(serializedSomething.innerXml);
+    parts.push(closeTag("something"));
 
   return {
       localName: "container",

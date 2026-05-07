@@ -14,6 +14,8 @@ const THE_LEAF = TestCommonJsonization.loadMinimalLeaf();
 
 const THE_BLOSSOM = TestCommonJsonization.loadMinimalBlossom();
 
+const THE_SOMETHING = TestCommonJsonization.loadMinimalSomething();
+
 const THE_CONTAINER = TestCommonJsonization.loadMinimalContainer();
 
 test("type matches for Branch", () => {
@@ -37,6 +39,13 @@ test("type matches for Branch", () => {
       THE_BLOSSOM
     )
   ).toStrictEqual(true);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_BRANCH,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
 
   expect(
     AasTypes.typesMatch(
@@ -71,6 +80,13 @@ test("type matches for Leaf", () => {
   expect(
     AasTypes.typesMatch(
       THE_LEAF,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_LEAF,
       THE_CONTAINER
     )
   ).toStrictEqual(false);
@@ -101,6 +117,50 @@ test("type matches for Blossom", () => {
   expect(
     AasTypes.typesMatch(
       THE_BLOSSOM,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_BLOSSOM,
+      THE_CONTAINER
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for Something", () => {
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_BRANCH
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_LEAF
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_BLOSSOM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_SOMETHING,
       THE_CONTAINER
     )
   ).toStrictEqual(false);
@@ -125,6 +185,13 @@ test("type matches for Container", () => {
     AasTypes.typesMatch(
       THE_CONTAINER,
       THE_BLOSSOM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    AasTypes.typesMatch(
+      THE_CONTAINER,
+      THE_SOMETHING
     )
   ).toStrictEqual(false);
 

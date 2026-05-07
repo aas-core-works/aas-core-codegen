@@ -3,7 +3,7 @@
 import io
 from typing import Tuple, Optional, List, Dict
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate, naming, specific_implementations
 from aas_core_codegen.common import (
@@ -26,21 +26,15 @@ from aas_core_codegen.typescript.common import (
 )
 
 
+# region De-serialization
+
+
 _PARSE_FUNCTION_BY_PRIMITIVE_TYPE = {
     intermediate.PrimitiveType.BOOL: Identifier("parseBooleanText"),
     intermediate.PrimitiveType.INT: Identifier("parseIntegerText"),
     intermediate.PrimitiveType.FLOAT: Identifier("parseFloatText"),
     intermediate.PrimitiveType.STR: Identifier("parseStringText"),
     intermediate.PrimitiveType.BYTEARRAY: Identifier("parseBase64EncodedBytesText"),
-}
-
-
-_SERIALIZE_FUNCTION_BY_PRIMITIVE_TYPE = {
-    intermediate.PrimitiveType.BOOL: Identifier("serializeBooleanText"),
-    intermediate.PrimitiveType.INT: Identifier("serializeIntegerText"),
-    intermediate.PrimitiveType.FLOAT: Identifier("serializeFloatText"),
-    intermediate.PrimitiveType.STR: Identifier("serializeStringText"),
-    intermediate.PrimitiveType.BYTEARRAY: Identifier("serializeBase64EncodedBytesText"),
 }
 
 
@@ -51,22 +45,26 @@ def _parse_function_for_atomic_type(
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return _PARSE_FUNCTION_BY_PRIMITIVE_TYPE[type_annotation.a_type]
 
-    if isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        if isinstance(type_annotation.our_type, intermediate.Enumeration):
-            return typescript_naming.function_name(
-                Identifier(f"parse_{type_annotation.our_type.name}_text")
-            )
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        our_type = type_annotation.our_type
 
-        if isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
-            return _PARSE_FUNCTION_BY_PRIMITIVE_TYPE[
-                type_annotation.our_type.constrainee
-            ]
-
-        raise AssertionError(
-            f"Unexpected atomic XML text type: {type_annotation.our_type}"
+        assert not isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         )
 
-    assert_never(type_annotation)
+        if isinstance(our_type, intermediate.Enumeration):
+            return typescript_naming.function_name(
+                Identifier(f"parse_{our_type.name}_text")
+            )
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return _PARSE_FUNCTION_BY_PRIMITIVE_TYPE[our_type.constrainee]
+
+        else:
+            assert_never(our_type)
+
+    else:
+        assert_never(type_annotation)
 
 
 def _parse_function_name_for_concrete_class(
@@ -76,31 +74,6 @@ def _parse_function_name_for_concrete_class(
     return typescript_naming.function_name(
         Identifier(f"parse_{cls.name}_from_open_tag")
     )
-
-
-def _serialize_function_for_atomic_type(
-    type_annotation: intermediate.AtomicTypeAnnotation,
-) -> Identifier:
-    """Resolve the generated serializer helper for an atomic XML text value."""
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return _SERIALIZE_FUNCTION_BY_PRIMITIVE_TYPE[type_annotation.a_type]
-
-    if isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        if isinstance(type_annotation.our_type, intermediate.Enumeration):
-            return typescript_naming.function_name(
-                Identifier(f"serialize_{type_annotation.our_type.name}_text")
-            )
-
-        if isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
-            return _SERIALIZE_FUNCTION_BY_PRIMITIVE_TYPE[
-                type_annotation.our_type.constrainee
-            ]
-
-        raise AssertionError(
-            f"Unexpected atomic XML text type: {type_annotation.our_type}"
-        )
-
-    assert_never(type_annotation)
 
 
 def _generate_parse_text_as_enumeration(
@@ -135,12 +108,17 @@ function {parse_function_name}(
     )
 
 
+@require(lambda cls, prop: id(prop) in cls.property_id_set)
 def _generate_parse_case_for_property(
     cls: intermediate.ConcreteClass,
     prop: intermediate.Property,
     var_name: Identifier,
 ) -> Stripped:
-    """Generate a switch case to parse a property from XML element content."""
+    """
+    Generate a switch case to parse a property from XML element content.
+
+    The generated code stores the parsed property value into ``var_name``.
+    """
     xml_name_literal = typescript_common.string_literal(naming.xml_property(prop.name))
 
     type_anno = intermediate.beneath_optional(prop.type_annotation)
@@ -165,15 +143,24 @@ if ({var_name} !== null) {{
             type_anno.our_type,
             (intermediate.AbstractClass, intermediate.ConcreteClass),
         ):
+            our_type = type_anno.our_type
             as_function_name = typescript_naming.function_name(
-                Identifier(f"as_{type_anno.our_type.name}")
+                Identifier(f"as_{our_type.name}")
             )
 
-            expected_name = typescript_naming.interface_name(type_anno.our_type.name)
+            expected_name = typescript_naming.interface_name(our_type.name)
 
-            parse_body = Stripped(
-                f"""\
-const classOrError = parseClassValueInProperty(cursor, propertyStartTag);
+            if (
+                isinstance(our_type, intermediate.ConcreteClass)
+                and len(our_type.concrete_descendants) == 0
+            ):
+                parse_function_name = _parse_function_name_for_concrete_class(
+                    cls=our_type
+                )
+
+                parse_body = Stripped(
+                    f"""\
+const classOrError = {parse_function_name}(cursor, propertyStartTag);
 if (classOrError.error !== null) {{
 {I}propertyError = classOrError.error;
 {I}break;
@@ -190,7 +177,28 @@ if (casted === null) {{
 }}
 
 {var_name} = casted;"""
-            )
+                )
+            else:
+                parse_body = Stripped(
+                    f"""\
+const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
+if (classOrError.error !== null) {{
+{I}propertyError = classOrError.error;
+{I}break;
+}}
+
+const casted = AasTypes.{as_function_name}(classOrError.mustValue());
+if (casted === null) {{
+{I}propertyError = new DeserializationError(
+{II}"Expected property " +
+{III}{xml_name_literal} +
+{III}" to contain an instance of {expected_name}"
+{I});
+{I}break;
+}}
+
+{var_name} = casted;"""
+                )
         else:
             parse_function = _parse_function_for_atomic_type(type_anno)
             parse_body = Stripped(
@@ -426,9 +434,6 @@ def _generate_parse_concrete_class(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate parser for a concrete class from a start XML tag."""
     function_name = _parse_function_name_for_concrete_class(cls=cls)
     cls_name = typescript_naming.class_name(cls.name)
-    local_name_literal = typescript_common.string_literal(
-        naming.xml_class_name(cls.name)
-    )
 
     var_declarations = []  # type: List[Stripped]
     required_checks = []  # type: List[Stripped]
@@ -529,13 +534,6 @@ function {function_name}(
 {I}startTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {{
 {I}const observedLocalName = localNameOfTag(startTag.tag);
-{I}if (observedLocalName !== {local_name_literal}) {{
-{II}return newDeserializationError<AasTypes.Class>(
-{III}`Expected root XML element {local_name_literal}, ` +
-{III}`but got: ${{observedLocalName}}`
-{II});
-{I}}}
-
 {I}{indent_but_first_line(declarations, I)}
 
 {I}cursor.skipIgnorable();
@@ -611,6 +609,49 @@ function {function_name}(
     )
 
 
+# endregion
+
+# region Serialization
+
+
+_SERIALIZE_FUNCTION_BY_PRIMITIVE_TYPE = {
+    intermediate.PrimitiveType.BOOL: Identifier("serializeBooleanText"),
+    intermediate.PrimitiveType.INT: Identifier("serializeIntegerText"),
+    intermediate.PrimitiveType.FLOAT: Identifier("serializeFloatText"),
+    intermediate.PrimitiveType.STR: Identifier("serializeStringText"),
+    intermediate.PrimitiveType.BYTEARRAY: Identifier("serializeBase64EncodedBytesText"),
+}
+
+
+def _serialize_function_for_atomic_type(
+    type_annotation: intermediate.AtomicTypeAnnotation,
+) -> Identifier:
+    """Resolve the name of the serialization function name for an atomic XML text value."""
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return _SERIALIZE_FUNCTION_BY_PRIMITIVE_TYPE[type_annotation.a_type]
+
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+
+        assert not isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        )
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return typescript_naming.function_name(
+                Identifier(f"serialize_{our_type.name}_text")
+            )
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return _SERIALIZE_FUNCTION_BY_PRIMITIVE_TYPE[our_type.constrainee]
+
+        else:
+            assert_never(our_type)
+
+    else:
+        assert_never(type_annotation)
+
+
 def _generate_serialize_text_as_enumeration(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
@@ -652,18 +693,31 @@ def _generate_serialize_block_for_property(
             type_anno.our_type,
             (intermediate.AbstractClass, intermediate.ConcreteClass),
         ):
+            our_type = type_anno.our_type
             serialized_var = typescript_naming.variable_name(
                 Identifier(f"serialized_{prop.name}")
             )
-            body = Stripped(
-                f"""\
+            if (
+                isinstance(our_type, intermediate.ConcreteClass)
+                and len(our_type.concrete_descendants) == 0
+            ):
+                body = Stripped(
+                    f"""\
+const {serialized_var} = this.transform({access_expr});
+parts.push(openTag({xml_name_literal}));
+parts.push({serialized_var}.innerXml);
+parts.push(closeTag({xml_name_literal}));"""
+                )
+            else:
+                body = Stripped(
+                    f"""\
 const {serialized_var} = this.transform({access_expr});
 parts.push(openTag({xml_name_literal}));
 parts.push(openTag({serialized_var}.localName));
 parts.push({serialized_var}.innerXml);
 parts.push(closeTag({serialized_var}.localName));
 parts.push(closeTag({xml_name_literal}));"""
-            )
+                )
         else:
             serialize_function = _serialize_function_for_atomic_type(type_anno)
             body = Stripped(
@@ -859,6 +913,9 @@ const ROOT_DISPATCH_BY_LOCAL_NAME =
     )
 
     return Stripped(writer.getvalue())
+
+
+# endregion
 
 
 # fmt: off
@@ -1328,7 +1385,7 @@ function parseBase64EncodedBytesText(
 {I});
 }}
 
-function parseClassValueInProperty(
+function parsePropertyAsClassInstance(
 {I}cursor: XmlCursor,
 {I}propertyStartTag: OpenTagToken
 ): AasCommon.Either<AasTypes.Class, DeserializationError> {{

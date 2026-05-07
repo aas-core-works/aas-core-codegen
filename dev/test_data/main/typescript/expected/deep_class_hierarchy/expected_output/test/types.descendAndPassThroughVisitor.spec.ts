@@ -154,6 +154,26 @@ test("descend against PassThroughVisitor", () => {
   expectDescendAndPassThroughVisitorSame(instance);
 });
 
+test("descend of Something", () => {
+  const instance = TestCommonJsonization.loadMaximalSomething();
+
+  compareOrRecordTrace(
+    instance,
+    path.join(
+      TestCommon.TEST_DATA_DIR,
+      "descend",
+      "Something",
+      "maximal.json.trace"
+    )
+  );
+});
+
+test("descend against PassThroughVisitor", () => {
+  const instance = TestCommonJsonization.loadMaximalSomething();
+
+  expectDescendAndPassThroughVisitorSame(instance);
+});
+
 test("descend of Container", () => {
   const instance = TestCommonJsonization.loadMaximalContainer();
 

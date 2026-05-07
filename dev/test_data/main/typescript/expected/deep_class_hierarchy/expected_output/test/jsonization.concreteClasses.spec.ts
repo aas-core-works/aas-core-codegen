@@ -562,6 +562,149 @@ test("Blossom verification fail", () => {
   }
 });
 
+test("Something round-trip OK", () => {
+  const pths = Array.from(
+    TestCommon.findFilesBySuffixRecursively(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Json",
+        "Expected",
+        "Something"
+      ),
+      ".json"
+    )
+  );
+  pths.sort();
+
+  for (const pth of pths) {
+    const jsonable = TestCommon.readJsonFromFileSync(pth);
+
+    const instanceOrError = AasJsonization.somethingFromJsonable(
+      jsonable
+    );
+    expect(instanceOrError.error).toBeNull();
+    const instance = instanceOrError.mustValue();
+
+    TestCommon.assertNoVerificationErrors(AasVerification.verify(instance), pth);
+
+    assertSerializeDeserializeEqualsOriginal(
+      jsonable,
+      instance,
+      pth
+    );
+  }
+});
+
+test("Something deserialization fail", () => {
+  for (
+    const causeDir of
+    TestCommon.findImmediateSubdirectories(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Json",
+        "Unexpected",
+        "Unserializable"
+      )
+    )
+  ) {
+    // NOTE (mristin):
+    // Unlike other SDKs, we can not be really sure what additional properties
+    // JavaScript might bring about. Therefore, we leave out the tests with
+    // the validation of additional properties.
+    if (path.basename(causeDir) == "UnexpectedAdditionalProperty") {
+      continue;
+    }
+
+    const clsDir = path.join(
+      causeDir,
+      "Something"
+    );
+    if (!fs.existsSync(clsDir)) {
+      // NOTE (mristin):
+      // Some classes indeed lack the invalid examples.
+      continue;
+    }
+
+    const pths = Array.from(
+      TestCommon.findFilesBySuffixRecursively(
+        clsDir,
+        ".json"
+      )
+    );
+    pths.sort();
+
+    for (const pth of pths) {
+      const jsonable = TestCommon.readJsonFromFileSync(pth);
+
+      const instanceOrError = AasJsonization.somethingFromJsonable(
+        jsonable
+      );
+      if (instanceOrError.error === null) {
+        throw new Error(`Expected a de-serialization error for ${pth}, but got none`);
+      }
+
+      assertDeserializationErrorEqualsExpectedOrRecord(
+        instanceOrError.error,
+        pth
+      );
+    }
+  }
+});
+
+test("Something verification fail", () => {
+  for (
+    const causeDir of
+    TestCommon.findImmediateSubdirectories(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Json",
+        "Unexpected",
+        "Invalid"
+      )
+    )
+  ) {
+    const clsDir = path.join(
+      causeDir,
+      "Something"
+    );
+    if (!fs.existsSync(clsDir)) {
+      // NOTE (mristin):
+      // Some classes indeed lack the invalid examples.
+      continue;
+    }
+
+    const pths = Array.from(
+      TestCommon.findFilesBySuffixRecursively(
+        clsDir,
+        ".json"
+      )
+    );
+    pths.sort();
+
+    for (const pth of pths) {
+      const jsonable = TestCommon.readJsonFromFileSync(pth);
+
+      const instanceOrError = AasJsonization.somethingFromJsonable(
+        jsonable
+      );
+      if (instanceOrError.error !== null) {
+        throw new Error(
+          `Expected no de-serialization error for ${pth}, ` +
+          `but got: ${instanceOrError.error.message}: ${instanceOrError.error.path}`
+        );
+      }
+
+      const instance = instanceOrError.mustValue();
+
+      const verificationErrors = Array.from(AasVerification.verify(instance));
+      assertVerificationErrorsEqualExpectedOrRecord(
+        verificationErrors,
+        pth
+      );
+    }
+  }
+});
+
 test("Container round-trip OK", () => {
   const pths = Array.from(
     TestCommon.findFilesBySuffixRecursively(

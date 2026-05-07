@@ -205,6 +205,70 @@ export function loadMinimalBlossom(
 }
 
 /**
+ * Load a maximal example of {@link types.Something} from
+ * the test data directory.
+ */
+export function loadMaximalSomething(
+): AasTypes.Something {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "Something",
+    "maximal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.somethingFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asSomething(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Something in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal example of {@link types.Something} from
+ * the test data directory.
+ */
+export function loadMinimalSomething(
+): AasTypes.Something {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "Something",
+    "minimal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = AasJsonization.somethingFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = AasTypes.asSomething(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of Something in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
  * Load a maximal example of {@link types.Container} from
  * the test data directory.
  */

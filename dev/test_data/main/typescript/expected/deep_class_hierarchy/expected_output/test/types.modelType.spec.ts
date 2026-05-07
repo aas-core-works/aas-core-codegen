@@ -96,6 +96,35 @@ test("model type to string of Blossom", () => {
   );
 });
 
+test("model type of Something", () => {
+  const instance = TestCommonJsonization.loadMinimalSomething();
+
+  expect(instance.modelType()).toStrictEqual(
+    AasTypes.ModelType.Something
+  );
+});
+
+test("model type from string of Something", () => {
+  const text = "Something";
+  const literal = AasStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    AasTypes.ModelType.Something
+  );
+});
+
+test("model type to string of Something", () => {
+  const text = AasStringification.mustModelTypeToString(
+    AasTypes.ModelType.Something
+  );
+
+  expect(text).toStrictEqual(
+    "Something"
+  );
+});
+
 test("model type of Container", () => {
   const instance = TestCommonJsonization.loadMinimalContainer();
 

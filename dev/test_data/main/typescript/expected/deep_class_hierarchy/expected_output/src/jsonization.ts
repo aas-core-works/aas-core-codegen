@@ -1088,10 +1088,150 @@ export function blossomFromJsonable(
 
 /**
  * Provide de-serialize & set methods for properties
+ * of {@link types!Something}.
+ */
+class SetterForSomething {
+  someChoice: AasTypes.INode | null = null;
+
+  somethingWithoutChoice: AasTypes.Branch | null = null;
+
+  /**
+   * Parse `jsonable` as the value of {@link someChoice}.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setSomeChoiceFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = nodeFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.someChoice = parsedOrError.mustValue();
+      return null;
+    }
+  }
+
+  /**
+   * Parse `jsonable` as the value of {@link somethingWithoutChoice}.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setSomethingWithoutChoiceFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = branchFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.somethingWithoutChoice = parsedOrError.mustValue();
+      return null;
+    }
+  }
+}
+
+/**
+ * Parse an instance of {@link types!Something} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!Something},
+ * or an error if any
+ */
+export function somethingFromJsonable(
+  jsonable: JsonValue
+): AasCommon.Either<
+  AasTypes.Something,
+  DeserializationError
+> {
+  if (jsonable === null) {
+    return newDeserializationError<AasTypes.Something>(
+      "Expected a JSON object, but got null"
+    );
+  }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Something>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
+  if (typeof jsonable !== "object") {
+    return newDeserializationError<AasTypes.Something>(
+      `Expected a JSON object, but got: ${typeof jsonable}`
+    );
+  }
+
+  const setter = new SetterForSomething();
+
+  for (const key in jsonable) {
+    const jsonableValue = jsonable[key];
+    const setterMethod =
+      SETTER_MAP_FOR_SOMETHING.get(key);
+
+    // NOTE (mristin, 2022-11-30):
+    // Since we conflate here a JavaScript object with a JSON object, we ignore
+    // properties which we do not know how to de-serialize and assume they are
+    // related to the *JavaScript* properties of the object or `Object` prototype.
+    if (setterMethod === undefined) {
+      continue;
+    }
+
+    const error = setterMethod.call(setter, jsonableValue);
+    if (error !== null) {
+      error.path.prepend(
+        new PropertySegment(<JsonObject>jsonable, key)
+      );
+      return new AasCommon.Either<
+        AasTypes.Something,
+        DeserializationError
+      >(
+          null,
+          error
+        );
+    }
+  }
+
+  if (setter.someChoice === null) {
+    return newDeserializationError<
+      AasTypes.Something
+    >(
+      "The required property 'someChoice' is missing"
+    );
+  }
+
+  if (setter.somethingWithoutChoice === null) {
+    return newDeserializationError<
+      AasTypes.Something
+    >(
+      "The required property 'somethingWithoutChoice' is missing"
+    );
+  }
+
+  return new AasCommon.Either<
+    AasTypes.Something,
+    DeserializationError
+  >(
+    new AasTypes.Something(
+      setter.someChoice,
+      setter.somethingWithoutChoice
+    ),
+    null
+  );
+}
+
+/**
+ * Provide de-serialize & set methods for properties
  * of {@link types!Container}.
  */
 class SetterForContainer {
   node: AasTypes.INode | null = null;
+
+  something: AasTypes.Something | null = null;
 
   /**
    * Parse `jsonable` as the value of {@link node}.
@@ -1109,6 +1249,26 @@ class SetterForContainer {
       return parsedOrError.error;
     } else {
       this.node = parsedOrError.mustValue();
+      return null;
+    }
+  }
+
+  /**
+   * Parse `jsonable` as the value of {@link something}.
+   *
+   * @param jsonable - to be parsed
+   * @returns error, if any
+   */
+  setSomethingFromJsonable(
+    jsonable: JsonValue
+  ): DeserializationError | null {
+    const parsedOrError = somethingFromJsonable(
+      jsonable
+    );
+    if (parsedOrError.error !== null) {
+      return parsedOrError.error;
+    } else {
+      this.something = parsedOrError.mustValue();
       return null;
     }
   }
@@ -1182,12 +1342,21 @@ export function containerFromJsonable(
     );
   }
 
+  if (setter.something === null) {
+    return newDeserializationError<
+      AasTypes.Container
+    >(
+      "The required property 'something' is missing"
+    );
+  }
+
   return new AasCommon.Either<
     AasTypes.Container,
     DeserializationError
   >(
     new AasTypes.Container(
-      setter.node
+      setter.node,
+      setter.something
     ),
     null
   );
@@ -1345,6 +1514,25 @@ const SETTER_MAP_FOR_BLOSSOM =
     ]
   );
 
+const SETTER_MAP_FOR_SOMETHING =
+  new Map<
+    string,
+    (
+      jsonable: JsonValue
+    ) => DeserializationError | null
+  >(
+    [
+      [
+        "someChoice",
+        SetterForSomething.prototype.setSomeChoiceFromJsonable
+      ],
+      [
+        "somethingWithoutChoice",
+        SetterForSomething.prototype.setSomethingWithoutChoiceFromJsonable
+      ],
+    ]
+  );
+
 const SETTER_MAP_FOR_CONTAINER =
   new Map<
     string,
@@ -1356,6 +1544,10 @@ const SETTER_MAP_FOR_CONTAINER =
       [
         "node",
         SetterForContainer.prototype.setNodeFromJsonable
+      ],
+      [
+        "something",
+        SetterForContainer.prototype.setSomethingFromJsonable
       ],
     ]
   );
@@ -1451,6 +1643,26 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
    * @param that - instance to be serialization
    * @returns JSON-able representation
    */
+  transformSomething(
+    that: AasTypes.Something
+  ): JsonObject {
+    const jsonable: JsonObject = {};
+
+    jsonable["someChoice"] =
+      this.transform(that.someChoice);
+
+    jsonable["somethingWithoutChoice"] =
+      this.transform(that.somethingWithoutChoice);
+
+    return jsonable;
+  }
+
+  /**
+   * Serialize `that` to a JSON-able representation.
+   *
+   * @param that - instance to be serialization
+   * @returns JSON-able representation
+   */
   transformContainer(
     that: AasTypes.Container
   ): JsonObject {
@@ -1458,6 +1670,9 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
 
     jsonable["node"] =
       this.transform(that.node);
+
+    jsonable["something"] =
+      this.transform(that.something);
 
     return jsonable;
   }

@@ -161,6 +161,37 @@ class Verifier
     // No verification has been defined for Blossom.
   }
 
+  *transformSomethingWithContext(
+    that: AasTypes.Something,
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    if (context === true) {
+      for (const error of this.transformWithContext(
+          that.someChoice, context)
+      ) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "someChoice"
+          )
+        );
+        yield error;
+      }
+
+      for (const error of this.transformWithContext(
+          that.somethingWithoutChoice, context)
+      ) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "somethingWithoutChoice"
+          )
+        );
+        yield error;
+      }
+    }
+  }
+
   *transformContainerWithContext(
     that: AasTypes.Container,
     context: boolean
@@ -171,6 +202,18 @@ class Verifier
           new PropertySegment(
             that,
             "node"
+          )
+        );
+        yield error;
+      }
+
+      for (const error of this.transformWithContext(
+          that.something, context)
+      ) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "something"
           )
         );
         yield error;
