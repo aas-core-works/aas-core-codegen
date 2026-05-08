@@ -3,6 +3,40 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.23 (2026-05-08)
+===================
+* Add generation of test code for Java (#599)
+* Handle list of primitives in XSD (#602)
+* Fix integer JSON serialization in C++ (#603)
+* Add xmlization to TypeScript (#607)
+* Discontinue RDF+SHACL and JSON-LD generators (#615)
+* Discontinue OPC-UA generator (#616)
+* Discontinue protobuf generator (#617)
+* Infer schema constraints for values (#618)
+* Support list of non-optionals in XSD (#620)
+
+This version introduces XML de/serialization for the
+TypeScript generator, bringing it to feature parity with the other
+SDK generators.
+
+The Java generator now also generates the unit tests.
+
+We extend XSD support to handle lists of non-optionals such as
+constrained primitives and lists of lists (#604, #620). Schema
+constraint inference was generalized to operate at the value level
+rather than only at the property level (#618), for broader list support.
+
+We fix a bug in the C++ generator where JSON serialization of
+integers was incorrect (#603). The issue was masked because the
+official AAS meta-model does not use integer primitives directly.
+
+Finally, we discontinue the RDF+SHACL, JSON-LD, OPC-UA, and
+protobuf generators. These generators had few or no known active
+users and would have required significant maintenance effort to
+keep up with the new list-of-primitives support. Users relying
+on protobuf, OPC-UA, RDF+SHACL, or JSON-LD output should pin
+to version 0.0.22.
+
 0.0.22 (2026-03-12)
 ===================
 * Add generation of test code for C++ (#594)
