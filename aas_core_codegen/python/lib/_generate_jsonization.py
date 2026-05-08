@@ -1001,13 +1001,21 @@ jsonable[{key_literal}] = (
                 access_expression=Stripped("item"), type_anno=type_anno.items
             )
 
-            block = Stripped(
-                f"""\
+            # NOTE (mristin):
+            # We optimize here to avoid unnecessary comprehension.
+            if transformation_expression == "item":
+                block = Stripped(
+                    f"""\
+jsonable[{key_literal}] = list(that.{prop_name})"""
+                )
+            else:
+                block = Stripped(
+                    f"""\
 jsonable[{key_literal}] = [
 {I}{transformation_expression}
 {I}for item in that.{prop_name}
 ]"""
-            )
+                )
 
         else:
             assert_never(type_anno)
