@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something xmlns="https://dummy.com">
+    <listOfListsOfInts>
+        <v>
+            <v>1</v>
+            <v>2</v>
+        </v>
+        <v>
+            <v>42</v>
+        </v>
+        <v>
+            <v>-7</v>
+            <v>0</v>
+            <v>999999999</v>
+        </v>
+        <v>
+            <v>123</v>
+            <v>456</v>
+        </v>
+    </listOfListsOfInts>
+</something>

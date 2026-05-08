@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<something xmlns="https://dummy.com">
+    <listOfListsOfResults>
+        <v>
+            <v>ok</v>
+            <v>fail</v>
+        </v>
+        <v>
+            <v>ok</v>
+        </v>
+        <v>
+            <v>fail</v>
+            <v>fail</v>
+        </v>
+        <v>
+            <v>ok</v>
+            <v>ok</v>
+            <v>fail</v>
+        </v>
+    </listOfListsOfResults>
+</something>
