@@ -55,7 +55,7 @@ import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             """\
-_REPO_ROOT = pathlib.Path(os.path.realpath(__file__)).parent.parent"""
+_REPO_ROOT = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent"""
         ),
         Stripped(
             '''\

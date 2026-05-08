@@ -15,6 +15,7 @@ import unittest
 import aas_core3.types as aas_types
 
 
+import tests.common
 import tests.common_xmlization
 
 

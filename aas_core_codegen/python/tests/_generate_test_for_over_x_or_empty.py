@@ -133,6 +133,7 @@ import {qualified_module_name}.types as aas_types"""
         ),
         Stripped(
             """\
+import tests.common
 import tests.common_xmlization"""
         ),
     ]

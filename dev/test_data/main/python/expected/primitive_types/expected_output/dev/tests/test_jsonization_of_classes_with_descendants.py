@@ -15,6 +15,7 @@ import unittest
 import dummy.jsonization as aas_jsonization
 
 
+import tests.common
 import tests.common_jsonization
 
 

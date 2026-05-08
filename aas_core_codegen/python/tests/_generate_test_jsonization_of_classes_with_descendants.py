@@ -124,6 +124,7 @@ import {qualified_module_name}.jsonization as aas_jsonization"""
         ),
         Stripped(
             """\
+import tests.common
 import tests.common_jsonization"""
         ),
         _generate_test_case(symbol_table=symbol_table),
