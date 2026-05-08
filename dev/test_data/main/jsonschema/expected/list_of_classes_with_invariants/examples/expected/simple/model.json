@@ -1,0 +1,27 @@
+{
+  "someItems": [
+    {
+      "modelType": "SomeItem",
+      "name": "Widget"
+    },
+    {
+      "modelType": "AnotherItem",
+      "serialNumber": 1001
+    },
+    {
+      "modelType": "SomeItem",
+      "name": "Gadget"
+    }
+  ],
+  "listOfParentlessAndChildless": [
+    {
+      "identifier": "ID-001"
+    },
+    {
+      "identifier": "ID-002"
+    },
+    {
+      "identifier": "ID-003"
+    }
+  ]
+}

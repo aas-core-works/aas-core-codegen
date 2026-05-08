@@ -1,0 +1,8 @@
+{
+  "listOfListsOfResults": [
+    ["ok", "fail"],
+    ["ok"],
+    ["fail", "fail"],
+    ["ok", "ok", "fail"]
+  ]
+}

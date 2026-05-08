@@ -298,6 +298,12 @@ class Test_jsonschema(_TestCase):
             case_name="list_of_classes",
         )
 
+    def test_expected_list_of_classes_with_invariants(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="list_of_classes_with_invariants",
+        )
+
     def test_expected_list_of_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
