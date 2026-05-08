@@ -1,0 +1,14 @@
+{
+  "listOfListsOfItems": [
+    [
+      {"modelType": "SomeItem", "name": "First Item"},
+      {"modelType": "AnotherItem", "serialNumber": 1001}
+    ],
+    [
+      {"modelType": "AnotherItem", "serialNumber": 2002}
+    ],
+    [
+      {"modelType": "SomeItem", "name": "Third Item"}
+    ]
+  ]
+}

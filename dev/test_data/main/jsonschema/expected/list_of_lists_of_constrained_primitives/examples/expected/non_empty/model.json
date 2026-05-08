@@ -1,0 +1,8 @@
+{
+  "listOfListsOfNames": [
+    ["Alice", "Bob"],
+    ["Charlie"],
+    ["Dave", "Eve", "Frank"],
+    ["Grace", "Heidi"]
+  ]
+}
