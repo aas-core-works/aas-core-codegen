@@ -21,6 +21,7 @@ import unittest
 import dummy.types as aas_types
 
 
+import tests.common
 import tests.common_xmlization
 
 

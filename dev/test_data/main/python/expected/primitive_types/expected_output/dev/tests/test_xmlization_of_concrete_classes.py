@@ -18,6 +18,7 @@ import xml.etree.ElementTree as ET
 import dummy.xmlization as aas_xmlization
 
 
+import tests.common
 import tests.common_xmlization
 
 

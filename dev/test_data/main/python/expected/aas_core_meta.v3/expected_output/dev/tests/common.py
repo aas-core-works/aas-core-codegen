@@ -20,7 +20,7 @@ import aas_core3.common as aas_common
 import aas_core3.types as aas_types
 
 
-_REPO_ROOT = pathlib.Path(os.path.realpath(__file__)).parent.parent
+_REPO_ROOT = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
 
 #: Path to the directory which contains input and golden files

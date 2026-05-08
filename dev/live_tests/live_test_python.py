@@ -288,16 +288,27 @@ disable=too-few-public-methods,len-as-condition,duplicate-code,no-else-raise,no-
                 # well.
                 env.pop("PYTHONPATH", None)
 
-                env_var_test_data_dir = f"{env_var_prefix}_TEST_DATA_DIR"
                 env_var_test_record_mode = f"{env_var_prefix}_TESTS_RECORD_MODE"
-
-                env[env_var_test_data_dir] = str(project_dir / "test_data")
                 env[env_var_test_record_mode] = "1"
 
                 print(
                     f"Running "
-                    f"{env_var_test_data_dir}"
-                    f"={env.get(env_var_test_data_dir)} "
+                    f"{env_var_test_record_mode}"
+                    f"={env.get(env_var_test_record_mode)} "
+                    f"{live_tests_common.escape_and_join_command(cmd)} "
+                    f"in {project_dir}"
+                )
+                subprocess.check_call(cmd, cwd=project_dir, env=env)
+
+                # NOTE (mristin):
+                # Parts of the Python tests were accessing tests.common which was not
+                # properly imported. We only run mypy on the library, but not on tests,
+                # so that bug remained uncovered in the live tests. We now re-run
+                # the tests against the recorded traces to avoid the regression.
+
+                env[env_var_test_record_mode] = "0"
+                print(
+                    f"Running the tests again without re-recording with "
                     f"{env_var_test_record_mode}"
                     f"={env.get(env_var_test_record_mode)} "
                     f"{live_tests_common.escape_and_join_command(cmd)} "

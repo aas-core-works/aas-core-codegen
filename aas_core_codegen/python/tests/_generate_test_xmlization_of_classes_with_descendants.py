@@ -149,6 +149,7 @@ import {qualified_module_name}.xmlization as aas_xmlization"""
         ),
         Stripped(
             """\
+import tests.common
 import tests.common_xmlization"""
         ),
         _generate_test_case(symbol_table=symbol_table),
