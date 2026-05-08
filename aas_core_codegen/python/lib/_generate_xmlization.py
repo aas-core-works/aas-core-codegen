@@ -964,7 +964,7 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                 read_item_cls_as_element = Identifier(
                     _READ_FUNCTION_BY_PRIMITIVE_TYPE[type_anno.items.a_type]
                 )
-                items_type = Stripped(str(type_anno.items.a_type))
+                items_type = python_common.PRIMITIVE_TYPE_MAP[type_anno.items.a_type]
             else:
                 raise AssertionError(
                     "(mristin, 2022-10-09) We handle only lists of classes and primitive types"
