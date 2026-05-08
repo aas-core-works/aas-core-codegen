@@ -1,0 +1,5 @@
+<leaf xmlns="https://dummy.com">
+  <identifier>leaf-max-001</identifier>
+  <description>maximal leaf description</description>
+  <value>214748364</value>
+</leaf>

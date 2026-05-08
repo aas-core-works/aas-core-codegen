@@ -1,0 +1,23 @@
+<container xmlns="https://dummy.com">
+  <node>
+    <branch>
+      <identifier>nested-branch-min</identifier>
+      <description>nested branch</description>
+    </branch>
+  </node>
+  <something>
+    <someChoice>
+      <leaf>
+        <identifier>nested-leaf-in-container-min</identifier>
+        <description>nested leaf in container minimal</description>
+        <value>11</value>
+      </leaf>
+    </someChoice>
+    <somethingWithoutChoice>
+      <branch>
+        <identifier>nested-branch-in-container-min</identifier>
+        <description>nested branch in container minimal</description>
+      </branch>
+    </somethingWithoutChoice>
+  </something>
+</container>

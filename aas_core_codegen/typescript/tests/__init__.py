@@ -5,9 +5,13 @@ from aas_core_codegen.typescript.tests import (
     _generate_common_base64_spec,
     _generate_common_base64url_spec,
     _generate_common_jsonization,
+    _generate_common_xmlization,
     _generate_jsonization_concrete_classes_spec,
     _generate_jsonization_enums_spec,
     _generate_jsonization_interfaces_spec,
+    _generate_xmlization_concrete_classes_spec,
+    _generate_xmlization_enums_spec,
+    _generate_xmlization_interfaces_spec,
     _generate_types_casts_spec,
     _generate_types_descend_and_pass_through_visitor_spec,
     _generate_types_descend_once_spec,
@@ -22,11 +26,17 @@ generate_common = _generate_common.generate
 generate_common_base64_spec = _generate_common_base64_spec.generate
 generate_common_base64url_spec = _generate_common_base64url_spec.generate
 generate_common_jsonization = _generate_common_jsonization.generate
+generate_common_xmlization = _generate_common_xmlization.generate
 generate_jsonization_concrete_classes_spec = (
     _generate_jsonization_concrete_classes_spec.generate
 )
 generate_jsonization_enums_spec = _generate_jsonization_enums_spec.generate
 generate_jsonization_interfaces_spec = _generate_jsonization_interfaces_spec.generate
+generate_xmlization_concrete_classes_spec = (
+    _generate_xmlization_concrete_classes_spec.generate
+)
+generate_xmlization_enums_spec = _generate_xmlization_enums_spec.generate
+generate_xmlization_interfaces_spec = _generate_xmlization_interfaces_spec.generate
 generate_types_casts_spec = _generate_types_casts_spec.generate
 generate_types_descend_and_pass_through_visitor_spec = (
     _generate_types_descend_and_pass_through_visitor_spec.generate

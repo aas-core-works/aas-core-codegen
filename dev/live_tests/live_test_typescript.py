@@ -175,7 +175,8 @@ def main() -> int:
     "rollup": "^3.10.0",
     "ts-jest": "^29.0.3",
     "typedoc": "^0.23.22",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "xmlsax-typescript": "^1.0.0-rc.2"
   }},
   "main": "dist/lib/cjs/index.js",
   "module": "dist/lib/esm/index.js",
@@ -271,12 +272,18 @@ def main() -> int:
   "rules": {
     "no-console": 2,
     "prettier/prettier": 2,
+    "no-constant-condition": [
+      "error",
+      {
+        "checkLoops": false
+      }
+    ],
     // See: https://stackoverflow.com/a/64067915/1600678
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
-        "varsIgnorePattern": "^(_|Aas.*)$"
+        "varsIgnorePattern": "^(_|Aas.*|.*FromJsonable|.*FromXmlElement|parse.*|serialize.*)$"
       }
     ]
   }

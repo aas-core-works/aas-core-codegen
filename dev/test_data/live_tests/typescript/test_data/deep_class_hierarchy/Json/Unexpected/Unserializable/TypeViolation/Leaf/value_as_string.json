@@ -1,0 +1,6 @@
+{
+  "modelType": "Leaf",
+  "identifier": "leaf-bad",
+  "description": "wrong value type",
+  "value": "not-an-int"
+}

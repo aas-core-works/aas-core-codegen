@@ -1,0 +1,5 @@
+<leaf>
+  <identifier>leaf-bad</identifier>
+  <description>wrong value type</description>
+  <value>not-an-int</value>
+</leaf>

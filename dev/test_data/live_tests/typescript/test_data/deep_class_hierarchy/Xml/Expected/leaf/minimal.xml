@@ -1,0 +1,5 @@
+<leaf xmlns="https://dummy.com">
+  <identifier>leaf-min</identifier>
+  <description>minimal leaf</description>
+  <value>1</value>
+</leaf>

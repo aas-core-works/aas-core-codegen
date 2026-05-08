@@ -1,0 +1,6 @@
+{
+  "node": {
+    "identifier": "nested-bad",
+    "description": "missing modelType"
+  }
+}
