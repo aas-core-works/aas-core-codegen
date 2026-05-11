@@ -62,7 +62,6 @@ You also have to install the development dependencies, including different devel
 Background Literature
 =====================
 Please make yourself familiar with a general literature on compiler design.
-
 For example, `Crafting Interpreters`_ is a good book.
 
 .. _Crafting Interpreters: https://craftinginterpreters.com/
@@ -73,6 +72,359 @@ Please also read relevant publications related to the aas-core-codegen:
 * https://www.researchgate.net/publication/356039469_Generative_and_Model-driven_SDK_development_for_the_Industrie_40_Digital_Twin,
 * https://www.researchgate.net/publication/373325991_Generation_of_Digital_Twins_for_Information_Exchange_Between_Partners_in_the_Industrie_40_Value_Chain,
 
+Structure Overview
+==================
+Directory Structure
+-------------------
+The repository is organized as follows:
+
+.. code-block::
+
+    aas-core-codegen/
+    ├── aas_core_codegen/       Main Python package
+    │   ├── common.py           Shared data structures and functions
+                                (Error, Identifier, *etc.*)
+    │   ├── main.py             Entry point (aas-core-codegen console command)
+    │   ├── run.py              Run logic shared across generators
+                                (coupled to main.py, but also used in tests)
+    │   ├── naming.py           Generation of target-specific names based on identifiers
+    │   ├── specific_implementations.py  Look-up of implementation-specific snippets
+    │   ├── stringify.py        Debug stringification of internal structures
+    │   ├── parse/              Parsing meta-model source files into an AST
+    │   ├── intermediate/       Intermediate Representation (IR)
+    │   ├── infer_for_schema/   Schema-constraint inference from the IR
+    │   ├── yielding/           Linearized yielding for languages without yield
+    │   ├── smoke/              Verify a model by running a smoke-test transpilation
+    │   ├── cpp/                C++ SDK generator
+    │   ├── csharp/             C# SDK generator
+    │   ├── golang/             Go SDK generator
+    │   ├── java/               Java SDK generator
+    │   ├── jsonschema/         JSON Schema generator
+    │   ├── python/             Python SDK generator
+    │   ├── typescript/         TypeScript SDK generator
+    │   └── xsd/                XSD schema generator
+    ├── dev/                    Development tooling (separate installable package)
+    │   ├── continuous_integration/  Pre-commit and CI scripts
+    │   ├── dev_scripts/        Developer helper scripts
+    │   ├── live_tests/         Live end-to-end tests against temporary-generated SDKs
+    │   ├── tests/              Unit and integration tests
+    │   └── test_data/          Golden test data (recorded expected output)
+    ├── pyproject.toml          Package configuration and entry-point declaration
+    ├── CONTRIBUTING.rst        This file
+    ├── README.rst              Project overview and usage instructions
+    └── CHANGELOG.rst           Release notes
+
+The main package lives under `aas_core_codegen/`_.
+The development tooling -- scripts, tests (both integration and unit), pre-commit checks, *etc.* -- lives under `dev/`_.
+For example, the script to convert an existing file into a sequence of stripped text blocks lives at
+`dev/dev_scripts/convert_file_into_sequence_of_stripped_blocks.py`_.
+
+.. _aas_core_codegen/: https://github.com/aas-core-works/aas-core-codegen/tree/main/aas_core_codegen
+.. _dev/: https://github.com/aas-core-works/aas-core-codegen/tree/main/dev
+.. _dev/dev_scripts/convert_file_into_sequence_of_stripped_blocks.py: https://github.com/aas-core-works/aas-core-codegen/blob/main/dev/dev_scripts/convert_file_into_sequence_of_stripped_blocks.py
+
+Module Structure
+----------------
+The main entry point is ``aas_core_codegen/main.py``, which corresponds to the ``aas-core-codegen`` console command declared in ``pyproject.toml``.
+It delegates the bulk of the work to ``run.py``, which contains the run logic shared across generators and is also used directly in tests.
+
+The transpilation pipeline follows three major stages, as described in the `background literature <Background Literature_>`_: parsing the formalized meta-modelinto an AST, interpreting the AST into an Intermediate Representation (IR), and finally generating code from the IR for each target language.
+
+``parse/`` -- Parse the Meta-model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``parse`` module takes the source of the formalized AAS meta-model -- written in a strongly-reduced subset of Python -- and translates it into a parsed AST.
+The Python source is first tokenised with the ``asttokens`` library (``_translate.source_to_atok``), then walked and translated into our own typed structures (``_translate.atok_to_symbol_table``).
+
+The result is a ``SymbolTable`` holding all the classes, enumerations, constants and constrained primitives found in the meta-model source.
+Each of these objects is an instance of one of the types defined in ``_types.py`` (``AbstractClass``, ``ConcreteClass``, ``Enumeration``, *etc.*).
+At this stage all cross-references -- superclasses, property types, method argument types -- are still plain ``Identifier`` strings; they are resolved only in the ``intermediate`` stage.
+
+``parse/tree.py`` provides our custom AST for constraint expressions.
+It is a deliberate simplification of the full Python AST: only the constructs that appear in meta-model constraints are represented.
+Nodes carry a reference back to the original ``ast.AST`` node for error reporting.
+The module exposes ``Visitor`` and ``Transformer`` base classes for working with the tree.
+
+``parse/retree/`` provides parsing and manipulation of the regular expressions that appear in meta-model constraints.
+Because target languages have incompatible regex flavours -- in particular, C# cannot express character points above the UTF-16 range as a single literal -- we parse regexes into our own AST (``retree._types``) and re-render them per target platform *via* ``retree._render``.
+The ``retree._fix`` module applies the platform-specific fixes; the ``retree._parse`` module contains the parser; and ``retree._visitor`` provides a visitor base class for the regex AST.
+
+``intermediate/`` -- Intermediate Representation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``intermediate`` module interprets the parsed ``SymbolTable`` into a semantically
+richer Intermediate Representation.
+Whereas the ``parse`` module focuses purely on syntax, ``intermediate`` resolves cross-references, infers types, and crystallises the semantics needed by the code generators.
+
+The translation is a **two-pass process** (implemented in ``_translate.py``):
+
+* **First pass** -- all ``OurType`` symbols (classes, enumerations, constrained primitives) are instantiated as placeholder objects and collected into a symbol table.
+* **Second pass** -- each placeholder is populated: string-based references in properties, method signatures, inheritance lists, and constraint expressions are resolved to the actual symbol objects created in the first pass.
+
+The types of the IR live in ``_types.py``.
+They are mutated during the two-pass translation but are thereafter treated as immutable (see ``Final`` and Constant Containers in the `Coding Style Guide`_).
+
+The remaining submodules each handle one aspect of the interpretation:
+
+* ``type_inference.py`` -- infers a type for every node in a ``parse.tree`` constraint expression.
+  The types roughly follow the annotations in ``_types.py`` but are not identical; for example, a ``LENGTH`` pseudo-primitive exists only during type inference.
+* ``construction.py`` -- analyses constructor bodies to understand how each class initialises its properties.
+* ``pattern_verification.py`` -- analyses pattern-verification functions (functions defined in a meta-model that check a string against a regular expression), and records them in the IR so generators can emit the corresponding checks.
+* ``revm.py`` -- transpiles regular expressions to instructions for a non-backtracking virtual machine (based on Ken Thompson's approach).
+  The regular expression engines in many standard libraries (such as Java or C++) have exponential worst-case complexity on certain inputs; the VM provides linear-time matching and is used wherever the target language does not ship a comparable engine.
+* ``doc.py`` -- types for resolved references inside docstrings.
+  Documentation is parsed from RST-formatted docstrings and the symbol references within it are resolved to IR symbols.
+* ``_hierarchy.py`` -- builds an ontology of the class hierarchy (ancestors, descendants, topological order) that generators query when emitting visitor dispatching or inheritance-related code.
+
+``infer_for_schema/`` -- Schema Constraint Inference
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Schemas such as JSON Schema and XSD can express only a subset of the constraints found in the IR (lengths, patterns, enumeration membership).
+The ``infer_for_schema`` module walks the constraint ASTs and matches structural patterns to extract the constraints that a schema can represent.
+The result is a set of ``LenConstraint``, ``PatternConstraint``, *etc.* objects that the schema generators consume directly.
+The matching logic lives in ``infer_for_schema/match.py``.
+
+``yielding/`` -- Linearized Yielding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Some target languages (most notably C++) lack a native ``yield`` / generator construct.
+For those languages, code that would naturally be written as a generator must instead be linearized into an explicit state machine.
+The ``yielding`` module transforms a control-flow graph that uses ``yield`` into a sequence of coroutine-compatible steps that can be rendered as a ``while``/``switch`` loop in the target language.
+
+Language SDK Generators
+-----------------------
+Each supported language has its own generator package under ``aas_core_codegen/<language>/``.
+The packages share a consistent internal layout described below.
+
+``main.py``
+^^^^^^^^^^^
+The entry point for an SDK generator.
+It receives the ``SymbolTable`` from ``intermediate`` and orchestrates calls to the submodules in ``lib/`` to produce the full SDK output on disk.
+
+Shared Modules
+^^^^^^^^^^^^^^
+Each generator contains a set of modules shared across its ``lib/`` submodules:
+
+* ``common.py`` -- helper functions and constants used by multiple submodules within the same generator.
+  Examples include formatting utilities, primitive-type mappings, or reusable code fragments.
+* ``naming.py`` -- derives language-idiomatic names (classes, interfaces, properties, methods, *etc.*) from the ``Identifier`` strings in the IR.
+  For example, how to derive an interface name in Go or a property name in TypeScript from the IR identifier.
+* ``description.py`` -- renders the documentation from the IR into the language-specific comment syntax (Sphinx docstrings for Python, XML doc-comments for C#, JSDoc for TypeScript, *etc.*).
+* ``transpilation.py`` -- translates ``parse.tree`` constraint expressions from the IR into executable code in the target language.
+  This covers the bodies of invariant checks and verification functions.
+* ``unrolling.py`` -- generates nested looping code for recursively typed properties (lists of lists, *etc.*).
+  For example, when verifying or serializing a property typed as ``List[List[str]]``, ``unrolling.py`` produces the corresponding nested iterations.
+
+``lib/``
+^^^^^^^^
+Each submodule in ``lib/`` is responsible for generating one component of the output SDK.
+The naming ``_generate_<component>.py`` mirrors the component it produces.
+Most languages share the following components in the generated SDK:
+
+* ``types`` -- data structures representing the meta-model classes and enumerations.
+* ``constants`` -- global constant values defined in the meta-model (*e.g.*, constant sets of strings).
+* ``stringification`` -- functions to convert enumerations to and from their string representations.
+* ``jsonization`` -- de/serialization of model instances to and from JSON.
+* ``xmlization`` -- de/serialization of model instances to and from XML.
+* ``verification`` -- functions that check the invariants defined in the meta-model.
+* ``common`` -- helpers shared across the generated SDK components.
+
+Additional components appear where the language or its community conventions require them:
+
+* ``reporting`` (C#, Go, Java) -- data structures and utilities for collecting and formatting de/serialization and verification errors, used in languages where exception-based error propagation is not the preferred idiom.
+* ``enhancing`` (C#, C++, Go, Java) -- wrapping and unwrapping model instances with custom user-defined data without modifying the generated types; see the `documentation on enhancing in Go`_.
+* ``visitation`` (C#, C++, Java) -- ``Visitor`` and ``Transformer`` base classes for traversing the model hierarchy; see `Visitor pattern`_.
+* ``copying`` (C#, Java) -- functions to produce deep copies of model instances.
+* ``generation`` (Java) -- builder classes for constructing model instances incrementally.
+* ``index`` (TypeScript) -- a barrel ``index.ts`` file that re-exports all public symbols from the other SDK modules.
+* ``iteration`` (C++) -- free functions to descend into and iterate over model instances, serving the same role that ``visitation`` fills for class-based languages.
+* ``revm`` (C++) -- regular expressions, emitted because C++ lacks a cross-platform, linear-time regex engine in its standard library.
+* ``wstringification`` (C++) -- wide-string (``std::wstring``) variants of the stringification functions.
+
+.. _documentation on enhancing in Go: https://github.com/aas-core-works/aas-core3.1-golang#enhancing
+.. _Visitor pattern: https://en.wikipedia.org/wiki/Visitor_pattern
+
+``tests/``
+^^^^^^^^^^
+Each submodule in ``tests/`` generates source files for the SDK's own test suite.
+The generated tests cover serialization round-trips, verification of valid and invalid instances, visitor traversal, and other SDK-level contracts.
+The submodules follow the same naming convention as ``lib/``: one ``_generate_<component>`` module per test suite produced.
+
+Language-specific Modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Some languages require additional inference before code can be emitted.
+These inferences live in dedicated modules at the top level of the generator package:
+
+* ``golang/pointering.py`` -- determines which IR nodes correspond to Go pointer (``*T``) types versus value types.
+  Go distinguishes them at the syntax level, so the generator must resolve nullability before rendering any expression.
+* ``cpp/optionaling.py`` -- analogous to ``pointering.py`` for C++: determines which nodes carry ``std::optional<T>`` types.
+* ``cpp/yielding.py`` -- emits the linearized coroutine steps produced by ``aas_core_codegen.yielding`` into C++ syntax (``while``/``switch`` state machines).
+* ``java/optional.py`` -- determines which nodes use ``Optional<T>`` versus bare types in Java.
+
+Live Tests
+----------
+The live tests are end-to-end integration scripts that verify the generated SDKs are not only textually correct but also actually compile, type-check, and pass their own unit tests.
+They live in `dev/live_tests/`_ and are run manually -- they are not part of the pre-commit pipeline because they require language-specific toolchains that are not universally available.
+
+.. _dev/live_tests/: https://github.com/aas-core-works/aas-core-codegen/tree/main/dev/live_tests
+
+One script exists per supported language:
+
+* ``dev/live_tests/live_test_cpp.py`` -- C++
+* ``dev/live_tests/live_test_csharp.py`` -- C#
+* ``dev/live_tests/live_test_golang.py`` -- Go
+* ``dev/live_tests/live_test_python.py`` -- Python
+* ``dev/live_tests/live_test_typescript.py`` -- TypeScript
+
+How a Live Test Works
+^^^^^^^^^^^^^^^^^^^^^
+Each script iterates over the golden test cases recorded in ``dev/test_data/main/<language>/expected/``.
+For every case it:
+
+1. Copies the expected output files (the generated SDK source) into a temporary working directory (or into ``--output_dir`` if given).
+2. Synthesizes the project boilerplate that is not part of the generated SDK itself -- build files, dependency manifests, project configuration -- because the code generator only produces the library source, not a complete project.
+3. Compiles (or type-checks) the assembled project.
+4. If a matching sub-directory exists under ``dev/test_data/live_tests/<language>/test_data/<case>/``, copies that test data into the project and runs the generated SDK's own unit test suite.
+   The tests are first executed in *record mode* (the ``*_TEST_RECORD_MODE`` environment variable is set to ``1``) so that any missing golden traces are written out.
+
+Command-line Options
+^^^^^^^^^^^^^^^^^^^^
+All live-test scripts accept the same two options:
+
+``--output_dir PATH``
+    Write the assembled project into ``PATH`` instead of a temporary directory.
+    The directory is **not** deleted after the run, which is useful for inspecting failures or iterating on a fix.
+    If omitted, a temporary directory is created and removed automatically.
+
+``--select REGEX``
+    Run only the test cases whose directory name matches the given regular expression.
+    For example, ``--select primitive_types`` runs only the ``primitive_types`` case.
+
+Prerequisites
+^^^^^^^^^^^^^
+Each script requires the corresponding language toolchain to be installed and available on ``PATH``:
+
+*C++*
+    ``cmake`` and a C++ compiler.
+    Dependencies (``nlohmann-json``, ``expat``, ``tl-optional``, ``tl-expected``) are managed via `vcpkg`_.
+    The ``VCPKG_ROOT`` environment variable must point to the root of a vcpkg installation.
+
+    .. _vcpkg: https://github.com/microsoft/vcpkg
+
+*C#*
+    The .NET SDK (``dotnet`` command).
+    The script targets ``net6.0``.
+
+*Go*
+    The ``go`` toolchain and ``goimports``.
+    Install ``goimports`` with:
+
+    .. code-block::
+
+        go install golang.org/x/tools/cmd/goimports@latest
+
+    The script looks for ``goimports`` on ``PATH`` and falls back to ``~/go/bin/goimports``.
+
+*Python*
+    Python 3.9 or later (the same interpreter that runs the script).
+    The script creates a dedicated virtual environment inside the temporary project directory and installs ``mypy`` and ``pylint`` to type-check and lint the generated code before running the tests.
+
+*TypeScript*
+    ``node`` and ``npm``.
+    The script installs all dependencies *via* ``npm install`` and then runs lint, build, and jest tests.
+
+Development Scripts
+-------------------
+The development scripts in `dev/dev_scripts/`_ assist with the development tasks such as authoring code-generation templates and debugging regex handling.
+
+.. _dev/dev_scripts/: https://github.com/aas-core-works/aas-core-codegen/tree/main/dev/dev_scripts
+
+``convert_file_into_sequence_of_stripped_blocks.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The code generators build their output from ``Stripped(...)`` string blocks in which indentation is expressed as ``{I}``, ``{II}``, ``{III}``, *etc.* placeholders (one ``I`` per indentation level) rather than literal spaces or tabs.
+Writing these blocks by hand is tedious and error-prone.
+This script automates the conversion: given a plain source file it splits the content into top-level blocks (separated by blank lines that are not inside an indented region), escapes backslashes and curly brackets, and replaces leading indentation with the corresponding placeholder.
+The result is printed to stdout as a series of ``Stripped(...)`` expressions ready to be pasted into a generator module.
+
+``replace-curly-brackets-backslashes-and-*-indent.html``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Three browser-based (no server required) equivalents of ``convert_file_into_sequence_of_stripped_blocks.py``, one per indentation style:
+
+* ``replace-curly-brackets-backslashes-and-four-space-indent.html``
+* ``replace-curly-brackets-backslashes-and-two-space-indent.html``
+* ``replace-curly-brackets-backslashes-and-tab-indent.html``
+
+Open the appropriate file in a browser, paste a code snippet into the upper text area, and the lower text area immediately shows the escaped and placeholder-substituted result.
+Checkboxes allow suppressing backslash or curly-bracket escaping when they are not needed.
+A *Copy* button copies the output to the clipboard.
+These pages are most convenient for converting small ad-hoc snippets interactively, whereas the Python script is better suited for processing entire files.
+
+``compare_rendered_regexes_against_source_py.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``parse/retree/`` module re-renders regular expressions into platform-specific forms.
+For each test case under ``dev/test_data/parse_retree/expected/`` the test data contains a ``source.py`` file (the original Python-literal regex) and a ``rendered_regex.txt`` file (the expected re-rendered form).
+This script walks all those pairs and prints the cases where the ``repr`` of ``rendered_regex.txt`` no longer matches ``source.py``, making it easy to spot regressions or inconsistencies after changes to the regex renderer.
+
+``draw_bipartite_graph_based_on_lines.py``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+When large blocks of generated code are reordered rather than changed, ``diff`` output becomes noisy and hard to read.
+This script helps by treating each line as a node and printing, for every line in ``--ours`` that also appears in ``--theirs``, the pair of line numbers.
+The resulting bipartite mapping shows which blocks have simply moved, making it easier to identify a minimal reordering and to verify that no content was accidentally lost.
+
+Test Data
+---------
+Almost all tests in ``dev/tests/`` are *golden tests*: the test runs the production code, serialises the result to text, and compares it against a pre-recorded expected file.
+If the ``AAS_CORE_CODEGEN_TESTS_RERECORD`` environment variable is set, the test writes it (record mode); on subsequent runs without this environment variable the test fails if the output differs from the recorded file.
+This makes it easy to review changes: ``git diff dev/test_data/`` shows exactly what the output of the generators changed.
+
+The golden files live in ``dev/test_data/``.
+The sub-directory structure mirrors the test-module structure: a test in ``dev/tests/cpp`` looks for its golden data under ``dev/test_data/cpp/``.
+
+Each top-level sub-directory of ``dev/test_data/`` serves a distinct purpose:
+
+``common_meta_models/``
+    Meta-model source files that are reused by multiple test suites.
+    For example, ``common_meta_models/aas_core_meta.v3.py`` is the full AAS V3.0 meta-model and is referenced by the intermediate and end-to-end main tests.
+
+``parse/``
+    Golden data for ``dev/tests/parse/``, which tests the ``aas_core_codegen.parse`` module.
+    Cases are split into ``expected/`` (valid meta-models that must parse successfully) and ``unexpected/`` (meta-models that must fail with a specific error).
+    Each leaf directory contains a ``meta_model.py`` (the input) and either an ``expected_symbol_table.txt`` (the serialised parse result) or an ``expected_error.txt`` (the expected error message).
+
+``parse_retree/``
+    Golden data for ``dev/tests/parse_retree/``, which tests the ``aas_core_codegen.parse.retree`` regex parser and renderer.
+    Each leaf directory under ``expected/`` contains ``source.py`` (the input regex string literal), ``expected_parsed_regex.txt`` (the serialised regex AST), and ``rendered_regex.txt`` (the re-rendered platform-neutral form).
+    Leaf directories under ``unexpected/`` contain ``source.py`` and ``expected_error.txt``.
+
+``intermediate/``
+    Golden data for ``dev/tests/intermediate/``, which tests the ``aas_core_codegen.intermediate`` module.
+    The layout mirrors ``parse/``: ``expected/`` cases contain ``meta_model.py`` and ``expected_symbol_table.txt``; ``unexpected/`` cases contain ``meta_model.py`` and ``expected_error.txt``.
+
+``intermediate_revm/``
+    Golden data for the REVM (regular-expression virtual machine) tests in ``dev/tests/intermediate/``.
+    Each case has ``expected/`` and ``unexpected/`` sub-trees, following the same convention as ``intermediate/``.
+
+``smoke/``
+    Golden data for ``dev/tests/smoke/``, which runs a smoke transpilation over every meta-model under ``smoke/test_main/expected/`` and verifies that the transpilation either succeeds or fails with a known error.
+    ``unexpected/`` cases each contain a ``meta_model.py`` and an ``expected_stderr.txt``.
+
+``main/``
+    The most important test data directory: end-to-end golden tests that run the full transpilation pipeline for every target language.
+    The structure is ``main/<language>/expected/<case>/``.
+    Each case directory contains:
+
+    * ``meta_model.py`` -- the input meta-model.
+    * ``input/snippets/`` -- implementation-specific snippets supplied to the generator.
+    * ``expected_output/`` -- the expected SDK source tree produced by the generator, stored file-by-file.
+
+    These expected outputs serve a dual purpose: they are compared against during the test run *and* they are copied into the temporary project by the live tests (see `Live Tests`_).
+
+``csharp/``
+    Unit-test golden data for individual C# generator modules, *e.g.*,
+    ``csharp/test_types/`` for ``_generate_types.py`` and ``csharp/test_verification/`` for ``_generate_verification.py``.
+    Each leaf directory contains ``meta_model.py`` and an expected ``.cs`` snippet file that covers only the module under test, not a full SDK output.
+
+``live_tests/``
+    Test data used by the generated SDK's own unit tests when running under a live test.
+    The structure is ``live_tests/<language>/test_data/<case>/``.
+    Each case directory contains serialised AAS instances (organised as ``Json/`` and ``Xml/`` sub-directories) that the generated test suite reads to verify de/serialisation round-trips and constraint checking.
+    See `Live Tests`_ for how this data is consumed.
 
 Coding Style Guide
 ==================
@@ -306,13 +658,3 @@ We follow Chris Beams' `guidelines on commit messages`_:
 If you are merging in a pull request, please squash before merging.
 We want to keep the Git history as simple as possible, and the commits during the development are rarely insightful later.
 
-Development Scripts
-===================
-We need to frequently back-propagate test data from `aas-core-meta`_ repository.
-To facilitate fetching and re-recording test output whenever the meta-models change, we wrote a couple of scripts in `dev_scripts/`_.
-
-The scripts are hopefully self-explaining.
-Please let us know if you need more information so that we can improve this documentation accordingly.
-
-.. _aas-core-meta: https://github.com/aas-core-works/aas-core-meta/
-.. _dev_scripts/: https://github.com/aas-core-works/aas-core-codegen/tree/main/dev_scripts
