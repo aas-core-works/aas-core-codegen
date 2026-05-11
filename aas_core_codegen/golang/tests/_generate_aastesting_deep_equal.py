@@ -117,19 +117,76 @@ if !DeepEqual(
                 # noinspection PyTypeChecker
                 assert_never(type_anno.our_type)
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+
             assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
             ), (
-                f"NOTE (mristin): We expect only lists of classes "
-                f"at the moment, but you specified {type_anno}. "
+                f"NOTE (mristin): We expect only lists of atomic values at the moment, "
+                f"but you specified {type_anno}. "
                 f"Please contact the developers if you need this feature."
             )
 
-            cmp_subblock = Stripped(
-                f"""\
+            # fmt: off
+            direct_comparison_possible =  (
+                isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
+                or (
+                    isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                    and isinstance(
+                        type_anno.items.our_type,
+                        (
+                            intermediate.Enumeration,
+                            intermediate.ConstrainedPrimitive
+                        )
+                    )
+                )
+            )
+            # fmt: on
+
+            if direct_comparison_possible:
+                items_primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+                if items_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                    cmp_subblock = Stripped(
+                        f"""\
+if 
+{I}len({that_var}) !=
+{I}len({other_var}) {{
+{I}return false
+}}
+for i := range {that_var} {{
+{I}if !bytes.Equal({that_var}[i], {other_var}[i]) {{
+{II}return false
+{I}}}
+}}"""
+                    )
+                else:
+                    cmp_subblock = Stripped(
+                        f"""\
+if 
+{I}len({that_var}) !=
+{I}len({other_var}) {{
+{I}return false
+}}
+for i := range {that_var} {{
+{I}if {that_var}[i] != {other_var}[i] {{
+{II}return false
+{I}}}
+}}"""
+                    )
+
+            else:
+                # fmt: off
+                assert (
+                    isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                    and isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass)
+                    )
+                )
+                # fmt: on
+
+                cmp_subblock = Stripped(
+                    f"""\
 if 
 {I}len({that_var}) !=
 {I}len({other_var}) {{
@@ -143,10 +200,7 @@ for i := range {that_var} {{
 {II}return false
 {I}}}
 }}"""
-            )
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
+                )
 
         assert cmp_subblock is not None
 

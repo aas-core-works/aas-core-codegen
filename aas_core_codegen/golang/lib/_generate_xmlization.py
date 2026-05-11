@@ -647,6 +647,94 @@ type Scalar interface {{
     )
 
 
+def _generate_read_list_of_scalars() -> Stripped:
+    return Stripped(
+        f"""\
+// Read a list of scalars, *i.e.*, non-instances as a sequence of `<v>` elements.
+//
+// The item is serialized as text in the `<v>` element.
+//
+// Every start element is considered to mark the start of an item serialization. We
+// stop the reading as soon as we encounter a non-start element.
+//
+// That last non-start element is returned as `next` element.
+func readListOfScalars[T Scalar](
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}readTextAsT func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{I}) (value T, aNext xml.Token, anErr error),
+) (values []T, next xml.Token, err error) {{
+{I}i := 0
+{I}for {{
+{II}current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}if _, ok := current.(xml.StartElement); !ok {{
+{III}break
+{II}}}
+
+{II}var local string
+{II}local, err = parseAsStartElementAndExtractLocalName(
+{III}current,
+{II})
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}if local != "v" {{
+{III}err = newDeserializationError(
+{IIII}fmt.Sprintf(
+{IIIII}"Expected start element 'v' as a delimiter for a list of values, "+
+{IIIIII}"but got %s",
+{IIIII}local,
+{IIII}),
+{III})
+{II}}}
+
+{II}// Move the current to the value
+{II}current, err = readNext(decoder, current)
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}var value T
+{II}var valueErr error
+{II}value, current, valueErr = readTextAsT(decoder, current)
+{II}if valueErr != nil {{
+{III}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
+{IIII}deseriaErr.Path.PrependIndex(
+{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIII})
+{III}}}
+{III}err = valueErr
+{III}return
+{II}}}
+
+{II}values = append(values, value)
+
+{II}i++
+
+{II}err = checkEndElement(current, local)
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}current, err = readNext(decoder, nil)
+{II}if err != nil {{
+{III}return
+{II}}}
+{I}}}
+
+{I}next = current
+{I}return
+}}"""
+    )
+
+
 def _generate_read_list_of_instances() -> Stripped:
     return Stripped(
         f"""\
@@ -901,30 +989,88 @@ if valueErr == nil {{
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
             ), (
-                f"NOTE (mristin): We expect only lists of classes "
+                f"NOTE (mristin): We expect only lists of atomic values "
                 f"at the moment, but you specified {type_anno}. "
                 f"Please contact the developers if you need this feature."
             )
 
-            read_item_function = golang_naming.private_function_name(
-                Identifier(f"read_{type_anno.items.our_type.name}_with_lookahead")
-            )
+            items_primitive_type = intermediate.try_primitive_type(type_anno.items)
 
-            case_body_blocks.append(
-                Stripped(
-                    f"""\
+            if items_primitive_type is not None:
+                read_text_function = _READ_FUNCTION_BY_PRIMITIVE_TYPE[
+                    items_primitive_type
+                ]
+
+                case_body_blocks.append(
+                    Stripped(
+                        f"""\
+{prop_var}, current, valueErr = readListOfScalars(
+{I}decoder,
+{I}current,
+{I}{read_text_function},
+)"""
+                    )
+                )
+            else:
+                if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                    raise AssertionError(
+                        "This code path should have been handled before, "
+                        "in the try-primitive-type branch."
+                    )
+
+                elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                    if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                        read_text_function = golang_naming.private_function_name(
+                            Identifier(f"read_text_as_{type_anno.items.our_type.name}")
+                        )
+
+                        case_body_blocks.append(
+                            Stripped(
+                                f"""\
+{prop_var}, current, valueErr = readListOfScalars(
+{I}decoder,
+{I}current,
+{I}{read_text_function},
+)"""
+                            )
+                        )
+                    elif isinstance(
+                        type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                    ):
+                        raise AssertionError(
+                            "This code path should have been handled before, "
+                            "in the try-primitive-type branch."
+                        )
+                    elif isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    ):
+                        read_item_function = golang_naming.private_function_name(
+                            Identifier(
+                                f"read_{type_anno.items.our_type.name}_with_lookahead"
+                            )
+                        )
+
+                        case_body_blocks.append(
+                            Stripped(
+                                f"""\
 {prop_var}, current, valueErr = readListOfInstances(
 {I}decoder,
 {I}current,
 {I}{read_item_function},
 )"""
-                )
-            )
+                            )
+                        )
+
+                    else:
+                        # noinspection PyTypeChecker
+                        assert_never(type_anno.items.our_type)
+                else:
+                    # noinspection PyTypeChecker
+                    assert_never(type_anno.items)
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
@@ -1876,6 +2022,72 @@ func writeListOfInstancesProperty[T aastypes.IClass](
     )
 
 
+def _generate_write_list_of_scalars_property() -> Stripped:
+    return Stripped(
+        f"""\
+// Serialize the list of scalars as a sequence of XML `<v>` elements
+// enclosed in a parent XML element with the `local` name.
+func writeListOfScalarsProperty[T Scalar](
+{I}encoder *xml.Encoder,
+{I}local string,
+{I}list []T,
+{I}writeTAsText func(anEncoder *xml.Encoder, aValue T) (anErr error),
+) (err error) {{
+{I}err = writeStartElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}for i, item := range list {{
+{II}err = writeStartElement(
+{III}encoder,
+{III}"v",
+{III}false,
+{II})
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}err = writeTAsText(encoder, item)
+{II}if err != nil {{
+{III}if seriaErr, ok := err.(*SerializationError); ok {{
+{IIII}seriaErr.Path.PrependIndex(
+{IIIII}&aasreporting.IndexSegment{{
+{IIIIII}Index: i,
+{IIIII}}},
+{IIII})
+{III}}}
+{III}return
+{II}}}
+
+{II}err = writeEndElement(
+{III}encoder,
+{III}"v",
+{III}false,
+{II})
+{II}if err != nil {{
+{III}return
+{II}}}
+{I}}}
+
+{I}err = writeEndElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}return
+}}"""
+    )
+
+
 def _generate_write_enumeration_as_text(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
@@ -2058,26 +2270,57 @@ err = writeDiscriminatedInstanceProperty(
             assert_never(our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
-        ), (
-            f"NOTE (mristin): We expect only lists of classes "
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            f"NOTE (mristin): We expect only lists of atomic values "
             f"at the moment, but you specified {type_anno}. "
             f"Please contact the developers if you need this feature."
         )
 
-        write_block = Stripped(
-            f"""\
+        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation) or (
+            isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+            and isinstance(
+                type_anno.items.our_type,
+                (intermediate.ConstrainedPrimitive, intermediate.Enumeration),
+            )
+        ):
+            items_primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+            if items_primitive_type is not None:
+                write_function = _WRITE_FUNCTION_BY_PRIMITIVE_TYPE[items_primitive_type]
+            else:
+                assert isinstance(
+                    type_anno.items, intermediate.OurTypeAnnotation
+                ) and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+                write_function = golang_naming.private_function_name(
+                    Identifier(f"write_{type_anno.items.our_type.name}_as_text")
+                )
+
+            write_block = Stripped(
+                f"""\
+err = writeListOfScalarsProperty(
+{I}encoder,
+{I}{local_literal},
+{I}{access_expr},
+{I}{write_function},
+)
+{if_err_nil_prepend_name_if_serialization_error_return}"""
+            )
+        else:
+            assert isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+            assert isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            )
+
+            write_block = Stripped(
+                f"""\
 err = writeListOfInstancesProperty(
 {I}encoder,
 {I}{local_literal},
 {I}{access_expr},
 )
 {if_err_nil_prepend_name_if_serialization_error_return}"""
-        )
+            )
 
     else:
         assert_never(type_anno)
@@ -2393,6 +2636,7 @@ const Namespace = {namespace_literal}"""
             _generate_parse_as_start_element_and_extract_local_name(),
             _generate_check_end_element(),
             _generate_scalar_definition(),
+            _generate_read_list_of_scalars(),
             _generate_read_list_of_instances(),
         ]
     )
@@ -2459,6 +2703,7 @@ const Namespace = {namespace_literal}"""
             _generate_write_embedded_instance_property(),
             _generate_write_instance_property_with_discriminator(),
             _generate_write_list_of_instances_property(),
+            _generate_write_list_of_scalars_property(),
         ]
     )
 

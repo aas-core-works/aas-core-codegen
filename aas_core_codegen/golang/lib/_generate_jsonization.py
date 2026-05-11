@@ -629,12 +629,9 @@ if err != nil {{
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
             ), (
-                f"NOTE (mristin): We expect only lists of classes "
+                f"NOTE (mristin): We expect only lists of atomic types "
                 f"at the moment, but you specified {type_anno}. "
                 f"Please contact the developers if you need this feature."
             )
@@ -1294,15 +1291,10 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
         block: Stripped
 
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items,
-                intermediate.OurTypeAnnotation,
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ), (
-                "(mristin, 2023-04-12): We expect only lists of our classes. "
-                "Other lists are not handled yet. Please contact the developers."
+            assert not isinstance(type_anno.items, intermediate.ListTypeAnnotation), (
+                "(mristin): We currently generate only the code to serialize lists of "
+                "atomic values. If you need this feature, please contact "
+                "the developers."
             )
 
             statements = [
@@ -1355,11 +1347,8 @@ for i, v := range that.{getter_name}() {{
                 statements.append(
                     Stripped(
                         f"""\
-for _, v := range that.{getter_name}() {{
-{I}{prop_jsonable_var} = append(
-{II}{prop_jsonable_var},
-{II}{indent_but_first_line(serialize_expr, II)}
-{I})
+for i, v := range that.{getter_name}() {{
+{I}{prop_jsonable_var}[i] = {indent_but_first_line(serialize_expr, II)}
 }}"""
                     )
                 )

@@ -5,6 +5,7 @@ from aas_core_codegen.intermediate import _types, _translate, _stringify
 TypeAnnotation = _types.TypeAnnotation
 TypeAnnotationUnion = _types.TypeAnnotationUnion
 AtomicTypeAnnotation = _types.AtomicTypeAnnotation
+AtomicTypeAnnotationAsTuple = _types.AtomicTypeAnnotationAsTuple
 PrimitiveType = _types.PrimitiveType
 PRIMITIVE_TYPE_TO_PYTHON_TYPE = _types.PRIMITIVE_TYPE_TO_PYTHON_TYPE
 PYTHON_TYPE_TO_PRIMITIVE_TYPE = _types.PYTHON_TYPE_TO_PRIMITIVE_TYPE

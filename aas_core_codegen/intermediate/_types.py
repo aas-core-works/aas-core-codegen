@@ -206,6 +206,9 @@ assert TypeAnnotationExceptOptionalAsTuple == get_args(TypeAnnotationExceptOptio
 
 AtomicTypeAnnotation = Union[PrimitiveTypeAnnotation, OurTypeAnnotation]
 
+AtomicTypeAnnotationAsTuple = (PrimitiveTypeAnnotation, OurTypeAnnotation)
+assert AtomicTypeAnnotationAsTuple == get_args(AtomicTypeAnnotation)
+
 assert_union_without_excluded(
     original_union=TypeAnnotationUnion,
     subset_union=AtomicTypeAnnotation,
