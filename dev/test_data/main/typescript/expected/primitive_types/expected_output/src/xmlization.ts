@@ -225,6 +225,7 @@ class XmlCursor {
   }
 
   skipIgnorable(): void {
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const token = this.current();
       if (token === null) {
@@ -348,6 +349,68 @@ function readTextContentAndConsumeEndTag(
   );
 }
 
+function parsePropertyAsClassInstance(
+  cursor: XmlCursor,
+  propertyStartTag: OpenTagToken
+): AasCommon.Either<AasTypes.Class, DeserializationError> {
+  cursor.skipIgnorable();
+
+  const token = cursor.current();
+  if (!(token instanceof OpenTagToken)) {
+    return newDeserializationError<AasTypes.Class>(
+      "Expected nested class element in XML property, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  const namespaceError = checkExpectedOpenTagNamespace(token);
+  if (namespaceError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      namespaceError
+    );
+  }
+
+  const localName = localNameOfTag(token.tag);
+  const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localName);
+  if (dispatch === undefined) {
+    return newDeserializationError<AasTypes.Class>(
+      `Unexpected nested class XML element: ${localName}`
+    );
+  }
+
+  cursor.advance();
+  const instanceOrError = dispatch(cursor, token);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  const propertyCloseToken = cursor.current();
+  if (!(propertyCloseToken instanceof CloseTagToken)) {
+    return newDeserializationError<AasTypes.Class>(
+      "Expected property closing XML element after nested class, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  const expectedPropertyLocalName = localNameOfTag(propertyStartTag.tag);
+  const propertyCloseError = checkExpectedCloseTag(
+    propertyCloseToken,
+    expectedPropertyLocalName
+  );
+  if (propertyCloseError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      propertyCloseError
+    );
+  }
+
+  cursor.advance();
+
+  return instanceOrError;
+}
+
 function parseBooleanText(
   text: string
 ): AasCommon.Either<boolean, DeserializationError> {
@@ -427,68 +490,6 @@ function parseBase64EncodedBytesText(
   );
 }
 
-function parsePropertyAsClassInstance(
-  cursor: XmlCursor,
-  propertyStartTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  cursor.skipIgnorable();
-
-  const token = cursor.current();
-  if (!(token instanceof OpenTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected nested class element in XML property, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const namespaceError = checkExpectedOpenTagNamespace(token);
-  if (namespaceError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      namespaceError
-    );
-  }
-
-  const localName = localNameOfTag(token.tag);
-  const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localName);
-  if (dispatch === undefined) {
-    return newDeserializationError<AasTypes.Class>(
-      `Unexpected nested class XML element: ${localName}`
-    );
-  }
-
-  cursor.advance();
-  const instanceOrError = dispatch(cursor, token);
-  if (instanceOrError.error !== null) {
-    return instanceOrError;
-  }
-
-  cursor.skipIgnorable();
-  const propertyCloseToken = cursor.current();
-  if (!(propertyCloseToken instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected property closing XML element after nested class, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const expectedPropertyLocalName = localNameOfTag(propertyStartTag.tag);
-  const propertyCloseError = checkExpectedCloseTag(
-    propertyCloseToken,
-    expectedPropertyLocalName
-  );
-  if (propertyCloseError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      propertyCloseError
-    );
-  }
-
-  cursor.advance();
-
-  return instanceOrError;
-}
-
 function parseSomethingFromOpenTag(
   cursor: XmlCursor,
   startTag: OpenTagToken
@@ -501,6 +502,7 @@ function parseSomethingFromOpenTag(
   let theSomeBytes: Uint8Array | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {

@@ -210,6 +210,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            test_rel_path / "xmlization.common.spec.ts",
+            lambda: (
+                typescript_tests.generate_xmlization_common_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
             test_rel_path / "xmlization.enums.spec.ts",
             lambda: (
                 typescript_tests.generate_xmlization_enums_spec(

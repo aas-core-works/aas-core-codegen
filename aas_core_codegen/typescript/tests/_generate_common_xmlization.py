@@ -151,4 +151,5 @@ export function {load_minimal_name}(
 
 
 assert generate.__doc__ is not None
+assert __doc__ is not None
 assert generate.__doc__.strip().startswith(__doc__.strip())
