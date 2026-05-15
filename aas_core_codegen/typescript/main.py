@@ -183,6 +183,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            test_rel_path / "jsonization.common.spec.ts",
+            lambda: (
+                typescript_tests.generate_jsonization_common_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
             test_rel_path / "jsonization.enums.spec.ts",
             lambda: (
                 typescript_tests.generate_jsonization_enums_spec(
@@ -201,11 +210,45 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            test_rel_path / "jsonization.negative.spec.ts",
+            lambda: (
+                typescript_tests.generate_jsonization_negative_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "stringification.enums.spec.ts",
+            lambda: (
+                typescript_tests.generate_stringification_enums_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "verification.spec.ts",
+            lambda: (
+                typescript_tests.generate_verification_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
             test_rel_path / "xmlization.concreteClasses.spec.ts",
             lambda: (
                 typescript_tests.generate_xmlization_concrete_classes_spec(
                     symbol_table=verified_ir_table,
                 ),
+                None,
+            ),
+        ),
+        (
+            test_rel_path / "xmlization.basic.spec.ts",
+            lambda: (
+                typescript_tests.generate_xmlization_basic_spec(),
                 None,
             ),
         ),

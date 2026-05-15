@@ -24,6 +24,50 @@ test("ModellingKind XML round-trip OK", () => {
   );
 });
 
+test("ModellingKind XML deserializes Template OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodel();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"kind"}>)([^<]*)(</${"kind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Template"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodel(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.kind).toStrictEqual(
+    AasTypes.ModellingKind.Template
+  );
+});
+
+test("ModellingKind XML deserializes Instance OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodel();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"kind"}>)([^<]*)(</${"kind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Instance"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodel(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.kind).toStrictEqual(
+    AasTypes.ModellingKind.Instance
+  );
+});
+
 test("ModellingKind XML deserialization fail", () => {
   const instance = TestCommonXmlization.loadMaximalSubmodel();
   const xmlText = AasXmlization.toXmlString(instance);
@@ -53,6 +97,72 @@ test("QualifierKind XML round-trip OK", () => {
   expect(casted).not.toBeNull();
   expect(casted.kind).toStrictEqual(
     instance.kind
+  );
+});
+
+test("QualifierKind XML deserializes ValueQualifier OK", () => {
+  const instance = TestCommonXmlization.loadMaximalQualifier();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"kind"}>)([^<]*)(</${"kind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ValueQualifier"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asQualifier(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.kind).toStrictEqual(
+    AasTypes.QualifierKind.ValueQualifier
+  );
+});
+
+test("QualifierKind XML deserializes ConceptQualifier OK", () => {
+  const instance = TestCommonXmlization.loadMaximalQualifier();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"kind"}>)([^<]*)(</${"kind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ConceptQualifier"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asQualifier(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.kind).toStrictEqual(
+    AasTypes.QualifierKind.ConceptQualifier
+  );
+});
+
+test("QualifierKind XML deserializes TemplateQualifier OK", () => {
+  const instance = TestCommonXmlization.loadMaximalQualifier();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"kind"}>)([^<]*)(</${"kind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"TemplateQualifier"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asQualifier(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.kind).toStrictEqual(
+    AasTypes.QualifierKind.TemplateQualifier
   );
 });
 
@@ -88,6 +198,72 @@ test("AssetKind XML round-trip OK", () => {
   );
 });
 
+test("AssetKind XML deserializes Type OK", () => {
+  const instance = TestCommonXmlization.loadMaximalAssetInformation();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"assetKind"}>)([^<]*)(</${"assetKind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Type"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asAssetInformation(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.assetKind).toStrictEqual(
+    AasTypes.AssetKind.Type
+  );
+});
+
+test("AssetKind XML deserializes Instance OK", () => {
+  const instance = TestCommonXmlization.loadMaximalAssetInformation();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"assetKind"}>)([^<]*)(</${"assetKind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Instance"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asAssetInformation(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.assetKind).toStrictEqual(
+    AasTypes.AssetKind.Instance
+  );
+});
+
+test("AssetKind XML deserializes NotApplicable OK", () => {
+  const instance = TestCommonXmlization.loadMaximalAssetInformation();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"assetKind"}>)([^<]*)(</${"assetKind"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"NotApplicable"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asAssetInformation(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.assetKind).toStrictEqual(
+    AasTypes.AssetKind.NotApplicable
+  );
+});
+
 test("AssetKind XML deserialization fail", () => {
   const instance = TestCommonXmlization.loadMaximalAssetInformation();
   const xmlText = AasXmlization.toXmlString(instance);
@@ -117,6 +293,380 @@ test("AasSubmodelElements XML round-trip OK", () => {
   expect(casted).not.toBeNull();
   expect(casted.typeValueListElement).toStrictEqual(
     instance.typeValueListElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes AnnotatedRelationshipElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"AnnotatedRelationshipElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.AnnotatedRelationshipElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes BasicEventElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"BasicEventElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.BasicEventElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes Blob OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Blob"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.Blob
+  );
+});
+
+test("AasSubmodelElements XML deserializes Capability OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Capability"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.Capability
+  );
+});
+
+test("AasSubmodelElements XML deserializes DataElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"DataElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.DataElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes Entity OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Entity"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.Entity
+  );
+});
+
+test("AasSubmodelElements XML deserializes EventElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"EventElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.EventElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes File OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"File"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.File
+  );
+});
+
+test("AasSubmodelElements XML deserializes MultiLanguageProperty OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"MultiLanguageProperty"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.MultiLanguageProperty
+  );
+});
+
+test("AasSubmodelElements XML deserializes Operation OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Operation"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.Operation
+  );
+});
+
+test("AasSubmodelElements XML deserializes Property OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Property"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.Property
+  );
+});
+
+test("AasSubmodelElements XML deserializes Range OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Range"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.Range
+  );
+});
+
+test("AasSubmodelElements XML deserializes ReferenceElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ReferenceElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.ReferenceElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes RelationshipElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"RelationshipElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.RelationshipElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes SubmodelElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SubmodelElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.SubmodelElement
+  );
+});
+
+test("AasSubmodelElements XML deserializes SubmodelElementList OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SubmodelElementList"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.SubmodelElementList
+  );
+});
+
+test("AasSubmodelElements XML deserializes SubmodelElementCollection OK", () => {
+  const instance = TestCommonXmlization.loadMaximalSubmodelElementList();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"typeValueListElement"}>)([^<]*)(</${"typeValueListElement"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SubmodelElementCollection"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asSubmodelElementList(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.typeValueListElement).toStrictEqual(
+    AasTypes.AasSubmodelElements.SubmodelElementCollection
   );
 });
 
@@ -152,6 +702,50 @@ test("EntityType XML round-trip OK", () => {
   );
 });
 
+test("EntityType XML deserializes CoManagedEntity OK", () => {
+  const instance = TestCommonXmlization.loadMaximalEntity();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"entityType"}>)([^<]*)(</${"entityType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"CoManagedEntity"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asEntity(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.entityType).toStrictEqual(
+    AasTypes.EntityType.CoManagedEntity
+  );
+});
+
+test("EntityType XML deserializes SelfManagedEntity OK", () => {
+  const instance = TestCommonXmlization.loadMaximalEntity();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"entityType"}>)([^<]*)(</${"entityType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SelfManagedEntity"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asEntity(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.entityType).toStrictEqual(
+    AasTypes.EntityType.SelfManagedEntity
+  );
+});
+
 test("EntityType XML deserialization fail", () => {
   const instance = TestCommonXmlization.loadMaximalEntity();
   const xmlText = AasXmlization.toXmlString(instance);
@@ -181,6 +775,50 @@ test("Direction XML round-trip OK", () => {
   expect(casted).not.toBeNull();
   expect(casted.direction).toStrictEqual(
     instance.direction
+  );
+});
+
+test("Direction XML deserializes Input OK", () => {
+  const instance = TestCommonXmlization.loadMaximalBasicEventElement();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"direction"}>)([^<]*)(</${"direction"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"input"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asBasicEventElement(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.direction).toStrictEqual(
+    AasTypes.Direction.Input
+  );
+});
+
+test("Direction XML deserializes Output OK", () => {
+  const instance = TestCommonXmlization.loadMaximalBasicEventElement();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"direction"}>)([^<]*)(</${"direction"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"output"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asBasicEventElement(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.direction).toStrictEqual(
+    AasTypes.Direction.Output
   );
 });
 
@@ -216,6 +854,50 @@ test("StateOfEvent XML round-trip OK", () => {
   );
 });
 
+test("StateOfEvent XML deserializes On OK", () => {
+  const instance = TestCommonXmlization.loadMaximalBasicEventElement();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"state"}>)([^<]*)(</${"state"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"on"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asBasicEventElement(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.state).toStrictEqual(
+    AasTypes.StateOfEvent.On
+  );
+});
+
+test("StateOfEvent XML deserializes Off OK", () => {
+  const instance = TestCommonXmlization.loadMaximalBasicEventElement();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"state"}>)([^<]*)(</${"state"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"off"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asBasicEventElement(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.state).toStrictEqual(
+    AasTypes.StateOfEvent.Off
+  );
+});
+
 test("StateOfEvent XML deserialization fail", () => {
   const instance = TestCommonXmlization.loadMaximalBasicEventElement();
   const xmlText = AasXmlization.toXmlString(instance);
@@ -245,6 +927,50 @@ test("ReferenceTypes XML round-trip OK", () => {
   expect(casted).not.toBeNull();
   expect(casted.type).toStrictEqual(
     instance.type
+  );
+});
+
+test("ReferenceTypes XML deserializes ExternalReference OK", () => {
+  const instance = TestCommonXmlization.loadMaximalReference();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ExternalReference"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asReference(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.ReferenceTypes.ExternalReference
+  );
+});
+
+test("ReferenceTypes XML deserializes ModelReference OK", () => {
+  const instance = TestCommonXmlization.loadMaximalReference();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ModelReference"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asReference(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.ReferenceTypes.ModelReference
   );
 });
 
@@ -280,6 +1006,534 @@ test("KeyTypes XML round-trip OK", () => {
   );
 });
 
+test("KeyTypes XML deserializes AnnotatedRelationshipElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"AnnotatedRelationshipElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.AnnotatedRelationshipElement
+  );
+});
+
+test("KeyTypes XML deserializes AssetAdministrationShell OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"AssetAdministrationShell"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.AssetAdministrationShell
+  );
+});
+
+test("KeyTypes XML deserializes BasicEventElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"BasicEventElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.BasicEventElement
+  );
+});
+
+test("KeyTypes XML deserializes Blob OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Blob"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Blob
+  );
+});
+
+test("KeyTypes XML deserializes Capability OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Capability"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Capability
+  );
+});
+
+test("KeyTypes XML deserializes ConceptDescription OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ConceptDescription"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.ConceptDescription
+  );
+});
+
+test("KeyTypes XML deserializes DataElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"DataElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.DataElement
+  );
+});
+
+test("KeyTypes XML deserializes Entity OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Entity"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Entity
+  );
+});
+
+test("KeyTypes XML deserializes EventElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"EventElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.EventElement
+  );
+});
+
+test("KeyTypes XML deserializes File OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"File"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.File
+  );
+});
+
+test("KeyTypes XML deserializes FragmentReference OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"FragmentReference"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.FragmentReference
+  );
+});
+
+test("KeyTypes XML deserializes GlobalReference OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"GlobalReference"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.GlobalReference
+  );
+});
+
+test("KeyTypes XML deserializes Identifiable OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Identifiable"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Identifiable
+  );
+});
+
+test("KeyTypes XML deserializes MultiLanguageProperty OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"MultiLanguageProperty"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.MultiLanguageProperty
+  );
+});
+
+test("KeyTypes XML deserializes Operation OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Operation"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Operation
+  );
+});
+
+test("KeyTypes XML deserializes Property OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Property"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Property
+  );
+});
+
+test("KeyTypes XML deserializes Range OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Range"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Range
+  );
+});
+
+test("KeyTypes XML deserializes Referable OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Referable"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Referable
+  );
+});
+
+test("KeyTypes XML deserializes ReferenceElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"ReferenceElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.ReferenceElement
+  );
+});
+
+test("KeyTypes XML deserializes RelationshipElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"RelationshipElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.RelationshipElement
+  );
+});
+
+test("KeyTypes XML deserializes Submodel OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"Submodel"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.Submodel
+  );
+});
+
+test("KeyTypes XML deserializes SubmodelElement OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SubmodelElement"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.SubmodelElement
+  );
+});
+
+test("KeyTypes XML deserializes SubmodelElementCollection OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SubmodelElementCollection"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.SubmodelElementCollection
+  );
+});
+
+test("KeyTypes XML deserializes SubmodelElementList OK", () => {
+  const instance = TestCommonXmlization.loadMaximalKey();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"type"}>)([^<]*)(</${"type"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"SubmodelElementList"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asKey(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.type).toStrictEqual(
+    AasTypes.KeyTypes.SubmodelElementList
+  );
+});
+
 test("KeyTypes XML deserialization fail", () => {
   const instance = TestCommonXmlization.loadMaximalKey();
   const xmlText = AasXmlization.toXmlString(instance);
@@ -312,6 +1566,666 @@ test("DataTypeDefXsd XML round-trip OK", () => {
   );
 });
 
+test("DataTypeDefXsd XML deserializes AnyUri OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:anyURI"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.AnyUri
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Base64Binary OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:base64Binary"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Base64Binary
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Boolean OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:boolean"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Boolean
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Byte OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:byte"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Byte
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Date OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:date"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Date
+  );
+});
+
+test("DataTypeDefXsd XML deserializes DateTime OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:dateTime"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.DateTime
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Decimal OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:decimal"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Decimal
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Double OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:double"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Double
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Duration OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:duration"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Duration
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Float OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:float"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Float
+  );
+});
+
+test("DataTypeDefXsd XML deserializes GDay OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:gDay"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GDay
+  );
+});
+
+test("DataTypeDefXsd XML deserializes GMonth OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:gMonth"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GMonth
+  );
+});
+
+test("DataTypeDefXsd XML deserializes GMonthDay OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:gMonthDay"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GMonthDay
+  );
+});
+
+test("DataTypeDefXsd XML deserializes GYear OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:gYear"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GYear
+  );
+});
+
+test("DataTypeDefXsd XML deserializes GYearMonth OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:gYearMonth"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GYearMonth
+  );
+});
+
+test("DataTypeDefXsd XML deserializes HexBinary OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:hexBinary"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.HexBinary
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Int OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:int"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Int
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Integer OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:integer"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Integer
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Long OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:long"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Long
+  );
+});
+
+test("DataTypeDefXsd XML deserializes NegativeInteger OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:negativeInteger"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.NegativeInteger
+  );
+});
+
+test("DataTypeDefXsd XML deserializes NonNegativeInteger OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:nonNegativeInteger"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.NonNegativeInteger
+  );
+});
+
+test("DataTypeDefXsd XML deserializes NonPositiveInteger OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:nonPositiveInteger"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.NonPositiveInteger
+  );
+});
+
+test("DataTypeDefXsd XML deserializes PositiveInteger OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:positiveInteger"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.PositiveInteger
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Short OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:short"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Short
+  );
+});
+
+test("DataTypeDefXsd XML deserializes String OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:string"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.String
+  );
+});
+
+test("DataTypeDefXsd XML deserializes Time OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:time"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Time
+  );
+});
+
+test("DataTypeDefXsd XML deserializes UnsignedByte OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:unsignedByte"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedByte
+  );
+});
+
+test("DataTypeDefXsd XML deserializes UnsignedInt OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:unsignedInt"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedInt
+  );
+});
+
+test("DataTypeDefXsd XML deserializes UnsignedLong OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:unsignedLong"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedLong
+  );
+});
+
+test("DataTypeDefXsd XML deserializes UnsignedShort OK", () => {
+  const instance = TestCommonXmlization.loadMaximalExtension();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"valueType"}>)([^<]*)(</${"valueType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"xs:unsignedShort"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asExtension(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.valueType).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedShort
+  );
+});
+
 test("DataTypeDefXsd XML deserialization fail", () => {
   const instance = TestCommonXmlization.loadMaximalExtension();
   const xmlText = AasXmlization.toXmlString(instance);
@@ -341,6 +2255,424 @@ test("DataTypeIec61360 XML round-trip OK", () => {
   expect(casted).not.toBeNull();
   expect(casted.dataType).toStrictEqual(
     instance.dataType
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Date OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"DATE"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Date
+  );
+});
+
+test("DataTypeIec61360 XML deserializes String OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"STRING"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.String
+  );
+});
+
+test("DataTypeIec61360 XML deserializes StringTranslatable OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"STRING_TRANSLATABLE"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.StringTranslatable
+  );
+});
+
+test("DataTypeIec61360 XML deserializes IntegerMeasure OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"INTEGER_MEASURE"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.IntegerMeasure
+  );
+});
+
+test("DataTypeIec61360 XML deserializes IntegerCount OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"INTEGER_COUNT"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.IntegerCount
+  );
+});
+
+test("DataTypeIec61360 XML deserializes IntegerCurrency OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"INTEGER_CURRENCY"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.IntegerCurrency
+  );
+});
+
+test("DataTypeIec61360 XML deserializes RealMeasure OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"REAL_MEASURE"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.RealMeasure
+  );
+});
+
+test("DataTypeIec61360 XML deserializes RealCount OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"REAL_COUNT"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.RealCount
+  );
+});
+
+test("DataTypeIec61360 XML deserializes RealCurrency OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"REAL_CURRENCY"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.RealCurrency
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Boolean OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"BOOLEAN"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Boolean
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Iri OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"IRI"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Iri
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Irdi OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"IRDI"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Irdi
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Rational OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"RATIONAL"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Rational
+  );
+});
+
+test("DataTypeIec61360 XML deserializes RationalMeasure OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"RATIONAL_MEASURE"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.RationalMeasure
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Time OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"TIME"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Time
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Timestamp OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"TIMESTAMP"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Timestamp
+  );
+});
+
+test("DataTypeIec61360 XML deserializes File OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"FILE"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.File
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Html OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"HTML"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Html
+  );
+});
+
+test("DataTypeIec61360 XML deserializes Blob OK", () => {
+  const instance = TestCommonXmlization.loadMaximalDataSpecificationIec61360();
+  const xmlText = AasXmlization.toXmlString(instance);
+
+  const regex = new RegExp(
+    `(<${"dataType"}>)([^<]*)(</${"dataType"}>)`
+  );
+  const adaptedXmlText = xmlText.replace(
+    regex,
+    `$1${"BLOB"}$3`
+  );
+
+  const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+  expect(anotherOrError.error).toBeNull();
+
+  const casted = AasTypes.asDataSpecificationIec61360(anotherOrError.mustValue());
+  expect(casted).not.toBeNull();
+  expect(casted.dataType).toStrictEqual(
+    AasTypes.DataTypeIec61360.Blob
   );
 });
 

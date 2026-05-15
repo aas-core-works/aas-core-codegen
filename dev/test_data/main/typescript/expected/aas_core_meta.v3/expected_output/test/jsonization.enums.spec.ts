@@ -8,7 +8,7 @@
 import * as AasJsonization from "../src/jsonization";
 import * as AasTypes from "../src/types";
 
-test("ModellingKind round-trip OK", () => {
+test("ModellingKind deserializes Template OK", () => {
   const jsonable = "Template";
 
   const literalOrError = AasJsonization.modellingKindFromJsonable(
@@ -16,10 +16,25 @@ test("ModellingKind round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.ModellingKind.Template
+  );
+});
+
+test("ModellingKind deserializes Instance OK", () => {
+  const jsonable = "Instance";
+
+  const literalOrError = AasJsonization.modellingKindFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.ModellingKind.Instance
   );
 });
 
@@ -35,7 +50,7 @@ test("ModellingKind deserialization fail", () => {
   );
 });
 
-test("QualifierKind round-trip OK", () => {
+test("QualifierKind deserializes ValueQualifier OK", () => {
   const jsonable = "ValueQualifier";
 
   const literalOrError = AasJsonization.qualifierKindFromJsonable(
@@ -43,10 +58,40 @@ test("QualifierKind round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.QualifierKind.ValueQualifier
+  );
+});
+
+test("QualifierKind deserializes ConceptQualifier OK", () => {
+  const jsonable = "ConceptQualifier";
+
+  const literalOrError = AasJsonization.qualifierKindFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.QualifierKind.ConceptQualifier
+  );
+});
+
+test("QualifierKind deserializes TemplateQualifier OK", () => {
+  const jsonable = "TemplateQualifier";
+
+  const literalOrError = AasJsonization.qualifierKindFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.QualifierKind.TemplateQualifier
   );
 });
 
@@ -62,7 +107,7 @@ test("QualifierKind deserialization fail", () => {
   );
 });
 
-test("AssetKind round-trip OK", () => {
+test("AssetKind deserializes Type OK", () => {
   const jsonable = "Type";
 
   const literalOrError = AasJsonization.assetKindFromJsonable(
@@ -70,10 +115,40 @@ test("AssetKind round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.AssetKind.Type
+  );
+});
+
+test("AssetKind deserializes Instance OK", () => {
+  const jsonable = "Instance";
+
+  const literalOrError = AasJsonization.assetKindFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AssetKind.Instance
+  );
+});
+
+test("AssetKind deserializes NotApplicable OK", () => {
+  const jsonable = "NotApplicable";
+
+  const literalOrError = AasJsonization.assetKindFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AssetKind.NotApplicable
   );
 });
 
@@ -89,7 +164,7 @@ test("AssetKind deserialization fail", () => {
   );
 });
 
-test("AasSubmodelElements round-trip OK", () => {
+test("AasSubmodelElements deserializes AnnotatedRelationshipElement OK", () => {
   const jsonable = "AnnotatedRelationshipElement";
 
   const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
@@ -97,10 +172,250 @@ test("AasSubmodelElements round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.AasSubmodelElements.AnnotatedRelationshipElement
+  );
+});
+
+test("AasSubmodelElements deserializes BasicEventElement OK", () => {
+  const jsonable = "BasicEventElement";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.BasicEventElement
+  );
+});
+
+test("AasSubmodelElements deserializes Blob OK", () => {
+  const jsonable = "Blob";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.Blob
+  );
+});
+
+test("AasSubmodelElements deserializes Capability OK", () => {
+  const jsonable = "Capability";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.Capability
+  );
+});
+
+test("AasSubmodelElements deserializes DataElement OK", () => {
+  const jsonable = "DataElement";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.DataElement
+  );
+});
+
+test("AasSubmodelElements deserializes Entity OK", () => {
+  const jsonable = "Entity";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.Entity
+  );
+});
+
+test("AasSubmodelElements deserializes EventElement OK", () => {
+  const jsonable = "EventElement";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.EventElement
+  );
+});
+
+test("AasSubmodelElements deserializes File OK", () => {
+  const jsonable = "File";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.File
+  );
+});
+
+test("AasSubmodelElements deserializes MultiLanguageProperty OK", () => {
+  const jsonable = "MultiLanguageProperty";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.MultiLanguageProperty
+  );
+});
+
+test("AasSubmodelElements deserializes Operation OK", () => {
+  const jsonable = "Operation";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.Operation
+  );
+});
+
+test("AasSubmodelElements deserializes Property OK", () => {
+  const jsonable = "Property";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.Property
+  );
+});
+
+test("AasSubmodelElements deserializes Range OK", () => {
+  const jsonable = "Range";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.Range
+  );
+});
+
+test("AasSubmodelElements deserializes ReferenceElement OK", () => {
+  const jsonable = "ReferenceElement";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.ReferenceElement
+  );
+});
+
+test("AasSubmodelElements deserializes RelationshipElement OK", () => {
+  const jsonable = "RelationshipElement";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.RelationshipElement
+  );
+});
+
+test("AasSubmodelElements deserializes SubmodelElement OK", () => {
+  const jsonable = "SubmodelElement";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.SubmodelElement
+  );
+});
+
+test("AasSubmodelElements deserializes SubmodelElementList OK", () => {
+  const jsonable = "SubmodelElementList";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.SubmodelElementList
+  );
+});
+
+test("AasSubmodelElements deserializes SubmodelElementCollection OK", () => {
+  const jsonable = "SubmodelElementCollection";
+
+  const literalOrError = AasJsonization.aasSubmodelElementsFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.AasSubmodelElements.SubmodelElementCollection
   );
 });
 
@@ -116,7 +431,7 @@ test("AasSubmodelElements deserialization fail", () => {
   );
 });
 
-test("EntityType round-trip OK", () => {
+test("EntityType deserializes CoManagedEntity OK", () => {
   const jsonable = "CoManagedEntity";
 
   const literalOrError = AasJsonization.entityTypeFromJsonable(
@@ -124,10 +439,25 @@ test("EntityType round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.EntityType.CoManagedEntity
+  );
+});
+
+test("EntityType deserializes SelfManagedEntity OK", () => {
+  const jsonable = "SelfManagedEntity";
+
+  const literalOrError = AasJsonization.entityTypeFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.EntityType.SelfManagedEntity
   );
 });
 
@@ -143,7 +473,7 @@ test("EntityType deserialization fail", () => {
   );
 });
 
-test("Direction round-trip OK", () => {
+test("Direction deserializes Input OK", () => {
   const jsonable = "input";
 
   const literalOrError = AasJsonization.directionFromJsonable(
@@ -151,10 +481,25 @@ test("Direction round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.Direction.Input
+  );
+});
+
+test("Direction deserializes Output OK", () => {
+  const jsonable = "output";
+
+  const literalOrError = AasJsonization.directionFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.Direction.Output
   );
 });
 
@@ -170,7 +515,7 @@ test("Direction deserialization fail", () => {
   );
 });
 
-test("StateOfEvent round-trip OK", () => {
+test("StateOfEvent deserializes On OK", () => {
   const jsonable = "on";
 
   const literalOrError = AasJsonization.stateOfEventFromJsonable(
@@ -178,10 +523,25 @@ test("StateOfEvent round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.StateOfEvent.On
+  );
+});
+
+test("StateOfEvent deserializes Off OK", () => {
+  const jsonable = "off";
+
+  const literalOrError = AasJsonization.stateOfEventFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.StateOfEvent.Off
   );
 });
 
@@ -197,7 +557,7 @@ test("StateOfEvent deserialization fail", () => {
   );
 });
 
-test("ReferenceTypes round-trip OK", () => {
+test("ReferenceTypes deserializes ExternalReference OK", () => {
   const jsonable = "ExternalReference";
 
   const literalOrError = AasJsonization.referenceTypesFromJsonable(
@@ -205,10 +565,25 @@ test("ReferenceTypes round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.ReferenceTypes.ExternalReference
+  );
+});
+
+test("ReferenceTypes deserializes ModelReference OK", () => {
+  const jsonable = "ModelReference";
+
+  const literalOrError = AasJsonization.referenceTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.ReferenceTypes.ModelReference
   );
 });
 
@@ -224,7 +599,7 @@ test("ReferenceTypes deserialization fail", () => {
   );
 });
 
-test("KeyTypes round-trip OK", () => {
+test("KeyTypes deserializes AnnotatedRelationshipElement OK", () => {
   const jsonable = "AnnotatedRelationshipElement";
 
   const literalOrError = AasJsonization.keyTypesFromJsonable(
@@ -232,10 +607,355 @@ test("KeyTypes round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.KeyTypes.AnnotatedRelationshipElement
+  );
+});
+
+test("KeyTypes deserializes AssetAdministrationShell OK", () => {
+  const jsonable = "AssetAdministrationShell";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.AssetAdministrationShell
+  );
+});
+
+test("KeyTypes deserializes BasicEventElement OK", () => {
+  const jsonable = "BasicEventElement";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.BasicEventElement
+  );
+});
+
+test("KeyTypes deserializes Blob OK", () => {
+  const jsonable = "Blob";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Blob
+  );
+});
+
+test("KeyTypes deserializes Capability OK", () => {
+  const jsonable = "Capability";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Capability
+  );
+});
+
+test("KeyTypes deserializes ConceptDescription OK", () => {
+  const jsonable = "ConceptDescription";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.ConceptDescription
+  );
+});
+
+test("KeyTypes deserializes DataElement OK", () => {
+  const jsonable = "DataElement";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.DataElement
+  );
+});
+
+test("KeyTypes deserializes Entity OK", () => {
+  const jsonable = "Entity";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Entity
+  );
+});
+
+test("KeyTypes deserializes EventElement OK", () => {
+  const jsonable = "EventElement";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.EventElement
+  );
+});
+
+test("KeyTypes deserializes File OK", () => {
+  const jsonable = "File";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.File
+  );
+});
+
+test("KeyTypes deserializes FragmentReference OK", () => {
+  const jsonable = "FragmentReference";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.FragmentReference
+  );
+});
+
+test("KeyTypes deserializes GlobalReference OK", () => {
+  const jsonable = "GlobalReference";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.GlobalReference
+  );
+});
+
+test("KeyTypes deserializes Identifiable OK", () => {
+  const jsonable = "Identifiable";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Identifiable
+  );
+});
+
+test("KeyTypes deserializes MultiLanguageProperty OK", () => {
+  const jsonable = "MultiLanguageProperty";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.MultiLanguageProperty
+  );
+});
+
+test("KeyTypes deserializes Operation OK", () => {
+  const jsonable = "Operation";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Operation
+  );
+});
+
+test("KeyTypes deserializes Property OK", () => {
+  const jsonable = "Property";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Property
+  );
+});
+
+test("KeyTypes deserializes Range OK", () => {
+  const jsonable = "Range";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Range
+  );
+});
+
+test("KeyTypes deserializes Referable OK", () => {
+  const jsonable = "Referable";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Referable
+  );
+});
+
+test("KeyTypes deserializes ReferenceElement OK", () => {
+  const jsonable = "ReferenceElement";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.ReferenceElement
+  );
+});
+
+test("KeyTypes deserializes RelationshipElement OK", () => {
+  const jsonable = "RelationshipElement";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.RelationshipElement
+  );
+});
+
+test("KeyTypes deserializes Submodel OK", () => {
+  const jsonable = "Submodel";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.Submodel
+  );
+});
+
+test("KeyTypes deserializes SubmodelElement OK", () => {
+  const jsonable = "SubmodelElement";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.SubmodelElement
+  );
+});
+
+test("KeyTypes deserializes SubmodelElementCollection OK", () => {
+  const jsonable = "SubmodelElementCollection";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.SubmodelElementCollection
+  );
+});
+
+test("KeyTypes deserializes SubmodelElementList OK", () => {
+  const jsonable = "SubmodelElementList";
+
+  const literalOrError = AasJsonization.keyTypesFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.KeyTypes.SubmodelElementList
   );
 });
 
@@ -251,7 +971,7 @@ test("KeyTypes deserialization fail", () => {
   );
 });
 
-test("DataTypeDefXsd round-trip OK", () => {
+test("DataTypeDefXsd deserializes AnyUri OK", () => {
   const jsonable = "xs:anyURI";
 
   const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
@@ -259,10 +979,445 @@ test("DataTypeDefXsd round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.DataTypeDefXsd.AnyUri
+  );
+});
+
+test("DataTypeDefXsd deserializes Base64Binary OK", () => {
+  const jsonable = "xs:base64Binary";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Base64Binary
+  );
+});
+
+test("DataTypeDefXsd deserializes Boolean OK", () => {
+  const jsonable = "xs:boolean";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Boolean
+  );
+});
+
+test("DataTypeDefXsd deserializes Byte OK", () => {
+  const jsonable = "xs:byte";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Byte
+  );
+});
+
+test("DataTypeDefXsd deserializes Date OK", () => {
+  const jsonable = "xs:date";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Date
+  );
+});
+
+test("DataTypeDefXsd deserializes DateTime OK", () => {
+  const jsonable = "xs:dateTime";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.DateTime
+  );
+});
+
+test("DataTypeDefXsd deserializes Decimal OK", () => {
+  const jsonable = "xs:decimal";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Decimal
+  );
+});
+
+test("DataTypeDefXsd deserializes Double OK", () => {
+  const jsonable = "xs:double";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Double
+  );
+});
+
+test("DataTypeDefXsd deserializes Duration OK", () => {
+  const jsonable = "xs:duration";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Duration
+  );
+});
+
+test("DataTypeDefXsd deserializes Float OK", () => {
+  const jsonable = "xs:float";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Float
+  );
+});
+
+test("DataTypeDefXsd deserializes GDay OK", () => {
+  const jsonable = "xs:gDay";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GDay
+  );
+});
+
+test("DataTypeDefXsd deserializes GMonth OK", () => {
+  const jsonable = "xs:gMonth";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GMonth
+  );
+});
+
+test("DataTypeDefXsd deserializes GMonthDay OK", () => {
+  const jsonable = "xs:gMonthDay";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GMonthDay
+  );
+});
+
+test("DataTypeDefXsd deserializes GYear OK", () => {
+  const jsonable = "xs:gYear";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GYear
+  );
+});
+
+test("DataTypeDefXsd deserializes GYearMonth OK", () => {
+  const jsonable = "xs:gYearMonth";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.GYearMonth
+  );
+});
+
+test("DataTypeDefXsd deserializes HexBinary OK", () => {
+  const jsonable = "xs:hexBinary";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.HexBinary
+  );
+});
+
+test("DataTypeDefXsd deserializes Int OK", () => {
+  const jsonable = "xs:int";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Int
+  );
+});
+
+test("DataTypeDefXsd deserializes Integer OK", () => {
+  const jsonable = "xs:integer";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Integer
+  );
+});
+
+test("DataTypeDefXsd deserializes Long OK", () => {
+  const jsonable = "xs:long";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Long
+  );
+});
+
+test("DataTypeDefXsd deserializes NegativeInteger OK", () => {
+  const jsonable = "xs:negativeInteger";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.NegativeInteger
+  );
+});
+
+test("DataTypeDefXsd deserializes NonNegativeInteger OK", () => {
+  const jsonable = "xs:nonNegativeInteger";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.NonNegativeInteger
+  );
+});
+
+test("DataTypeDefXsd deserializes NonPositiveInteger OK", () => {
+  const jsonable = "xs:nonPositiveInteger";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.NonPositiveInteger
+  );
+});
+
+test("DataTypeDefXsd deserializes PositiveInteger OK", () => {
+  const jsonable = "xs:positiveInteger";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.PositiveInteger
+  );
+});
+
+test("DataTypeDefXsd deserializes Short OK", () => {
+  const jsonable = "xs:short";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Short
+  );
+});
+
+test("DataTypeDefXsd deserializes String OK", () => {
+  const jsonable = "xs:string";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.String
+  );
+});
+
+test("DataTypeDefXsd deserializes Time OK", () => {
+  const jsonable = "xs:time";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.Time
+  );
+});
+
+test("DataTypeDefXsd deserializes UnsignedByte OK", () => {
+  const jsonable = "xs:unsignedByte";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedByte
+  );
+});
+
+test("DataTypeDefXsd deserializes UnsignedInt OK", () => {
+  const jsonable = "xs:unsignedInt";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedInt
+  );
+});
+
+test("DataTypeDefXsd deserializes UnsignedLong OK", () => {
+  const jsonable = "xs:unsignedLong";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedLong
+  );
+});
+
+test("DataTypeDefXsd deserializes UnsignedShort OK", () => {
+  const jsonable = "xs:unsignedShort";
+
+  const literalOrError = AasJsonization.dataTypeDefXsdFromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeDefXsd.UnsignedShort
   );
 });
 
@@ -278,7 +1433,7 @@ test("DataTypeDefXsd deserialization fail", () => {
   );
 });
 
-test("DataTypeIec61360 round-trip OK", () => {
+test("DataTypeIec61360 deserializes Date OK", () => {
   const jsonable = "DATE";
 
   const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
@@ -286,10 +1441,280 @@ test("DataTypeIec61360 round-trip OK", () => {
   );
 
   expect(literalOrError.error).toBeNull();
-  const literal = literalOrError.mustValue();
+  const parsedLiteral = literalOrError.mustValue();
 
-  expect(literal).toStrictEqual(
+  expect(parsedLiteral).toStrictEqual(
     AasTypes.DataTypeIec61360.Date
+  );
+});
+
+test("DataTypeIec61360 deserializes String OK", () => {
+  const jsonable = "STRING";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.String
+  );
+});
+
+test("DataTypeIec61360 deserializes StringTranslatable OK", () => {
+  const jsonable = "STRING_TRANSLATABLE";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.StringTranslatable
+  );
+});
+
+test("DataTypeIec61360 deserializes IntegerMeasure OK", () => {
+  const jsonable = "INTEGER_MEASURE";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.IntegerMeasure
+  );
+});
+
+test("DataTypeIec61360 deserializes IntegerCount OK", () => {
+  const jsonable = "INTEGER_COUNT";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.IntegerCount
+  );
+});
+
+test("DataTypeIec61360 deserializes IntegerCurrency OK", () => {
+  const jsonable = "INTEGER_CURRENCY";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.IntegerCurrency
+  );
+});
+
+test("DataTypeIec61360 deserializes RealMeasure OK", () => {
+  const jsonable = "REAL_MEASURE";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.RealMeasure
+  );
+});
+
+test("DataTypeIec61360 deserializes RealCount OK", () => {
+  const jsonable = "REAL_COUNT";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.RealCount
+  );
+});
+
+test("DataTypeIec61360 deserializes RealCurrency OK", () => {
+  const jsonable = "REAL_CURRENCY";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.RealCurrency
+  );
+});
+
+test("DataTypeIec61360 deserializes Boolean OK", () => {
+  const jsonable = "BOOLEAN";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Boolean
+  );
+});
+
+test("DataTypeIec61360 deserializes Iri OK", () => {
+  const jsonable = "IRI";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Iri
+  );
+});
+
+test("DataTypeIec61360 deserializes Irdi OK", () => {
+  const jsonable = "IRDI";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Irdi
+  );
+});
+
+test("DataTypeIec61360 deserializes Rational OK", () => {
+  const jsonable = "RATIONAL";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Rational
+  );
+});
+
+test("DataTypeIec61360 deserializes RationalMeasure OK", () => {
+  const jsonable = "RATIONAL_MEASURE";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.RationalMeasure
+  );
+});
+
+test("DataTypeIec61360 deserializes Time OK", () => {
+  const jsonable = "TIME";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Time
+  );
+});
+
+test("DataTypeIec61360 deserializes Timestamp OK", () => {
+  const jsonable = "TIMESTAMP";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Timestamp
+  );
+});
+
+test("DataTypeIec61360 deserializes File OK", () => {
+  const jsonable = "FILE";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.File
+  );
+});
+
+test("DataTypeIec61360 deserializes Html OK", () => {
+  const jsonable = "HTML";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Html
+  );
+});
+
+test("DataTypeIec61360 deserializes Blob OK", () => {
+  const jsonable = "BLOB";
+
+  const literalOrError = AasJsonization.dataTypeIec61360FromJsonable(
+    jsonable
+  );
+
+  expect(literalOrError.error).toBeNull();
+  const parsedLiteral = literalOrError.mustValue();
+
+  expect(parsedLiteral).toStrictEqual(
+    AasTypes.DataTypeIec61360.Blob
   );
 });
 
