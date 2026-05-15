@@ -225,6 +225,7 @@ class XmlCursor {
   }
 
   skipIgnorable(): void {
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const token = this.current();
       if (token === null) {
@@ -348,6 +349,68 @@ function readTextContentAndConsumeEndTag(
   );
 }
 
+function parsePropertyAsClassInstance(
+  cursor: XmlCursor,
+  propertyStartTag: OpenTagToken
+): AasCommon.Either<AasTypes.Class, DeserializationError> {
+  cursor.skipIgnorable();
+
+  const token = cursor.current();
+  if (!(token instanceof OpenTagToken)) {
+    return newDeserializationError<AasTypes.Class>(
+      "Expected nested class element in XML property, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  const namespaceError = checkExpectedOpenTagNamespace(token);
+  if (namespaceError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      namespaceError
+    );
+  }
+
+  const localName = localNameOfTag(token.tag);
+  const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localName);
+  if (dispatch === undefined) {
+    return newDeserializationError<AasTypes.Class>(
+      `Unexpected nested class XML element: ${localName}`
+    );
+  }
+
+  cursor.advance();
+  const instanceOrError = dispatch(cursor, token);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  const propertyCloseToken = cursor.current();
+  if (!(propertyCloseToken instanceof CloseTagToken)) {
+    return newDeserializationError<AasTypes.Class>(
+      "Expected property closing XML element after nested class, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  const expectedPropertyLocalName = localNameOfTag(propertyStartTag.tag);
+  const propertyCloseError = checkExpectedCloseTag(
+    propertyCloseToken,
+    expectedPropertyLocalName
+  );
+  if (propertyCloseError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      propertyCloseError
+    );
+  }
+
+  cursor.advance();
+
+  return instanceOrError;
+}
+
 function parseBooleanText(
   text: string
 ): AasCommon.Either<boolean, DeserializationError> {
@@ -425,68 +488,6 @@ function parseBase64EncodedBytesText(
     decodedOrError.mustValue(),
     null
   );
-}
-
-function parsePropertyAsClassInstance(
-  cursor: XmlCursor,
-  propertyStartTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  cursor.skipIgnorable();
-
-  const token = cursor.current();
-  if (!(token instanceof OpenTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected nested class element in XML property, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const namespaceError = checkExpectedOpenTagNamespace(token);
-  if (namespaceError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      namespaceError
-    );
-  }
-
-  const localName = localNameOfTag(token.tag);
-  const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localName);
-  if (dispatch === undefined) {
-    return newDeserializationError<AasTypes.Class>(
-      `Unexpected nested class XML element: ${localName}`
-    );
-  }
-
-  cursor.advance();
-  const instanceOrError = dispatch(cursor, token);
-  if (instanceOrError.error !== null) {
-    return instanceOrError;
-  }
-
-  cursor.skipIgnorable();
-  const propertyCloseToken = cursor.current();
-  if (!(propertyCloseToken instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected property closing XML element after nested class, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const expectedPropertyLocalName = localNameOfTag(propertyStartTag.tag);
-  const propertyCloseError = checkExpectedCloseTag(
-    propertyCloseToken,
-    expectedPropertyLocalName
-  );
-  if (propertyCloseError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      propertyCloseError
-    );
-  }
-
-  cursor.advance();
-
-  return instanceOrError;
 }
 
 function parseModellingKindText(
@@ -744,6 +745,7 @@ function parseExtensionFromOpenTag(
   let theRefersTo: Array<AasTypes.Reference> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -821,6 +823,7 @@ function parseExtensionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -989,6 +992,7 @@ function parseExtensionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -1134,6 +1138,7 @@ function parseAdministrativeInformationFromOpenTag(
   let theTemplateId: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -1181,6 +1186,7 @@ function parseAdministrativeInformationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -1431,6 +1437,7 @@ function parseQualifierFromOpenTag(
   let theValueId: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -1508,6 +1515,7 @@ function parseQualifierFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -1800,6 +1808,7 @@ function parseAssetAdministrationShellFromOpenTag(
   let theSubmodels: Array<AasTypes.Reference> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -1847,6 +1856,7 @@ function parseAssetAdministrationShellFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -1989,6 +1999,7 @@ function parseAssetAdministrationShellFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -2079,6 +2090,7 @@ function parseAssetAdministrationShellFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -2225,6 +2237,7 @@ function parseAssetAdministrationShellFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -2375,6 +2388,7 @@ function parseAssetAdministrationShellFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -2531,6 +2545,7 @@ function parseAssetInformationFromOpenTag(
   let theDefaultThumbnail: AasTypes.Resource | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -2630,6 +2645,7 @@ function parseAssetInformationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -2827,6 +2843,7 @@ function parseResourceFromOpenTag(
   let theContentType: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -2977,6 +2994,7 @@ function parseSpecificAssetIdFromOpenTag(
   let theExternalSubjectId: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -3054,6 +3072,7 @@ function parseSpecificAssetIdFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -3294,6 +3313,7 @@ function parseSubmodelFromOpenTag(
   let theSubmodelElements: Array<AasTypes.ISubmodelElement> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -3341,6 +3361,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -3483,6 +3504,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -3573,6 +3595,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -3775,6 +3798,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -3865,6 +3889,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -3955,6 +3980,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4045,6 +4071,7 @@ function parseSubmodelFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4203,6 +4230,7 @@ function parseRelationshipElementFromOpenTag(
   let theSecond: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -4250,6 +4278,7 @@ function parseRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4392,6 +4421,7 @@ function parseRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4482,6 +4512,7 @@ function parseRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4602,6 +4633,7 @@ function parseRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4692,6 +4724,7 @@ function parseRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -4782,6 +4815,7 @@ function parseRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5007,6 +5041,7 @@ function parseSubmodelElementListFromOpenTag(
   let theValue: Array<AasTypes.ISubmodelElement> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -5054,6 +5089,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5196,6 +5232,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5286,6 +5323,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5406,6 +5444,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5496,6 +5535,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5586,6 +5626,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5784,6 +5825,7 @@ function parseSubmodelElementListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -5942,6 +5984,7 @@ function parseSubmodelElementCollectionFromOpenTag(
   let theValue: Array<AasTypes.ISubmodelElement> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -5989,6 +6032,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6131,6 +6175,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6221,6 +6266,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6341,6 +6387,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6431,6 +6478,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6521,6 +6569,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6611,6 +6660,7 @@ function parseSubmodelElementCollectionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6763,6 +6813,7 @@ function parsePropertyFromOpenTag(
   let theValueId: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -6810,6 +6861,7 @@ function parsePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -6952,6 +7004,7 @@ function parsePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7042,6 +7095,7 @@ function parsePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7162,6 +7216,7 @@ function parsePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7252,6 +7307,7 @@ function parsePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7342,6 +7398,7 @@ function parsePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7581,6 +7638,7 @@ function parseMultiLanguagePropertyFromOpenTag(
   let theValueId: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -7628,6 +7686,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7770,6 +7829,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7860,6 +7920,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -7980,6 +8041,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8070,6 +8132,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8160,6 +8223,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8250,6 +8314,7 @@ function parseMultiLanguagePropertyFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8433,6 +8498,7 @@ function parseRangeFromOpenTag(
   let theMax: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -8480,6 +8546,7 @@ function parseRangeFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8622,6 +8689,7 @@ function parseRangeFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8712,6 +8780,7 @@ function parseRangeFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8832,6 +8901,7 @@ function parseRangeFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -8922,6 +8992,7 @@ function parseRangeFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9012,6 +9083,7 @@ function parseRangeFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9246,6 +9318,7 @@ function parseReferenceElementFromOpenTag(
   let theValue: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -9293,6 +9366,7 @@ function parseReferenceElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9435,6 +9509,7 @@ function parseReferenceElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9525,6 +9600,7 @@ function parseReferenceElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9645,6 +9721,7 @@ function parseReferenceElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9735,6 +9812,7 @@ function parseReferenceElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -9825,6 +9903,7 @@ function parseReferenceElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10006,6 +10085,7 @@ function parseBlobFromOpenTag(
   let theContentType: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -10053,6 +10133,7 @@ function parseBlobFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10195,6 +10276,7 @@ function parseBlobFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10285,6 +10367,7 @@ function parseBlobFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10405,6 +10488,7 @@ function parseBlobFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10495,6 +10579,7 @@ function parseBlobFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10585,6 +10670,7 @@ function parseBlobFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10793,6 +10879,7 @@ function parseFileFromOpenTag(
   let theContentType: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -10840,6 +10927,7 @@ function parseFileFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -10982,6 +11070,7 @@ function parseFileFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11072,6 +11161,7 @@ function parseFileFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11192,6 +11282,7 @@ function parseFileFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11282,6 +11373,7 @@ function parseFileFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11372,6 +11464,7 @@ function parseFileFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11581,6 +11674,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
   let theAnnotations: Array<AasTypes.IDataElement> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -11628,6 +11722,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11770,6 +11865,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11860,6 +11956,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -11980,6 +12077,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12070,6 +12168,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12160,6 +12259,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12310,6 +12410,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12475,6 +12576,7 @@ function parseEntityFromOpenTag(
   let theSpecificAssetIds: Array<AasTypes.SpecificAssetId> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -12522,6 +12624,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12664,6 +12767,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12754,6 +12858,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12874,6 +12979,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -12964,6 +13070,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -13054,6 +13161,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -13144,6 +13252,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -13286,6 +13395,7 @@ function parseEntityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -13441,6 +13551,7 @@ function parseEventPayloadFromOpenTag(
   let thePayload: Uint8Array | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -13797,6 +13908,7 @@ function parseBasicEventElementFromOpenTag(
   let theMaxInterval: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -13844,6 +13956,7 @@ function parseBasicEventElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -13986,6 +14099,7 @@ function parseBasicEventElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -14076,6 +14190,7 @@ function parseBasicEventElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -14196,6 +14311,7 @@ function parseBasicEventElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -14286,6 +14402,7 @@ function parseBasicEventElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -14376,6 +14493,7 @@ function parseBasicEventElementFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -14767,6 +14885,7 @@ function parseOperationFromOpenTag(
   let theInoutputVariables: Array<AasTypes.OperationVariable> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -14814,6 +14933,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -14956,6 +15076,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15046,6 +15167,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15166,6 +15288,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15256,6 +15379,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15346,6 +15470,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15436,6 +15561,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15526,6 +15652,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15616,6 +15743,7 @@ function parseOperationFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -15759,6 +15887,7 @@ function parseOperationVariableFromOpenTag(
   let theValue: AasTypes.ISubmodelElement | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -15890,6 +16019,7 @@ function parseCapabilityFromOpenTag(
   let theEmbeddedDataSpecifications: Array<AasTypes.EmbeddedDataSpecification> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -15937,6 +16067,7 @@ function parseCapabilityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16079,6 +16210,7 @@ function parseCapabilityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16169,6 +16301,7 @@ function parseCapabilityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16289,6 +16422,7 @@ function parseCapabilityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16379,6 +16513,7 @@ function parseCapabilityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16469,6 +16604,7 @@ function parseCapabilityFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16617,6 +16753,7 @@ function parseConceptDescriptionFromOpenTag(
   let theIsCaseOf: Array<AasTypes.Reference> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -16664,6 +16801,7 @@ function parseConceptDescriptionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16806,6 +16944,7 @@ function parseConceptDescriptionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -16896,6 +17035,7 @@ function parseConceptDescriptionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -17042,6 +17182,7 @@ function parseConceptDescriptionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -17132,6 +17273,7 @@ function parseConceptDescriptionFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -17278,6 +17420,7 @@ function parseReferenceFromOpenTag(
   let theKeys: Array<AasTypes.Key> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -17381,6 +17524,7 @@ function parseReferenceFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -17526,6 +17670,7 @@ function parseKeyFromOpenTag(
   let theValue: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -17679,6 +17824,7 @@ function parseLangStringNameTypeFromOpenTag(
   let theText: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -17832,6 +17978,7 @@ function parseLangStringTextTypeFromOpenTag(
   let theText: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -17986,6 +18133,7 @@ function parseEnvironmentFromOpenTag(
   let theConceptDescriptions: Array<AasTypes.ConceptDescription> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -18033,6 +18181,7 @@ function parseEnvironmentFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -18123,6 +18272,7 @@ function parseEnvironmentFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -18213,6 +18363,7 @@ function parseEnvironmentFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -18348,6 +18499,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
   let theDataSpecificationContent: AasTypes.IDataSpecificationContent | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -18511,6 +18663,7 @@ function parseLevelTypeFromOpenTag(
   let theMax: boolean | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -18730,6 +18883,7 @@ function parseValueReferencePairFromOpenTag(
   let theValueId: AasTypes.Reference | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -18886,6 +19040,7 @@ function parseValueListFromOpenTag(
   let theValueReferencePairs: Array<AasTypes.ValueReferencePair> | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -18933,6 +19088,7 @@ function parseValueListFromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -19070,6 +19226,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
   let theText: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -19223,6 +19380,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
   let theText: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -19376,6 +19534,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
   let theText: string | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -19539,6 +19698,7 @@ function parseDataSpecificationIec61360FromOpenTag(
   let theLevelType: AasTypes.LevelType | null = null;
 
   cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const token = cursor.current();
     if (token === null) {
@@ -19586,6 +19746,7 @@ function parseDataSpecificationIec61360FromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -19676,6 +19837,7 @@ function parseDataSpecificationIec61360FromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
@@ -19900,6 +20062,7 @@ function parseDataSpecificationIec61360FromOpenTag(
         let itemIndex = 0;
 
         cursor.skipIgnorable();
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const itemOrClose = cursor.current();
           if (itemOrClose === null) {
