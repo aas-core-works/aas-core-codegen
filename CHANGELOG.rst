@@ -3,6 +3,15 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.24 (2026-05-15)
+===================
+* Improve coverage for TypeScript test data gen (#630)
+* Add support for list of primitives in Python (#625)
+
+In this version we greatly improves the coverage of Xmlization for 
+TypeScript. This way we fixed a blocking issue for the TypeScript SDK 
+generation due to too little coverage.
+
 0.0.23 (2026-05-08)
 ===================
 * Add generation of test code for Java (#599)
