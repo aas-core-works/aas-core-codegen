@@ -59,7 +59,7 @@ test("XML duplicate property fails", () => {
 
   const propertyName = "name";
   const propertyPattern = new RegExp(
-    `(<${escapeRegExp(propertyName)}>[\\s\\S]*?</${escapeRegExp(propertyName)}>)`
+    `(<${escapeRegExp(propertyName)}>[\s\S]*?</${escapeRegExp(propertyName)}>)`
   );
   const match = propertyPattern.exec(text);
   if (match === null) {
@@ -86,7 +86,10 @@ test("XML nested class dispatch mismatch fails", () => {
 
   const propertyName = "value";
   const propertyPattern = new RegExp(
-    `(<${escapeRegExp(propertyName)}>\\s*)(<([A-Za-z_][\\w.-]*)>)([\\s\\S]*?)(</\\3>)(\\s*</${escapeRegExp(propertyName)}>)`
+    `(<${escapeRegExp(propertyName)}>\\s*)` +
+    `(<([A-Za-z_][\\w.-]*)>)` +
+    `([\\s\\S]*?)(</\\3>)` +
+    `(\\s*</${escapeRegExp(propertyName)}>)`
   );
   const match = propertyPattern.exec(text);
   if (match === null) {
@@ -94,7 +97,8 @@ test("XML nested class dispatch mismatch fails", () => {
   }
 
   const brokenProperty =
-    `${match[1]}<UnknownNestedClassXmlElement>${match[4]}</UnknownNestedClassXmlElement>${match[6]}`;
+    `${match[1]}<UnknownNestedClassXmlElement>${match[4]}` +
+    `</UnknownNestedClassXmlElement>${match[6]}`;
 
   const brokenText = text.replace(match[0], brokenProperty);
   expectDeserializationError(brokenText);

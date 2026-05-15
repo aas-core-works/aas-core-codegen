@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 from icontract import ensure
 
 from aas_core_codegen import intermediate, naming
-from aas_core_codegen.common import Identifier, Stripped
+from aas_core_codegen.common import Stripped
 from aas_core_codegen.typescript import common as typescript_common
 from aas_core_codegen.typescript.common import INDENT as I
 
@@ -86,9 +86,10 @@ def _first_nested_class_dispatch_candidate(
             ):
                 continue
 
-            if isinstance(type_anno.our_type, intermediate.ConcreteClass) and len(
-                type_anno.our_type.concrete_descendants
-            ) == 0:
+            if (
+                isinstance(type_anno.our_type, intermediate.ConcreteClass)
+                and len(type_anno.our_type.concrete_descendants) == 0
+            ):
                 continue
 
             return concrete_cls, prop
@@ -140,7 +141,9 @@ function escapeRegExp(text: string): string {
     first_cls = _first_concrete_class(symbol_table)
     if first_cls is not None:
         first_cls_xml_name = naming.xml_class_name(first_cls.name)
-        first_cls_xml_name_literal = typescript_common.string_literal(first_cls_xml_name)
+        first_cls_xml_name_literal = typescript_common.string_literal(
+            first_cls_xml_name
+        )
 
         blocks.append(
             Stripped(
@@ -203,7 +206,7 @@ test("XML duplicate property fails", () => {{
 
 {I}const propertyName = {duplicate_prop_xml_literal};
 {I}const propertyPattern = new RegExp(
-{I}{I}`(<${{escapeRegExp(propertyName)}}>[\\\\s\\\\S]*?</${{escapeRegExp(propertyName)}}>)`
+{I}{I}`(<${{escapeRegExp(propertyName)}}>[\\s\\S]*?</${{escapeRegExp(propertyName)}}>)`
 {I});
 {I}const match = propertyPattern.exec(text);
 {I}if (match === null) {{
@@ -283,7 +286,10 @@ test("XML nested class dispatch mismatch fails", () => {{
 
 {I}const propertyName = {nested_prop_xml_name_literal};
 {I}const propertyPattern = new RegExp(
-{I}{I}`(<${{escapeRegExp(propertyName)}}>\\\\s*)(<([A-Za-z_][\\\\w.-]*)>)([\\\\s\\\\S]*?)(</\\\\3>)(\\\\s*</${{escapeRegExp(propertyName)}}>)`
+{I}{I}`(<${{escapeRegExp(propertyName)}}>\\\\s*)` +
+{I}{I}`(<([A-Za-z_][\\\\w.-]*)>)` +
+{I}{I}`([\\\\s\\\\S]*?)(</\\\\3>)` +
+{I}{I}`(\\\\s*</${{escapeRegExp(propertyName)}}>)`
 {I});
 {I}const match = propertyPattern.exec(text);
 {I}if (match === null) {{
@@ -291,7 +297,8 @@ test("XML nested class dispatch mismatch fails", () => {{
 {I}}}
 
 {I}const brokenProperty =
-{I}{I}`${{match[1]}}<UnknownNestedClassXmlElement>${{match[4]}}</UnknownNestedClassXmlElement>${{match[6]}}`;
+{I}{I}`${{match[1]}}<UnknownNestedClassXmlElement>${{match[4]}}` +
+{I}{I}`</UnknownNestedClassXmlElement>${{match[6]}}`;
 
 {I}const brokenText = text.replace(match[0], brokenProperty);
 {I}expectDeserializationError(brokenText);
