@@ -28,7 +28,9 @@ def _first_required_property_candidate(
     """Find the first required property among all concrete classes."""
     for concrete_cls in symbol_table.concrete_classes:
         for prop in concrete_cls.properties:
-            if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            if not isinstance(
+                prop.type_annotation, intermediate.OptionalTypeAnnotation
+            ):
                 return concrete_cls, prop
 
     return None
@@ -159,9 +161,6 @@ function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.Js
 
     first_cls = _first_concrete_class(symbol_table)
     if first_cls is not None:
-        first_cls_name_json_literal = typescript_common.string_literal(
-            naming.json_model_type(first_cls.name)
-        )
         deserialization_function = typescript_naming.function_name(
             Identifier(f"{first_cls.name}_from_jsonable")
         )
