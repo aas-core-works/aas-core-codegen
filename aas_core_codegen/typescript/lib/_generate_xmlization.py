@@ -38,6 +38,175 @@ _PARSE_FUNCTION_BY_PRIMITIVE_TYPE = {
 }
 
 
+def _generate_parse_text_for_primitive_type(
+    primitive_type: intermediate.PrimitiveType,
+) -> Stripped:
+    """Generate parser for a primitive XML text representation."""
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return Stripped(
+            f"""\
+function parseBooleanText(
+{I}text: string
+): AasCommon.Either<boolean, DeserializationError> {{
+{I}if (text === "true" || text === "1") {{
+{II}return new AasCommon.Either<boolean, DeserializationError>(true, null);
+{I}}}
+{I}if (text === "false" || text === "0") {{
+{II}return new AasCommon.Either<boolean, DeserializationError>(false, null);
+{I}}}
+
+{I}return newDeserializationError<boolean>(
+{II}`Expected xs:boolean text, but got: ${{text}}`
+{I});
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(
+            f"""\
+function parseIntegerText(
+{I}text: string
+): AasCommon.Either<number, DeserializationError> {{
+{I}if (!/^[+-]?\\d+$/.test(text)) {{
+{II}return newDeserializationError<number>(
+{III}`Expected integer text, but got: ${{text}}`
+{II});
+{I}}}
+
+{I}const value = Number(text);
+{I}if (!Number.isInteger(value)) {{
+{II}return newDeserializationError<number>(
+{III}`Expected integer text, but got: ${{text}}`
+{II});
+{I}}}
+
+{I}return new AasCommon.Either<number, DeserializationError>(value, null);
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        return Stripped(
+            f"""\
+function parseFloatText(
+{I}text: string
+): AasCommon.Either<number, DeserializationError> {{
+{I}if (text === "INF") {{
+{II}return new AasCommon.Either<number, DeserializationError>(Infinity, null);
+{I}}}
+{I}if (text === "-INF") {{
+{II}return new AasCommon.Either<number, DeserializationError>(-Infinity, null);
+{I}}}
+{I}if (text === "NaN") {{
+{II}return new AasCommon.Either<number, DeserializationError>(NaN, null);
+{I}}}
+
+{I}const value = Number(text);
+{I}if (Number.isNaN(value)) {{
+{II}return newDeserializationError<number>(
+{III}`Expected xs:double text, but got: ${{text}}`
+{II});
+{I}}}
+
+{I}return new AasCommon.Either<number, DeserializationError>(value, null);
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped(
+            f"""\
+function parseStringText(
+{I}text: string
+): AasCommon.Either<string, DeserializationError> {{
+{I}return new AasCommon.Either<string, DeserializationError>(text, null);
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        return Stripped(
+            f"""\
+function parseBase64EncodedBytesText(
+{I}text: string
+): AasCommon.Either<Uint8Array, DeserializationError> {{
+{I}const decodedOrError = AasCommon.base64Decode(text);
+{I}if (decodedOrError.error !== null) {{
+{II}return newDeserializationError<Uint8Array>(
+{III}decodedOrError.error
+{II});
+{I}}}
+
+{I}return new AasCommon.Either<Uint8Array, DeserializationError>(
+{II}decodedOrError.mustValue(),
+{II}null
+{I});
+}}"""
+        )
+
+    else:
+        assert_never(primitive_type)
+
+
+def _generate_serialize_text_for_primitive_type(
+    primitive_type: intermediate.PrimitiveType,
+) -> Stripped:
+    """Generate serializer for a primitive XML text representation."""
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return Stripped(
+            f"""\
+function serializeBooleanText(value: boolean): string {{
+{I}return value ? "true" : "false";
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(
+            f"""\
+function serializeIntegerText(value: number): string {{
+{I}if (!Number.isInteger(value)) {{
+{II}throw new Error(`Expected an integer, but got: ${{value}}`);
+{I}}}
+
+{I}return `${{value}}`;
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        return Stripped(
+            f"""\
+function serializeFloatText(value: number): string {{
+{I}if (Number.isNaN(value)) {{
+{II}return "NaN";
+{I}}}
+{I}if (value === Infinity) {{
+{II}return "INF";
+{I}}}
+{I}if (value === -Infinity) {{
+{II}return "-INF";
+{I}}}
+
+{I}return `${{value}}`;
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped(
+            f"""\
+function serializeStringText(value: string): string {{
+{I}return escapeXmlText(value);
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        return Stripped(
+            f"""\
+function serializeBase64EncodedBytesText(value: Uint8Array): string {{
+{I}return escapeXmlText(AasCommon.base64Encode(value));
+}}"""
+        )
+
+    else:
+        assert_never(primitive_type)
+
+
 def _parse_function_for_atomic_type(
     type_annotation: intermediate.AtomicTypeAnnotation,
 ) -> Identifier:
@@ -242,6 +411,7 @@ const parsedItems = new Array<{list_items_type}>();
 let itemIndex = 0;
 
 cursor.skipIgnorable();
+// eslint-disable-next-line no-constant-condition
 while (true) {{
 {I}const itemOrClose = cursor.current();
 {I}if (itemOrClose === null) {{
@@ -332,6 +502,7 @@ const parsedItems = new Array<{list_items_type}>();
 let itemIndex = 0;
 
 cursor.skipIgnorable();
+// eslint-disable-next-line no-constant-condition
 while (true) {{
 {I}const itemOrClose = cursor.current();
 {I}if (itemOrClose === null) {{
@@ -537,6 +708,7 @@ function {function_name}(
 {I}{indent_but_first_line(declarations, I)}
 
 {I}cursor.skipIgnorable();
+{I}// eslint-disable-next-line no-constant-condition
 {I}while (true) {{
 {II}const token = cursor.current();
 {II}if (token === null) {{
@@ -1183,6 +1355,7 @@ class XmlCursor {{
 {I}}}
 
 {I}skipIgnorable(): void {{
+{II}// eslint-disable-next-line no-constant-condition
 {II}while (true) {{
 {III}const token = this.current();
 {III}if (token === null) {{
@@ -1306,85 +1479,6 @@ function readTextContentAndConsumeEndTag(
 {I});
 }}
 
-function parseBooleanText(
-{I}text: string
-): AasCommon.Either<boolean, DeserializationError> {{
-{I}if (text === "true" || text === "1") {{
-{II}return new AasCommon.Either<boolean, DeserializationError>(true, null);
-{I}}}
-{I}if (text === "false" || text === "0") {{
-{II}return new AasCommon.Either<boolean, DeserializationError>(false, null);
-{I}}}
-
-{I}return newDeserializationError<boolean>(
-{II}`Expected xs:boolean text, but got: ${{text}}`
-{I});
-}}
-
-function parseIntegerText(
-{I}text: string
-): AasCommon.Either<number, DeserializationError> {{
-{I}if (!/^[+-]?\\d+$/.test(text)) {{
-{II}return newDeserializationError<number>(
-{III}`Expected integer text, but got: ${{text}}`
-{II});
-{I}}}
-
-{I}const value = Number(text);
-{I}if (!Number.isInteger(value)) {{
-{II}return newDeserializationError<number>(
-{III}`Expected integer text, but got: ${{text}}`
-{II});
-{I}}}
-
-{I}return new AasCommon.Either<number, DeserializationError>(value, null);
-}}
-
-function parseFloatText(
-{I}text: string
-): AasCommon.Either<number, DeserializationError> {{
-{I}if (text === "INF") {{
-{II}return new AasCommon.Either<number, DeserializationError>(Infinity, null);
-{I}}}
-{I}if (text === "-INF") {{
-{II}return new AasCommon.Either<number, DeserializationError>(-Infinity, null);
-{I}}}
-{I}if (text === "NaN") {{
-{II}return new AasCommon.Either<number, DeserializationError>(NaN, null);
-{I}}}
-
-{I}const value = Number(text);
-{I}if (Number.isNaN(value)) {{
-{II}return newDeserializationError<number>(
-{III}`Expected xs:double text, but got: ${{text}}`
-{II});
-{I}}}
-
-{I}return new AasCommon.Either<number, DeserializationError>(value, null);
-}}
-
-function parseStringText(
-{I}text: string
-): AasCommon.Either<string, DeserializationError> {{
-{I}return new AasCommon.Either<string, DeserializationError>(text, null);
-}}
-
-function parseBase64EncodedBytesText(
-{I}text: string
-): AasCommon.Either<Uint8Array, DeserializationError> {{
-{I}const decodedOrError = AasCommon.base64Decode(text);
-{I}if (decodedOrError.error !== null) {{
-{II}return newDeserializationError<Uint8Array>(
-{III}decodedOrError.error
-{II});
-{I}}}
-
-{I}return new AasCommon.Either<Uint8Array, DeserializationError>(
-{II}decodedOrError.mustValue(),
-{II}null
-{I});
-}}
-
 function parsePropertyAsClassInstance(
 {I}cursor: XmlCursor,
 {I}propertyStartTag: OpenTagToken
@@ -1448,6 +1542,9 @@ function parsePropertyAsClassInstance(
 }}"""
         ),
     ]  # type: List[Stripped]
+
+    for primitive_type in intermediate.PrimitiveType:
+        blocks.append(_generate_parse_text_for_primitive_type(primitive_type))
 
     for enumeration in symbol_table.enumerations:
         blocks.append(_generate_parse_text_as_enumeration(enumeration))
@@ -1572,42 +1669,16 @@ function escapeXmlText(text: string): string {{
 {II}.replace(/>/g, "&gt;")
 {II}.replace(/\"/g, "&quot;")
 {II}.replace(/'/g, "&apos;");
-}}
-
-function serializeBooleanText(value: boolean): string {{
-{I}return value ? "true" : "false";
-}}
-
-function serializeIntegerText(value: number): string {{
-{I}if (!Number.isInteger(value)) {{
-{II}throw new Error(`Expected an integer, but got: ${{value}}`);
-{I}}}
-
-{I}return `${{value}}`;
-}}
-
-function serializeFloatText(value: number): string {{
-{I}if (Number.isNaN(value)) {{
-{II}return "NaN";
-{I}}}
-{I}if (value === Infinity) {{
-{II}return "INF";
-{I}}}
-{I}if (value === -Infinity) {{
-{II}return "-INF";
-{I}}}
-
-{I}return `${{value}}`;
-}}
-
-function serializeStringText(value: string): string {{
-{I}return escapeXmlText(value);
-}}
-
-function serializeBase64EncodedBytesText(value: Uint8Array): string {{
-{I}return escapeXmlText(AasCommon.base64Encode(value));
 }}"""
             ),
+        ]
+    )
+
+    for primitive_type in intermediate.PrimitiveType:
+        blocks.append(_generate_serialize_text_for_primitive_type(primitive_type))
+
+    blocks.extend(
+        [
             _generate_serializer(symbol_table=symbol_table),
             Stripped("const SERIALIZER = new Serializer();"),
             Stripped(
@@ -1644,4 +1715,5 @@ export function toXmlString(that: AasTypes.Class): string {{
 
 
 assert generate.__doc__ is not None
+assert __doc__ is not None
 assert generate.__doc__.strip().startswith(__doc__.strip())

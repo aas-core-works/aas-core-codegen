@@ -10,6 +10,7 @@ from aas_core_codegen.typescript.tests import (
     _generate_jsonization_enums_spec,
     _generate_jsonization_interfaces_spec,
     _generate_xmlization_concrete_classes_spec,
+    _generate_xmlization_common_spec,
     _generate_xmlization_enums_spec,
     _generate_xmlization_interfaces_spec,
     _generate_types_casts_spec,
@@ -35,6 +36,7 @@ generate_jsonization_interfaces_spec = _generate_jsonization_interfaces_spec.gen
 generate_xmlization_concrete_classes_spec = (
     _generate_xmlization_concrete_classes_spec.generate
 )
+generate_xmlization_common_spec = _generate_xmlization_common_spec.generate
 generate_xmlization_enums_spec = _generate_xmlization_enums_spec.generate
 generate_xmlization_interfaces_spec = _generate_xmlization_interfaces_spec.generate
 generate_types_casts_spec = _generate_types_casts_spec.generate
