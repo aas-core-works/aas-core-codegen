@@ -13,6 +13,7 @@ from aas_core_codegen.typescript.tests import (
     _generate_xmlization_common_spec,
     _generate_xmlization_enums_spec,
     _generate_xmlization_interfaces_spec,
+    _generate_xmlization_negative_spec,
     _generate_types_casts_spec,
     _generate_types_descend_and_pass_through_visitor_spec,
     _generate_types_descend_once_spec,
@@ -39,6 +40,7 @@ generate_xmlization_concrete_classes_spec = (
 generate_xmlization_common_spec = _generate_xmlization_common_spec.generate
 generate_xmlization_enums_spec = _generate_xmlization_enums_spec.generate
 generate_xmlization_interfaces_spec = _generate_xmlization_interfaces_spec.generate
+generate_xmlization_negative_spec = _generate_xmlization_negative_spec.generate
 generate_types_casts_spec = _generate_types_casts_spec.generate
 generate_types_descend_and_pass_through_visitor_spec = (
     _generate_types_descend_and_pass_through_visitor_spec.generate

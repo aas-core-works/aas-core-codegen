@@ -145,68 +145,6 @@ function parseBase64EncodedBytesText(
         assert_never(primitive_type)
 
 
-def _generate_serialize_text_for_primitive_type(
-    primitive_type: intermediate.PrimitiveType,
-) -> Stripped:
-    """Generate serializer for a primitive XML text representation."""
-    if primitive_type is intermediate.PrimitiveType.BOOL:
-        return Stripped(
-            f"""\
-function serializeBooleanText(value: boolean): string {{
-{I}return value ? "true" : "false";
-}}"""
-        )
-
-    elif primitive_type is intermediate.PrimitiveType.INT:
-        return Stripped(
-            f"""\
-function serializeIntegerText(value: number): string {{
-{I}if (!Number.isInteger(value)) {{
-{II}throw new Error(`Expected an integer, but got: ${{value}}`);
-{I}}}
-
-{I}return `${{value}}`;
-}}"""
-        )
-
-    elif primitive_type is intermediate.PrimitiveType.FLOAT:
-        return Stripped(
-            f"""\
-function serializeFloatText(value: number): string {{
-{I}if (Number.isNaN(value)) {{
-{II}return "NaN";
-{I}}}
-{I}if (value === Infinity) {{
-{II}return "INF";
-{I}}}
-{I}if (value === -Infinity) {{
-{II}return "-INF";
-{I}}}
-
-{I}return `${{value}}`;
-}}"""
-        )
-
-    elif primitive_type is intermediate.PrimitiveType.STR:
-        return Stripped(
-            f"""\
-function serializeStringText(value: string): string {{
-{I}return escapeXmlText(value);
-}}"""
-        )
-
-    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-        return Stripped(
-            f"""\
-function serializeBase64EncodedBytesText(value: Uint8Array): string {{
-{I}return escapeXmlText(AasCommon.base64Encode(value));
-}}"""
-        )
-
-    else:
-        assert_never(primitive_type)
-
-
 def _parse_function_for_atomic_type(
     type_annotation: intermediate.AtomicTypeAnnotation,
 ) -> Identifier:
@@ -844,6 +782,68 @@ function {serialize_function_name}(
 {I}return escapeXmlText(AasStringification.{to_string_function}(value));
 }}"""
     )
+
+
+def _generate_serialize_text_for_primitive_type(
+    primitive_type: intermediate.PrimitiveType,
+) -> Stripped:
+    """Generate serializer for a primitive XML text representation."""
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return Stripped(
+            f"""\
+function serializeBooleanText(value: boolean): string {{
+{I}return value ? "true" : "false";
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(
+            f"""\
+function serializeIntegerText(value: number): string {{
+{I}if (!Number.isInteger(value)) {{
+{II}throw new Error(`Expected an integer, but got: ${{value}}`);
+{I}}}
+
+{I}return `${{value}}`;
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        return Stripped(
+            f"""\
+function serializeFloatText(value: number): string {{
+{I}if (Number.isNaN(value)) {{
+{II}return "NaN";
+{I}}}
+{I}if (value === Infinity) {{
+{II}return "INF";
+{I}}}
+{I}if (value === -Infinity) {{
+{II}return "-INF";
+{I}}}
+
+{I}return `${{value}}`;
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped(
+            f"""\
+function serializeStringText(value: string): string {{
+{I}return escapeXmlText(value);
+}}"""
+        )
+
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        return Stripped(
+            f"""\
+function serializeBase64EncodedBytesText(value: Uint8Array): string {{
+{I}return escapeXmlText(AasCommon.base64Encode(value));
+}}"""
+        )
+
+    else:
+        assert_never(primitive_type)
 
 
 def _generate_serialize_block_for_property(

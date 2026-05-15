@@ -237,6 +237,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            test_rel_path / "xmlization.negative.spec.ts",
+            lambda: (
+                typescript_tests.generate_xmlization_negative_spec(
+                    symbol_table=verified_ir_table,
+                ),
+                None,
+            ),
+        ),
+        (
             test_rel_path / "types.casts.spec.ts",
             lambda: (
                 typescript_tests.generate_types_casts_spec(
