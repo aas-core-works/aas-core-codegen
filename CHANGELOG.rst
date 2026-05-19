@@ -3,6 +3,15 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.25 (2026-05-19)
+===================
+* Increase TypeScript SDK Code Coverage (#632)
+
+The previous release, 0.0.24, did not provide sufficient code coverage
+for the TypeScript SDK, but that was revealed only once we already
+released 0.0.24 and ran the continuous integration of the TypeScript
+SDK.
+
 0.0.24 (2026-05-15)
 ===================
 * Improve coverage for TypeScript test data gen (#630)
