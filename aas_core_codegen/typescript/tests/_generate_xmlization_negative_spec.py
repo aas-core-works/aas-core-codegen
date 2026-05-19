@@ -206,7 +206,7 @@ test("XML duplicate property fails", () => {{
 
 {I}const propertyName = {duplicate_prop_xml_literal};
 {I}const propertyPattern = new RegExp(
-{I}{I}`(<${{escapeRegExp(propertyName)}}>[\\s\\S]*?</${{escapeRegExp(propertyName)}}>)`
+{I}{I}`(<${{escapeRegExp(propertyName)}}>[\\\\s\\\\S]*?</${{escapeRegExp(propertyName)}}>)`
 {I});
 {I}const match = propertyPattern.exec(text);
 {I}if (match === null) {{

@@ -74,6 +74,9 @@ import * as TestCommonXmlization from "./commonXmlization";"""
         as_function = typescript_naming.function_name(
             Identifier(f"as_{carrier_cls.name}")
         )
+        prop_xml_name_literal = typescript_common.string_literal(
+            naming.xml_property(carrier_prop.name)
+        )
 
         blocks.append(
             Stripped(
@@ -94,14 +97,42 @@ test("{enum_name_typescript} XML round-trip OK", () => {{
             )
         )
 
+        for literal in enumeration.literals:
+            literal_name_typescript = typescript_naming.enum_literal_name(literal.name)
+            literal_value_literal = typescript_common.string_literal(literal.value)
+
+            blocks.append(
+                Stripped(
+                    f"""\
+test("{enum_name_typescript} XML deserializes {literal_name_typescript} OK", () => {{
+{I}const instance = TestCommonXmlization.{load_maximal_name}();
+{I}const xmlText = AasXmlization.toXmlString(instance);
+
+{I}const regex = new RegExp(
+{II}`(<${{{prop_xml_name_literal}}}>)([^<]*)(</${{{prop_xml_name_literal}}}>)`
+{I});
+{I}const adaptedXmlText = xmlText.replace(
+{II}regex,
+{II}`$1${{{literal_value_literal}}}$3`
+{I});
+
+{I}const anotherOrError = AasXmlization.fromXmlString(adaptedXmlText);
+{I}expect(anotherOrError.error).toBeNull();
+
+{I}const casted = AasTypes.{as_function}(anotherOrError.mustValue());
+{I}expect(casted).not.toBeNull();
+{I}expect(casted.{prop_name_typescript}).toStrictEqual(
+{II}AasTypes.{enum_name_typescript}.{literal_name_typescript}
+{I});
+}});"""
+                )
+            )
+
         literal_value_set = set(literal.value for literal in enumeration.literals)
         invalid_literal_value = "invalid-literal"
         while invalid_literal_value in literal_value_set:
             invalid_literal_value = f"very-{invalid_literal_value}"
 
-        prop_xml_name_literal = typescript_common.string_literal(
-            naming.xml_property(carrier_prop.name)
-        )
         invalid_literal_literal = typescript_common.string_literal(
             invalid_literal_value
         )

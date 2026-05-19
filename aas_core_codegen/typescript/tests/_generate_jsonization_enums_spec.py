@@ -47,17 +47,17 @@ import * as AasTypes from "../src/types";"""
             len(enumeration.literals) > 0
         ), f"Unexpected enumeration without literals: {enumeration.name}"
 
-        literal = enumeration.literals[0]
-        literal_name_typescript = typescript_naming.enum_literal_name(literal.name)
-
         deserialization_function = typescript_naming.function_name(
             Identifier(f"{enumeration.name}_from_jsonable")
         )
 
-        blocks.append(
-            Stripped(
-                f"""\
-test("{enum_name_typescript} round-trip OK", () => {{
+        for literal in enumeration.literals:
+            literal_name_typescript = typescript_naming.enum_literal_name(literal.name)
+
+            blocks.append(
+                Stripped(
+                    f"""\
+test("{enum_name_typescript} deserializes {literal_name_typescript} OK", () => {{
 {I}const jsonable = {typescript_common.string_literal(literal.value)};
 
 {I}const literalOrError = AasJsonization.{deserialization_function}(
@@ -65,14 +65,14 @@ test("{enum_name_typescript} round-trip OK", () => {{
 {I});
 
 {I}expect(literalOrError.error).toBeNull();
-{I}const literal = literalOrError.mustValue();
+{I}const parsedLiteral = literalOrError.mustValue();
 
-{I}expect(literal).toStrictEqual(
+{I}expect(parsedLiteral).toStrictEqual(
 {II}AasTypes.{enum_name_typescript}.{literal_name_typescript}
 {I});
 }});"""
+                )
             )
-        )
 
         literal_value_set = set(literal.value for literal in enumeration.literals)
         invalid_literal_value = "invalid-literal"

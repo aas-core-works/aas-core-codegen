@@ -59,7 +59,7 @@ test("XML duplicate property fails", () => {
 
   const propertyName = "someBool";
   const propertyPattern = new RegExp(
-    `(<${escapeRegExp(propertyName)}>[\s\S]*?</${escapeRegExp(propertyName)}>)`
+    `(<${escapeRegExp(propertyName)}>[\\s\\S]*?</${escapeRegExp(propertyName)}>)`
   );
   const match = propertyPattern.exec(text);
   if (match === null) {
