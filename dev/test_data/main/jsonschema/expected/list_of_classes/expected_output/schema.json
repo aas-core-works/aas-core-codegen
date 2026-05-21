@@ -57,6 +57,17 @@
         "SomeItem"
       ]
     },
+    "Simple": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
     "SomeItem": {
       "allOf": [
         {
@@ -85,10 +96,17 @@
           "items": {
             "$ref": "#/definitions/AbstractItem_choice"
           }
+        },
+        "someSimples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Simple"
+          }
         }
       },
       "required": [
-        "someItems"
+        "someItems",
+        "someSimples"
       ]
     }
   }

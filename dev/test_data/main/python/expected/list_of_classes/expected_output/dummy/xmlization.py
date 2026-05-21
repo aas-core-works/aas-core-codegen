@@ -871,6 +871,204 @@ def another_item_from_str(
     )
 
 
+def simple_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Simple:
+    """
+    Read an instance of :py:class:`.types.Simple` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = aas_xmlization.simple_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Simple` read from
+        :paramref:`iterator`
+    """
+    next_event_element = next(iterator, None)
+    if next_event_element is None:
+        raise DeserializationException(
+            # fmt: off
+            "Expected the start element for Simple, "
+            "but got the end-of-input"
+            # fmt: on
+        )
+
+    next_event, next_element = next_event_element
+    if next_event != 'start':
+        raise DeserializationException(
+            f"Expected the start element for Simple, "
+            f"but got event {next_event!r} and element {next_element.tag!r}"
+        )
+
+    try:
+        return _read_simple_as_element(
+            next_element,
+            iterator
+        )
+    except DeserializationException as exception:
+        exception.path._prepend(ElementSegment(next_element))
+        raise exception
+
+
+def simple_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Simple:
+    """
+    Read an instance of :py:class:`.types.Simple` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as aas_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = aas_xmlization.simple_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.Simple` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Simple` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return simple_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def simple_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Simple:
+    """
+    Read an instance of :py:class:`.types.Simple` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        path = pathlib.Path(...)
+        instance = aas_xmlization.simple_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.Simple` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Simple` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return simple_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def simple_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> aas_types.Simple:
+    """
+    Read an instance of :py:class:`.types.Simple` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as aas_xmlization
+
+        text = "<...>...</...>"
+        instance = aas_xmlization.simple_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.Simple` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Simple` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return simple_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
 def something_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
 ) -> aas_types.Something:
@@ -1931,6 +2129,153 @@ def _read_another_item_as_element(
     )
 
 
+class _ReaderAndSetterForSimple:
+    """
+    Provide a buffer for reading and setting the properties for the class
+    :py:class:`Simple`.
+
+    The properties correspond to the constructor arguments of
+    :py:class:`Simple`. We use this buffer to facilitate dispatching when
+    parsing the properties in a streaming fashion.
+    """
+
+    def __init__(self) -> None:
+        """Initialize with all the properties unset."""
+        self.name: Optional[str] = None
+
+    def read_and_set_name(
+        self,
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+    ) -> None:
+        """
+        Read :paramref:`element` as the property
+        :py:attr:`.types.Simple.name` and set it.
+        """
+        self.name = _read_str_from_element_text(
+            element,
+            iterator
+        )
+
+
+def _read_simple_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Simple:
+    """
+    Read an instance of :py:class:`.types.Simple`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    if element.text is not None and len(element.text.strip()) != 0:
+        raise DeserializationException(
+            f"Expected only XML elements representing the properties and whitespace text, "
+            f"but got text: {element.text!r}"
+        )
+
+    _raise_if_has_tail_or_attrib(element)
+
+    reader_and_setter = (
+        _ReaderAndSetterForSimple()
+    )
+
+    while True:
+        next_event_element = next(iterator, None)
+        if next_event_element is None:
+            raise DeserializationException(
+                "Expected one or more XML-encoded properties or the end element, "
+                "but got the end-of-input"
+            )
+
+        next_event, next_element = next_event_element
+        if next_event == 'end' and next_element.tag == element.tag:
+            # We reached the end element enclosing the sequence.
+            break
+
+        if next_event != 'start':
+            raise DeserializationException(
+                "Expected a start element corresponding to a property, "
+                f"but got event {next_event!r} and element {next_element.tag!r}"
+            )
+
+        try:
+            tag_wo_ns = _parse_element_tag(next_element)
+        except DeserializationException as exception:
+            exception.path._prepend(ElementSegment(next_element))
+            raise
+
+        read_and_set_method = _READ_AND_SET_DISPATCH_FOR_SIMPLE.get(
+            tag_wo_ns,
+            None
+        )
+        if read_and_set_method is None:
+            an_exception = DeserializationException(
+                f"Expected an element representing a property, "
+                f"but got an element with unexpected tag: {tag_wo_ns!r}"
+            )
+            an_exception.path._prepend(ElementSegment(next_element))
+            raise an_exception
+
+        try:
+            read_and_set_method(
+                reader_and_setter,
+                next_element,
+                iterator
+            )
+        except DeserializationException as exception:
+            exception.path._prepend(ElementSegment(next_element))
+            raise
+
+    if reader_and_setter.name is None:
+        raise DeserializationException(
+            "The required property 'name' is missing"
+        )
+
+    return aas_types.Simple(
+        reader_and_setter.name
+    )
+
+
+def _read_simple_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> aas_types.Simple:
+    """
+    Read an instance of :py:class:`.types.Simple` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    tag_wo_ns = _parse_element_tag(element)
+
+    if tag_wo_ns != 'simple':
+        raise DeserializationException(
+            f"Expected the element with the tag 'simple', "
+            f"but got tag: {tag_wo_ns}"
+        )
+
+    return _read_simple_as_sequence(
+        element,
+        iterator
+    )
+
+
 class _ReaderAndSetterForSomething:
     """
     Provide a buffer for reading and setting the properties for the class
@@ -1944,6 +2289,7 @@ class _ReaderAndSetterForSomething:
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
         self.some_items: Optional[List[aas_types.AbstractItem]] = None
+        self.some_simples: Optional[List[aas_types.Simple]] = None
 
     def read_and_set_some_items(
         self,
@@ -1998,6 +2344,60 @@ class _ReaderAndSetterForSomething:
             item_i += 1
 
         self.some_items = result
+
+    def read_and_set_some_simples(
+        self,
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+    ) -> None:
+        """
+        Read :paramref:`element` as the property
+        :py:attr:`.types.Something.some_simples` and set it.
+        """
+        if element.text is not None and len(element.text.strip()) != 0:
+            raise DeserializationException(
+                f"Expected only item elements and whitespace text, "
+                f"but got text: {element.text!r}"
+            )
+
+        result: List[
+            aas_types.Simple
+        ] = []
+
+        item_i = 0
+
+        while True:
+            next_event_element = next(iterator, None)
+            if next_event_element is None:
+                raise DeserializationException(
+                    "Expected one or more items from a list or the end element, "
+                    "but got end-of-input"
+                )
+
+            next_event, next_element = next_event_element
+            if next_event == 'end' and next_element.tag == element.tag:
+                # We reached the end of the list.
+                break
+
+            if next_event != 'start':
+                raise DeserializationException(
+                    "Expected a start element corresponding to an item, "
+                    f"but got event {next_event!r} and element {next_element.tag!r}"
+                )
+
+            try:
+                item = _read_simple_as_element(
+                    next_element,
+                    iterator
+                )
+            except DeserializationException as exception:
+                exception.path._prepend(IndexSegment(next_element, item_i))
+                raise
+
+            result.append(item)
+            item_i += 1
+
+        self.some_simples = result
 
 
 def _read_something_as_sequence(
@@ -2083,8 +2483,14 @@ def _read_something_as_sequence(
             "The required property 'someItems' is missing"
         )
 
+    if reader_and_setter.some_simples is None:
+        raise DeserializationException(
+            "The required property 'someSimples' is missing"
+        )
+
     return aas_types.Something(
-        reader_and_setter.some_items
+        reader_and_setter.some_items,
+        reader_and_setter.some_simples
     )
 
 
@@ -2206,6 +2612,24 @@ _READ_AND_SET_DISPATCH_FOR_ANOTHER_ITEM: Mapping[
 
 
 #: Dispatch XML property name to read & set method in
+#: :py:class:`_ReaderAndSetterForSimple`
+_READ_AND_SET_DISPATCH_FOR_SIMPLE: Mapping[
+    str,
+    Callable[
+        [
+            _ReaderAndSetterForSimple,
+            Element,
+            Iterator[Tuple[str, Element]]
+        ],
+        None
+    ]
+] = {
+    'name':
+        _ReaderAndSetterForSimple.read_and_set_name,
+}
+
+
+#: Dispatch XML property name to read & set method in
 #: :py:class:`_ReaderAndSetterForSomething`
 _READ_AND_SET_DISPATCH_FOR_SOMETHING: Mapping[
     str,
@@ -2220,6 +2644,8 @@ _READ_AND_SET_DISPATCH_FOR_SOMETHING: Mapping[
 ] = {
     'someItems':
         _ReaderAndSetterForSomething.read_and_set_some_items,
+    'someSimples':
+        _ReaderAndSetterForSomething.read_and_set_some_simples,
 }
 
 
@@ -2237,6 +2663,7 @@ _GENERAL_DISPATCH: Mapping[
 ] = {
     'someItem': _read_some_item_as_sequence,
     'anotherItem': _read_another_item_as_sequence,
+    'simple': _read_simple_as_sequence,
     'something': _read_something_as_sequence,
 }
 
@@ -2588,6 +3015,42 @@ class _Serializer(aas_types.AbstractVisitor):
         )
         self._write_end_element('anotherItem')
 
+    def _write_simple_as_sequence(
+        self,
+        that: aas_types.Simple
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as a sequence of
+        XML elements.
+
+        Each element in the sequence corresponds to a property. If no properties
+        are set, nothing is written to the :py:attr:`~stream`.
+
+        :param that: instance to be serialized
+        """
+        self._write_str_property(
+            'name',
+            that.name
+        )
+
+    def visit_simple(
+        self,
+        that: aas_types.Simple
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        self._write_start_element('simple')
+        self._write_simple_as_sequence(
+            that
+        )
+        self._write_end_element('simple')
+
     def _write_something_as_sequence(
         self,
         that: aas_types.Something
@@ -2608,6 +3071,14 @@ class _Serializer(aas_types.AbstractVisitor):
             for an_item in that.some_items:
                 self.visit(an_item)
             self._write_end_element('someItems')
+
+        if len(that.some_simples) == 0:
+            self._write_empty_element('someSimples')
+        else:
+            self._write_start_element('someSimples')
+            for another_item in that.some_simples:
+                self.visit(another_item)
+            self._write_end_element('someSimples')
 
     def visit_something(
         self,

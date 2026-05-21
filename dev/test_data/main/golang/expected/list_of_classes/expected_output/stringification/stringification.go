@@ -12,6 +12,7 @@ import (
 var modelTypeFromStringMap = map[string]aastypes.ModelType {
 	"SomeItem": aastypes.ModelTypeSomeItem,
 	"AnotherItem": aastypes.ModelTypeAnotherItem,
+	"Simple": aastypes.ModelTypeSimple,
 	"Something": aastypes.ModelTypeSomething,
 }
 
@@ -28,6 +29,7 @@ func ModelTypeFromString(
 var modelTypeToStringArray = [...]string {
 	"SomeItem",
 	"AnotherItem",
+	"Simple",
 	"Something",
 }
 

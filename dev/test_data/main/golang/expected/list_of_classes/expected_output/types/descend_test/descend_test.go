@@ -57,6 +57,30 @@ func TestDescendOnAnInstanceOfAnotherItem(
 	}
 }
 
+func TestDescendOnAnInstanceOfSimple(
+	t *testing.T,
+) {
+	instance := aastesting.MustLoadMaximalSimple()
+
+	expectedPth := filepath.Join(
+		aastesting.TestDataDir,
+		"Descend",
+		"Simple",
+		"maximal.json.trace",
+	)
+
+	onlyOnce := false
+
+	message := compareOrRerecordTrace(
+		instance,
+		expectedPth,
+		onlyOnce,
+	)
+	if message != nil {
+		t.Fatal(*message)
+	}
+}
+
 func TestDescendOnAnInstanceOfSomething(
 	t *testing.T,
 ) {

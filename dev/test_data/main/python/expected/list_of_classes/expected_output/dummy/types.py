@@ -227,10 +227,80 @@ class AnotherItem(AbstractItem):
         self.serial_number = serial_number
 
 
+class Simple(Class):
+    # pylint: disable=missing-class-docstring
+
+    name: str
+
+    def descend_once(self) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this instance.
+
+        We do not recurse into the referenced instance.
+
+        :yield: instances directly referenced from this instance
+        """
+        # No descendable properties
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    def descend(self) -> Iterator[Class]:
+        """
+        Iterate recursively over the instances referenced from this one.
+
+        :yield: instances recursively referenced from this instance
+        """
+        # No descendable properties
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    def accept(self, visitor: "AbstractVisitor") -> None:
+        """Dispatch the :paramref:`visitor` on this instance."""
+        visitor.visit_simple(self)
+
+    def accept_with_context(
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
+    ) -> None:
+        """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
+        visitor.visit_simple_with_context(self, context)
+
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
+        """Dispatch the :paramref:`transformer` on this instance."""
+        return transformer.transform_simple(self)
+
+    def transform_with_context(
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
+    ) -> T:
+        """
+        Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
+        """
+        return transformer.transform_simple_with_context(
+            self, context)
+
+    def __init__(self, name: str) -> None:
+        """Initialize with the given values."""
+        self.name = name
+
+
 class Something(Class):
     # pylint: disable=missing-class-docstring
 
     some_items: List['AbstractItem']
+
+    some_simples: List['Simple']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -242,6 +312,8 @@ class Something(Class):
         """
         yield from self.some_items
 
+        yield from self.some_simples
+
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
@@ -252,6 +324,11 @@ class Something(Class):
             yield an_item
 
             yield from an_item.descend()
+
+        for another_item in self.some_simples:
+            yield another_item
+
+            yield from another_item.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -283,9 +360,14 @@ class Something(Class):
         return transformer.transform_something_with_context(
             self, context)
 
-    def __init__(self, some_items: List['AbstractItem']) -> None:
+    def __init__(
+            self,
+            some_items: List['AbstractItem'],
+            some_simples: List['Simple']
+    ) -> None:
         """Initialize with the given values."""
         self.some_items = some_items
+        self.some_simples = some_simples
 
 
 class AbstractVisitor:
@@ -309,6 +391,14 @@ class AbstractVisitor:
     def visit_another_item(
             self,
             that: AnotherItem
+    ) -> None:
+        """Visit :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def visit_simple(
+            self,
+            that: Simple
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
@@ -351,6 +441,15 @@ class AbstractVisitorWithContext(Generic[ContextT]):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def visit_simple_with_context(
+            self,
+            that: Simple,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def visit_something_with_context(
             self,
             that: Something,
@@ -385,6 +484,14 @@ class PassThroughVisitor(AbstractVisitor):
     def visit_another_item(
             self,
             that: AnotherItem
+    ) -> None:
+        """Visit :paramref:`that`."""
+        for another in that.descend_once():
+            self.visit(another)
+
+    def visit_simple(
+            self,
+            that: Simple
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
@@ -434,6 +541,15 @@ class PassThroughVisitorWithContext(
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
+    def visit_simple_with_context(
+            self,
+            that: Simple,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        for another in that.descend_once():
+            self.visit_with_context(another, context)
+
     def visit_something_with_context(
             self,
             that: Something,
@@ -465,6 +581,14 @@ class AbstractTransformer(Generic[T]):
     def transform_another_item(
             self,
             that: AnotherItem
+    ) -> T:
+        """Transform :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_simple(
+            self,
+            that: Simple
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
@@ -503,6 +627,15 @@ class AbstractTransformerWithContext(
     def transform_another_item_with_context(
             self,
             that: AnotherItem,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_simple_with_context(
+            self,
+            that: Simple,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
@@ -553,6 +686,13 @@ class TransformerWithDefault(AbstractTransformer[T]):
         """Transform :paramref:`that`."""
         return self.default
 
+    def transform_simple(
+            self,
+            that: Simple
+    ) -> T:
+        """Transform :paramref:`that`."""
+        return self.default
+
     def transform_something(
             self,
             that: Something
@@ -596,6 +736,14 @@ class TransformerWithDefaultAndContext(
     def transform_another_item_with_context(
             self,
             that: AnotherItem,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        return self.default
+
+    def transform_simple_with_context(
+            self,
+            that: Simple,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""

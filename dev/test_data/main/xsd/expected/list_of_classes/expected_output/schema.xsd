@@ -15,9 +15,9 @@
       <xs:element name="serialNumber" type="xs:long"/>
     </xs:sequence>
   </xs:group>
-  <xs:group name="parentlessAndChildless">
+  <xs:group name="simple">
     <xs:sequence>
-      <xs:element name="identifier" type="xs:string"/>
+      <xs:element name="name" type="xs:string"/>
     </xs:sequence>
   </xs:group>
   <xs:group name="someItem">
@@ -35,10 +35,10 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="listOfParentlessAndChildless">
+      <xs:element name="someSimples">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="parentlessAndChildless" type="parentlessAndChildless_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="simple" type="simple_t" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -57,9 +57,9 @@
       <xs:group ref="anotherItem"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="parentlessAndChildless_t">
+  <xs:complexType name="simple_t">
     <xs:sequence>
-      <xs:group ref="parentlessAndChildless"/>
+      <xs:group ref="simple"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="someItem_t">

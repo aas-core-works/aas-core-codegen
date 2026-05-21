@@ -178,6 +178,90 @@ func MustLoadMinimalAnotherItem(
 	return
 }
 
+// Load a maximal example of [aastypes.ISimple] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMaximalSimple(
+) (result aastypes.ISimple) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"Simple",
+		"maximal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.SimpleFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of ISimple " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.ISimple)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of ISimple at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a minimal example of [aastypes.ISimple] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMinimalSimple(
+) (result aastypes.ISimple) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"Simple",
+		"minimal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := aasjsonization.SimpleFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of ISimple " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(aastypes.ISimple)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of ISimple at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
 // Load a maximal example of [aastypes.ISomething] from
 // the test data directory.
 //
