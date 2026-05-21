@@ -44,6 +44,22 @@ func deepEqualAnotherItem(
 // Perform a comparison for deep equality between `that` and `other` instance.
 //
 // The deep equality means that all the properties are checked for equality recursively.
+func deepEqualSimple(
+	that aastypes.ISimple,
+	other aastypes.ISimple,
+) bool {
+	thatName := that.Name()
+	otherName := other.Name()
+	if thatName != otherName {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
 func deepEqualSomething(
 	that aastypes.ISomething,
 	other aastypes.ISomething,
@@ -59,6 +75,22 @@ func deepEqualSomething(
 		if !DeepEqual(
 			thatSomeItems[i],
 			otherSomeItems[i],
+		) {
+			return false
+		}
+	}
+
+	thatSomeSimples := that.SomeSimples()
+	otherSomeSimples := other.SomeSimples()
+	if 
+		len(thatSomeSimples) !=
+		len(otherSomeSimples) {
+		return false
+	}
+	for i := range thatSomeSimples {
+		if !DeepEqual(
+			thatSomeSimples[i],
+			otherSomeSimples[i],
 		) {
 			return false
 		}
@@ -85,6 +117,11 @@ func DeepEqual(
 		return deepEqualAnotherItem(
 			that.(aastypes.IAnotherItem),
 			other.(aastypes.IAnotherItem),
+		)
+	case aastypes.ModelTypeSimple:
+		return deepEqualSimple(
+			that.(aastypes.ISimple),
+			other.(aastypes.ISimple),
 		)
 	case aastypes.ModelTypeSomething:
 		return deepEqualSomething(

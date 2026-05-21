@@ -164,6 +164,18 @@ class _Transformer(
         yield
 
     # noinspection PyMethodMayBeStatic
+    def transform_simple(
+            self,
+            that: aas_types.Simple
+    ) -> Iterator[Error]:
+        # No verification has been defined for Simple.
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
             that: aas_types.Something
@@ -180,6 +192,22 @@ class _Transformer(
                     PropertySegment(
                         that,
                         'some_items'
+                    )
+                )
+                yield error
+
+        for i, another_item in enumerate(that.some_simples):
+            for error in self.transform(another_item):
+                error.path._prepend(
+                    IndexSegment(
+                        that.some_simples,
+                        i
+                    )
+                )
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'some_simples'
                     )
                 )
                 yield error

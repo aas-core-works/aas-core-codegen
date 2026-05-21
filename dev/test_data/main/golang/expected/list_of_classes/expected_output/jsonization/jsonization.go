@@ -514,6 +514,92 @@ func anotherItemFromMapWithoutDispatch(
 	return
 }
 
+// Parse `jsonable` as an instance of [aastypes.ISimple],
+// or return an error.
+func SimpleFromJsonable(
+	jsonable interface{},
+) (
+	result aastypes.ISimple,
+	err error,
+) {
+	if jsonable == nil {
+		err = newDeserializationError(
+			"Expected a JSON object, but got null",
+		)
+		return
+	}
+
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Expected a JSON object, but got %T",
+				jsonable,
+			),
+		)
+		return
+	}
+
+	result, err = simpleFromMapWithoutDispatch(m)
+
+	return
+}
+
+// Parse [aastypes.ISimple] from a map,
+// or return an error, if any.
+func simpleFromMapWithoutDispatch(
+	m map[string]interface{},
+) (
+	result aastypes.ISimple,
+	err error,
+) {
+	var theName string
+
+	foundName := false
+
+	for k, v := range m {
+		switch k {
+		case "name":
+			theName, err = stringFromJsonable(
+				v,
+			)
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "name",
+						},
+					)
+				}
+				return
+			}
+			foundName = true
+
+		default:
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property: %s",
+					k,
+				),
+			)
+			return
+		}
+	}
+
+	if !foundName {
+		err = newDeserializationError(
+			"The required property 'name' is missing",
+		)
+		return
+	}
+
+	result = aastypes.NewSimple(
+		theName,
+	)
+
+	return
+}
+
 // Parse `jsonable` as an instance of [aastypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
@@ -554,8 +640,10 @@ func somethingFromMapWithoutDispatch(
 	err error,
 ) {
 	var theSomeItems []aastypes.IAbstractItem
+	var theSomeSimples []aastypes.ISimple
 
 	foundSomeItems := false
+	foundSomeSimples := false
 
 	for k, v := range m {
 		switch k {
@@ -612,6 +700,59 @@ func somethingFromMapWithoutDispatch(
 			theSomeItems = array
 			foundSomeItems = true
 
+		case "someSimples":
+			jsonableArray, ok := v.([]interface{})
+			if !ok {
+				deseriaErr := newDeserializationError(
+					fmt.Sprintf(
+						"Expected an array, but got %T",
+						v,
+					),
+				)
+
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "someSimples",
+					},
+				)
+
+				err = deseriaErr
+
+				return
+			}
+
+			array := make(
+				[]aastypes.ISimple,
+				len(jsonableArray),
+			)
+			for i, itemJsonable := range jsonableArray {
+				var item aastypes.ISimple
+				item, err = SimpleFromJsonable(
+					itemJsonable,
+				)
+				if err != nil {
+					if deseriaErr, ok := err.(*DeserializationError); ok {
+						deseriaErr.Path.PrependIndex(
+							&aasreporting.IndexSegment{
+								Index: i,
+							},
+						)
+
+						deseriaErr.Path.PrependName(
+							&aasreporting.NameSegment{
+								Name: "someSimples",
+							},
+						)
+					}
+
+					return
+				}
+
+				array[i] = item
+			}
+			theSomeSimples = array
+			foundSomeSimples = true
+
 		default:
 			err = newDeserializationError(
 				fmt.Sprintf(
@@ -630,8 +771,16 @@ func somethingFromMapWithoutDispatch(
 		return
 	}
 
+	if !foundSomeSimples {
+		err = newDeserializationError(
+			"The required property 'someSimples' is missing",
+		)
+		return
+	}
+
 	result = aastypes.NewSomething(
 		theSomeItems,
+		theSomeSimples,
 	)
 
 	return
@@ -804,6 +953,22 @@ func anotherItemToMap(
 	return
 }
 
+// Serialize [aastypes.ISimple] as a JSON-able map.
+//
+// This function performs no dispatch! It is only used to serialize
+// the properties. If you want to serialize an instance of
+// [aastypes.ISimple] with proper dispatch, call
+// [ToJsonable].
+func simpleToMap(
+	that aastypes.ISimple,
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{})
+
+	result["name"] = that.Name()
+
+	return
+}
+
 // Serialize [aastypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
@@ -845,6 +1010,36 @@ func somethingToMap(
 	}
 	result["someItems"] = jsonableSomeItems
 
+	jsonableSomeSimples := make(
+		[]interface{},
+		len(that.SomeSimples()),
+	)
+	for i, v := range that.SomeSimples() {
+		var jsonable interface{}
+		jsonable, err = ToJsonable(
+			v,
+		)
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{
+						Index: i,
+					},
+				)
+
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "SomeSimples()",
+					},
+				)
+			}
+
+			return
+		}
+		jsonableSomeSimples[i] = jsonable
+	}
+	result["someSimples"] = jsonableSomeSimples
+
 	return
 }
 
@@ -863,6 +1058,10 @@ func ToJsonable(
 	case aastypes.ModelTypeAnotherItem:
 		result, err = anotherItemToMap(
 			that.(aastypes.IAnotherItem),
+		)
+	case aastypes.ModelTypeSimple:
+		result, err = simpleToMap(
+			that.(aastypes.ISimple),
 		)
 	case aastypes.ModelTypeSomething:
 		result, err = somethingToMap(

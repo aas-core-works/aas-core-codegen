@@ -9,12 +9,12 @@
         </anotherItem>
     </someItems>
 
-    <listOfParentlessAndChildless>
-        <parentlessAndChildless>
-            <identifier>ID-001</identifier>
-        </parentlessAndChildless>
-        <parentlessAndChildless>
-            <identifier>ID-002</identifier>
-        </parentlessAndChildless>
-    </listOfParentlessAndChildless>
+    <someSimples>
+        <simple>
+            <name>ID-001</name>
+        </simple>
+        <simple>
+            <name>ID-002</name>
+        </simple>
+    </someSimples>
 </something>

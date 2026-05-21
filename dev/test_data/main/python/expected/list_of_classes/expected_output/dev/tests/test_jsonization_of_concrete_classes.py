@@ -68,6 +68,30 @@ class TestRoundTrips(unittest.TestCase):
             )
             self.assertListEqual([], list(map(str, mismatches)))
 
+    def test_simple(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'Simple'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                original_jsonable = json.load(fid)
+
+            instance = aas_jsonization.simple_from_jsonable(
+                original_jsonable
+            )
+
+            another_jsonable = aas_jsonization.to_jsonable(instance)
+
+            mismatches = tests.common_jsonization.check_equal(
+                original_jsonable,
+                another_jsonable
+            )
+            self.assertListEqual([], list(map(str, mismatches)))
+
     def test_something(self) -> None:
         for path in sorted(
             (

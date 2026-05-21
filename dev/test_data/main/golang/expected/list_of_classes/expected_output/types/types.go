@@ -12,6 +12,7 @@ type ModelType int
 const (
 	ModelTypeSomeItem ModelType = iota
 	ModelTypeAnotherItem
+	ModelTypeSimple
 	ModelTypeSomething
 )
 
@@ -230,6 +231,89 @@ func NewAnotherItem(
 	}
 }
 
+type ISimple interface {
+	IClass
+
+	Name() string;
+
+	SetName(
+		value string,
+	);
+}
+
+// Check whether the instance corresponds to [aastypes.ISimple]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsSimple(
+	that IClass,
+) (ok bool) {
+	ok = that.ModelType() == ModelTypeSimple
+	return
+}
+
+// Implements ISimple.
+type Simple struct {
+	name string
+}
+
+func (s *Simple) Name(
+) string {
+	return s.name
+}
+
+func (s *Simple) SetName(
+	value string,
+) {
+	s.name = value
+}
+
+func (s *Simple) ModelType(
+) ModelType {
+	return ModelTypeSimple
+}
+
+// Apply the action on the instances referenced from s.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// We do not recurse into the referenced instances.
+//
+// The action is not applied on s.
+func (s *Simple) DescendOnce(
+	action func(IClass) bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Apply the action recursively on the instances referenced from s.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on s.
+func (s *Simple) Descend(
+	action func(IClass) bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Create a new instance of Simple with
+// the given properties.
+func NewSimple(
+	name string,
+) *Simple {
+	return &Simple{
+		name: name,
+	}
+}
+
 type ISomething interface {
 	IClass
 
@@ -237,6 +321,12 @@ type ISomething interface {
 
 	SetSomeItems(
 		value []IAbstractItem,
+	);
+
+	SomeSimples() []ISimple;
+
+	SetSomeSimples(
+		value []ISimple,
 	);
 }
 
@@ -255,6 +345,7 @@ func IsSomething(
 // Implements ISomething.
 type Something struct {
 	someItems []IAbstractItem
+	someSimples []ISimple
 }
 
 func (s *Something) SomeItems(
@@ -266,6 +357,17 @@ func (s *Something) SetSomeItems(
 	value []IAbstractItem,
 ) {
 	s.someItems = value
+}
+
+func (s *Something) SomeSimples(
+) []ISimple {
+	return s.someSimples
+}
+
+func (s *Something) SetSomeSimples(
+	value []ISimple,
+) {
+	s.someSimples = value
 }
 
 func (s *Something) ModelType(
@@ -286,6 +388,13 @@ func (s *Something) DescendOnce(
 ) (abort bool) {
 	for _, v := range s.someItems {
 		abort = action(v);
+		if abort {
+			return
+		}
+	}
+
+	for _, v1 := range s.someSimples {
+		abort = action(v1);
 		if abort {
 			return
 		}
@@ -317,6 +426,20 @@ func (s *Something) Descend(
 		}
 	}
 
+	for _, v1 := range s.someSimples {
+		abort = action(v1);
+		if abort {
+			return
+		}
+
+		abort = v1.Descend(
+			action,
+		);
+		if abort {
+			return
+		}
+	}
+
 	return
 }
 
@@ -324,9 +447,11 @@ func (s *Something) Descend(
 // the given properties.
 func NewSomething(
 	someItems []IAbstractItem,
+	someSimples []ISimple,
 ) *Something {
 	return &Something{
 		someItems: someItems,
+		someSimples: someSimples,
 	}
 }
 

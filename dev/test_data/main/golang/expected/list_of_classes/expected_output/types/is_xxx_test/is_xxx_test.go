@@ -28,6 +28,14 @@ func TestIsXxxOnAnInstanceOfSomeItem(t *testing.T) {
 		)
 	}
 
+	if aastypes.IsSimple(instance) {
+		t.Errorf(
+			"Expected IsSimple to be false on an instance " +
+			"of ISomeItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
 	if aastypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
@@ -56,10 +64,54 @@ func TestIsXxxOnAnInstanceOfAnotherItem(t *testing.T) {
 		)
 	}
 
+	if aastypes.IsSimple(instance) {
+		t.Errorf(
+			"Expected IsSimple to be false on an instance " +
+			"of IAnotherItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
 	if aastypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
 			"of IAnotherItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+}
+
+func TestIsXxxOnAnInstanceOfSimple(t *testing.T) {
+	instance := aastesting.MustLoadMinimalSimple()
+
+	if aastypes.IsSomeItem(instance) {
+		t.Errorf(
+			"Expected IsSomeItem to be false on an instance " +
+			"of ISimple with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsAnotherItem(instance) {
+		t.Errorf(
+			"Expected IsAnotherItem to be false on an instance " +
+			"of ISimple with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if !aastypes.IsSimple(instance) {
+		t.Errorf(
+			"Expected IsSimple to be true on an instance " +
+			"of ISimple with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsSomething(instance) {
+		t.Errorf(
+			"Expected IsSomething to be false on an instance " +
+			"of ISimple with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)
 	}
@@ -79,6 +131,14 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 	if aastypes.IsAnotherItem(instance) {
 		t.Errorf(
 			"Expected IsAnotherItem to be false on an instance " +
+			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if aastypes.IsSimple(instance) {
+		t.Errorf(
+			"Expected IsSimple to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)

@@ -33,24 +33,28 @@ class Another_item(Abstract_item):
         self.serial_number = serial_number
 
 
-class Parentless_and_childless:
-    identifier: str
+# NOTE (mristin):
+# This class does not inherit from any other class nor does it have any descendants.
+# This allows us to test the edge case where a class does not require a model type for
+# serialization.
+class Simple:
+    name: str
 
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
+    def __init__(self, name: str) -> None:
+        self.name = name
 
 
 class Something:
     some_items: List[Abstract_item]
-    list_of_parentless_and_childless: List[Parentless_and_childless]
+    some_simples: List[Simple]
 
     def __init__(
             self,
             some_items: List[Abstract_item],
-            list_of_parentless_and_childless: List[Parentless_and_childless]
+            some_simples: List[Simple]
     ) -> None:
         self.some_items = some_items
-        self.list_of_parentless_and_childless = list_of_parentless_and_childless
+        self.some_simples = some_simples
 
 
 __version__ = "dummy"

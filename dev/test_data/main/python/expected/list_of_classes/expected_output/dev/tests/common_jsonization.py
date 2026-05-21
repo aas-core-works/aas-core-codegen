@@ -122,6 +122,8 @@ _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
 ] = {
     'AnotherItem':
         aas_jsonization.another_item_from_jsonable,
+    'Simple':
+        aas_jsonization.simple_from_jsonable,
     'SomeItem':
         aas_jsonization.some_item_from_jsonable,
     'Something':
@@ -135,6 +137,8 @@ _MODEL_TYPE_TO_CLASS: Mapping[
 ] = {
     'AnotherItem':
         aas_types.AnotherItem,
+    'Simple':
+        aas_types.Simple,
     'SomeItem':
         aas_types.SomeItem,
     'Something':

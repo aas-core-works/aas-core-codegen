@@ -145,6 +145,70 @@ func wrapAnotherItem[E any](
 	return
 }
 
+type enhancedSimple[E any] struct {
+	instance aastypes.ISimple
+	enhancement E
+}
+
+func (es *enhancedSimple[E]) ModelType(
+) aastypes.ModelType {
+	return es.instance.ModelType()
+}
+
+func (es *enhancedSimple[E]) DescendOnce(
+	action func(aastypes.IClass)bool,
+) bool {
+	return es.instance.DescendOnce(action)
+}
+
+func (es *enhancedSimple[E]) Descend(
+	action func(aastypes.IClass) bool,
+) bool {
+	return es.instance.Descend(action)
+}
+
+func (es *enhancedSimple[E]) Name(
+) string {
+	return es.instance.Name()
+}
+
+func (es *enhancedSimple[E]) SetName(
+	value string,
+) {
+	es.instance.SetName(value)
+}
+
+func (es *enhancedSimple[E]) getEnhancement(
+) E {
+	return es.enhancement
+}
+
+func (es *enhancedSimple[E]) setEnhancement(
+	value E,
+) {
+	es.enhancement = value
+}
+
+func wrapSimple[E any](
+	that aastypes.ISimple,
+	factory func(aastypes.IClass) (E, bool),
+) (result aastypes.ISimple) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedSimple[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	return
+}
+
 type enhancedSomething[E any] struct {
 	instance aastypes.ISomething
 	enhancement E
@@ -176,6 +240,17 @@ func (es *enhancedSomething[E]) SetSomeItems(
 	value []aastypes.IAbstractItem,
 ) {
 	es.instance.SetSomeItems(value)
+}
+
+func (es *enhancedSomething[E]) SomeSimples(
+) []aastypes.ISimple {
+	return es.instance.SomeSimples()
+}
+
+func (es *enhancedSomething[E]) SetSomeSimples(
+	value []aastypes.ISimple,
+) {
+	es.instance.SetSomeSimples(value)
 }
 
 func (es *enhancedSomething[E]) getEnhancement(
@@ -215,6 +290,15 @@ func wrapSomething[E any](
 		).(aastypes.IAbstractItem)
 	}
 
+	theSomeSimples := that.SomeSimples()
+	for i, v := range theSomeSimples {
+		// Update in-situ
+		theSomeSimples[i] = Wrap[E](
+			v,
+			factory,
+		).(aastypes.ISimple)
+	}
+
 	return
 }
 
@@ -249,6 +333,11 @@ func Wrap[E any](
 	case aastypes.ModelTypeAnotherItem:
 		result = wrapAnotherItem[E](
 			that.(aastypes.IAnotherItem),
+			factory,
+		)
+	case aastypes.ModelTypeSimple:
+		result = wrapSimple[E](
+			that.(aastypes.ISimple),
 			factory,
 		)
 	case aastypes.ModelTypeSomething:

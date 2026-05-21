@@ -1000,6 +1000,181 @@ func readAnotherItemWithLookahead(
 	return
 }
 
+// De-serialize the instance of [aastypes.ISimple]
+// as a sequence of XML elements, each representing a property
+// of [aastypes.ISimple].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readSimpleAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance aastypes.ISimple,
+	next xml.Token,
+	err error,
+) {
+	var theName string
+
+	foundName := false
+
+	for {
+		current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+		if err != nil {
+			return
+		}
+
+		if _, isEOF := current.(eof); isEOF {
+			break
+		}
+
+		startElement, ok := current.(xml.StartElement)
+		if !ok {
+			if charData, isCharData := current.(xml.CharData); isCharData {
+				err = newDeserializationError(
+					fmt.Sprintf(
+						"Expected a sequence of XML elements representing properties "+
+						"of ISimple, but got text: %s",
+						string(charData),
+					),
+				)
+				return
+			}
+
+			break
+		}
+
+		var local string
+		local, err = extractLocalNameFromStartElement(startElement)
+		if err != nil {
+			return
+		}
+
+		// Move the current to the content of the XML element
+		current, err = readNext(decoder, nil)
+		if err != nil {
+			return
+		}
+
+		var valueErr error
+		switch local {
+		case "name":
+			theName, current, valueErr = readText(
+				decoder,
+				current,
+			)
+			foundName = true
+
+		default:
+			valueErr = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property",
+				),
+			)
+		}
+
+		if valueErr != nil {
+			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
+				deseriaErr.Path.PrependName(
+					&aasreporting.NameSegment{Name: local},
+				)
+			}
+			err = valueErr
+		}
+
+		if err != nil {
+			return
+		}
+
+		current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+		if err != nil {
+			return
+		}
+
+		err = checkEndElement(current, local)
+		if err != nil {
+			return
+		}
+
+		current, err = readNext(decoder, current)
+		if err != nil {
+			return
+		}
+	}
+
+	current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+	if err != nil {
+		return
+	}
+
+	next = current
+
+	if !foundName {
+		err = newDeserializationError(
+			"The required property 'name' is missing",
+		)
+		return
+	}
+
+	instance = aastypes.NewSimple(
+		theName,
+	)
+	return
+}
+
+// De-serialize an instance of [aastypes.ISimple]
+// as an XML element where the start element is expected to have been already
+// read as `current` token.
+//
+// The de-serialization stops by consuming the final end element. The next call to
+// the `decoder.Token()` will return the element just after the end element.
+func readSimpleWithLookahead(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance aastypes.ISimple,
+	err error,
+) {
+	current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+	if err != nil {
+		return
+	}
+
+	var local string
+	local, err = parseAsStartElementAndExtractLocalName(
+		current,
+	)
+	if err != nil {
+		return
+	}
+
+	expectedLocal := "simple"
+	if local != expectedLocal {
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Expected a start element with local name %s, "+
+					"but got a start element with local name %s",
+				expectedLocal, local,
+			),
+		)
+		return
+	}
+
+	current, err = readNext(decoder, current)
+	if err != nil {
+		return
+	}
+
+	instance, current, err = readSimpleAsSequence(
+		decoder,
+		current,
+)
+	if err != nil {
+		return
+	}
+
+	err = checkEndElement(current, local)
+	return
+}
+
 // De-serialize the instance of [aastypes.ISomething]
 // as a sequence of XML elements, each representing a property
 // of [aastypes.ISomething].
@@ -1014,8 +1189,10 @@ func readSomethingAsSequence(
 	err error,
 ) {
 	var theSomeItems []aastypes.IAbstractItem
+	var theSomeSimples []aastypes.ISimple
 
 	foundSomeItems := false
+	foundSomeSimples := false
 
 	for {
 		current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
@@ -1064,6 +1241,14 @@ func readSomethingAsSequence(
 				readAbstractItemWithLookahead,
 			)
 			foundSomeItems = true
+
+		case "someSimples":
+			theSomeSimples, current, valueErr = readList(
+				decoder,
+				current,
+				readSimpleWithLookahead,
+			)
+			foundSomeSimples = true
 
 		default:
 			valueErr = newDeserializationError(
@@ -1116,8 +1301,16 @@ func readSomethingAsSequence(
 		return
 	}
 
+	if !foundSomeSimples {
+		err = newDeserializationError(
+			"The required property 'someSimples' is missing",
+		)
+		return
+	}
+
 	instance = aastypes.NewSomething(
 		theSomeItems,
+		theSomeSimples,
 	)
 	return
 }
@@ -1214,6 +1407,10 @@ func Unmarshal(
 			)
 		case "anotherItem":
 			instance, current, err = readAnotherItemAsSequence(
+				decoder, current,
+			)
+		case "simple":
+			instance, current, err = readSimpleAsSequence(
 				decoder, current,
 			)
 		case "something":
@@ -1748,6 +1945,89 @@ func writeAnotherItem(
 }
 
 // Serialize the instance
+// of [aastypes.ISimple]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Flush at the end element of each property.
+func writeSimpleAsSequence(
+	encoder *xml.Encoder,
+	that aastypes.ISimple,
+) (err error) {
+	// region Name
+
+	err = writeStringProperty(
+		encoder,
+		"name",
+		that.Name(),
+	)
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Name()",
+				},
+			)
+		}
+		return
+	}
+
+	err = encoder.Flush()
+	if err != nil {
+		return err
+	}
+
+	// endregion
+
+	return
+}
+
+// Serialize the instance of [aastypes.ISimple]
+// enclosed in an XML element which represents the model type.
+//
+// If `withNamespace` is set, the `xmlns` attribute is set in the outer XML element.
+//
+// Flush once the closing end element has been written.
+func writeSimple(
+	encoder *xml.Encoder,
+	that aastypes.ISimple,
+	withNamespace bool,
+) (err error) {
+	local := "simple"
+	
+	err = writeStartElement(
+		encoder,
+		local,
+		withNamespace,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeSimpleAsSequence(
+		encoder,
+		that,
+	)
+	if err != nil {
+		return
+	}
+	
+	err = writeEndElement(
+		encoder,
+		local,
+		withNamespace,
+	)
+	if err != nil {
+		return
+	}
+
+	err = encoder.Flush()
+	return
+}
+
+// Serialize the instance
 // of [aastypes.ISomething]
 // as a sequence of properties, each represented as an XML element.
 //
@@ -1771,6 +2051,31 @@ func writeSomethingAsSequence(
 			seriaErr.Path.PrependName(
 				&aasreporting.NameSegment{
 					Name: "SomeItems()",
+				},
+			)
+		}
+		return
+	}
+
+	err = encoder.Flush()
+	if err != nil {
+		return err
+	}
+
+	// endregion
+
+	// region SomeSimples
+
+	err = writeListProperty(
+		encoder,
+		"someSimples",
+		that.SomeSimples(),
+	)
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeSimples()",
 				},
 			)
 		}
@@ -1850,6 +2155,12 @@ func Marshal(
 		err = writeAnotherItem(
 			encoder,
 			that.(aastypes.IAnotherItem),
+			withNamespace,
+		)
+	case aastypes.ModelTypeSimple:
+		err = writeSimple(
+			encoder,
+			that.(aastypes.ISimple),
 			withNamespace,
 		)
 	case aastypes.ModelTypeSomething:

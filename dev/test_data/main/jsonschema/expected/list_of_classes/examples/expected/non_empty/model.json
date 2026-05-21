@@ -8,5 +8,13 @@
       "modelType": "SomeItem",
       "name": "Example Name"
     }
+  ],
+  "someSimples": [
+    {
+      "name": "ID-001"
+    },
+    {
+      "name": "ID-002"
+    }
   ]
 }

@@ -222,6 +222,111 @@ func TestAnotherItemDeserializationFail(t *testing.T) {
 	}
 }
 
+func TestSimpleRoundTripOK(t *testing.T) {
+	pths := aastesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			aastesting.TestDataDir,
+			"Json",
+			"Expected",
+			"Simple",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := aastesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := aasjsonization.SimpleFromJsonable(
+			jsonable,
+		)
+		ok := assertNoDeserializationError(t, deseriaErr, pth)
+		if !ok {
+			return
+		}
+
+		anotherJsonable, seriaErr := aasjsonization.ToJsonable(deserialized)
+		ok = assertNoSerializationError(t, seriaErr, pth)
+		if !ok {
+			return
+		}
+
+		ok = assertSerializationEqualsDeserialization(
+			t,
+			jsonable,
+			anotherJsonable,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestSimpleDeserializationFail(t *testing.T) {
+	pattern := filepath.Join(
+		aastesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Unserializable",
+		"*",  // This asterisk represents the cause.
+		"Simple",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := aastesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := aastesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(aastesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						aastesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				aastesting.TestDataDir,
+				"DeserializationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".error",
+			)
+
+			_, deseriaErr := aasjsonization.SimpleFromJsonable(
+				jsonable,
+			)
+			ok := assertDeserializationErrorEqualsExpectedOrRecord(
+				t, deseriaErr, pth, expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
 func TestSomethingRoundTripOK(t *testing.T) {
 	pths := aastesting.FindFilesBySuffixRecursively(
 		filepath.Join(

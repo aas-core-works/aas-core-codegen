@@ -84,6 +84,23 @@ func VerifyAnotherItem(
 	return
 }
 
+// Verify `that` instance of [aastypes.ISimple].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifySimple(
+	that aastypes.ISimple,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	// No verification has been defined for ISimple.
+
+	return
+}
+
 // Verify `that` instance of [aastypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -131,6 +148,41 @@ func VerifySomething(
 		}
 	}
 
+	if that.SomeSimples() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: SomeSimples",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		for i, v := range that.SomeSimples() {
+			abort = Verify(
+				v,
+				func(err *VerificationError) bool {
+					err.Path.PrependIndex(
+						&aasreporting.IndexSegment{
+							Index: i,
+						},
+					)
+
+					err.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "SomeSimples",
+						},
+					)
+
+					return onError(err)
+				},
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
 	return
 }
 
@@ -154,6 +206,11 @@ func Verify(
 	case aastypes.ModelTypeAnotherItem:
 		abort = VerifyAnotherItem(
 			that.(aastypes.IAnotherItem),
+			onError,
+		)
+	case aastypes.ModelTypeSimple:
+		abort = VerifySimple(
+			that.(aastypes.ISimple),
 			onError,
 		)
 	case aastypes.ModelTypeSomething:

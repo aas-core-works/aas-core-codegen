@@ -510,12 +510,86 @@ def another_item_from_jsonable(
     )
 
 
+class _SetterForSimple:
+    """Provide de-serialization-setters for properties."""
+
+    def __init__(self) -> None:
+        """Initialize with all the properties unset."""
+        self.name: Optional[str] = None
+
+    def ignore(self, jsonable: Jsonable) -> None:
+        """Ignore :paramref:`jsonable` and do not set anything."""
+        pass
+
+    def set_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
+        """
+        Parse :paramref:`jsonable` as the value of :py:attr:`~name`.
+
+        :param jsonable: input to be parsed
+        """
+        self.name = _str_from_jsonable(
+            jsonable
+        )
+
+
+def simple_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Simple:
+    """
+    Parse an instance of :py:class:`.types.Simple` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.Simple`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    if not isinstance(jsonable, collections.abc.Mapping):
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
+
+    setter = _SetterForSimple()
+
+    for key, jsonable_value in jsonable.items():
+        setter_method = (
+            _SETTER_MAP_FOR_SIMPLE.get(key)
+        )
+        if setter_method is None:
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
+
+        try:
+            setter_method(setter, jsonable_value)
+        except DeserializationException as exception:
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
+            raise exception
+
+    if setter.name is None:
+        raise DeserializationException(
+            "The required property 'name' is missing"
+        )
+
+    return aas_types.Simple(
+        setter.name
+    )
+
+
 class _SetterForSomething:
     """Provide de-serialization-setters for properties."""
 
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
         self.some_items: Optional[List[aas_types.AbstractItem]] = None
+        self.some_simples: Optional[List[aas_types.Simple]] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
@@ -556,6 +630,42 @@ class _SetterForSomething:
             items.append(item)
 
         self.some_items = items
+
+    def set_some_simples_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
+        """
+        Parse :paramref:`jsonable` as the value of :py:attr:`~some_simples`.
+
+        :param jsonable: input to be parsed
+        """
+        array_like = _try_to_cast_to_array_like(jsonable)
+        if array_like is None:
+            raise DeserializationException(
+                f"Expected something array-like, but got: {type(jsonable)}"
+            )
+
+        items: List[
+            aas_types.Simple
+        ] = []
+        for i, jsonable_item in enumerate(array_like):
+            try:
+                item = simple_from_jsonable(
+                    jsonable_item
+                )
+            except DeserializationException as exception:
+                exception.path._prepend(
+                    IndexSegment(
+                        array_like,
+                        i
+                    )
+                )
+                raise
+
+            items.append(item)
+
+        self.some_simples = items
 
 
 def something_from_jsonable(
@@ -601,8 +711,14 @@ def something_from_jsonable(
             "The required property 'someItems' is missing"
         )
 
+    if setter.some_simples is None:
+        raise DeserializationException(
+            "The required property 'someSimples' is missing"
+        )
+
     return aas_types.Something(
-        setter.some_items
+        setter.some_items,
+        setter.some_simples
     )
 
 
@@ -643,6 +759,20 @@ _SETTER_MAP_FOR_ANOTHER_ITEM: Mapping[
 }
 
 
+_SETTER_MAP_FOR_SIMPLE: Mapping[
+    str,
+    Callable[
+        [_SetterForSimple, Jsonable],
+        None
+    ]
+] = {
+    'name':
+        _SetterForSimple.set_name_from_jsonable,
+    'modelType':
+        _SetterForSimple.ignore
+}
+
+
 _SETTER_MAP_FOR_SOMETHING: Mapping[
     str,
     Callable[
@@ -652,6 +782,8 @@ _SETTER_MAP_FOR_SOMETHING: Mapping[
 ] = {
     'someItems':
         _SetterForSomething.set_some_items_from_jsonable,
+    'someSimples':
+        _SetterForSomething.set_some_simples_from_jsonable,
     'modelType':
         _SetterForSomething.ignore
 }
@@ -710,6 +842,18 @@ class _Serializer(
 
         return jsonable
 
+    # noinspection PyMethodMayBeStatic
+    def transform_simple(
+        self,
+        that: aas_types.Simple
+    ) -> MutableJsonable:
+        """Serialize :paramref:`that` to a JSON-able representation."""
+        jsonable: MutableMapping[str, MutableJsonable] = dict()
+
+        jsonable['name'] = that.name
+
+        return jsonable
+
     def transform_something(
         self,
         that: aas_types.Something
@@ -720,6 +864,11 @@ class _Serializer(
         jsonable['someItems'] = [
             self.transform(item)
             for item in that.some_items
+        ]
+
+        jsonable['someSimples'] = [
+            self.transform(item)
+            for item in that.some_simples
         ]
 
         return jsonable
