@@ -168,6 +168,688 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 	return
 }
 
+func TestModellingKindRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyModellingKind(
+		aastypes.ModellingKind(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyModellingKind(
+		aastypes.ModellingKind(1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyModellingKind(
+		aastypes.ModellingKind(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyModellingKind(
+		aastypes.ModellingKind(1 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestQualifierKindRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyQualifierKind(
+		aastypes.QualifierKind(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyQualifierKind(
+		aastypes.QualifierKind(2),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyQualifierKind(
+		aastypes.QualifierKind(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyQualifierKind(
+		aastypes.QualifierKind(2 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestAssetKindRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyAssetKind(
+		aastypes.AssetKind(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyAssetKind(
+		aastypes.AssetKind(2),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyAssetKind(
+		aastypes.AssetKind(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyAssetKind(
+		aastypes.AssetKind(2 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestAASSubmodelElementsRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyAASSubmodelElements(
+		aastypes.AASSubmodelElements(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyAASSubmodelElements(
+		aastypes.AASSubmodelElements(16),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyAASSubmodelElements(
+		aastypes.AASSubmodelElements(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyAASSubmodelElements(
+		aastypes.AASSubmodelElements(16 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestEntityTypeRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyEntityType(
+		aastypes.EntityType(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyEntityType(
+		aastypes.EntityType(1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyEntityType(
+		aastypes.EntityType(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyEntityType(
+		aastypes.EntityType(1 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestDirectionRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyDirection(
+		aastypes.Direction(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyDirection(
+		aastypes.Direction(1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyDirection(
+		aastypes.Direction(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyDirection(
+		aastypes.Direction(1 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestStateOfEventRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyStateOfEvent(
+		aastypes.StateOfEvent(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyStateOfEvent(
+		aastypes.StateOfEvent(1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyStateOfEvent(
+		aastypes.StateOfEvent(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyStateOfEvent(
+		aastypes.StateOfEvent(1 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestReferenceTypesRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyReferenceTypes(
+		aastypes.ReferenceTypes(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyReferenceTypes(
+		aastypes.ReferenceTypes(1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyReferenceTypes(
+		aastypes.ReferenceTypes(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyReferenceTypes(
+		aastypes.ReferenceTypes(1 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestKeyTypesRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyKeyTypes(
+		aastypes.KeyTypes(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyKeyTypes(
+		aastypes.KeyTypes(23),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyKeyTypes(
+		aastypes.KeyTypes(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyKeyTypes(
+		aastypes.KeyTypes(23 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestDataTypeDefXSDRuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyDataTypeDefXSD(
+		aastypes.DataTypeDefXSD(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyDataTypeDefXSD(
+		aastypes.DataTypeDefXSD(29),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyDataTypeDefXSD(
+		aastypes.DataTypeDefXSD(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyDataTypeDefXSD(
+		aastypes.DataTypeDefXSD(29 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
+func TestDataTypeIEC61360RuntimeRange(t *testing.T) {
+	var gotErr *aasverification.VerificationError
+
+	// No error is expected on the first literal.
+	aasverification.VerifyDataTypeIEC61360(
+		aastypes.DataTypeIEC61360(0),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	aasverification.VerifyDataTypeIEC61360(
+		aastypes.DataTypeIEC61360(18),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	aasverification.VerifyDataTypeIEC61360(
+		aastypes.DataTypeIEC61360(0 - 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	aasverification.VerifyDataTypeIEC61360(
+		aastypes.DataTypeIEC61360(18 + 1),
+		func (err *aasverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
 func TestExtensionOK(t *testing.T) {
 	pths := aastesting.FindFilesBySuffixRecursively(
 		filepath.Join(

@@ -2890,24 +2890,19 @@ func VerifyExtension(
 	}
 
 	if that.ValueType() != nil {
-		if
-			*that.ValueType() < aastypes.DataTypeDefXSDAnyURI ||
-			*that.ValueType() > aastypes.DataTypeDefXSDUnsignedShort {
-			err := newVerificationError(
-				fmt.Sprintf(
-					"Invalid literal value for DataTypeDefXSD: %v",
-					that.ValueType(),
-				),
-			)
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueType",
-				},
-			)
-			abort = onError(err)
-			if abort {
-				return
-			}
+		abort = VerifyDataTypeDefXSD(
+			*that.ValueType(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueType",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3197,24 +3192,19 @@ func VerifyQualifier(
 	}
 
 	if that.Kind() != nil {
-		if
-			*that.Kind() < aastypes.QualifierKindValueQualifier ||
-			*that.Kind() > aastypes.QualifierKindTemplateQualifier {
-			err := newVerificationError(
-				fmt.Sprintf(
-					"Invalid literal value for QualifierKind: %v",
-					that.Kind(),
-				),
-			)
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Kind",
-				},
-			)
-			abort = onError(err)
-			if abort {
-				return
-			}
+		abort = VerifyQualifierKind(
+			*that.Kind(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Kind",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3233,24 +3223,19 @@ func VerifyQualifier(
 		return
 	}
 
-	if
-		that.ValueType() < aastypes.DataTypeDefXSDAnyURI ||
-		that.ValueType() > aastypes.DataTypeDefXSDUnsignedShort {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for DataTypeDefXSD: %v",
-				that.ValueType(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueType",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyDataTypeDefXSD(
+		that.ValueType(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueType",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.Value() != nil {
@@ -3751,24 +3736,19 @@ func VerifyAssetInformation(
 		}
 	}
 
-	if
-		that.AssetKind() < aastypes.AssetKindType ||
-		that.AssetKind() > aastypes.AssetKindNotApplicable {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for AssetKind: %v",
-				that.AssetKind(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "AssetKind",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyAssetKind(
+		that.AssetKind(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "AssetKind",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.GlobalAssetID() != nil {
@@ -4450,24 +4430,19 @@ func VerifySubmodel(
 	}
 
 	if that.Kind() != nil {
-		if
-			*that.Kind() < aastypes.ModellingKindTemplate ||
-			*that.Kind() > aastypes.ModellingKindInstance {
-			err := newVerificationError(
-				fmt.Sprintf(
-					"Invalid literal value for ModellingKind: %v",
-					that.Kind(),
-				),
-			)
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "Kind",
-				},
-			)
-			abort = onError(err)
-			if abort {
-				return
-			}
+		abort = VerifyModellingKind(
+			*that.Kind(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "Kind",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -5515,45 +5490,35 @@ func VerifySubmodelElementList(
 		}
 	}
 
-	if
-		that.TypeValueListElement() < aastypes.AASSubmodelElementsAnnotatedRelationshipElement ||
-		that.TypeValueListElement() > aastypes.AASSubmodelElementsSubmodelElementCollection {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for AASSubmodelElements: %v",
-				that.TypeValueListElement(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "TypeValueListElement",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyAASSubmodelElements(
+		that.TypeValueListElement(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "TypeValueListElement",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.ValueTypeListElement() != nil {
-		if
-			*that.ValueTypeListElement() < aastypes.DataTypeDefXSDAnyURI ||
-			*that.ValueTypeListElement() > aastypes.DataTypeDefXSDUnsignedShort {
-			err := newVerificationError(
-				fmt.Sprintf(
-					"Invalid literal value for DataTypeDefXSD: %v",
-					that.ValueTypeListElement(),
-				),
-			)
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "ValueTypeListElement",
-				},
-			)
-			abort = onError(err)
-			if abort {
-				return
-			}
+		abort = VerifyDataTypeDefXSD(
+			*that.ValueTypeListElement(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "ValueTypeListElement",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6423,24 +6388,19 @@ func VerifyProperty(
 		}
 	}
 
-	if
-		that.ValueType() < aastypes.DataTypeDefXSDAnyURI ||
-		that.ValueType() > aastypes.DataTypeDefXSDUnsignedShort {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for DataTypeDefXSD: %v",
-				that.ValueType(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueType",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyDataTypeDefXSD(
+		that.ValueType(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueType",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.Value() != nil {
@@ -7346,24 +7306,19 @@ func VerifyRange(
 		}
 	}
 
-	if
-		that.ValueType() < aastypes.DataTypeDefXSDAnyURI ||
-		that.ValueType() > aastypes.DataTypeDefXSDUnsignedShort {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for DataTypeDefXSD: %v",
-				that.ValueType(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "ValueType",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyDataTypeDefXSD(
+		that.ValueType(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "ValueType",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.Min() != nil {
@@ -9583,24 +9538,19 @@ func VerifyEntity(
 		}
 	}
 
-	if
-		that.EntityType() < aastypes.EntityTypeCoManagedEntity ||
-		that.EntityType() > aastypes.EntityTypeSelfManagedEntity {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for EntityType: %v",
-				that.EntityType(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "EntityType",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyEntityType(
+		that.EntityType(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "EntityType",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.GlobalAssetID() != nil {
@@ -10274,44 +10224,34 @@ func VerifyBasicEventElement(
 		}
 	}
 
-	if
-		that.Direction() < aastypes.DirectionInput ||
-		that.Direction() > aastypes.DirectionOutput {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for Direction: %v",
-				that.Direction(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Direction",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyDirection(
+		that.Direction(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Direction",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
-	if
-		that.State() < aastypes.StateOfEventOn ||
-		that.State() > aastypes.StateOfEventOff {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for StateOfEvent: %v",
-				that.State(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "State",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyStateOfEvent(
+		that.State(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "State",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.MessageTopic() != nil {
@@ -11947,24 +11887,19 @@ func VerifyReference(
 		}
 	}
 
-	if
-		that.Type() < aastypes.ReferenceTypesExternalReference ||
-		that.Type() > aastypes.ReferenceTypesModelReference {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for ReferenceTypes: %v",
-				that.Type(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Type",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyReferenceTypes(
+		that.Type(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Type",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	if that.ReferredSemanticID() != nil {
@@ -12034,24 +11969,19 @@ func VerifyKey(
 ) (abort bool) {
 	abort = false
 
-	if
-		that.Type() < aastypes.KeyTypesAnnotatedRelationshipElement ||
-		that.Type() > aastypes.KeyTypesSubmodelElementList {
-		err := newVerificationError(
-			fmt.Sprintf(
-				"Invalid literal value for KeyTypes: %v",
-				that.Type(),
-			),
-		)
-		err.Path.PrependName(
-			&aasreporting.NameSegment{
-				Name: "Type",
-			},
-		)
-		abort = onError(err)
-		if abort {
-			return
-		}
+	abort = VerifyKeyTypes(
+		that.Type(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "Type",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
 	}
 
 	abort = VerifyIdentifier(
@@ -12943,24 +12873,19 @@ func VerifyDataSpecificationIEC61360(
 	}
 
 	if that.DataType() != nil {
-		if
-			*that.DataType() < aastypes.DataTypeIEC61360Date ||
-			*that.DataType() > aastypes.DataTypeIEC61360Blob {
-			err := newVerificationError(
-				fmt.Sprintf(
-					"Invalid literal value for DataTypeIEC61360: %v",
-					that.DataType(),
-				),
-			)
-			err.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "DataType",
-				},
-			)
-			abort = onError(err)
-			if abort {
-				return
-			}
+		abort = VerifyDataTypeIEC61360(
+			*that.DataType(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DataType",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -13056,6 +12981,325 @@ func VerifyDataSpecificationIEC61360(
 		if abort {
 			return
 		}
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of ModellingKind.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyModellingKind(
+	that aastypes.ModellingKind,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.ModellingKindTemplate ||
+		that > aastypes.ModellingKindInstance {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for ModellingKind: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of QualifierKind.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyQualifierKind(
+	that aastypes.QualifierKind,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.QualifierKindValueQualifier ||
+		that > aastypes.QualifierKindTemplateQualifier {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for QualifierKind: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of AssetKind.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyAssetKind(
+	that aastypes.AssetKind,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.AssetKindType ||
+		that > aastypes.AssetKindNotApplicable {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for AssetKind: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of AASSubmodelElements.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyAASSubmodelElements(
+	that aastypes.AASSubmodelElements,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.AASSubmodelElementsAnnotatedRelationshipElement ||
+		that > aastypes.AASSubmodelElementsSubmodelElementCollection {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for AASSubmodelElements: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of EntityType.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyEntityType(
+	that aastypes.EntityType,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.EntityTypeCoManagedEntity ||
+		that > aastypes.EntityTypeSelfManagedEntity {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for EntityType: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of Direction.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyDirection(
+	that aastypes.Direction,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.DirectionInput ||
+		that > aastypes.DirectionOutput {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for Direction: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of StateOfEvent.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyStateOfEvent(
+	that aastypes.StateOfEvent,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.StateOfEventOn ||
+		that > aastypes.StateOfEventOff {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for StateOfEvent: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of ReferenceTypes.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyReferenceTypes(
+	that aastypes.ReferenceTypes,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.ReferenceTypesExternalReference ||
+		that > aastypes.ReferenceTypesModelReference {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for ReferenceTypes: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of KeyTypes.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyKeyTypes(
+	that aastypes.KeyTypes,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.KeyTypesAnnotatedRelationshipElement ||
+		that > aastypes.KeyTypesSubmodelElementList {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for KeyTypes: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of DataTypeDefXSD.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyDataTypeDefXSD(
+	that aastypes.DataTypeDefXSD,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.DataTypeDefXSDAnyURI ||
+		that > aastypes.DataTypeDefXSDUnsignedShort {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for DataTypeDefXSD: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of DataTypeIEC61360.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyDataTypeIEC61360(
+	that aastypes.DataTypeIEC61360,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < aastypes.DataTypeIEC61360Date ||
+		that > aastypes.DataTypeIEC61360Blob {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for DataTypeIEC61360: %v",
+					that,
+				),
+			),
+		)
 	}
 
 	return

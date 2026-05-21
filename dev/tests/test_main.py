@@ -273,6 +273,11 @@ class Test_golang(_TestCase):
             target=aas_core_codegen.main.Target.GOLANG, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_enum(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="enum"
+        )
+
     def test_expected_list_of_classes(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="list_of_classes"
