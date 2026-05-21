@@ -848,72 +848,9 @@ if that.{getter_name}() == nil {{
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
         our_type = type_anno.our_type
 
-        if isinstance(our_type, intermediate.Enumeration):
-            enum_name = golang_naming.enum_name(our_type.name)
-
-            # NOTE (mristin):
-            # The case where we have no literals defined is an edge case where no
-            # literal satisfies the condition.
-            if len(our_type.literals) == 0:
-                block = Stripped(
-                    f"""\
-err := newVerificationError(
-{I}fmt.Sprintf(
-{II}"The enumeration {enum_name} has no literals defined, " +
-{II}"but you passed in: %v",
-{II}that.{getter_name}()
-{I})
-)
-err.Path.Prepend(
-{I}&aasreporting.NameSegment{{
-{II}Name: {prop_name_literal},
-{I}}},
-)
-abort = onError(err)
-if abort {{
-{I}return
-}}"""
-                )
-            else:
-                first_literal = golang_naming.enum_literal_name(
-                    enumeration_name=our_type.name,
-                    literal_name=our_type.literals[0].name,
-                )
-                last_literal = golang_naming.enum_literal_name(
-                    enumeration_name=our_type.name,
-                    literal_name=our_type.literals[-1].name,
-                )
-
-                pointer_prefix = (
-                    "*"
-                    if golang_pointering.is_pointer_type(prop.type_annotation)
-                    else ""
-                )
-
-                block = Stripped(
-                    f"""\
-if
-{I}{pointer_prefix}that.{getter_name}() < aastypes.{first_literal} ||
-{I}{pointer_prefix}that.{getter_name}() > aastypes.{last_literal} {{
-{I}err := newVerificationError(
-{II}fmt.Sprintf(
-{III}"Invalid literal value for {enum_name}: %v",
-{III}that.{getter_name}(),
-{II}),
-{I})
-{I}err.Path.PrependName(
-{II}&aasreporting.NameSegment{{
-{III}Name: {prop_name_literal},
-{II}}},
-{I})
-{I}abort = onError(err)
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
-                )
-
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+        if isinstance(
+            our_type, (intermediate.Enumeration, intermediate.ConstrainedPrimitive)
+        ):
             verify_function_name = golang_naming.function_name(
                 Identifier(f"verify_{our_type.name}")
             )
@@ -1240,6 +1177,84 @@ func Verify(
     )
 
 
+def _generate_verify_enumeration(
+    enumeration: intermediate.Enumeration,
+) -> Stripped:
+    """Generate the verify function that checks the range of the enumeration literal."""
+    function_name = golang_naming.function_name(
+        Identifier(f"verify_{enumeration.name}")
+    )
+
+    enum_name = golang_naming.enum_name(enumeration.name)
+
+    # NOTE (mristin):
+    # The case where we have no literals defined is an edge case where no
+    # literal satisfies the condition.
+    if len(enumeration.literals) == 0:
+        body = Stripped(
+            f"""\
+abort = onError(
+{I}newVerificationError(
+{II}fmt.Sprintf(
+{III}"The enumeration {enum_name} has no literals defined, " +
+{III}"but you passed in: %v",
+{III}that,
+{II}),
+{I}),
+)
+
+return"""
+        )
+
+    else:
+        first_literal = golang_naming.enum_literal_name(
+            enumeration_name=enumeration.name,
+            literal_name=enumeration.literals[0].name,
+        )
+
+        last_literal = golang_naming.enum_literal_name(
+            enumeration_name=enumeration.name,
+            literal_name=enumeration.literals[-1].name,
+        )
+
+        body = Stripped(
+            f"""\
+abort = false
+
+if
+{I}that < aastypes.{first_literal} ||
+{I}that > aastypes.{last_literal} {{
+{I}abort = onError(
+{II}newVerificationError(
+{III}fmt.Sprintf(
+{IIII}"Invalid literal value for {enum_name}: %v",
+{IIII}that,
+{III}),
+{II}),
+{I})
+}}
+
+return"""
+        )
+
+    return Stripped(
+        f"""\
+// Verify that `that` is a literal in the valid range
+// of {enum_name}.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func {function_name}(
+{I}that aastypes.{enum_name},
+{I}onError func(*VerificationError) bool,
+) (abort bool) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _generate_verify_constrained_primitive(
     constrained_primitive: intermediate.ConstrainedPrimitive,
     symbol_table: intermediate.SymbolTable,
@@ -1471,6 +1486,10 @@ func (ve *VerificationError) PathString() string {{
         else:
             assert block is not None
             blocks.append(block)
+
+    for enumeration in symbol_table.enumerations:
+        block = _generate_verify_enumeration(enumeration=enumeration)
+        blocks.append(block)
 
     for constrained_primitive in symbol_table.constrained_primitives:
         block, underlying_errors = _generate_verify_constrained_primitive(

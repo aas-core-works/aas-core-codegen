@@ -21,6 +21,112 @@ from aas_core_codegen.golang.common import (
 )
 
 
+def _generate_test_runtime_range_for_enum(
+    enumeration: intermediate.Enumeration,
+) -> Stripped:
+    """Generate the test for checking the valid enumeration range."""
+    test_name = golang_naming.function_name(
+        Identifier(f"test_{enumeration.name}_runtime_range")
+    )
+
+    verify_function = golang_naming.function_name(
+        Identifier(f"verify_{enumeration.name}")
+    )
+
+    enum_name = golang_naming.enum_name(enumeration.name)
+
+    if len(enumeration.literals) == 0:
+        return Stripped(
+            f"""\
+func {test_name}(t *testing.T) {{
+{I}var gotErr *aasverification.VerificationError
+
+{I}// Any value should cause an error since {enum_name}
+{I}// specifies no literals.
+{I}{verify_function}(
+{II}42,
+{II}func (err *aasverification.VerificationError) bool {{
+{III}gotErr = err
+{III}return
+{II}}},
+{I})
+
+{I}if gotErr == nil {{
+{II}t.Fatal("Expected an error, but got none.")
+{II}return
+{I}}}
+}}"""
+        )
+    else:
+        first_literal_idx = 0
+        last_literal_idx = len(enumeration.literals) - 1
+
+        return Stripped(
+            f"""\
+func {test_name}(t *testing.T) {{
+{I}var gotErr *aasverification.VerificationError
+
+{I}// No error is expected on the first literal.
+{I}aasverification.{verify_function}(
+{II}aastypes.{enum_name}({first_literal_idx}),
+{II}func (err *aasverification.VerificationError) bool {{
+{III}gotErr = err
+{III}return false
+{II}}},
+{I})
+
+{I}if gotErr != nil {{
+{II}t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+{II}return
+{I}}}
+
+{I}// No error is expected on the last literal.
+{I}aasverification.{verify_function}(
+{II}aastypes.{enum_name}({last_literal_idx}),
+{II}func (err *aasverification.VerificationError) bool {{
+{III}gotErr = err
+{III}return false
+{II}}},
+{I})
+
+{I}if gotErr != nil {{
+{II}t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+{II}return
+{I}}}
+
+{I}// An error is expected before the first literal.
+{I}gotErr = nil
+{I}aasverification.{verify_function}(
+{II}aastypes.{enum_name}({first_literal_idx} - 1),
+{II}func (err *aasverification.VerificationError) bool {{
+{III}gotErr = err
+{III}return false
+{II}}},
+{I})
+
+{I}if gotErr == nil {{
+{II}t.Fatal("Expected an error, but got none.")
+{II}return
+{I}}}
+
+{I}// An error is expected after the last literal.
+{I}gotErr = nil
+{I}aasverification.{verify_function}(
+{II}aastypes.{enum_name}({last_literal_idx} + 1),
+{II}func (err *aasverification.VerificationError) bool {{
+{III}gotErr = err
+{III}return false
+{II}}},
+{I})
+
+{I}if gotErr == nil {{
+{II}t.Fatal("Expected an error, but got none.")
+{II}return
+{I}}}
+}}"""
+        )
+
+
 def _generate_for_cls(cls: intermediate.ConcreteClass) -> List[Stripped]:
     """Generate the tests for a class."""
     model_type_literal = golang_common.string_literal(naming.json_model_type(cls.name))
@@ -361,6 +467,9 @@ func assertEqualsExpectedOrRerecordVerificationErrors(
 }}"""
         ),
     ]  # type: List[Stripped]
+
+    for enumeration in symbol_table.enumerations:
+        blocks.append(_generate_test_runtime_range_for_enum(enumeration=enumeration))
 
     for concrete_cls in symbol_table.concrete_classes:
         blocks.extend(_generate_for_cls(cls=concrete_cls))
