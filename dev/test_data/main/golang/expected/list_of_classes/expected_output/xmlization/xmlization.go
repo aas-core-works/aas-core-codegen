@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
@@ -21,7 +22,6 @@ import (
 	aasreporting "github.com/dummy-works/dummy/reporting"
 	aasstringification "github.com/dummy-works/dummy/stringification"
 	aastypes "github.com/dummy-works/dummy/types"
-	aasverification "github.com/dummy-works/dummy/verification"
 )
 
 // region De-serialization
@@ -541,13 +541,22 @@ func checkEndElement(current xml.Token, local string) (err error) {
 	return
 }
 
+type Scalar interface {
+	~bool |
+	~int |
+	~int64 |
+	~float64 |
+	~string |
+	~[]byte
+}
+
 // Read a list of AAS instances as a sequence of XML elements.
 //
 // Every start element is considered to mark the start of an instance serialization. We
 // stop the reading as soon as we encounter a non-start element.
 //
 // That last non-start element is returned as `next` element.
-func readList[T aastypes.IClass](
+func readListOfInstances[T aastypes.IClass](
 	decoder *xml.Decoder,
 	current xml.Token,
 	readTWithLookahead func(
@@ -1235,7 +1244,7 @@ func readSomethingAsSequence(
 		var valueErr error
 		switch local {
 		case "someItems":
-			theSomeItems, current, valueErr = readList(
+			theSomeItems, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readAbstractItemWithLookahead,
@@ -1243,7 +1252,7 @@ func readSomethingAsSequence(
 			foundSomeItems = true
 
 		case "someSimples":
-			theSomeSimples, current, valueErr = readList(
+			theSomeSimples, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSimpleWithLookahead,
@@ -1522,105 +1531,40 @@ func writeText(
 	return
 }
 
-// Write the `value` of a property as `xs:boolean` enclosed in an XML element.
+// Write the `value` as a `xs:boolean` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeBooleanProperty(
+func writeBooleanAsText(
 	encoder *xml.Encoder,
-	local string,
 	value bool,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	text := "true"
 	if !value {
 		text = "false"
 	}
 	err = writeText(encoder, text)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as `xs:long` enclosed in an XML element.
+// Write the `value` as a `xs:long` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeLongProperty(
+func writeLongAsText(
 	encoder *xml.Encoder,
-	local string,
 	value int64,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	text := strconv.FormatInt(value, 10)
 	err = writeText(encoder, text)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as `xs:double` enclosed in an XML element.
+// Write the `value` as a `xs:double` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeDoubleProperty(
+func writeDoubleAsText(
 	encoder *xml.Encoder,
-	local string,
 	value float64,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	var text string
 
 	// See: https://www.w3.org/TR/xmlschema-2/#double
@@ -1638,84 +1582,132 @@ func writeDoubleProperty(
 	}
 
 	err = writeText(encoder, text)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as `xs:string` enclosed in an XML element.
+// Write the `value` as a `xs:string` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeStringProperty(
+func writeStringAsText(
 	encoder *xml.Encoder,
-	local string,
 	value string,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	err = writeText(encoder, value)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as base64-encoded bytes.
+// Write the `value` as a base64-encoded bytes in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeBytesProperty(
+func writeBytesAsText(
 	encoder *xml.Encoder,
-	local string,
 	value []byte,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	text := b64.StdEncoding.EncodeToString(
 		value,
 	)
 
 	err = writeText(encoder, text)
+	return
+}
+
+// Write the scalar `value` of a property enclosed in an XML element.
+//
+// Do not flush.
+//
+// The XML namespace is expected to have been defined outside of the resulting XML
+// element.
+func writeScalarProperty[T Scalar](
+	encoder *xml.Encoder,
+	local string,
+	value T,
+	writeTAsText func(anEncoder *xml.Encoder, aValue T) (anErr error),
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeTAsText(encoder, value)
+	if err != nil {
+		return
+	}
+
+	err = writeEndElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// Serialize the `instance` as a sequence of elements directly embedded
+// in an XML element with `local` name representing the property.
+//
+// Do not flush.
+func writeEmbeddedInstanceProperty[T aastypes.IClass](
+	encoder *xml.Encoder,
+	local string,
+	instance T,
+	writeTAsSequence func(anEncoder *xml.Encoder, that T) (anErr error),
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeTAsSequence(
+		encoder,
+		instance,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeEndElement(
+		encoder,
+		local,
+		false,
+	)
+	return
+}
+
+// Serialize the `instance` as a sequence of elements within a discriminator
+// element which is then embedded in an XML element with `local` name
+// representing the property.
+//
+// Do not flush.
+func writeDiscriminatedInstanceProperty(
+	encoder *xml.Encoder,
+	local string,
+	instance aastypes.IClass,
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	err = Marshal(
+		encoder,
+		instance,
+		false,
+	)
 	if err != nil {
 		return
 	}
@@ -1734,7 +1726,7 @@ func writeBytesProperty(
 
 // Serialize the list of instances as a sequence of XML elements enclosed in a parent
 // XML element with the `local` name.
-func writeListProperty[T aastypes.IClass](
+func writeListOfInstancesProperty[T aastypes.IClass](
 	encoder *xml.Encoder,
 	local string,
 	list []T,
@@ -1792,10 +1784,11 @@ func writeSomeItemAsSequence(
 ) (err error) {
 	// region Name
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"name",
 		that.Name(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -1875,10 +1868,11 @@ func writeAnotherItemAsSequence(
 ) (err error) {
 	// region SerialNumber
 
-	err = writeLongProperty(
+	err = writeScalarProperty(
 		encoder,
 		"serialNumber",
 		that.SerialNumber(),
+		writeLongAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -1958,10 +1952,11 @@ func writeSimpleAsSequence(
 ) (err error) {
 	// region Name
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"name",
 		that.Name(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -2041,7 +2036,7 @@ func writeSomethingAsSequence(
 ) (err error) {
 	// region SomeItems
 
-	err = writeListProperty(
+	err = writeListOfInstancesProperty(
 		encoder,
 		"someItems",
 		that.SomeItems(),
@@ -2066,7 +2061,7 @@ func writeSomethingAsSequence(
 
 	// region SomeSimples
 
-	err = writeListProperty(
+	err = writeListOfInstancesProperty(
 		encoder,
 		"someSimples",
 		that.SomeSimples(),

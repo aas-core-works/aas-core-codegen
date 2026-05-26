@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
@@ -21,7 +22,6 @@ import (
 	aasreporting "github.com/aas-core-works/aas-core3.0-golang/reporting"
 	aasstringification "github.com/aas-core-works/aas-core3.0-golang/stringification"
 	aastypes "github.com/aas-core-works/aas-core3.0-golang/types"
-	aasverification "github.com/aas-core-works/aas-core3.0-golang/verification"
 )
 
 // region De-serialization
@@ -541,13 +541,22 @@ func checkEndElement(current xml.Token, local string) (err error) {
 	return
 }
 
+type Scalar interface {
+	~bool |
+	~int |
+	~int64 |
+	~float64 |
+	~string |
+	~[]byte
+}
+
 // Read a list of AAS instances as a sequence of XML elements.
 //
 // Every start element is considered to mark the start of an instance serialization. We
 // stop the reading as soon as we encounter a non-start element.
 //
 // That last non-start element is returned as `next` element.
-func readList[T aastypes.IClass](
+func readListOfInstances[T aastypes.IClass](
 	decoder *xml.Decoder,
 	current xml.Token,
 	readTWithLookahead func(
@@ -783,7 +792,7 @@ func readExtensionAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
@@ -813,7 +822,7 @@ func readExtensionAsSequence(
 			theValue = &value
 
 		case "refersTo":
-			theRefersTo, current, valueErr = readList(
+			theRefersTo, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
@@ -1511,7 +1520,7 @@ func readAdministrativeInformationAsSequence(
 		var valueErr error
 		switch local {
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -1881,7 +1890,7 @@ func readQualifierAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
@@ -2126,7 +2135,7 @@ func readAssetAdministrationShellAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -2149,14 +2158,14 @@ func readAssetAdministrationShellAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -2176,7 +2185,7 @@ func readAssetAdministrationShellAsSequence(
 			foundID = true
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -2196,7 +2205,7 @@ func readAssetAdministrationShellAsSequence(
 			foundAssetInformation = true
 
 		case "submodels":
-			theSubmodels, current, valueErr = readList(
+			theSubmodels, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
@@ -2425,7 +2434,7 @@ func readAssetInformationAsSequence(
 			theGlobalAssetID = &value
 
 		case "specificAssetIds":
-			theSpecificAssetIDs, current, valueErr = readList(
+			theSpecificAssetIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSpecificAssetIDWithLookahead,
@@ -2861,7 +2870,7 @@ func readSpecificAssetIDAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
@@ -3085,7 +3094,7 @@ func readSubmodelAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -3108,14 +3117,14 @@ func readSubmodelAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -3149,28 +3158,28 @@ func readSubmodelAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
 			)
 
 		case "submodelElements":
-			theSubmodelElements, current, valueErr = readList(
+			theSubmodelElements, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSubmodelElementWithLookahead,
@@ -3497,7 +3506,7 @@ func readRelationshipElementAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -3520,14 +3529,14 @@ func readRelationshipElementAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -3540,21 +3549,21 @@ func readRelationshipElementAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -3831,7 +3840,7 @@ func readSubmodelElementListAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -3854,14 +3863,14 @@ func readSubmodelElementListAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -3874,21 +3883,21 @@ func readSubmodelElementListAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -3924,7 +3933,7 @@ func readSubmodelElementListAsSequence(
 			theValueTypeListElement = &value
 
 		case "value":
-			theValue, current, valueErr = readList(
+			theValue, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSubmodelElementWithLookahead,
@@ -4145,7 +4154,7 @@ func readSubmodelElementCollectionAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -4168,14 +4177,14 @@ func readSubmodelElementCollectionAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -4188,28 +4197,28 @@ func readSubmodelElementCollectionAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
 			)
 
 		case "value":
-			theValue, current, valueErr = readList(
+			theValue, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSubmodelElementWithLookahead,
@@ -4489,7 +4498,7 @@ func readPropertyAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -4512,14 +4521,14 @@ func readPropertyAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -4532,21 +4541,21 @@ func readPropertyAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -4783,7 +4792,7 @@ func readMultiLanguagePropertyAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -4806,14 +4815,14 @@ func readMultiLanguagePropertyAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -4826,28 +4835,28 @@ func readMultiLanguagePropertyAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
 			)
 
 		case "value":
-			theValue, current, valueErr = readList(
+			theValue, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -5063,7 +5072,7 @@ func readRangeAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -5086,14 +5095,14 @@ func readRangeAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -5106,21 +5115,21 @@ func readRangeAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -5358,7 +5367,7 @@ func readReferenceElementAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -5381,14 +5390,14 @@ func readReferenceElementAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -5401,21 +5410,21 @@ func readReferenceElementAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -5627,7 +5636,7 @@ func readBlobAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -5650,14 +5659,14 @@ func readBlobAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -5670,21 +5679,21 @@ func readBlobAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -5912,7 +5921,7 @@ func readFileAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -5935,14 +5944,14 @@ func readFileAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -5955,21 +5964,21 @@ func readFileAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -6201,7 +6210,7 @@ func readAnnotatedRelationshipElementAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -6224,14 +6233,14 @@ func readAnnotatedRelationshipElementAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -6244,21 +6253,21 @@ func readAnnotatedRelationshipElementAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -6279,7 +6288,7 @@ func readAnnotatedRelationshipElementAsSequence(
 			foundSecond = true
 
 		case "annotations":
-			theAnnotations, current, valueErr = readList(
+			theAnnotations, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readDataElementWithLookahead,
@@ -6504,7 +6513,7 @@ func readEntityAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -6527,14 +6536,14 @@ func readEntityAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -6547,28 +6556,28 @@ func readEntityAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
 			)
 
 		case "statements":
-			theStatements, current, valueErr = readList(
+			theStatements, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSubmodelElementWithLookahead,
@@ -6590,7 +6599,7 @@ func readEntityAsSequence(
 			theGlobalAssetID = &value
 
 		case "specificAssetIds":
-			theSpecificAssetIDs, current, valueErr = readList(
+			theSpecificAssetIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSpecificAssetIDWithLookahead,
@@ -7244,7 +7253,7 @@ func readBasicEventElementAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -7267,14 +7276,14 @@ func readBasicEventElementAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -7287,21 +7296,21 @@ func readBasicEventElementAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -7602,7 +7611,7 @@ func readOperationAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -7625,14 +7634,14 @@ func readOperationAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -7645,42 +7654,42 @@ func readOperationAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
 			)
 
 		case "inputVariables":
-			theInputVariables, current, valueErr = readList(
+			theInputVariables, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readOperationVariableWithLookahead,
 			)
 
 		case "outputVariables":
-			theOutputVariables, current, valueErr = readList(
+			theOutputVariables, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readOperationVariableWithLookahead,
 			)
 
 		case "inoutputVariables":
-			theInoutputVariables, current, valueErr = readList(
+			theInoutputVariables, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readOperationVariableWithLookahead,
@@ -8068,7 +8077,7 @@ func readCapabilityAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -8091,14 +8100,14 @@ func readCapabilityAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -8111,21 +8120,21 @@ func readCapabilityAsSequence(
 			)
 
 		case "supplementalSemanticIds":
-			theSupplementalSemanticIDs, current, valueErr = readList(
+			theSupplementalSemanticIDs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
 			)
 
 		case "qualifiers":
-			theQualifiers, current, valueErr = readList(
+			theQualifiers, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readQualifierWithLookahead,
 			)
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
@@ -8326,7 +8335,7 @@ func readConceptDescriptionAsSequence(
 		var valueErr error
 		switch local {
 		case "extensions":
-			theExtensions, current, valueErr = readList(
+			theExtensions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readExtensionWithLookahead,
@@ -8349,14 +8358,14 @@ func readConceptDescriptionAsSequence(
 			theIDShort = &value
 
 		case "displayName":
-			theDisplayName, current, valueErr = readList(
+			theDisplayName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringNameTypeWithLookahead,
 			)
 
 		case "description":
-			theDescription, current, valueErr = readList(
+			theDescription, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringTextTypeWithLookahead,
@@ -8376,14 +8385,14 @@ func readConceptDescriptionAsSequence(
 			foundID = true
 
 		case "embeddedDataSpecifications":
-			theEmbeddedDataSpecifications, current, valueErr = readList(
+			theEmbeddedDataSpecifications, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readEmbeddedDataSpecificationWithLookahead,
 			)
 
 		case "isCaseOf":
-			theIsCaseOf, current, valueErr = readList(
+			theIsCaseOf, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readReferenceWithLookahead,
@@ -8635,7 +8644,7 @@ func readReferenceAsSequence(
 			)
 
 		case "keys":
-			theKeys, current, valueErr = readList(
+			theKeys, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readKeyWithLookahead,
@@ -9541,21 +9550,21 @@ func readEnvironmentAsSequence(
 		var valueErr error
 		switch local {
 		case "assetAdministrationShells":
-			theAssetAdministrationShells, current, valueErr = readList(
+			theAssetAdministrationShells, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readAssetAdministrationShellWithLookahead,
 			)
 
 		case "submodels":
-			theSubmodels, current, valueErr = readList(
+			theSubmodels, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readSubmodelWithLookahead,
 			)
 
 		case "conceptDescriptions":
-			theConceptDescriptions, current, valueErr = readList(
+			theConceptDescriptions, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readConceptDescriptionWithLookahead,
@@ -10435,7 +10444,7 @@ func readValueListAsSequence(
 		var valueErr error
 		switch local {
 		case "valueReferencePairs":
-			theValueReferencePairs, current, valueErr = readList(
+			theValueReferencePairs, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readValueReferencePairWithLookahead,
@@ -11198,7 +11207,7 @@ func readDataSpecificationIEC61360AsSequence(
 		var valueErr error
 		switch local {
 		case "preferredName":
-			thePreferredName, current, valueErr = readList(
+			thePreferredName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringPreferredNameTypeIEC61360WithLookahead,
@@ -11206,7 +11215,7 @@ func readDataSpecificationIEC61360AsSequence(
 			foundPreferredName = true
 
 		case "shortName":
-			theShortName, current, valueErr = readList(
+			theShortName, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringShortNameTypeIEC61360WithLookahead,
@@ -11251,7 +11260,7 @@ func readDataSpecificationIEC61360AsSequence(
 			theDataType = &value
 
 		case "definition":
-			theDefinition, current, valueErr = readList(
+			theDefinition, current, valueErr = readListOfInstances(
 				decoder,
 				current,
 				readLangStringDefinitionTypeIEC61360WithLookahead,
@@ -11718,105 +11727,40 @@ func writeText(
 	return
 }
 
-// Write the `value` of a property as `xs:boolean` enclosed in an XML element.
+// Write the `value` as a `xs:boolean` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeBooleanProperty(
+func writeBooleanAsText(
 	encoder *xml.Encoder,
-	local string,
 	value bool,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	text := "true"
 	if !value {
 		text = "false"
 	}
 	err = writeText(encoder, text)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as `xs:long` enclosed in an XML element.
+// Write the `value` as a `xs:long` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeLongProperty(
+func writeLongAsText(
 	encoder *xml.Encoder,
-	local string,
 	value int64,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	text := strconv.FormatInt(value, 10)
 	err = writeText(encoder, text)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as `xs:double` enclosed in an XML element.
+// Write the `value` as a `xs:double` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeDoubleProperty(
+func writeDoubleAsText(
 	encoder *xml.Encoder,
-	local string,
 	value float64,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	var text string
 
 	// See: https://www.w3.org/TR/xmlschema-2/#double
@@ -11834,84 +11778,132 @@ func writeDoubleProperty(
 	}
 
 	err = writeText(encoder, text)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as `xs:string` enclosed in an XML element.
+// Write the `value` as a `xs:string` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeStringProperty(
+func writeStringAsText(
 	encoder *xml.Encoder,
-	local string,
 	value string,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	err = writeText(encoder, value)
-	if err != nil {
-		return
-	}
-
-	err = writeEndElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-// Write the `value` of a property as base64-encoded bytes.
+// Write the `value` as a base64-encoded bytes in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeBytesProperty(
+func writeBytesAsText(
 	encoder *xml.Encoder,
-	local string,
 	value []byte,
 ) (err error) {
-	err = writeStartElement(
-		encoder,
-		local,
-		false,
-	)
-	if err != nil {
-		return
-	}
-
 	text := b64.StdEncoding.EncodeToString(
 		value,
 	)
 
 	err = writeText(encoder, text)
+	return
+}
+
+// Write the scalar `value` of a property enclosed in an XML element.
+//
+// Do not flush.
+//
+// The XML namespace is expected to have been defined outside of the resulting XML
+// element.
+func writeScalarProperty[T Scalar](
+	encoder *xml.Encoder,
+	local string,
+	value T,
+	writeTAsText func(anEncoder *xml.Encoder, aValue T) (anErr error),
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeTAsText(encoder, value)
+	if err != nil {
+		return
+	}
+
+	err = writeEndElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// Serialize the `instance` as a sequence of elements directly embedded
+// in an XML element with `local` name representing the property.
+//
+// Do not flush.
+func writeEmbeddedInstanceProperty[T aastypes.IClass](
+	encoder *xml.Encoder,
+	local string,
+	instance T,
+	writeTAsSequence func(anEncoder *xml.Encoder, that T) (anErr error),
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeTAsSequence(
+		encoder,
+		instance,
+	)
+	if err != nil {
+		return
+	}
+
+	err = writeEndElement(
+		encoder,
+		local,
+		false,
+	)
+	return
+}
+
+// Serialize the `instance` as a sequence of elements within a discriminator
+// element which is then embedded in an XML element with `local` name
+// representing the property.
+//
+// Do not flush.
+func writeDiscriminatedInstanceProperty(
+	encoder *xml.Encoder,
+	local string,
+	instance aastypes.IClass,
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	err = Marshal(
+		encoder,
+		instance,
+		false,
+	)
 	if err != nil {
 		return
 	}
@@ -11930,7 +11922,7 @@ func writeBytesProperty(
 
 // Serialize the list of instances as a sequence of XML elements enclosed in a parent
 // XML element with the `local` name.
-func writeListProperty[T aastypes.IClass](
+func writeListOfInstancesProperty[T aastypes.IClass](
 	encoder *xml.Encoder,
 	local string,
 	list []T,
@@ -11991,17 +11983,11 @@ func writeExtensionAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12011,14 +11997,6 @@ func writeExtensionAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -12035,7 +12013,7 @@ func writeExtensionAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -12061,10 +12039,11 @@ func writeExtensionAsSequence(
 
 	// region Name
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"name",
 		that.Name(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -12089,10 +12068,11 @@ func writeExtensionAsSequence(
 	theValueType := that.ValueType()
 
 	if theValueType != nil {
-		err = writeDataTypeDefXSDProperty(
+		err = writeScalarProperty(
 			encoder,
 			"valueType",
 			*theValueType,
+			writeDataTypeDefXSDAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12118,10 +12098,11 @@ func writeExtensionAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"value",
 			*theValue,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12147,7 +12128,7 @@ func writeExtensionAsSequence(
 	theRefersTo := that.RefersTo()
 
 	if theRefersTo != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"refersTo",
 			theRefersTo,
@@ -12219,12 +12200,11 @@ func writeExtension(
 
 // Write the `value` of a property as string representation
 // of [aastypes.ModellingKind]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeModellingKindProperty(
+func writeModellingKindAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.ModellingKind,
 ) (err error) {
 	text, ok := aasstringification.ModellingKindToString(
@@ -12240,7 +12220,7 @@ func writeModellingKindProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -12261,7 +12241,7 @@ func writeAdministrativeInformationAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -12290,10 +12270,11 @@ func writeAdministrativeInformationAsSequence(
 	theVersion := that.Version()
 
 	if theVersion != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"version",
 			*theVersion,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12319,10 +12300,11 @@ func writeAdministrativeInformationAsSequence(
 	theRevision := that.Revision()
 
 	if theRevision != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"revision",
 			*theRevision,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12348,17 +12330,11 @@ func writeAdministrativeInformationAsSequence(
 	theCreator := that.Creator()
 
 	if theCreator != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"creator",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theCreator,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12368,14 +12344,6 @@ func writeAdministrativeInformationAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"creator",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -12392,10 +12360,11 @@ func writeAdministrativeInformationAsSequence(
 	theTemplateID := that.TemplateID()
 
 	if theTemplateID != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"templateId",
 			*theTemplateID,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12464,12 +12433,11 @@ func writeAdministrativeInformation(
 
 // Write the `value` of a property as string representation
 // of [aastypes.QualifierKind]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeQualifierKindProperty(
+func writeQualifierKindAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.QualifierKind,
 ) (err error) {
 	text, ok := aasstringification.QualifierKindToString(
@@ -12485,7 +12453,7 @@ func writeQualifierKindProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -12506,17 +12474,11 @@ func writeQualifierAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12526,14 +12488,6 @@ func writeQualifierAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -12550,7 +12504,7 @@ func writeQualifierAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -12579,10 +12533,11 @@ func writeQualifierAsSequence(
 	theKind := that.Kind()
 
 	if theKind != nil {
-		err = writeQualifierKindProperty(
+		err = writeScalarProperty(
 			encoder,
 			"kind",
 			*theKind,
+			writeQualifierKindAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12605,10 +12560,11 @@ func writeQualifierAsSequence(
 
 	// region Type
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"type",
 		that.Type(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -12630,10 +12586,11 @@ func writeQualifierAsSequence(
 
 	// region ValueType
 
-	err = writeDataTypeDefXSDProperty(
+	err = writeScalarProperty(
 		encoder,
 		"valueType",
 		that.ValueType(),
+		writeDataTypeDefXSDAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -12658,10 +12615,11 @@ func writeQualifierAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"value",
 			*theValue,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12687,17 +12645,11 @@ func writeQualifierAsSequence(
 	theValueID := that.ValueID()
 
 	if theValueID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"valueId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theValueID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12707,14 +12659,6 @@ func writeQualifierAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"valueId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -12789,7 +12733,7 @@ func writeAssetAdministrationShellAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -12818,10 +12762,11 @@ func writeAssetAdministrationShellAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12847,10 +12792,11 @@ func writeAssetAdministrationShellAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12876,7 +12822,7 @@ func writeAssetAdministrationShellAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -12905,7 +12851,7 @@ func writeAssetAdministrationShellAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -12934,17 +12880,11 @@ func writeAssetAdministrationShellAsSequence(
 	theAdministration := that.Administration()
 
 	if theAdministration != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"administration",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeAdministrativeInformationAsSequence(
-			encoder,
 			theAdministration,
+			writeAdministrativeInformationAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -12954,14 +12894,6 @@ func writeAssetAdministrationShellAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"administration",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -12975,10 +12907,11 @@ func writeAssetAdministrationShellAsSequence(
 
 	// region ID
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"id",
 		that.ID(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13003,7 +12936,7 @@ func writeAssetAdministrationShellAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -13032,17 +12965,11 @@ func writeAssetAdministrationShellAsSequence(
 	theDerivedFrom := that.DerivedFrom()
 
 	if theDerivedFrom != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"derivedFrom",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theDerivedFrom,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13052,14 +12979,6 @@ func writeAssetAdministrationShellAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"derivedFrom",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -13073,17 +12992,11 @@ func writeAssetAdministrationShellAsSequence(
 
 	// region AssetInformation
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"assetInformation",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeAssetInformationAsSequence(
-		encoder,
 		that.AssetInformation(),
+		writeAssetInformationAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13093,14 +13006,6 @@ func writeAssetAdministrationShellAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"assetInformation",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -13116,7 +13021,7 @@ func writeAssetAdministrationShellAsSequence(
 	theSubmodels := that.Submodels()
 
 	if theSubmodels != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"submodels",
 			theSubmodels,
@@ -13200,10 +13105,11 @@ func writeAssetInformationAsSequence(
 ) (err error) {
 	// region AssetKind
 
-	err = writeAssetKindProperty(
+	err = writeScalarProperty(
 		encoder,
 		"assetKind",
 		that.AssetKind(),
+		writeAssetKindAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13228,10 +13134,11 @@ func writeAssetInformationAsSequence(
 	theGlobalAssetID := that.GlobalAssetID()
 
 	if theGlobalAssetID != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"globalAssetId",
 			*theGlobalAssetID,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13257,7 +13164,7 @@ func writeAssetInformationAsSequence(
 	theSpecificAssetIDs := that.SpecificAssetIDs()
 
 	if theSpecificAssetIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"specificAssetIds",
 			theSpecificAssetIDs,
@@ -13286,10 +13193,11 @@ func writeAssetInformationAsSequence(
 	theAssetType := that.AssetType()
 
 	if theAssetType != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"assetType",
 			*theAssetType,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13315,17 +13223,11 @@ func writeAssetInformationAsSequence(
 	theDefaultThumbnail := that.DefaultThumbnail()
 
 	if theDefaultThumbnail != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"defaultThumbnail",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeResourceAsSequence(
-			encoder,
 			theDefaultThumbnail,
+			writeResourceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13335,14 +13237,6 @@ func writeAssetInformationAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"defaultThumbnail",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -13414,10 +13308,11 @@ func writeResourceAsSequence(
 ) (err error) {
 	// region Path
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"path",
 		that.Path(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13442,10 +13337,11 @@ func writeResourceAsSequence(
 	theContentType := that.ContentType()
 
 	if theContentType != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"contentType",
 			*theContentType,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13514,12 +13410,11 @@ func writeResource(
 
 // Write the `value` of a property as string representation
 // of [aastypes.AssetKind]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeAssetKindProperty(
+func writeAssetKindAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.AssetKind,
 ) (err error) {
 	text, ok := aasstringification.AssetKindToString(
@@ -13535,7 +13430,7 @@ func writeAssetKindProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -13556,17 +13451,11 @@ func writeSpecificAssetIDAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13576,14 +13465,6 @@ func writeSpecificAssetIDAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -13600,7 +13481,7 @@ func writeSpecificAssetIDAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -13626,10 +13507,11 @@ func writeSpecificAssetIDAsSequence(
 
 	// region Name
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"name",
 		that.Name(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13651,10 +13533,11 @@ func writeSpecificAssetIDAsSequence(
 
 	// region Value
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"value",
 		that.Value(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13679,17 +13562,11 @@ func writeSpecificAssetIDAsSequence(
 	theExternalSubjectID := that.ExternalSubjectID()
 
 	if theExternalSubjectID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"externalSubjectId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theExternalSubjectID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13699,14 +13576,6 @@ func writeSpecificAssetIDAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"externalSubjectId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -13781,7 +13650,7 @@ func writeSubmodelAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -13810,10 +13679,11 @@ func writeSubmodelAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13839,10 +13709,11 @@ func writeSubmodelAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13868,7 +13739,7 @@ func writeSubmodelAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -13897,7 +13768,7 @@ func writeSubmodelAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -13926,17 +13797,11 @@ func writeSubmodelAsSequence(
 	theAdministration := that.Administration()
 
 	if theAdministration != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"administration",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeAdministrativeInformationAsSequence(
-			encoder,
 			theAdministration,
+			writeAdministrativeInformationAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -13946,14 +13811,6 @@ func writeSubmodelAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"administration",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -13967,10 +13824,11 @@ func writeSubmodelAsSequence(
 
 	// region ID
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"id",
 		that.ID(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -13995,10 +13853,11 @@ func writeSubmodelAsSequence(
 	theKind := that.Kind()
 
 	if theKind != nil {
-		err = writeModellingKindProperty(
+		err = writeScalarProperty(
 			encoder,
 			"kind",
 			*theKind,
+			writeModellingKindAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14024,17 +13883,11 @@ func writeSubmodelAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14044,14 +13897,6 @@ func writeSubmodelAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -14068,7 +13913,7 @@ func writeSubmodelAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -14097,7 +13942,7 @@ func writeSubmodelAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -14126,7 +13971,7 @@ func writeSubmodelAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -14155,7 +14000,7 @@ func writeSubmodelAsSequence(
 	theSubmodelElements := that.SubmodelElements()
 
 	if theSubmodelElements != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"submodelElements",
 			theSubmodelElements,
@@ -14242,7 +14087,7 @@ func writeRelationshipElementAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -14271,10 +14116,11 @@ func writeRelationshipElementAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14300,10 +14146,11 @@ func writeRelationshipElementAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14329,7 +14176,7 @@ func writeRelationshipElementAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -14358,7 +14205,7 @@ func writeRelationshipElementAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -14387,17 +14234,11 @@ func writeRelationshipElementAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14407,14 +14248,6 @@ func writeRelationshipElementAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -14431,7 +14264,7 @@ func writeRelationshipElementAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -14460,7 +14293,7 @@ func writeRelationshipElementAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -14489,7 +14322,7 @@ func writeRelationshipElementAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -14515,17 +14348,11 @@ func writeRelationshipElementAsSequence(
 
 	// region First
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"first",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.First(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -14535,14 +14362,6 @@ func writeRelationshipElementAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"first",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -14555,17 +14374,11 @@ func writeRelationshipElementAsSequence(
 
 	// region Second
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"second",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.Second(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -14575,14 +14388,6 @@ func writeRelationshipElementAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"second",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -14645,12 +14450,11 @@ func writeRelationshipElementWithoutDispatch(
 
 // Write the `value` of a property as string representation
 // of [aastypes.AASSubmodelElements]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeAASSubmodelElementsProperty(
+func writeAASSubmodelElementsAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.AASSubmodelElements,
 ) (err error) {
 	text, ok := aasstringification.AASSubmodelElementsToString(
@@ -14666,7 +14470,7 @@ func writeAASSubmodelElementsProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -14687,7 +14491,7 @@ func writeSubmodelElementListAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -14716,10 +14520,11 @@ func writeSubmodelElementListAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14745,10 +14550,11 @@ func writeSubmodelElementListAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14774,7 +14580,7 @@ func writeSubmodelElementListAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -14803,7 +14609,7 @@ func writeSubmodelElementListAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -14832,17 +14638,11 @@ func writeSubmodelElementListAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14852,14 +14652,6 @@ func writeSubmodelElementListAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -14876,7 +14668,7 @@ func writeSubmodelElementListAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -14905,7 +14697,7 @@ func writeSubmodelElementListAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -14934,7 +14726,7 @@ func writeSubmodelElementListAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -14963,10 +14755,11 @@ func writeSubmodelElementListAsSequence(
 	theOrderRelevant := that.OrderRelevant()
 
 	if theOrderRelevant != nil {
-		err = writeBooleanProperty(
+		err = writeScalarProperty(
 			encoder,
 			"orderRelevant",
 			*theOrderRelevant,
+			writeBooleanAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -14992,17 +14785,11 @@ func writeSubmodelElementListAsSequence(
 	theSemanticIDListElement := that.SemanticIDListElement()
 
 	if theSemanticIDListElement != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticIdListElement",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticIDListElement,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15012,14 +14799,6 @@ func writeSubmodelElementListAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticIdListElement",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -15033,10 +14812,11 @@ func writeSubmodelElementListAsSequence(
 
 	// region TypeValueListElement
 
-	err = writeAASSubmodelElementsProperty(
+	err = writeScalarProperty(
 		encoder,
 		"typeValueListElement",
 		that.TypeValueListElement(),
+		writeAASSubmodelElementsAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -15061,10 +14841,11 @@ func writeSubmodelElementListAsSequence(
 	theValueTypeListElement := that.ValueTypeListElement()
 
 	if theValueTypeListElement != nil {
-		err = writeDataTypeDefXSDProperty(
+		err = writeScalarProperty(
 			encoder,
 			"valueTypeListElement",
 			*theValueTypeListElement,
+			writeDataTypeDefXSDAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15090,7 +14871,7 @@ func writeSubmodelElementListAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"value",
 			theValue,
@@ -15177,7 +14958,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -15206,10 +14987,11 @@ func writeSubmodelElementCollectionAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15235,10 +15017,11 @@ func writeSubmodelElementCollectionAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15264,7 +15047,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -15293,7 +15076,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -15322,17 +15105,11 @@ func writeSubmodelElementCollectionAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15342,14 +15119,6 @@ func writeSubmodelElementCollectionAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -15366,7 +15135,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -15395,7 +15164,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -15424,7 +15193,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -15453,7 +15222,7 @@ func writeSubmodelElementCollectionAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"value",
 			theValue,
@@ -15540,7 +15309,7 @@ func writePropertyAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -15569,10 +15338,11 @@ func writePropertyAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15598,10 +15368,11 @@ func writePropertyAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15627,7 +15398,7 @@ func writePropertyAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -15656,7 +15427,7 @@ func writePropertyAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -15685,17 +15456,11 @@ func writePropertyAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15705,14 +15470,6 @@ func writePropertyAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -15729,7 +15486,7 @@ func writePropertyAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -15758,7 +15515,7 @@ func writePropertyAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -15787,7 +15544,7 @@ func writePropertyAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -15813,10 +15570,11 @@ func writePropertyAsSequence(
 
 	// region ValueType
 
-	err = writeDataTypeDefXSDProperty(
+	err = writeScalarProperty(
 		encoder,
 		"valueType",
 		that.ValueType(),
+		writeDataTypeDefXSDAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -15841,10 +15599,11 @@ func writePropertyAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"value",
 			*theValue,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15870,17 +15629,11 @@ func writePropertyAsSequence(
 	theValueID := that.ValueID()
 
 	if theValueID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"valueId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theValueID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -15890,14 +15643,6 @@ func writePropertyAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"valueId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -15972,7 +15717,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -16001,10 +15746,11 @@ func writeMultiLanguagePropertyAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16030,10 +15776,11 @@ func writeMultiLanguagePropertyAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16059,7 +15806,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -16088,7 +15835,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -16117,17 +15864,11 @@ func writeMultiLanguagePropertyAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16137,14 +15878,6 @@ func writeMultiLanguagePropertyAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -16161,7 +15894,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -16190,7 +15923,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -16219,7 +15952,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -16248,7 +15981,7 @@ func writeMultiLanguagePropertyAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"value",
 			theValue,
@@ -16277,17 +16010,11 @@ func writeMultiLanguagePropertyAsSequence(
 	theValueID := that.ValueID()
 
 	if theValueID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"valueId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theValueID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16297,14 +16024,6 @@ func writeMultiLanguagePropertyAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"valueId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -16379,7 +16098,7 @@ func writeRangeAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -16408,10 +16127,11 @@ func writeRangeAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16437,10 +16157,11 @@ func writeRangeAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16466,7 +16187,7 @@ func writeRangeAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -16495,7 +16216,7 @@ func writeRangeAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -16524,17 +16245,11 @@ func writeRangeAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16544,14 +16259,6 @@ func writeRangeAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -16568,7 +16275,7 @@ func writeRangeAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -16597,7 +16304,7 @@ func writeRangeAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -16626,7 +16333,7 @@ func writeRangeAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -16652,10 +16359,11 @@ func writeRangeAsSequence(
 
 	// region ValueType
 
-	err = writeDataTypeDefXSDProperty(
+	err = writeScalarProperty(
 		encoder,
 		"valueType",
 		that.ValueType(),
+		writeDataTypeDefXSDAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -16680,10 +16388,11 @@ func writeRangeAsSequence(
 	theMin := that.Min()
 
 	if theMin != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"min",
 			*theMin,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16709,10 +16418,11 @@ func writeRangeAsSequence(
 	theMax := that.Max()
 
 	if theMax != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"max",
 			*theMax,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16796,7 +16506,7 @@ func writeReferenceElementAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -16825,10 +16535,11 @@ func writeReferenceElementAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16854,10 +16565,11 @@ func writeReferenceElementAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16883,7 +16595,7 @@ func writeReferenceElementAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -16912,7 +16624,7 @@ func writeReferenceElementAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -16941,17 +16653,11 @@ func writeReferenceElementAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -16961,14 +16667,6 @@ func writeReferenceElementAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -16985,7 +16683,7 @@ func writeReferenceElementAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -17014,7 +16712,7 @@ func writeReferenceElementAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -17043,7 +16741,7 @@ func writeReferenceElementAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -17072,17 +16770,11 @@ func writeReferenceElementAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"value",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theValue,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17092,14 +16784,6 @@ func writeReferenceElementAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"value",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -17174,7 +16858,7 @@ func writeBlobAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -17203,10 +16887,11 @@ func writeBlobAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17232,10 +16917,11 @@ func writeBlobAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17261,7 +16947,7 @@ func writeBlobAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -17290,7 +16976,7 @@ func writeBlobAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -17319,17 +17005,11 @@ func writeBlobAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17339,14 +17019,6 @@ func writeBlobAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -17363,7 +17035,7 @@ func writeBlobAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -17392,7 +17064,7 @@ func writeBlobAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -17421,7 +17093,7 @@ func writeBlobAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -17450,10 +17122,11 @@ func writeBlobAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeBytesProperty(
+		err = writeScalarProperty(
 			encoder,
 			"value",
 			theValue,
+			writeBytesAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17476,10 +17149,11 @@ func writeBlobAsSequence(
 
 	// region ContentType
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"contentType",
 		that.ContentType(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -17562,7 +17236,7 @@ func writeFileAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -17591,10 +17265,11 @@ func writeFileAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17620,10 +17295,11 @@ func writeFileAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17649,7 +17325,7 @@ func writeFileAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -17678,7 +17354,7 @@ func writeFileAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -17707,17 +17383,11 @@ func writeFileAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17727,14 +17397,6 @@ func writeFileAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -17751,7 +17413,7 @@ func writeFileAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -17780,7 +17442,7 @@ func writeFileAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -17809,7 +17471,7 @@ func writeFileAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -17838,10 +17500,11 @@ func writeFileAsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"value",
 			*theValue,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -17864,10 +17527,11 @@ func writeFileAsSequence(
 
 	// region ContentType
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"contentType",
 		that.ContentType(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -17950,7 +17614,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -17979,10 +17643,11 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18008,10 +17673,11 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18037,7 +17703,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -18066,7 +17732,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -18095,17 +17761,11 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18115,14 +17775,6 @@ func writeAnnotatedRelationshipElementAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -18139,7 +17791,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -18168,7 +17820,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -18197,7 +17849,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -18223,17 +17875,11 @@ func writeAnnotatedRelationshipElementAsSequence(
 
 	// region First
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"first",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.First(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -18243,14 +17889,6 @@ func writeAnnotatedRelationshipElementAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"first",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -18263,17 +17901,11 @@ func writeAnnotatedRelationshipElementAsSequence(
 
 	// region Second
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"second",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.Second(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -18283,14 +17915,6 @@ func writeAnnotatedRelationshipElementAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"second",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -18306,7 +17930,7 @@ func writeAnnotatedRelationshipElementAsSequence(
 	theAnnotations := that.Annotations()
 
 	if theAnnotations != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"annotations",
 			theAnnotations,
@@ -18393,7 +18017,7 @@ func writeEntityAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -18422,10 +18046,11 @@ func writeEntityAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18451,10 +18076,11 @@ func writeEntityAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18480,7 +18106,7 @@ func writeEntityAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -18509,7 +18135,7 @@ func writeEntityAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -18538,17 +18164,11 @@ func writeEntityAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18558,14 +18178,6 @@ func writeEntityAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -18582,7 +18194,7 @@ func writeEntityAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -18611,7 +18223,7 @@ func writeEntityAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -18640,7 +18252,7 @@ func writeEntityAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -18669,7 +18281,7 @@ func writeEntityAsSequence(
 	theStatements := that.Statements()
 
 	if theStatements != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"statements",
 			theStatements,
@@ -18695,10 +18307,11 @@ func writeEntityAsSequence(
 
 	// region EntityType
 
-	err = writeEntityTypeProperty(
+	err = writeScalarProperty(
 		encoder,
 		"entityType",
 		that.EntityType(),
+		writeEntityTypeAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -18723,10 +18336,11 @@ func writeEntityAsSequence(
 	theGlobalAssetID := that.GlobalAssetID()
 
 	if theGlobalAssetID != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"globalAssetId",
 			*theGlobalAssetID,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18752,7 +18366,7 @@ func writeEntityAsSequence(
 	theSpecificAssetIDs := that.SpecificAssetIDs()
 
 	if theSpecificAssetIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"specificAssetIds",
 			theSpecificAssetIDs,
@@ -18824,12 +18438,11 @@ func writeEntity(
 
 // Write the `value` of a property as string representation
 // of [aastypes.EntityType]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeEntityTypeProperty(
+func writeEntityTypeAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.EntityType,
 ) (err error) {
 	text, ok := aasstringification.EntityTypeToString(
@@ -18845,18 +18458,17 @@ func writeEntityTypeProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
 // Write the `value` of a property as string representation
 // of [aastypes.Direction]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeDirectionProperty(
+func writeDirectionAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.Direction,
 ) (err error) {
 	text, ok := aasstringification.DirectionToString(
@@ -18872,18 +18484,17 @@ func writeDirectionProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
 // Write the `value` of a property as string representation
 // of [aastypes.StateOfEvent]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeStateOfEventProperty(
+func writeStateOfEventAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.StateOfEvent,
 ) (err error) {
 	text, ok := aasstringification.StateOfEventToString(
@@ -18899,7 +18510,7 @@ func writeStateOfEventProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -18917,17 +18528,11 @@ func writeEventPayloadAsSequence(
 ) (err error) {
 	// region Source
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"source",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.Source(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -18937,14 +18542,6 @@ func writeEventPayloadAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"source",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -18960,17 +18557,11 @@ func writeEventPayloadAsSequence(
 	theSourceSemanticID := that.SourceSemanticID()
 
 	if theSourceSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"sourceSemanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSourceSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -18980,14 +18571,6 @@ func writeEventPayloadAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"sourceSemanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -19001,17 +18584,11 @@ func writeEventPayloadAsSequence(
 
 	// region ObservableReference
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"observableReference",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.ObservableReference(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -19021,14 +18598,6 @@ func writeEventPayloadAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"observableReference",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -19044,17 +18613,11 @@ func writeEventPayloadAsSequence(
 	theObservableSemanticID := that.ObservableSemanticID()
 
 	if theObservableSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"observableSemanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theObservableSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19064,14 +18627,6 @@ func writeEventPayloadAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"observableSemanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -19088,10 +18643,11 @@ func writeEventPayloadAsSequence(
 	theTopic := that.Topic()
 
 	if theTopic != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"topic",
 			*theTopic,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19117,17 +18673,11 @@ func writeEventPayloadAsSequence(
 	theSubjectID := that.SubjectID()
 
 	if theSubjectID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"subjectId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSubjectID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19137,14 +18687,6 @@ func writeEventPayloadAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"subjectId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -19158,10 +18700,11 @@ func writeEventPayloadAsSequence(
 
 	// region TimeStamp
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"timeStamp",
 		that.TimeStamp(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -19186,10 +18729,11 @@ func writeEventPayloadAsSequence(
 	thePayload := that.Payload()
 
 	if thePayload != nil {
-		err = writeBytesProperty(
+		err = writeScalarProperty(
 			encoder,
 			"payload",
 			thePayload,
+			writeBytesAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19273,7 +18817,7 @@ func writeBasicEventElementAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -19302,10 +18846,11 @@ func writeBasicEventElementAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19331,10 +18876,11 @@ func writeBasicEventElementAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19360,7 +18906,7 @@ func writeBasicEventElementAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -19389,7 +18935,7 @@ func writeBasicEventElementAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -19418,17 +18964,11 @@ func writeBasicEventElementAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19438,14 +18978,6 @@ func writeBasicEventElementAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -19462,7 +18994,7 @@ func writeBasicEventElementAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -19491,7 +19023,7 @@ func writeBasicEventElementAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -19520,7 +19052,7 @@ func writeBasicEventElementAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -19546,17 +19078,11 @@ func writeBasicEventElementAsSequence(
 
 	// region Observed
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"observed",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.Observed(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -19566,14 +19092,6 @@ func writeBasicEventElementAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"observed",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -19586,10 +19104,11 @@ func writeBasicEventElementAsSequence(
 
 	// region Direction
 
-	err = writeDirectionProperty(
+	err = writeScalarProperty(
 		encoder,
 		"direction",
 		that.Direction(),
+		writeDirectionAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -19611,10 +19130,11 @@ func writeBasicEventElementAsSequence(
 
 	// region State
 
-	err = writeStateOfEventProperty(
+	err = writeScalarProperty(
 		encoder,
 		"state",
 		that.State(),
+		writeStateOfEventAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -19639,10 +19159,11 @@ func writeBasicEventElementAsSequence(
 	theMessageTopic := that.MessageTopic()
 
 	if theMessageTopic != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"messageTopic",
 			*theMessageTopic,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19668,17 +19189,11 @@ func writeBasicEventElementAsSequence(
 	theMessageBroker := that.MessageBroker()
 
 	if theMessageBroker != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"messageBroker",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theMessageBroker,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19688,14 +19203,6 @@ func writeBasicEventElementAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"messageBroker",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -19712,10 +19219,11 @@ func writeBasicEventElementAsSequence(
 	theLastUpdate := that.LastUpdate()
 
 	if theLastUpdate != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"lastUpdate",
 			*theLastUpdate,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19741,10 +19249,11 @@ func writeBasicEventElementAsSequence(
 	theMinInterval := that.MinInterval()
 
 	if theMinInterval != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"minInterval",
 			*theMinInterval,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19770,10 +19279,11 @@ func writeBasicEventElementAsSequence(
 	theMaxInterval := that.MaxInterval()
 
 	if theMaxInterval != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"maxInterval",
 			*theMaxInterval,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19857,7 +19367,7 @@ func writeOperationAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -19886,10 +19396,11 @@ func writeOperationAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19915,10 +19426,11 @@ func writeOperationAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -19944,7 +19456,7 @@ func writeOperationAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -19973,7 +19485,7 @@ func writeOperationAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -20002,17 +19514,11 @@ func writeOperationAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20022,14 +19528,6 @@ func writeOperationAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -20046,7 +19544,7 @@ func writeOperationAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -20075,7 +19573,7 @@ func writeOperationAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -20104,7 +19602,7 @@ func writeOperationAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -20133,7 +19631,7 @@ func writeOperationAsSequence(
 	theInputVariables := that.InputVariables()
 
 	if theInputVariables != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"inputVariables",
 			theInputVariables,
@@ -20162,7 +19660,7 @@ func writeOperationAsSequence(
 	theOutputVariables := that.OutputVariables()
 
 	if theOutputVariables != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"outputVariables",
 			theOutputVariables,
@@ -20191,7 +19689,7 @@ func writeOperationAsSequence(
 	theInoutputVariables := that.InoutputVariables()
 
 	if theInoutputVariables != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"inoutputVariables",
 			theInoutputVariables,
@@ -20275,18 +19773,10 @@ func writeOperationVariableAsSequence(
 ) (err error) {
 	// region Value
 
-	err = writeStartElement(
+	err = writeDiscriminatedInstanceProperty(
 		encoder,
 		"value",
-	false,
-	)
-	if err != nil {
-		return
-	}
-	err = Marshal(
-		encoder,
 		that.Value(),
-		false,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -20296,14 +19786,6 @@ func writeOperationVariableAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"value",
-	false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -20377,7 +19859,7 @@ func writeCapabilityAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -20406,10 +19888,11 @@ func writeCapabilityAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20435,10 +19918,11 @@ func writeCapabilityAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20464,7 +19948,7 @@ func writeCapabilityAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -20493,7 +19977,7 @@ func writeCapabilityAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -20522,17 +20006,11 @@ func writeCapabilityAsSequence(
 	theSemanticID := that.SemanticID()
 
 	if theSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"semanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20542,14 +20020,6 @@ func writeCapabilityAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"semanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -20566,7 +20036,7 @@ func writeCapabilityAsSequence(
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 
 	if theSupplementalSemanticIDs != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"supplementalSemanticIds",
 			theSupplementalSemanticIDs,
@@ -20595,7 +20065,7 @@ func writeCapabilityAsSequence(
 	theQualifiers := that.Qualifiers()
 
 	if theQualifiers != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"qualifiers",
 			theQualifiers,
@@ -20624,7 +20094,7 @@ func writeCapabilityAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -20711,7 +20181,7 @@ func writeConceptDescriptionAsSequence(
 	theExtensions := that.Extensions()
 
 	if theExtensions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"extensions",
 			theExtensions,
@@ -20740,10 +20210,11 @@ func writeConceptDescriptionAsSequence(
 	theCategory := that.Category()
 
 	if theCategory != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"category",
 			*theCategory,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20769,10 +20240,11 @@ func writeConceptDescriptionAsSequence(
 	theIDShort := that.IDShort()
 
 	if theIDShort != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"idShort",
 			*theIDShort,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20798,7 +20270,7 @@ func writeConceptDescriptionAsSequence(
 	theDisplayName := that.DisplayName()
 
 	if theDisplayName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"displayName",
 			theDisplayName,
@@ -20827,7 +20299,7 @@ func writeConceptDescriptionAsSequence(
 	theDescription := that.Description()
 
 	if theDescription != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"description",
 			theDescription,
@@ -20856,17 +20328,11 @@ func writeConceptDescriptionAsSequence(
 	theAdministration := that.Administration()
 
 	if theAdministration != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"administration",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeAdministrativeInformationAsSequence(
-			encoder,
 			theAdministration,
+			writeAdministrativeInformationAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -20876,14 +20342,6 @@ func writeConceptDescriptionAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"administration",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -20897,10 +20355,11 @@ func writeConceptDescriptionAsSequence(
 
 	// region ID
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"id",
 		that.ID(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -20925,7 +20384,7 @@ func writeConceptDescriptionAsSequence(
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 
 	if theEmbeddedDataSpecifications != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"embeddedDataSpecifications",
 			theEmbeddedDataSpecifications,
@@ -20954,7 +20413,7 @@ func writeConceptDescriptionAsSequence(
 	theIsCaseOf := that.IsCaseOf()
 
 	if theIsCaseOf != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"isCaseOf",
 			theIsCaseOf,
@@ -21026,12 +20485,11 @@ func writeConceptDescription(
 
 // Write the `value` of a property as string representation
 // of [aastypes.ReferenceTypes]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeReferenceTypesProperty(
+func writeReferenceTypesAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.ReferenceTypes,
 ) (err error) {
 	text, ok := aasstringification.ReferenceTypesToString(
@@ -21047,7 +20505,7 @@ func writeReferenceTypesProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -21065,10 +20523,11 @@ func writeReferenceAsSequence(
 ) (err error) {
 	// region Type
 
-	err = writeReferenceTypesProperty(
+	err = writeScalarProperty(
 		encoder,
 		"type",
 		that.Type(),
+		writeReferenceTypesAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21093,17 +20552,11 @@ func writeReferenceAsSequence(
 	theReferredSemanticID := that.ReferredSemanticID()
 
 	if theReferredSemanticID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"referredSemanticId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theReferredSemanticID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -21113,14 +20566,6 @@ func writeReferenceAsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"referredSemanticId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -21134,7 +20579,7 @@ func writeReferenceAsSequence(
 
 	// region Keys
 
-	err = writeListProperty(
+	err = writeListOfInstancesProperty(
 		encoder,
 		"keys",
 		that.Keys(),
@@ -21217,10 +20662,11 @@ func writeKeyAsSequence(
 ) (err error) {
 	// region Type
 
-	err = writeKeyTypesProperty(
+	err = writeScalarProperty(
 		encoder,
 		"type",
 		that.Type(),
+		writeKeyTypesAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21242,10 +20688,11 @@ func writeKeyAsSequence(
 
 	// region Value
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"value",
 		that.Value(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21313,12 +20760,11 @@ func writeKey(
 
 // Write the `value` of a property as string representation
 // of [aastypes.KeyTypes]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeKeyTypesProperty(
+func writeKeyTypesAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.KeyTypes,
 ) (err error) {
 	text, ok := aasstringification.KeyTypesToString(
@@ -21334,18 +20780,17 @@ func writeKeyTypesProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
 // Write the `value` of a property as string representation
 // of [aastypes.DataTypeDefXSD]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeDataTypeDefXSDProperty(
+func writeDataTypeDefXSDAsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.DataTypeDefXSD,
 ) (err error) {
 	text, ok := aasstringification.DataTypeDefXSDToString(
@@ -21361,7 +20806,7 @@ func writeDataTypeDefXSDProperty(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -21379,10 +20824,11 @@ func writeLangStringNameTypeAsSequence(
 ) (err error) {
 	// region Language
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"language",
 		that.Language(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21404,10 +20850,11 @@ func writeLangStringNameTypeAsSequence(
 
 	// region Text
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"text",
 		that.Text(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21487,10 +20934,11 @@ func writeLangStringTextTypeAsSequence(
 ) (err error) {
 	// region Language
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"language",
 		that.Language(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21512,10 +20960,11 @@ func writeLangStringTextTypeAsSequence(
 
 	// region Text
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"text",
 		that.Text(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21598,7 +21047,7 @@ func writeEnvironmentAsSequence(
 	theAssetAdministrationShells := that.AssetAdministrationShells()
 
 	if theAssetAdministrationShells != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"assetAdministrationShells",
 			theAssetAdministrationShells,
@@ -21627,7 +21076,7 @@ func writeEnvironmentAsSequence(
 	theSubmodels := that.Submodels()
 
 	if theSubmodels != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"submodels",
 			theSubmodels,
@@ -21656,7 +21105,7 @@ func writeEnvironmentAsSequence(
 	theConceptDescriptions := that.ConceptDescriptions()
 
 	if theConceptDescriptions != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"conceptDescriptions",
 			theConceptDescriptions,
@@ -21740,17 +21189,11 @@ func writeEmbeddedDataSpecificationAsSequence(
 ) (err error) {
 	// region DataSpecification
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"dataSpecification",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.DataSpecification(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21760,14 +21203,6 @@ func writeEmbeddedDataSpecificationAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"dataSpecification",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -21780,18 +21215,10 @@ func writeEmbeddedDataSpecificationAsSequence(
 
 	// region DataSpecificationContent
 
-	err = writeStartElement(
+	err = writeDiscriminatedInstanceProperty(
 		encoder,
 		"dataSpecificationContent",
-	false,
-	)
-	if err != nil {
-		return
-	}
-	err = Marshal(
-		encoder,
 		that.DataSpecificationContent(),
-		false,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21801,14 +21228,6 @@ func writeEmbeddedDataSpecificationAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"dataSpecificationContent",
-	false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -21867,12 +21286,11 @@ func writeEmbeddedDataSpecification(
 
 // Write the `value` of a property as string representation
 // of [aastypes.DataTypeIEC61360]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
-func writeDataTypeIEC61360Property(
+func writeDataTypeIEC61360AsText(
 	encoder *xml.Encoder,
-	local string,
 	value aastypes.DataTypeIEC61360,
 ) (err error) {
 	text, ok := aasstringification.DataTypeIEC61360ToString(
@@ -21888,7 +21306,7 @@ func writeDataTypeIEC61360Property(
 		return
 	}
 
-	err = writeStringProperty(encoder, local, text)
+	err = writeText(encoder, text)
 	return
 }
 
@@ -21906,10 +21324,11 @@ func writeLevelTypeAsSequence(
 ) (err error) {
 	// region Min
 
-	err = writeBooleanProperty(
+	err = writeScalarProperty(
 		encoder,
 		"min",
 		that.Min(),
+		writeBooleanAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21931,10 +21350,11 @@ func writeLevelTypeAsSequence(
 
 	// region Nom
 
-	err = writeBooleanProperty(
+	err = writeScalarProperty(
 		encoder,
 		"nom",
 		that.Nom(),
+		writeBooleanAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21956,10 +21376,11 @@ func writeLevelTypeAsSequence(
 
 	// region Typ
 
-	err = writeBooleanProperty(
+	err = writeScalarProperty(
 		encoder,
 		"typ",
 		that.Typ(),
+		writeBooleanAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -21981,10 +21402,11 @@ func writeLevelTypeAsSequence(
 
 	// region Max
 
-	err = writeBooleanProperty(
+	err = writeScalarProperty(
 		encoder,
 		"max",
 		that.Max(),
+		writeBooleanAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22064,10 +21486,11 @@ func writeValueReferencePairAsSequence(
 ) (err error) {
 	// region Value
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"value",
 		that.Value(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22089,17 +21512,11 @@ func writeValueReferencePairAsSequence(
 
 	// region ValueID
 
-	err = writeStartElement(
+	err = writeEmbeddedInstanceProperty(
 		encoder,
 		"valueId",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
 		that.ValueID(),
+		writeReferenceAsSequence,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22109,14 +21526,6 @@ func writeValueReferencePairAsSequence(
 				},
 			)
 		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"valueId",
-		false,
-	)
-	if err != nil {
 		return
 	}
 
@@ -22187,7 +21596,7 @@ func writeValueListAsSequence(
 ) (err error) {
 	// region ValueReferencePairs
 
-	err = writeListProperty(
+	err = writeListOfInstancesProperty(
 		encoder,
 		"valueReferencePairs",
 		that.ValueReferencePairs(),
@@ -22270,10 +21679,11 @@ func writeLangStringPreferredNameTypeIEC61360AsSequence(
 ) (err error) {
 	// region Language
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"language",
 		that.Language(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22295,10 +21705,11 @@ func writeLangStringPreferredNameTypeIEC61360AsSequence(
 
 	// region Text
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"text",
 		that.Text(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22378,10 +21789,11 @@ func writeLangStringShortNameTypeIEC61360AsSequence(
 ) (err error) {
 	// region Language
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"language",
 		that.Language(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22403,10 +21815,11 @@ func writeLangStringShortNameTypeIEC61360AsSequence(
 
 	// region Text
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"text",
 		that.Text(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22486,10 +21899,11 @@ func writeLangStringDefinitionTypeIEC61360AsSequence(
 ) (err error) {
 	// region Language
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"language",
 		that.Language(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22511,10 +21925,11 @@ func writeLangStringDefinitionTypeIEC61360AsSequence(
 
 	// region Text
 
-	err = writeStringProperty(
+	err = writeScalarProperty(
 		encoder,
 		"text",
 		that.Text(),
+		writeStringAsText,
 	)
 	if err != nil {
 		if seriaErr, ok := err.(*SerializationError); ok {
@@ -22594,7 +22009,7 @@ func writeDataSpecificationIEC61360AsSequence(
 ) (err error) {
 	// region PreferredName
 
-	err = writeListProperty(
+	err = writeListOfInstancesProperty(
 		encoder,
 		"preferredName",
 		that.PreferredName(),
@@ -22622,7 +22037,7 @@ func writeDataSpecificationIEC61360AsSequence(
 	theShortName := that.ShortName()
 
 	if theShortName != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"shortName",
 			theShortName,
@@ -22651,10 +22066,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theUnit := that.Unit()
 
 	if theUnit != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"unit",
 			*theUnit,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22680,17 +22096,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theUnitID := that.UnitID()
 
 	if theUnitID != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"unitId",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeReferenceAsSequence(
-			encoder,
 			theUnitID,
+			writeReferenceAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22700,14 +22110,6 @@ func writeDataSpecificationIEC61360AsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"unitId",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -22724,10 +22126,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theSourceOfDefinition := that.SourceOfDefinition()
 
 	if theSourceOfDefinition != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"sourceOfDefinition",
 			*theSourceOfDefinition,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22753,10 +22156,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theSymbol := that.Symbol()
 
 	if theSymbol != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"symbol",
 			*theSymbol,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22782,10 +22186,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theDataType := that.DataType()
 
 	if theDataType != nil {
-		err = writeDataTypeIEC61360Property(
+		err = writeScalarProperty(
 			encoder,
 			"dataType",
 			*theDataType,
+			writeDataTypeIEC61360AsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22811,7 +22216,7 @@ func writeDataSpecificationIEC61360AsSequence(
 	theDefinition := that.Definition()
 
 	if theDefinition != nil {
-		err = writeListProperty(
+		err = writeListOfInstancesProperty(
 			encoder,
 			"definition",
 			theDefinition,
@@ -22840,10 +22245,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theValueFormat := that.ValueFormat()
 
 	if theValueFormat != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"valueFormat",
 			*theValueFormat,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22869,17 +22275,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theValueList := that.ValueList()
 
 	if theValueList != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"valueList",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeValueListAsSequence(
-			encoder,
 			theValueList,
+			writeValueListAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22889,14 +22289,6 @@ func writeDataSpecificationIEC61360AsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"valueList",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
@@ -22913,10 +22305,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theValue := that.Value()
 
 	if theValue != nil {
-		err = writeStringProperty(
+		err = writeScalarProperty(
 			encoder,
 			"value",
 			*theValue,
+			writeStringAsText,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22942,17 +22335,11 @@ func writeDataSpecificationIEC61360AsSequence(
 	theLevelType := that.LevelType()
 
 	if theLevelType != nil {
-		err = writeStartElement(
+		err = writeEmbeddedInstanceProperty(
 			encoder,
 			"levelType",
-			false,
-		)
-		if err != nil {
-			return
-		}
-		err = writeLevelTypeAsSequence(
-			encoder,
 			theLevelType,
+			writeLevelTypeAsSequence,
 		)
 		if err != nil {
 			if seriaErr, ok := err.(*SerializationError); ok {
@@ -22962,14 +22349,6 @@ func writeDataSpecificationIEC61360AsSequence(
 					},
 				)
 			}
-			return
-		}
-		err = writeEndElement(
-			encoder,
-			"levelType",
-			false,
-		)
-		if err != nil {
 			return
 		}
 	}
