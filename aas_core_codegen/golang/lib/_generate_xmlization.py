@@ -633,7 +633,21 @@ func checkEndElement(current xml.Token, local string) (err error) {{
     )
 
 
-def _generate_read_list() -> Stripped:
+def _generate_scalar_definition() -> Stripped:
+    return Stripped(
+        f"""\
+type Scalar interface {{
+{I}~bool |
+{I}~int |
+{I}~int64 |
+{I}~float64 |
+{I}~string |
+{I}~[]byte
+}}"""
+    )
+
+
+def _generate_read_list_of_instances() -> Stripped:
     return Stripped(
         f"""\
 // Read a list of AAS instances as a sequence of XML elements.
@@ -642,7 +656,7 @@ def _generate_read_list() -> Stripped:
 // stop the reading as soon as we encounter a non-start element.
 //
 // That last non-start element is returned as `next` element.
-func readList[T aastypes.IClass](
+func readListOfInstances[T aastypes.IClass](
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}readTWithLookahead func(
@@ -892,7 +906,7 @@ if valueErr == nil {{
                 type_anno.items.our_type,
                 (intermediate.AbstractClass, intermediate.ConcreteClass),
             ), (
-                f"NOTE (mristin, 2023-03-29): We expect only lists of classes "
+                f"NOTE (mristin): We expect only lists of classes "
                 f"at the moment, but you specified {type_anno}. "
                 f"Please contact the developers if you need this feature."
             )
@@ -904,7 +918,7 @@ if valueErr == nil {{
             case_body_blocks.append(
                 Stripped(
                     f"""\
-{prop_var}, current, valueErr = readList(
+{prop_var}, current, valueErr = readListOfInstances(
 {I}decoder,
 {I}current,
 {I}{read_item_function},
@@ -912,6 +926,7 @@ if valueErr == nil {{
                 )
             )
         else:
+            # noinspection PyTypeChecker
             assert_never(type_anno)
 
         assert len(case_body_blocks) > 0
@@ -1568,118 +1583,53 @@ func writeText(
     )
 
 
-def _generate_write_boolean_property() -> Stripped:
+def _generate_write_boolean_as_text() -> Stripped:
     return Stripped(
         f"""\
-// Write the `value` of a property as `xs:boolean` enclosed in an XML element.
+// Write the `value` as a `xs:boolean` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeBooleanProperty(
+func writeBooleanAsText(
 {I}encoder *xml.Encoder,
-{I}local string,
 {I}value bool,
 ) (err error) {{
-{I}err = writeStartElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}text := "true"
 {I}if !value {{
 {II}text = "false"
 {I}}}
 {I}err = writeText(encoder, text)
-{I}if err != nil {{
-{II}return
-{I}}}
-
-{I}err = writeEndElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}return
 }}"""
     )
 
 
-def _generate_write_long_property() -> Stripped:
+def _generate_write_long_as_text() -> Stripped:
     return Stripped(
         f"""\
-// Write the `value` of a property as `xs:long` enclosed in an XML element.
+// Write the `value` as a `xs:long` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeLongProperty(
+func writeLongAsText(
 {I}encoder *xml.Encoder,
-{I}local string,
 {I}value int64,
 ) (err error) {{
-{I}err = writeStartElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}text := strconv.FormatInt(value, 10)
 {I}err = writeText(encoder, text)
-{I}if err != nil {{
-{II}return
-{I}}}
-
-{I}err = writeEndElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}return
 }}"""
     )
 
 
-def _generate_write_double_property() -> Stripped:
+def _generate_write_double_as_text() -> Stripped:
     return Stripped(
         f"""\
-// Write the `value` of a property as `xs:double` enclosed in an XML element.
+// Write the `value` as a `xs:double` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeDoubleProperty(
+func writeDoubleAsText(
 {I}encoder *xml.Encoder,
-{I}local string,
 {I}value float64,
 ) (err error) {{
-{I}err = writeStartElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}var text string
 
 {I}// See: https://www.w3.org/TR/xmlschema-2/#double
@@ -1697,94 +1647,81 @@ func writeDoubleProperty(
 {I}}}
 
 {I}err = writeText(encoder, text)
-{I}if err != nil {{
-{II}return
-{I}}}
-
-{I}err = writeEndElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}return
 }}"""
     )
 
 
-def _generate_write_string_property() -> Stripped:
+def _generate_write_string_as_text() -> Stripped:
     return Stripped(
         f"""\
-// Write the `value` of a property as `xs:string` enclosed in an XML element.
+// Write the `value` as a `xs:string` in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeStringProperty(
+func writeStringAsText(
 {I}encoder *xml.Encoder,
-{I}local string,
 {I}value string,
 ) (err error) {{
-{I}err = writeStartElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}err = writeText(encoder, value)
-{I}if err != nil {{
-{II}return
-{I}}}
-
-{I}err = writeEndElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}return
 }}"""
     )
 
 
-def _generate_write_bytes_property() -> Stripped:
+def _generate_write_bytes_as_text() -> Stripped:
     return Stripped(
         f"""\
-// Write the `value` of a property as base64-encoded bytes.
+// Write the `value` as a base64-encoded bytes in a text element.
 //
 // Do not flush.
-//
-// The XML namespace is expected to have been defined outside of the resulting XML
-// element.
-func writeBytesProperty(
+func writeBytesAsText(
 {I}encoder *xml.Encoder,
-{I}local string,
 {I}value []byte,
 ) (err error) {{
-{I}err = writeStartElement(
-{II}encoder,
-{II}local,
-{II}false,
-{I})
-{I}if err != nil {{
-{II}return
-{I}}}
-
 {I}text := b64.StdEncoding.EncodeToString(
 {II}value,
 {I})
 
 {I}err = writeText(encoder, text)
+{I}return
+}}"""
+    )
+
+
+# NOTE (mristin):
+# We provide wrapper function for scalar values to reduce
+# the already copious amounts of generated code. While it might seem like unnecessary
+# abstraction (basically just a start element, a call to writeXxxAsText, and an end
+# element), it still reduces the lines of generated code substantially.
+#
+# In addition, we also re-use the writeXxxAsText in writeListOfScalarsProperty.
+
+
+def _generate_write_scalar_property() -> Stripped:
+    return Stripped(
+        f"""\
+// Write the scalar `value` of a property enclosed in an XML element.
+//
+// Do not flush.
+//
+// The XML namespace is expected to have been defined outside of the resulting XML
+// element.
+func writeScalarProperty[T Scalar](
+{I}encoder *xml.Encoder,
+{I}local string,
+{I}value T,
+{I}writeTAsText func(anEncoder *xml.Encoder, aValue T) (anErr error),
+) (err error) {{
+{I}err = writeStartElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = writeTAsText(encoder, value)
 {I}if err != nil {{
 {II}return
 {I}}}
@@ -1803,12 +1740,97 @@ func writeBytesProperty(
     )
 
 
-def _generate_write_list_as_sequence() -> Stripped:
+def _generate_write_embedded_instance_property() -> Stripped:
+    return Stripped(
+        f"""\
+// Serialize the `instance` as a sequence of elements directly embedded
+// in an XML element with `local` name representing the property.
+//
+// Do not flush.
+func writeEmbeddedInstanceProperty[T aastypes.IClass](
+{I}encoder *xml.Encoder,
+{I}local string,
+{I}instance T,
+{I}writeTAsSequence func(anEncoder *xml.Encoder, that T) (anErr error),
+) (err error) {{
+{I}err = writeStartElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = writeTAsSequence(
+{II}encoder,
+{II}instance,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = writeEndElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}return
+}}"""
+    )
+
+
+def _generate_write_instance_property_with_discriminator() -> Stripped:
+    return Stripped(
+        f"""\
+// Serialize the `instance` as a sequence of elements within a discriminator
+// element which is then embedded in an XML element with `local` name
+// representing the property.
+//
+// Do not flush.
+func writeDiscriminatedInstanceProperty(
+{I}encoder *xml.Encoder,
+{I}local string,
+{I}instance aastypes.IClass,
+) (err error) {{
+{I}err = writeStartElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = Marshal(
+{II}encoder,
+{II}instance,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = writeEndElement(
+{II}encoder,
+{II}local,
+{II}false,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}return
+}}"""
+    )
+
+
+def _generate_write_list_of_instances_property() -> Stripped:
     return Stripped(
         f"""\
 // Serialize the list of instances as a sequence of XML elements enclosed in a parent
 // XML element with the `local` name.
-func writeListProperty[T aastypes.IClass](
+func writeListOfInstancesProperty[T aastypes.IClass](
 {I}encoder *xml.Encoder,
 {I}local string,
 {I}list []T,
@@ -1854,12 +1876,12 @@ func writeListProperty[T aastypes.IClass](
     )
 
 
-def _generate_write_enumeration_property(
+def _generate_write_enumeration_as_text(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
     enum_name = golang_naming.enum_name(enumeration.name)
     function_name = golang_naming.private_function_name(
-        Identifier(f"write_{enumeration.name}_property")
+        Identifier(f"write_{enumeration.name}_as_text")
     )
     to_string_name = golang_naming.function_name(
         Identifier(f"{enumeration.name}_to_string")
@@ -1869,12 +1891,11 @@ def _generate_write_enumeration_property(
         f"""\
 // Write the `value` of a property as string representation
 // of [aastypes.{enum_name}]
-// enclosed in an XML element.
+// in a text element.
 //
 // Do not flush.
 func {function_name}(
 {I}encoder *xml.Encoder,
-{I}local string,
 {I}value aastypes.{enum_name},
 ) (err error) {{
 {I}text, ok := aasstringification.{to_string_name}(
@@ -1890,18 +1911,18 @@ func {function_name}(
 {II}return
 {I}}}
 
-{I}err = writeStringProperty(encoder, local, text)
+{I}err = writeText(encoder, text)
 {I}return
 }}"""
     )
 
 
 _WRITE_FUNCTION_BY_PRIMITIVE_TYPE = {
-    intermediate.PrimitiveType.BOOL: "writeBooleanProperty",
-    intermediate.PrimitiveType.INT: "writeLongProperty",
-    intermediate.PrimitiveType.FLOAT: "writeDoubleProperty",
-    intermediate.PrimitiveType.STR: "writeStringProperty",
-    intermediate.PrimitiveType.BYTEARRAY: "writeBytesProperty",
+    intermediate.PrimitiveType.BOOL: "writeBooleanAsText",
+    intermediate.PrimitiveType.INT: "writeLongAsText",
+    intermediate.PrimitiveType.FLOAT: "writeDoubleAsText",
+    intermediate.PrimitiveType.STR: "writeStringAsText",
+    intermediate.PrimitiveType.BYTEARRAY: "writeBytesAsText",
 }
 assert all(
     literal in _WRITE_FUNCTION_BY_PRIMITIVE_TYPE
@@ -1933,6 +1954,20 @@ def _generate_snippet_to_serialize_property(prop: intermediate.Property) -> Stri
             )
         )
 
+    if_err_nil_prepend_name_if_serialization_error_return = Stripped(
+        f"""\
+if err != nil {{
+{I}if seriaErr, ok := err.(*SerializationError); ok {{
+{II}seriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {segment_name_literal},
+{III}}},
+{II})
+{I}}}
+{I}return
+}}"""
+    )
+
     write_block = None  # type: Optional[Stripped]
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
@@ -1951,44 +1986,32 @@ def _generate_snippet_to_serialize_property(prop: intermediate.Property) -> Stri
                 type_anno.our_type, intermediate.Enumeration
             )
             write_function = golang_naming.private_function_name(
-                Identifier(f"write_{type_anno.our_type.name}_property")
+                Identifier(f"write_{type_anno.our_type.name}_as_text")
             )
 
         pointer = golang_pointering.is_pointer_type(prop.type_annotation)
 
-        if_err_nil_prepend_name_if_serialization_error = Stripped(
-            f"""\
-if err != nil {{
-{I}if seriaErr, ok := err.(*SerializationError); ok {{
-{II}seriaErr.Path.PrependName(
-{III}&aasreporting.NameSegment{{
-{IIII}Name: {segment_name_literal},
-{III}}},
-{II})
-{I}}}
-{I}return
-}}"""
-        )
-
         if pointer:
             write_block = Stripped(
                 f"""\
-err = {write_function}(
+err = writeScalarProperty(
 {I}encoder,
 {I}{local_literal},
 {I}*{access_expr},
+{I}{write_function},
 )
-{if_err_nil_prepend_name_if_serialization_error}"""
+{if_err_nil_prepend_name_if_serialization_error_return}"""
             )
         else:
             write_block = Stripped(
                 f"""\
-err = {write_function}(
+err = writeScalarProperty(
 {I}encoder,
 {I}{local_literal},
 {I}{access_expr},
+{I}{write_function},
 )
-{if_err_nil_prepend_name_if_serialization_error}"""
+{if_err_nil_prepend_name_if_serialization_error_return}"""
             )
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
@@ -2007,76 +2030,28 @@ err = {write_function}(
                 isinstance(our_type, intermediate.ConcreteClass)
                 and len(our_type.concrete_descendants) == 0
             ):
-                write_as_sequence_name = golang_naming.private_function_name(
+                write_as_sequence_function = golang_naming.private_function_name(
                     Identifier(f"write_{our_type.name}_as_sequence")
                 )
                 write_block = Stripped(
                     f"""\
-err = writeStartElement(
+err = writeEmbeddedInstanceProperty(
 {I}encoder,
 {I}{local_literal},
-{I}false,
-)
-if err != nil {{
-{I}return
-}}
-err = {write_as_sequence_name}(
-{I}encoder,
 {I}{access_expr},
+{I}{write_as_sequence_function},
 )
-if err != nil {{
-{I}if seriaErr, ok := err.(*SerializationError); ok {{
-{II}seriaErr.Path.PrependName(
-{III}&aasreporting.NameSegment{{
-{IIII}Name: {segment_name_literal},
-{III}}},
-{II})
-{I}}}
-{I}return
-}}
-err = writeEndElement(
-{I}encoder,
-{I}{local_literal},
-{I}false,
-)
-if err != nil {{
-{I}return
-}}"""
+{if_err_nil_prepend_name_if_serialization_error_return}"""
                 )
             else:
                 write_block = Stripped(
                     f"""\
-err = writeStartElement(
+err = writeDiscriminatedInstanceProperty(
 {I}encoder,
 {I}{local_literal},
-false,
-)
-if err != nil {{
-{I}return
-}}
-err = Marshal(
-{I}encoder,
 {I}{access_expr},
-{I}false,
 )
-if err != nil {{
-{I}if seriaErr, ok := err.(*SerializationError); ok {{
-{II}seriaErr.Path.PrependName(
-{III}&aasreporting.NameSegment{{
-{IIII}Name: {segment_name_literal},
-{III}}},
-{II})
-{I}}}
-{I}return
-}}
-err = writeEndElement(
-{I}encoder,
-{I}{local_literal},
-false,
-)
-if err != nil {{
-{I}return
-}}"""
+{if_err_nil_prepend_name_if_serialization_error_return}"""
                 )
 
         else:
@@ -2089,28 +2064,19 @@ if err != nil {{
             type_anno.items.our_type,
             (intermediate.AbstractClass, intermediate.ConcreteClass),
         ), (
-            f"NOTE (mristin, 2023-06-20): We expect only lists of classes "
+            f"NOTE (mristin): We expect only lists of classes "
             f"at the moment, but you specified {type_anno}. "
             f"Please contact the developers if you need this feature."
         )
 
         write_block = Stripped(
             f"""\
-err = writeListProperty(
+err = writeListOfInstancesProperty(
 {I}encoder,
 {I}{local_literal},
 {I}{access_expr},
 )
-if err != nil {{
-{I}if seriaErr, ok := err.(*SerializationError); ok {{
-{II}seriaErr.Path.PrependName(
-{III}&aasreporting.NameSegment{{
-{IIII}Name: {segment_name_literal},
-{III}}},
-{II})
-{I}}}
-{I}return
-}}"""
+{if_err_nil_prepend_name_if_serialization_error_return}"""
         )
 
     else:
@@ -2364,10 +2330,6 @@ def generate(
         f"{repo_url}/stringification"
     )
 
-    aasverification_url_literal = golang_common.string_literal(
-        f"{repo_url}/verification"
-    )
-
     namespace_literal = golang_common.string_literal(
         symbol_table.meta_model.xml_namespace
     )
@@ -2391,6 +2353,7 @@ import (
 {I}"fmt"
 {I}"io"
 {I}"math"
+{I}"regexp"
 {I}"strconv"
 {I}"strings"
 {I}"unicode"
@@ -2398,7 +2361,6 @@ import (
 {I}aasreporting {aasreporting_url_literal}
 {I}aasstringification {aasstringification_url_literal}
 {I}aastypes {aastypes_url_literal}
-{I}aasverification {aasverification_url_literal}
 )"""
         ),
         Stripped("// region De-serialization"),
@@ -2430,7 +2392,8 @@ const Namespace = {namespace_literal}"""
             _generate_extract_local_name_from_start_element(),
             _generate_parse_as_start_element_and_extract_local_name(),
             _generate_check_end_element(),
-            _generate_read_list(),
+            _generate_scalar_definition(),
+            _generate_read_list_of_instances(),
         ]
     )
 
@@ -2487,18 +2450,21 @@ const Namespace = {namespace_literal}"""
             _generate_write_start_element(),
             _generate_write_end_element(),
             _generate_write_text(),
-            _generate_write_boolean_property(),
-            _generate_write_long_property(),
-            _generate_write_double_property(),
-            _generate_write_string_property(),
-            _generate_write_bytes_property(),
-            _generate_write_list_as_sequence(),
+            _generate_write_boolean_as_text(),
+            _generate_write_long_as_text(),
+            _generate_write_double_as_text(),
+            _generate_write_string_as_text(),
+            _generate_write_bytes_as_text(),
+            _generate_write_scalar_property(),
+            _generate_write_embedded_instance_property(),
+            _generate_write_instance_property_with_discriminator(),
+            _generate_write_list_of_instances_property(),
         ]
     )
 
     for our_type in symbol_table.our_types:
         if isinstance(our_type, intermediate.Enumeration):
-            blocks.append(_generate_write_enumeration_property(enumeration=our_type))
+            blocks.append(_generate_write_enumeration_as_text(enumeration=our_type))
 
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2023-06-18):
