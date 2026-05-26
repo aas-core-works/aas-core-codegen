@@ -239,23 +239,31 @@ that.{prop_setter_name}(
                 assert_never(type_anno.our_type)
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ), (
-                f"NOTE (mristin): We expect only lists of classes "
-                f"at the moment, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                # Nothing to recurse into.
+                continue
 
-            items_interface_name = golang_naming.interface_name(
-                type_anno.items.our_type.name
-            )
+            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                    # Nothing to recurse into.
+                    continue
 
-            recurse_block = Stripped(
-                f"""\
+                elif isinstance(
+                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                ):
+                    # Nothing to recurse into.
+                    continue
+
+                elif isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    items_interface_name = golang_naming.interface_name(
+                        type_anno.items.our_type.name
+                    )
+
+                    recurse_block = Stripped(
+                        f"""\
 for i, v := range {prop_var} {{
 {I}// Update in-situ
 {I}{prop_var}[i] = Wrap[E](
@@ -263,7 +271,29 @@ for i, v := range {prop_var} {{
 {II}factory,
 {I}).(aastypes.{items_interface_name})
 }}"""
-            )
+                    )
+
+                else:
+                    assert_never(type_anno.items.our_type)
+
+            elif isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
+                raise NotImplementedError(
+                    f"NOTE (mristin, 2026-05-09): We do not currently support "
+                    f"the generation of enhancing code for lists of optionals, "
+                    f"but you specified {type_anno}. Please contact the developers if "
+                    f"you need this feature."
+                )
+
+            elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
+                raise NotImplementedError(
+                    f"NOTE (mristin, 2026-05-09): We do not currently support "
+                    f"the generation of enhancing code for lists of lists, "
+                    f"but you specified {type_anno}. Please contact the developers if "
+                    f"you need this feature."
+                )
+
+            else:
+                assert_never(type_anno.items)
 
         else:
             # noinspection PyTypeChecker

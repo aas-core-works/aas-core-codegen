@@ -542,34 +542,45 @@ if abort {{
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
             ), (
-                f"NOTE (mristin, 2023-03-29): We expect only lists of classes "
-                f"at the moment, but you specified {type_anno}. "
+                f"NOTE (mristin): We currently generate only the code to descend into "
+                f"lists of atomic values, but you specified {type_anno}. "
                 f"Please contact the developers if you need this feature."
             )
 
-            loop_var = next(generator_for_loop_variables)
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                continue
 
-            if not recurse:
-                prop_blocks.append(
-                    Stripped(
-                        f"""\
+            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                if isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
+                ):
+                    continue
+
+                elif isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    loop_var = next(generator_for_loop_variables)
+
+                    if not recurse:
+                        prop_blocks.append(
+                            Stripped(
+                                f"""\
 for _, {loop_var} := range {receiver}.{prop_name} {{
 {I}abort = action({loop_var});
 {I}if abort {{
 {II}return
 {I}}}
 }}"""
-                    )
-                )
-            else:
-                prop_blocks.append(
-                    Stripped(
-                        f"""\
+                            )
+                        )
+                    else:
+                        prop_blocks.append(
+                            Stripped(
+                                f"""\
 for _, {loop_var} := range {receiver}.{prop_name} {{
 {I}abort = action({loop_var});
 {I}if abort {{
@@ -583,8 +594,15 @@ for _, {loop_var} := range {receiver}.{prop_name} {{
 {II}return
 {I}}}
 }}"""
-                    )
-                )
+                            )
+                        )
+
+                else:
+                    # noinspection PyTypeChecker
+                    assert_never(type_anno.items)
+            else:
+                # noinspection PyTypeChecker
+                assert_never(type_anno.items)
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)

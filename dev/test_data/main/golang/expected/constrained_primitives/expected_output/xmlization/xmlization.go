@@ -550,6 +550,89 @@ type Scalar interface {
 	~[]byte
 }
 
+// Read a list of scalars, *i.e.*, non-instances as a sequence of `<v>` elements.
+//
+// The item is serialized as text in the `<v>` element.
+//
+// Every start element is considered to mark the start of an item serialization. We
+// stop the reading as soon as we encounter a non-start element.
+//
+// That last non-start element is returned as `next` element.
+func readListOfScalars[T Scalar](
+	decoder *xml.Decoder,
+	current xml.Token,
+	readTextAsT func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+	) (value T, aNext xml.Token, anErr error),
+) (values []T, next xml.Token, err error) {
+	i := 0
+	for {
+		current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+		if err != nil {
+			return
+		}
+
+		if _, ok := current.(xml.StartElement); !ok {
+			break
+		}
+
+		var local string
+		local, err = parseAsStartElementAndExtractLocalName(
+			current,
+		)
+		if err != nil {
+			return
+		}
+
+		if local != "v" {
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Expected start element 'v' as a delimiter for a list of values, "+
+						"but got %s",
+					local,
+				),
+			)
+		}
+
+		// Move the current to the value
+		current, err = readNext(decoder, current)
+		if err != nil {
+			return
+		}
+
+		var value T
+		var valueErr error
+		value, current, valueErr = readTextAsT(decoder, current)
+		if valueErr != nil {
+			if deseriaErr, ok := valueErr.(*DeserializationError); ok {
+				deseriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			err = valueErr
+			return
+		}
+
+		values = append(values, value)
+
+		i++
+
+		err = checkEndElement(current, local)
+		if err != nil {
+			return
+		}
+
+		current, err = readNext(decoder, nil)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+	return
+}
+
 // Read a list of AAS instances as a sequence of XML elements.
 //
 // Every start element is considered to mark the start of an instance serialization. We
@@ -1209,6 +1292,67 @@ func writeListOfInstancesProperty[T aastypes.IClass](
 					},
 				)
 			}
+			return
+		}
+	}
+
+	err = writeEndElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// Serialize the list of scalars as a sequence of XML `<v>` elements
+// enclosed in a parent XML element with the `local` name.
+func writeListOfScalarsProperty[T Scalar](
+	encoder *xml.Encoder,
+	local string,
+	list []T,
+	writeTAsText func(anEncoder *xml.Encoder, aValue T) (anErr error),
+) (err error) {
+	err = writeStartElement(
+		encoder,
+		local,
+		false,
+	)
+	if err != nil {
+		return
+	}
+
+	for i, item := range list {
+		err = writeStartElement(
+			encoder,
+			"v",
+			false,
+		)
+		if err != nil {
+			return
+		}
+
+		err = writeTAsText(encoder, item)
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{
+						Index: i,
+					},
+				)
+			}
+			return
+		}
+
+		err = writeEndElement(
+			encoder,
+			"v",
+			false,
+		)
+		if err != nil {
 			return
 		}
 	}

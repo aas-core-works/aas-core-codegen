@@ -23,7 +23,10 @@ from aas_core_codegen.common import (
     wrap_text_into_lines,
     assert_union_without_excluded,
 )
-from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    PrimitiveTypeAnnotation,
+)
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 from aas_core_codegen.golang import (
     common as golang_common,
@@ -37,7 +40,6 @@ from aas_core_codegen.golang.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII,
 )
 
 
@@ -901,43 +903,107 @@ if abort {{
             assert_never(our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
-        ), (
-            f"NOTE (mristin): We expect only lists of classes "
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
+            f"NOTE (mristin): We expect only lists of atomic values "
             f"at the moment, but you specified {type_anno}. "
             f"Please contact the developers if you need this feature."
         )
 
-        block = Stripped(
-            f"""\
-for i, v := range that.{getter_name}() {{
-{I}abort = Verify(
-{II}v,
-{II}func(err *VerificationError) bool {{
-{III}err.Path.PrependIndex(
-{IIII}&aasreporting.IndexSegment{{
-{IIIII}Index: i,
-{IIII}}},
-{III})
+        loop_body: Optional[Stripped] = None
 
-{III}err.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{
-{IIIII}Name: {prop_name_literal},
-{IIII}}},
-{III})
+        if isinstance(type_anno.items, PrimitiveTypeAnnotation):
+            # There is no verification for primitive types within a list.
+            pass
 
-{III}return onError(err)
-{II}}},
-{I})
-{I}if abort {{
-{II}return
-{I}}}
+        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            # NOTE (mristin):
+            # We adapted the code for verifying the atomic values from above. This does
+            # cause a bit of duplication, but abstracting away the code to make it
+            # reusable resulted in a much more convoluted and less understandable code
+            # that we decided to duplicate it here. For example, the logic for
+            # prepending the path to the error can not be easily abstracted.
+
+            if isinstance(
+                type_anno.items.our_type,
+                (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
+            ):
+                verify_function_name = golang_naming.function_name(
+                    Identifier(f"verify_{type_anno.items.our_type.name}")
+                )
+
+                pointer_prefix = (
+                    "*" if golang_pointering.is_pointer_type(type_anno.items) else ""
+                )
+
+                loop_body = Stripped(
+                    f"""\
+abort = {verify_function_name}(
+{I}{pointer_prefix}v,
+{I}func(err *VerificationError) bool {{
+{II}err.Path.PrependIndex(
+{III}&aasreporting.IndexSegment{{
+{IIII}Index: i,
+{III}}},
+{II})
+
+{II}err.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {prop_name_literal},
+{III}}},
+{II})
+
+{II}return onError(err)
+{I}}},
+)
+if abort {{
+{I}return
 }}"""
-        )
+                )
+
+            elif isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                loop_body = Stripped(
+                    f"""\
+abort = Verify(
+{I}v,
+{I}func(err *VerificationError) bool {{
+{II}err.Path.PrependIndex(
+{III}&aasreporting.IndexSegment{{
+{IIII}Index: i,
+{III}}},
+{II})
+
+{II}err.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {prop_name_literal},
+{III}}},
+{II})
+
+{II}return onError(err)
+{I}}},
+)
+if abort {{
+{I}return
+}}"""
+                )
+
+            else:
+                # noinspection PyTypeChecker
+                assert_never(type_anno.items.our_type)
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(type_anno.items)
+
+        if loop_body is not None:
+            block = Stripped(
+                f"""\
+for i, v := range that.{getter_name}() {{
+{I}{indent_but_first_line(loop_body, I)}
+}}"""
+            )
 
     else:
         assert_never(type_anno)
