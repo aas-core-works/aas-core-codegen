@@ -155,13 +155,18 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
     if len(cls.constructor.arguments) == 0:
         body_blocks.append(Stripped(f"return new Aas.{cls_name}();"))
     else:
-        # NOTE (mristin, 2022-11-04):
+        # NOTE (mristin):
+        # We handle first the case of properties containing lists, and make copies of
+        # the lists to separate variables. The variables are finally passed to
+        # the constructor (see below, after this code of block).
+        #
         # We could use LINQ to make deep copies of lists in expressions which are
         # directly passed to the constructor. This indeed makes sense if we wrote
         # the code manually, and would also be a more elegant solution. However,
         # LINQ comes with a certain overhead (for example, the memory for the new list
         # can not be pre-reserved ahead of time). That is why we make these copies in
         # separate variables and pass on the variables to the constructor.
+
         for arg in cls.constructor.arguments:
             prop_name = csharp_naming.property_name(arg.name)
             optional = isinstance(
@@ -173,38 +178,118 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
             if not isinstance(type_anno, intermediate.ListTypeAnnotation):
                 continue
 
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(type_anno.items.our_type, intermediate.Class), (
-                "(mristin, 2022-11-03) We handle only lists of classes in the deep "
-                "copies at the moment. The meta-model does not contain "
-                "any other lists, so we wanted to keep the code as simple as "
-                "possible, and avoid unrolling. Please contact the developers "
-                "if you need this feature."
-            )
-
-            # NOTE (mristin, 2022-11-04):
+            # NOTE (mristin):
             # We need to prefix to avoid any possible naming conflicts.
             variable_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
             variable_type = csharp_common.generate_type(type_anno)
 
-            if not optional:
-                body_blocks.append(
-                    Stripped(
-                        f"""\
+            # NOTE (mristin):
+            # We can make much simpler copies for lists of primitives and enums, so
+            # we optimize the generated code here.
+
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation) or (
+                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
+                )
+            ):
+                primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+                # NOTE (mristin):
+                # Byte arrays need deep copies -- all other lists can be simply copied.
+                if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                    if not optional:
+                        body_blocks.append(
+                            Stripped(
+                                f"""\
+var {variable_name} = new {variable_type}(
+{I}that.{prop_name}.Count);
+foreach (var item in that.{prop_name})
+{{
+{I}{variable_name}.Add((byte[])item.Clone());
+}}"""
+                            )
+                        )
+                    else:
+                        body_blocks.append(
+                            Stripped(
+                                f"""\
+{variable_type}? {variable_name} = null;
+if (that.{prop_name} != null)
+{{
+{I}{variable_name} = new {variable_type}(
+{II}that.{prop_name}.Count);
+{I}foreach (var item in that.{prop_name})
+{I}{{
+{II}{variable_name}.Add((byte[])item.Clone());
+{I}}}
+}}"""
+                            )
+                        )
+                else:
+                    # NOTE (mristin):
+                    # We add the assertion here to force the developer to change
+                    # the code in case that our assumption that the list items
+                    # are copied by value does not hold anymore. For example, if another
+                    # primitive type is introduced.
+
+                    assert primitive_type in (
+                        intermediate.PrimitiveType.BOOL,
+                        intermediate.PrimitiveType.INT,
+                        intermediate.PrimitiveType.FLOAT,
+                        intermediate.PrimitiveType.STR,
+                    ) or (
+                        isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                        and isinstance(
+                            type_anno.items.our_type, intermediate.Enumeration
+                        )
+                    )
+
+                    if not optional:
+                        body_blocks.append(
+                            Stripped(
+                                f"""\
+var {variable_name} = new {variable_type}(
+{I}that.{prop_name});"""
+                            )
+                        )
+                    else:
+                        body_blocks.append(
+                            Stripped(
+                                f"""\
+{variable_type}? {variable_name} = null;
+if (that.{prop_name} != null)
+{{
+{I}{variable_name} = new {variable_type}(
+{II}that.{prop_name});
+}}"""
+                            )
+                        )
+
+            elif isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                if not optional:
+                    body_blocks.append(
+                        Stripped(
+                            f"""\
 var {variable_name} = new {variable_type}(
 {I}that.{prop_name}.Count);
 foreach (var item in that.{prop_name})
 {{
 {I}{variable_name}.Add(Deep(item));
 }}"""
+                        )
                     )
-                )
-            else:
-                body_blocks.append(
-                    Stripped(
-                        f"""\
+                else:
+                    body_blocks.append(
+                        Stripped(
+                            f"""\
 {variable_type}? {variable_name} = null;
 if (that.{prop_name} != null)
 {{
@@ -215,7 +300,15 @@ if (that.{prop_name} != null)
 {II}{variable_name}.Add(Deep(item));
 {I}}}
 }}"""
+                        )
                     )
+            else:
+                raise NotImplementedError(
+                    "(mristin) We handle only lists of atomic values in the deep "
+                    "copies at the moment. The meta-model does not contain "
+                    "any other lists, so we wanted to keep the code as simple as "
+                    "possible, and avoid unrolling. Please contact the developers "
+                    "if you need this feature."
                 )
 
         constructor_arg_exprs = []  # type: List[str]
@@ -256,7 +349,7 @@ if (that.{prop_name} != null)
                     assert_never(type_anno.our_type)
 
             elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                # NOTE (mristin, 2022-11-04):
+                # NOTE (mristin):
                 # See how this variable is computed above in the generated code.
                 constructor_arg_exprs.append(
                     csharp_naming.variable_name(Identifier(f"the_{arg.name}"))

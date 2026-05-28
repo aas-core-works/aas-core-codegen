@@ -102,6 +102,345 @@ namespace dummy
             }
 
             /// <summary>
+            /// Consume a <c>&lt;v&gt;</c> element from the reader.
+            /// </summary>
+            private static void ReadVElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                if (reader.EOF) {
+                    error = new Reporting.Error(
+                        "Expected a <v> element, but got an end-of-file.");
+                    return;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.Element)
+                {
+                    error = new Reporting.Error(
+                        "Expected a <v> start element, " +
+                        $"but got the node of type {reader.NodeType} " +
+                        $"with the value {reader.Value}");
+                    return;
+                }
+
+                string elementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return;
+                }
+                if (elementName != "v")
+                {
+                    error = new Reporting.Error(
+                        "Expected a <v> element, " +
+                        $"but got an element {elementName}");
+                    return;
+                }
+
+                // We can consume now the start element.
+                reader.Read();
+            }
+
+            /// <summary>
+            /// Consume a <c>&lt;/v&gt;</c> element from the reader.
+            /// </summary>
+            private static void ReadVEndElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                if (reader.EOF) {
+                    error = new Reporting.Error(
+                        "Expected a </v> element, but got an end-of-file.");
+                    return;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                {
+                    error = new Reporting.Error(
+                        "Expected a </v> end element, " +
+                        $"but got the node of type {reader.NodeType} " +
+                        $"with the value {reader.Value}");
+                    return;
+                }
+
+                string elementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return;
+                }
+                if (elementName != "v")
+                {
+                    error = new Reporting.Error(
+                        "Expected a </v> element, " +
+                        $"but got an end element {elementName}");
+                    return;
+                }
+
+                // We can consume now the end element.
+                reader.Read();
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as bool.
+            /// </summary>
+            private static bool? ReadVElementAsBoolean(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                bool? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing bool, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsBoolean();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as bool: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as long.
+            /// </summary>
+            private static long? ReadVElementAsLong(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                long? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing long, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsLong();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as long: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as double.
+            /// </summary>
+            private static double? ReadVElementAsDouble(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                double? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing double, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsDouble();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as double: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as string.
+            /// </summary>
+            private static string? ReadVElementAsString(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                string? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing string, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsString();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as string: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> element as base64-encoded bytes.
+            /// </summary>
+            private static byte[]? ReadVElementAsBytes(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                byte[]? result;
+                if (reader.IsEmptyElement)
+                {
+                    result = new byte[0];
+                } else {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content with base64-encoded bytes, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = ReadWholeContentAsBase64(reader);
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            "The content could not be de-serialized as " +
+                            $"base64-encoded bytes: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of IAbstractItem from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -1592,9 +1931,7 @@ namespace dummy
 
                 foreach (var item in that.SomeItems)
                 {
-                    this.Visit(
-                        item,
-                        writer);
+                    this.Visit(item, writer);
                 }
 
                 writer.WriteEndElement();
@@ -1605,9 +1942,7 @@ namespace dummy
 
                 foreach (var item in that.SomeSimples)
                 {
-                    this.Visit(
-                        item,
-                        writer);
+                    this.Visit(item, writer);
                 }
 
                 writer.WriteEndElement();

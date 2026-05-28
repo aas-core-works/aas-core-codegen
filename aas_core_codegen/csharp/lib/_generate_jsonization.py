@@ -273,8 +273,9 @@ if ({target_var} == null)
             type_anno.items,
             (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
         ), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate_._verify_only_simple_type_patterns"
+            f"(mristin): We generate only code for lists of atomic values in the JSON "
+            f"de-serialization, but got a list of type {type_anno}. "
+            f"Please contact the developers if you need this feature."
         )
 
         item_type = csharp_common.generate_type(type_anno.items)
@@ -1180,8 +1181,9 @@ def _generate_transform_property(
             type_anno.items,
             (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
         ), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate._verify_only_simple_type_patterns."
+            f"(mristin): We generate only code for lists of atomic values in the JSON "
+            f"serialization, but got a list of type {type_anno}. "
+            f"Please contact the developers if you need this feature."
         )
 
         item_type = csharp_common.generate_type(type_anno.items)

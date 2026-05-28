@@ -108,6 +108,265 @@ private static string TryElementName(
     )
 
 
+def _generate_read_v_element() -> Stripped:
+    return Stripped(
+        f"""\
+/// <summary>
+/// Consume a <c>&lt;v&gt;</c> element from the reader.
+/// </summary>
+private static void ReadVElement(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}if (reader.EOF) {{
+{II}error = new Reporting.Error(
+{III}"Expected a <v> element, but got an end-of-file.");
+{II}return;
+{I}}}
+
+{I}if (reader.NodeType != Xml.XmlNodeType.Element)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected a <v> start element, " +
+{III}$"but got the node of type {{reader.NodeType}} " +
+{III}$"with the value {{reader.Value}}");
+{II}return;
+{I}}}
+
+{I}string elementName = TryElementName(
+{II}reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return;
+{I}}}
+{I}if (elementName != "v")
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected a <v> element, " +
+{III}$"but got an element {{elementName}}");
+{II}return;
+{I}}}
+
+{I}// We can consume now the start element.
+{I}reader.Read();
+}}"""
+    )
+
+
+def _generate_read_v_end_element() -> Stripped:
+    return Stripped(
+        f"""\
+/// <summary>
+/// Consume a <c>&lt;/v&gt;</c> element from the reader.
+/// </summary>
+private static void ReadVEndElement(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}if (reader.EOF) {{
+{II}error = new Reporting.Error(
+{III}"Expected a </v> element, but got an end-of-file.");
+{II}return;
+{I}}}
+
+{I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected a </v> end element, " +
+{III}$"but got the node of type {{reader.NodeType}} " +
+{III}$"with the value {{reader.Value}}");
+{II}return;
+{I}}}
+
+{I}string elementName = TryElementName(
+{II}reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return;
+{I}}}
+{I}if (elementName != "v")
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected a </v> element, " +
+{III}$"but got an end element {{elementName}}");
+{II}return;
+{I}}}
+
+{I}// We can consume now the end element.
+{I}reader.Read();
+}}"""
+    )
+
+
+def _generate_read_v_element_as_primitive_functions() -> List[Stripped]:
+    result = []  # type: List[Stripped]
+
+    for function_name, result_type, deserialization_expr in (
+        ("ReadVElementAsBoolean", "bool", "reader.ReadContentAsBoolean()"),
+        ("ReadVElementAsLong", "long", "reader.ReadContentAsLong()"),
+        ("ReadVElementAsDouble", "double", "reader.ReadContentAsDouble()"),
+        ("ReadVElementAsString", "string", "reader.ReadContentAsString()"),
+    ):
+        result.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Read the content of a <c>&lt;v&gt;</c> element
+/// and parse it as {result_type}.
+/// </summary>
+private static {result_type}? {function_name}(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}ReadVElement(reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}{result_type}? result = null;
+{I}if (!reader.IsEmptyElement)
+{I}{{
+{II}if (reader.EOF)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an XML content representing {result_type}, " +
+{IIII}"but reached the end-of-file");
+{III}return null;
+{II}}}
+
+{II}try
+{II}{{
+{III}result = {deserialization_expr};
+{II}}}
+{II}catch (System.FormatException exception)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}$"The content could not be de-serialized as {result_type}: {{exception}}");
+{III}return null;
+{II}}}
+{I}}}
+
+{I}ReadVEndElement(reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}if (result == null)
+{I}{{
+{II}throw new System.InvalidOperationException(
+{III}"Unexpected result null when there is no error.");
+{I}}}
+{I}return result;
+}}"""
+            )
+        )
+
+    result.append(
+        Stripped(
+            f"""\
+/// <summary>
+/// Read a <c>&lt;v&gt;</c> element as base64-encoded bytes.
+/// </summary>
+private static byte[]? ReadVElementAsBytes(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}ReadVElement(reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}byte[]? result;
+{I}if (reader.IsEmptyElement)
+{I}{{
+{II}result = new byte[0];
+{I}}} else {{
+{II}if (reader.EOF)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an XML content with base64-encoded bytes, " +
+{IIII}"but reached the end-of-file");
+{III}return null;
+{II}}}
+
+{II}try
+{II}{{
+{III}result = ReadWholeContentAsBase64(reader);
+{II}}}
+{II}catch (System.FormatException exception)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"The content could not be de-serialized as " +
+{IIII}$"base64-encoded bytes: {{exception}}");
+{III}return null;
+{II}}}
+{I}}}
+
+{I}ReadVEndElement(reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}return result;
+}}"""
+        )
+    )
+
+    return result
+
+
+def _generate_read_v_element_as_enumeration(
+    enumeration: intermediate.Enumeration,
+) -> Stripped:
+    """Generate the function to de-serialize a literal from a ``<v>``."""
+    enum_name = csharp_naming.enum_name(enumeration.name)
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+/// <see cref="Aas.{enum_name}"/>.
+/// </summary>
+private static Aas.{enum_name}? ReadVElementAs{enum_name}(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}string? text = ReadVElementAsString(reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}if (text == null)
+{I}{{
+{II}throw new System.InvalidOperationException(
+{III}"Text must not be null if error is null.");
+{I}}}
+
+{I}Aas.{enum_name}? result = Stringification.{enum_name}FromString(
+{II}text);
+
+{I}if (result == null)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"The text could not be parsed as enumeration literal " +
+{III}$"of {enum_name}: {{result}}");
+{II}return null;
+{I}}}
+
+{I}return result;
+}}"""
+    )
+
+
 def _generate_deserialize_primitive_property(
     prop: intermediate.Property, cls: intermediate.ConcreteClass
 ) -> Stripped:
@@ -380,37 +639,66 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
     """Generate the code to de-serialize a property ``prop`` as a list."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    # fmt: off
-    assert (
-        isinstance(type_anno, intermediate.ListTypeAnnotation)
-        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
+    assert isinstance(type_anno, intermediate.ListTypeAnnotation), "Pre-condition"
+
+    deserialize_method: Stripped
+
+    primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+    if primitive_type is not None or (
+        isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+        and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+    ):
+        if primitive_type is not None:
+            if primitive_type is intermediate.PrimitiveType.BOOL:
+                deserialize_method = Stripped("ReadVElementAsBoolean")
+            elif primitive_type is intermediate.PrimitiveType.INT:
+                deserialize_method = Stripped("ReadVElementAsLong")
+            elif primitive_type is intermediate.PrimitiveType.FLOAT:
+                deserialize_method = Stripped("ReadVElementAsDouble")
+            elif primitive_type is intermediate.PrimitiveType.STR:
+                deserialize_method = Stripped("ReadVElementAsString")
+            elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                deserialize_method = Stripped("ReadVElementAsBytes")
+            else:
+                assert_never(primitive_type)
+        else:
+            assert isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+
+            enum_name = csharp_naming.enum_name(type_anno.items.our_type.name)
+            deserialize_method = Stripped(f"ReadVElementAs{enum_name}")
+
+    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.items.our_type,
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    ):
+        if (
+            isinstance(type_anno.items.our_type, intermediate.AbstractClass)
+            or len(type_anno.items.our_type.concrete_descendants) > 0
+        ):
+            deserialize_method = Stripped(
+                f"{csharp_naming.interface_name(type_anno.items.our_type.name)}FromElement"
+            )
+        else:
+            deserialize_method = Stripped(
+                f"{csharp_naming.class_name(type_anno.items.our_type.name)}FromElement"
+            )
+    else:
+        raise NotImplementedError(
+            f"(mristin) We only handle XML de/serialization of lists containing atomic "
+            f"values, but you want to generate the code for a list of type {type_anno}. "
+            f"Please contact the developers if you need this feature."
         )
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
-    # fmt: on
+
+    xml_prop_name = naming.xml_property(prop.name)
+    xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
 
-    item_our_type = type_anno.items.our_type
-    if (
-        isinstance(item_our_type, intermediate.AbstractClass)
-        or len(item_our_type.concrete_descendants) > 0
-    ):
-        deserialize_method = (
-            f"{csharp_naming.interface_name(type_anno.items.our_type.name)}FromElement"
-        )
-    else:
-        deserialize_method = (
-            f"{csharp_naming.class_name(type_anno.items.our_type.name)}FromElement"
-        )
-
     item_type = csharp_common.generate_type(type_anno.items)
-
-    xml_prop_name = naming.xml_property(prop.name)
-    xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
 
     body_for_non_empty_property = Stripped(
         f"""\
@@ -1069,7 +1357,13 @@ def _generate_deserialize_impl(
         _generate_skip_whitespace_and_comments(),
         _generate_read_whole_content_as_base_64(),
         _generate_extract_element_name(),
+        _generate_read_v_element(),
+        _generate_read_v_end_element(),
+        *_generate_read_v_element_as_primitive_functions(),
     ]  # type: List[Stripped]
+
+    for enumeration in symbol_table.enumerations:
+        blocks.append(_generate_read_v_element_as_enumeration(enumeration))
 
     errors = []  # type: List[Error]
 
@@ -1409,7 +1703,7 @@ def _generate_serialize_enumeration_property_as_content(
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
         type_anno.our_type, intermediate.Enumeration
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
+    )
 
     enumeration = type_anno.our_type
 
@@ -1456,14 +1750,14 @@ def _generate_serialize_interface_property_as_content(
 
     # fmt: off
     assert (
-        isinstance(type_anno, intermediate.OurTypeAnnotation)
-        and (
-            isinstance(type_anno.our_type, intermediate.AbstractClass)
-            or (
-                isinstance(type_anno.our_type, intermediate.ConcreteClass)
-                and len(type_anno.our_type.concrete_descendants) > 0
+            isinstance(type_anno, intermediate.OurTypeAnnotation)
+            and (
+                    isinstance(type_anno.our_type, intermediate.AbstractClass)
+                    or (
+                            isinstance(type_anno.our_type, intermediate.ConcreteClass)
+                            and len(type_anno.our_type.concrete_descendants) > 0
+                    )
             )
-        )
     ), "See intermediate._translate._verify_only_simple_type_patterns"
     # fmt: on
 
@@ -1540,17 +1834,73 @@ def _generate_serialize_list_property_as_content(
 ) -> Stripped:
     """Generate the serialization of a list ``prop`` as a sequence of elements."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
+    assert isinstance(type_anno, intermediate.ListTypeAnnotation)
 
-    # fmt: off
-    assert (
-        isinstance(type_anno, intermediate.ListTypeAnnotation)
-        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
+    primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+    body: Stripped
+
+    if primitive_type is not None:
+        write_item_statement: Stripped
+
+        if (
+            primitive_type is intermediate.PrimitiveType.BOOL
+            or primitive_type is intermediate.PrimitiveType.INT
+            or primitive_type is intermediate.PrimitiveType.FLOAT
+            or primitive_type is intermediate.PrimitiveType.STR
+        ):
+            write_item_statement = Stripped(
+                """\
+writer.WriteValue(item);"""
+            )
+        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+            write_item_statement = Stripped(
+                """\
+writer.WriteBase64(item, 0, item.Length);"""
+            )
+        else:
+            assert_never(primitive_type)
+
+        body = Stripped(
+            f"""\
+writer.WriteStartElement("v", NS);
+{write_item_statement}
+writer.WriteEndElement();"""
         )
-    ), "See intermediate._translate._verify_only_simple_type_patterns"
-    # fmt: on
+
+    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+        our_type = type_anno.items.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            enum_name = csharp_naming.enum_name(our_type.name)
+
+            body = Stripped(
+                f"""\
+writer.WriteStartElement("v", NS);
+writer.WriteValue(
+{I}Stringification.ToString(item)
+{II}?? throw new System.ArgumentException(
+{III}"Invalid literal for the enumeration {enum_name}: " +
+{III}item.ToString()));
+writer.WriteEndElement();"""
+            )
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            raise AssertionError("This case should have been handled before.")
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            body = Stripped(
+                """\
+this.Visit(item, writer);"""
+            )
+    else:
+        raise NotImplementedError(
+            "(mristin) We generate currently only the code for serializing lists of "
+            "atomic values to XML, but you want to generate the code for a list of "
+            f"type {type_anno}. "
+            f"Please contact the developers if you need this feature."
+        )
 
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
@@ -1563,9 +1913,7 @@ writer.WriteStartElement(
 
 foreach (var item in that.{prop_name})
 {{
-{I}this.Visit(
-{II}item,
-{II}writer);
+{I}{indent_but_first_line(body, I)}
 }}
 
 writer.WriteEndElement();"""
