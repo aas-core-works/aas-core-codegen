@@ -267,6 +267,16 @@ class Test_csharp(_TestCase):
             case_name="constrained_primitives",
         )
 
+    def test_expected_enum(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="enum"
+        )
+
+    def test_expected_list_of_classes(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="list_of_classes"
+        )
+
     def test_expected_primitive_types(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="primitive_types"

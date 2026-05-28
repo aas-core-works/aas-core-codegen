@@ -1,0 +1,1 @@
+<something xmlns="https://dummy.com"><someItems><someItem><name>some name</name></someItem><anotherItem><serialNumber>42</serialNumber></anotherItem></someItems><someSimples><simple><name>ID-001</name></simple><simple><name>ID-002</name></simple></someSimples></something>
