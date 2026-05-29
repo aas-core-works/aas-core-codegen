@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "aas-core-codegen-dev"
 version = "0.0.1"
 description = "Develop aas-core-codegen."
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 dependencies = [
     "black==22.3.0",
@@ -31,10 +31,6 @@ packages = [
     "continuous_integration",
     "live_tests"
 ]
-
-[tool.black]
-line-length = 88
-target-version = ["py38"]
 
 # NOTE (mristin):
 # We put the configuration of mypy and pylint in separate files as it is a nightmare
