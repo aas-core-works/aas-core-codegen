@@ -366,11 +366,11 @@ export function somethingFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
-    if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.Something>(
-        "Expected a JSON object, but got a JSON array"
-      );
-    }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.Something>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Something>(
       `Expected a JSON object, but got: ${typeof jsonable}`

@@ -8,13 +8,35 @@
 import * as fs from "fs";
 import * as path from "path";
 
+// NOTE (mristin):
+// Initially, we used string operations to manipulate the XML files, but that lead
+// to maintainability problems. For example, we suddenly had to take care of edge
+// cases such as self-closing elements (e.g., `<something />`). Instead, we decided
+// to use a proper library. There is a DOMParser in XMLSerializer provided in
+// the browser, but node.js does not ship with them, unless we explicitly add "dom".
+//
+// In the end, we decided to use an external library as development dependency since
+// all the other approaches (gymnastics with jest, tsconfig and tsconfig.test) turned
+// out to be much more complicated.
+import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
+import type { Document } from "@xmldom/xmldom";
+
 import * as AasXmlization from "../src/xmlization";
 
 import * as TestCommon from "./common";
 
-function readExpectedXml(classXmlName: string, fileName: "minimal.xml" | "maximal.xml"): string {
-  const pth = path.join(TestCommon.TEST_DATA_DIR, "Xml", "Expected", classXmlName, fileName);
-  return fs.readFileSync(pth, "utf-8");
+function parseXml(xmlText: string): [Document, null] | [null, string] {
+  let errorMessage: string | null = null;
+
+  const document = new DOMParser({
+    errorHandler: (level: string, msg: string) => {
+      if (level === "error" || level === "fatalError") {
+        errorMessage = msg;
+      }
+    }
+  }).parseFromString(xmlText, "application/xml");
+
+  return errorMessage !== null ? [null, errorMessage] : [document, null];
 }
 
 function expectDeserializationError(xmlText: string): void {
@@ -22,12 +44,11 @@ function expectDeserializationError(xmlText: string): void {
   expect(instanceOrError.error).not.toBeNull();
 }
 
-function escapeRegExp(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, "\$&");
-}
-
 test("XML namespace mismatch fails", () => {
-  const text = readExpectedXml("extension", "minimal.xml");
+  const pth = path.join(
+    TestCommon.TEST_DATA_DIR, "Xml", "Expected", "extension", "minimal.xml"
+  );
+  const text = fs.readFileSync(pth, "utf-8");
   const brokenText = text.replace(
     /xmlns="[^"]*"/,
     'xmlns="urn:aas-core-codegen:broken"'
@@ -38,7 +59,10 @@ test("XML namespace mismatch fails", () => {
 });
 
 test("XML wrong root closing element fails", () => {
-  const text = readExpectedXml("extension", "minimal.xml");
+  const pth = path.join(
+    TestCommon.TEST_DATA_DIR, "Xml", "Expected", "extension", "minimal.xml"
+  );
+  const text = fs.readFileSync(pth, "utf-8");
   const expectedClosing = "</extension>";
   const insertionIndex = text.lastIndexOf(expectedClosing);
   if (insertionIndex < 0) {
@@ -55,52 +79,85 @@ test("XML wrong root closing element fails", () => {
 });
 
 test("XML duplicate property fails", () => {
-  const text = readExpectedXml("extension", "minimal.xml");
-
   const propertyName = "name";
-  const propertyPattern = new RegExp(
-    `(<${escapeRegExp(propertyName)}>[\\s\\S]*?</${escapeRegExp(propertyName)}>)`
+
+  const pth = path.join(
+    TestCommon.TEST_DATA_DIR, "Xml", "Expected", "extension", "minimal.xml"
   );
-  const match = propertyPattern.exec(text);
-  if (match === null) {
-    throw new Error(`Failed to find a property element for: ${propertyName}`);
+  const [document, parseError] = parseXml(fs.readFileSync(pth, "utf-8"));
+  if (parseError !== null) {
+    throw new Error(`Invalid XML fixture: ${parseError}`);
   }
 
-  const rootClosing = "</extension>";
-  const insertionIndex = text.lastIndexOf(rootClosing);
-  if (insertionIndex < 0) {
-    throw new Error(`Failed to find root closing tag: ${rootClosing}`);
+  const root = document.documentElement;
+  if (root.tagName !== "extension") {
+    throw new Error(
+      `Expected root element <extension>, ` +
+      `got <${root.tagName}>`
+    );
   }
 
-  const duplicatedProperty = match[1];
-  const brokenText =
-    text.slice(0, insertionIndex) +
-    duplicatedProperty +
-    text.slice(insertionIndex);
+  const property = Array.from(root.children).find(
+    (child) => child.tagName === propertyName
+  );
+
+  if (property === undefined) {
+    throw new Error(`Failed to find property element: ${propertyName}`);
+  }
+
+  root.appendChild(property.cloneNode(true));
+
+  const brokenText = new XMLSerializer().serializeToString(document);
 
   expectDeserializationError(brokenText);
 });
 
 test("XML nested class dispatch mismatch fails", () => {
-  const text = readExpectedXml("operationVariable", "maximal.xml");
-
   const propertyName = "value";
-  const propertyPattern = new RegExp(
-    `(<${escapeRegExp(propertyName)}>\\s*)` +
-    `(<([A-Za-z_][\\w.-]*)>)` +
-    `([\\s\\S]*?)(</\\3>)` +
-    `(\\s*</${escapeRegExp(propertyName)}>)`
+
+  const pth = path.join(
+    TestCommon.TEST_DATA_DIR, "Xml", "Expected", "operationVariable", "maximal.xml"
   );
-  const match = propertyPattern.exec(text);
-  if (match === null) {
-    throw new Error(`Failed to find a nested class in property: ${propertyName}`);
+  const [document, parseError] = parseXml(fs.readFileSync(pth, "utf-8"));
+  if (parseError !== null) {
+    throw new Error(`Invalid XML fixture: ${parseError}`);
   }
 
-  const brokenProperty =
-    `${match[1]}<UnknownNestedClassXmlElement>${match[4]}` +
-    `</UnknownNestedClassXmlElement>${match[6]}`;
+  const root = document.documentElement;
+  if (root.tagName !== "operationVariable") {
+    throw new Error(
+      `Expected root element <operationVariable>, ` +
+      `got <${root.tagName}>`
+    );
+  }
 
-  const brokenText = text.replace(match[0], brokenProperty);
+  const property = Array.from(root.children).find(
+    (child) => child.tagName === propertyName
+  );
+
+  if (property === undefined) {
+    throw new Error(`Failed to find property element: ${propertyName}`);
+  }
+
+  const nestedClass = Array.from(property.childNodes).find(
+    (child) => child.nodeType === child.ELEMENT_NODE
+  ) ?? null;
+  if (nestedClass === null) {
+    throw new Error(`Failed to find nested class element in: ${propertyName}`);
+  }
+
+  const brokenNestedClass = document.createElement("unknownNestedClassXmlElement");
+  // We move the children from nestedClass to brokenNestedClass; appendChild
+  // will automatically re-assign the parent, see:
+  // https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
+  while (nestedClass.firstChild !== null) {
+    brokenNestedClass.appendChild(nestedClass.firstChild);
+  }
+
+  property.replaceChild(brokenNestedClass, nestedClass);
+
+  const brokenText = new XMLSerializer().serializeToString(document);
+
   expectDeserializationError(brokenText);
 });
 

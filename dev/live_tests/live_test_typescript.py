@@ -176,7 +176,8 @@ def main() -> int:
     "ts-jest": "^29.0.3",
     "typedoc": "^0.23.22",
     "typescript": "^4.8.4",
-    "xmlsax-typescript": "^1.0.0-rc.2"
+    "xmlsax-typescript": "^1.0.0-rc.2",
+    "@xmldom/xmldom": "^0.9.10"
   }},
   "main": "dist/lib/cjs/index.js",
   "module": "dist/lib/esm/index.js",

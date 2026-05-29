@@ -791,8 +791,8 @@ if (!Number.isInteger(that.{prop_name})) {{
         return Stripped(""), None
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
         if isinstance(type_anno.our_type, intermediate.Enumeration):
-            # We rely on TypeScript compiler to check for valid enumerations, so we do not check
-            # the enumerations on our side.
+            # We rely on TypeScript compiler to check for valid enumerations, so we do
+            # not check the enumerations on our side.
             return Stripped(""), None
 
         elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
@@ -831,7 +831,9 @@ for (const error of {function_name}(
         elif isinstance(
             type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            for_error_of_this_transform = f"for (const error of this.transformWithContext(that.{prop_name}, context))"
+            for_error_of_this_transform = f"""\
+for (const error of this.transformWithContext(that.{prop_name}, context))"""
+
             # Heuristic to break the lines, very rudimentary
             if len(for_error_of_this_transform) > 70:
                 for_error_of_this_transform = f"""\
@@ -858,10 +860,42 @@ for (const error of this.transformWithContext(
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.OurTypeAnnotation), (
-            "We chose to implement only a very limited pattern matching; "
-            "see the note above in the code."
-        )
+        item_error_generation_expr: str
+
+        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+            # Lists of primitives are verified at the level of class invariants.
+            return Stripped(""), None
+
+        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                # We rely on TypeScript compiler to check for valid enumerations, so we
+                # do not check the lists of enumerations on our side.
+                return Stripped(""), None
+
+            elif isinstance(
+                type_anno.items.our_type, intermediate.ConstrainedPrimitive
+            ):
+                item_error_generation_expr = typescript_naming.function_name(
+                    Identifier(f"verify_{type_anno.items.our_type.name}(item)")
+                )
+
+            elif isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                item_error_generation_expr = Stripped(
+                    "this.transformWithContext(item, context)"
+                )
+
+            else:
+                assert_never(type_anno.items.our_type)
+
+        else:
+            raise NotImplementedError(
+                "(mristin) We currently generate only the code to verify lists of "
+                f"atomic values, but we got a list of type {type_anno}. "
+                f"Please contact the developers if you need this feature."
+            )
 
         index_var = typescript_naming.variable_name(Identifier(f"{prop.name}_index"))
 
@@ -870,7 +904,7 @@ for (const error of this.transformWithContext(
                 f"""\
 let {index_var} = 0;
 for (const item of that.{prop_name}) {{
-{I}for (const error of this.transformWithContext(item, context)) {{
+{I}for (const error of {item_error_generation_expr}) {{
 {II}error.path.prepend(
 {III}new IndexSegment(
 {IIII}that.{prop_name},

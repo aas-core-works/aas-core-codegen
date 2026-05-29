@@ -777,11 +777,11 @@ if (jsonable === null) {{
 {II}"Expected a JSON object, but got null"
 {I});
 }}
-{I}if (Array.isArray(jsonable)) {{
-{II}return newDeserializationError<AasTypes.{cls_name}>(
-{III}"Expected a JSON object, but got a JSON array"
-{II});
-{I}}}
+if (Array.isArray(jsonable)) {{
+{I}return newDeserializationError<AasTypes.{cls_name}>(
+{II}"Expected a JSON object, but got a JSON array"
+{I});
+}}
 if (typeof jsonable !== "object") {{
 {I}return newDeserializationError<AasTypes.{cls_name}>(
 {II}`Expected a JSON object, but got: ${{typeof jsonable}}`
@@ -1101,21 +1101,66 @@ jsonable[{key_literal}] =
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert isinstance(
                 type_anno.items,
-                (intermediate.PrimitiveType, intermediate.OurTypeAnnotation),
+                intermediate.AtomicTypeAnnotationAsTuple,
             ), (
-                "We expect only lists of primitive and our types. Lists of optionals "
-                "and nested lists are not handled yet. Please contact the developers."
+                f"(mristin) We generate the JSON serialization code only for "
+                f"the lists of atomic values at the moment, "
+                f"but we got a list of type {type_anno}. "
+                "Please contact the developers if you need this feature."
             )
+
+            items_jsonable_type: Stripped
+            items_primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+            if items_primitive_type is not None:
+                if items_primitive_type == intermediate.PrimitiveType.BOOL:
+                    items_jsonable_type = Stripped("boolean")
+                elif items_primitive_type == intermediate.PrimitiveType.INT:
+                    items_jsonable_type = Stripped("number")
+                elif items_primitive_type == intermediate.PrimitiveType.FLOAT:
+                    items_jsonable_type = Stripped("number")
+                elif items_primitive_type == intermediate.PrimitiveType.STR:
+                    items_jsonable_type = Stripped("string")
+                elif items_primitive_type == intermediate.PrimitiveType.BYTEARRAY:
+                    items_jsonable_type = Stripped("string")
+                else:
+                    assert_never(items_primitive_type)
+
+            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                    items_jsonable_type = Stripped("string")
+
+                elif isinstance(
+                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                ):
+                    raise AssertionError("This case should have been handled before.")
+
+                elif isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    items_jsonable_type = Stripped("JsonObject")
+
+                else:
+                    assert_never(type_anno.items.our_type)
+
+            else:
+                raise NotImplementedError(
+                    f"(mristin) We generate the JSON serialization code only for "
+                    f"the lists of atomic values at the moment, "
+                    f"but we got a list of type {type_anno}. "
+                    "Please contact the developers if you need this feature."
+                )
+
+            var_name = typescript_naming.variable_name(Identifier(f"{prop.name}_array"))
 
             transformation_expression = _generate_transform_atomic_value(
                 access_expression=Stripped("item"), type_anno=type_anno.items
             )
 
-            var_name = typescript_naming.variable_name(Identifier(f"{prop.name}_array"))
-
             block = Stripped(
                 f"""\
-const {var_name} = new Array<JsonObject>();
+const {var_name} = new Array<{items_jsonable_type}>();
 for (const item of that.{prop_name}) {{
 {I}{var_name}.push(
 {II}{indent_but_first_line(transformation_expression, II)}
