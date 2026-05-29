@@ -102,6 +102,730 @@ namespace AasCore.Aas3_0
             }
 
             /// <summary>
+            /// Consume a <c>&lt;v&gt;</c> element from the reader.
+            /// </summary>
+            private static void ReadVElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                if (reader.EOF) {
+                    error = new Reporting.Error(
+                        "Expected a <v> element, but got an end-of-file.");
+                    return;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.Element)
+                {
+                    error = new Reporting.Error(
+                        "Expected a <v> start element, " +
+                        $"but got the node of type {reader.NodeType} " +
+                        $"with the value {reader.Value}");
+                    return;
+                }
+
+                string elementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return;
+                }
+                if (elementName != "v")
+                {
+                    error = new Reporting.Error(
+                        "Expected a <v> element, " +
+                        $"but got an element {elementName}");
+                    return;
+                }
+
+                // We can consume now the start element.
+                reader.Read();
+            }
+
+            /// <summary>
+            /// Consume a <c>&lt;/v&gt;</c> element from the reader.
+            /// </summary>
+            private static void ReadVEndElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                if (reader.EOF) {
+                    error = new Reporting.Error(
+                        "Expected a </v> element, but got an end-of-file.");
+                    return;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                {
+                    error = new Reporting.Error(
+                        "Expected a </v> end element, " +
+                        $"but got the node of type {reader.NodeType} " +
+                        $"with the value {reader.Value}");
+                    return;
+                }
+
+                string elementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return;
+                }
+                if (elementName != "v")
+                {
+                    error = new Reporting.Error(
+                        "Expected a </v> element, " +
+                        $"but got an end element {elementName}");
+                    return;
+                }
+
+                // We can consume now the end element.
+                reader.Read();
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as bool.
+            /// </summary>
+            private static bool? ReadVElementAsBoolean(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                bool? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing bool, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsBoolean();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as bool: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as long.
+            /// </summary>
+            private static long? ReadVElementAsLong(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                long? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing long, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsLong();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as long: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as double.
+            /// </summary>
+            private static double? ReadVElementAsDouble(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                double? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing double, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsDouble();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as double: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read the content of a <c>&lt;v&gt;</c> element
+            /// and parse it as string.
+            /// </summary>
+            private static string? ReadVElementAsString(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                string? result = null;
+                if (!reader.IsEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content representing string, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = reader.ReadContentAsString();
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            $"The content could not be de-serialized as string: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (result == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected result null when there is no error.");
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> element as base64-encoded bytes.
+            /// </summary>
+            private static byte[]? ReadVElementAsBytes(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                ReadVElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                byte[]? result;
+                if (reader.IsEmptyElement)
+                {
+                    result = new byte[0];
+                } else {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML content with base64-encoded bytes, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    try
+                    {
+                        result = ReadWholeContentAsBase64(reader);
+                    }
+                    catch (System.FormatException exception)
+                    {
+                        error = new Reporting.Error(
+                            "The content could not be de-serialized as " +
+                            $"base64-encoded bytes: {exception}");
+                        return null;
+                    }
+                }
+
+                ReadVEndElement(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.ModellingKind"/>.
+            /// </summary>
+            private static Aas.ModellingKind? ReadVElementAsModellingKind(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.ModellingKind? result = Stringification.ModellingKindFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of ModellingKind: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.QualifierKind"/>.
+            /// </summary>
+            private static Aas.QualifierKind? ReadVElementAsQualifierKind(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.QualifierKind? result = Stringification.QualifierKindFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of QualifierKind: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.AssetKind"/>.
+            /// </summary>
+            private static Aas.AssetKind? ReadVElementAsAssetKind(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.AssetKind? result = Stringification.AssetKindFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of AssetKind: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.AasSubmodelElements"/>.
+            /// </summary>
+            private static Aas.AasSubmodelElements? ReadVElementAsAasSubmodelElements(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.AasSubmodelElements? result = Stringification.AasSubmodelElementsFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of AasSubmodelElements: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.EntityType"/>.
+            /// </summary>
+            private static Aas.EntityType? ReadVElementAsEntityType(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.EntityType? result = Stringification.EntityTypeFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of EntityType: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.Direction"/>.
+            /// </summary>
+            private static Aas.Direction? ReadVElementAsDirection(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.Direction? result = Stringification.DirectionFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of Direction: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.StateOfEvent"/>.
+            /// </summary>
+            private static Aas.StateOfEvent? ReadVElementAsStateOfEvent(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.StateOfEvent? result = Stringification.StateOfEventFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of StateOfEvent: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.ReferenceTypes"/>.
+            /// </summary>
+            private static Aas.ReferenceTypes? ReadVElementAsReferenceTypes(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.ReferenceTypes? result = Stringification.ReferenceTypesFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of ReferenceTypes: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.KeyTypes"/>.
+            /// </summary>
+            private static Aas.KeyTypes? ReadVElementAsKeyTypes(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.KeyTypes? result = Stringification.KeyTypesFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of KeyTypes: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.DataTypeDefXsd"/>.
+            /// </summary>
+            private static Aas.DataTypeDefXsd? ReadVElementAsDataTypeDefXsd(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.DataTypeDefXsd? result = Stringification.DataTypeDefXsdFromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of DataTypeDefXsd: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
+            /// <see cref="Aas.DataTypeIec61360"/>.
+            /// </summary>
+            private static Aas.DataTypeIec61360? ReadVElementAsDataTypeIec61360(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                )
+            {
+                string? text = ReadVElementAsString(reader, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Text must not be null if error is null.");
+                }
+
+                Aas.DataTypeIec61360? result = Stringification.DataTypeIec61360FromString(
+                    text);
+
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "The text could not be parsed as enumeration literal " +
+                        $"of DataTypeIec61360: {result}");
+                    return null;
+                }
+
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of IHasSemantics from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -21825,9 +22549,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -21879,9 +22601,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.RefersTo)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -21913,9 +22633,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22009,9 +22727,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22108,9 +22824,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22148,9 +22862,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22164,9 +22876,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22202,9 +22912,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22241,9 +22949,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Submodels)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22301,9 +23007,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SpecificAssetIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22412,9 +23116,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22477,9 +23179,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22517,9 +23217,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22533,9 +23231,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22601,9 +23297,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22617,9 +23311,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22633,9 +23325,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22649,9 +23339,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SubmodelElements)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22683,9 +23371,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22723,9 +23409,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22739,9 +23423,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22768,9 +23450,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22784,9 +23464,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22800,9 +23478,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22854,9 +23530,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22894,9 +23568,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22910,9 +23582,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22939,9 +23609,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22955,9 +23623,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -22971,9 +23637,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23043,9 +23707,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Value)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23077,9 +23739,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23117,9 +23777,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23133,9 +23791,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23162,9 +23818,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23178,9 +23832,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23194,9 +23846,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23210,9 +23860,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Value)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23244,9 +23892,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23284,9 +23930,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23300,9 +23944,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23329,9 +23971,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23345,9 +23985,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23361,9 +23999,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23434,9 +24070,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23474,9 +24108,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23490,9 +24122,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23519,9 +24149,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23535,9 +24163,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23551,9 +24177,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23567,9 +24191,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Value)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23614,9 +24236,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23654,9 +24274,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23670,9 +24288,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23699,9 +24315,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23715,9 +24329,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23731,9 +24343,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23803,9 +24413,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23843,9 +24451,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23859,9 +24465,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23888,9 +24492,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23904,9 +24506,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23920,9 +24520,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -23967,9 +24565,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24007,9 +24603,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24023,9 +24617,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24052,9 +24644,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24068,9 +24658,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24084,9 +24672,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24141,9 +24727,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24181,9 +24765,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24197,9 +24779,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24226,9 +24806,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24242,9 +24820,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24258,9 +24834,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24313,9 +24887,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24353,9 +24925,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24369,9 +24939,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24398,9 +24966,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24414,9 +24980,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24430,9 +24994,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24466,9 +25028,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Annotations)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24500,9 +25060,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24540,9 +25098,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24556,9 +25112,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24585,9 +25139,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24601,9 +25153,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24617,9 +25167,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24633,9 +25181,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Statements)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24675,9 +25221,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SpecificAssetIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24821,9 +25365,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24861,9 +25403,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24877,9 +25417,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24906,9 +25444,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24922,9 +25458,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -24938,9 +25472,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25071,9 +25603,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25111,9 +25641,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25127,9 +25655,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25156,9 +25682,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25172,9 +25696,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25188,9 +25710,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25204,9 +25724,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.InputVariables)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25220,9 +25738,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.OutputVariables)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25236,9 +25752,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.InoutputVariables)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25298,9 +25812,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25338,9 +25850,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25354,9 +25864,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25383,9 +25891,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.SupplementalSemanticIds)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25399,9 +25905,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Qualifiers)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25415,9 +25919,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25449,9 +25951,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Extensions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25489,9 +25989,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.DisplayName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25505,9 +26003,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Description)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25543,9 +26039,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.EmbeddedDataSpecifications)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25559,9 +26053,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.IsCaseOf)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25618,9 +26110,7 @@ namespace AasCore.Aas3_0
 
                 foreach (var item in that.Keys)
                 {
-                    this.Visit(
-                        item,
-                        writer);
+                    this.Visit(item, writer);
                 }
 
                 writer.WriteEndElement();
@@ -25764,9 +26254,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.AssetAdministrationShells)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25780,9 +26268,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Submodels)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25796,9 +26282,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.ConceptDescriptions)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -25957,9 +26441,7 @@ namespace AasCore.Aas3_0
 
                 foreach (var item in that.ValueReferencePairs)
                 {
-                    this.Visit(
-                        item,
-                        writer);
+                    this.Visit(item, writer);
                 }
 
                 writer.WriteEndElement();
@@ -26096,9 +26578,7 @@ namespace AasCore.Aas3_0
 
                 foreach (var item in that.PreferredName)
                 {
-                    this.Visit(
-                        item,
-                        writer);
+                    this.Visit(item, writer);
                 }
 
                 writer.WriteEndElement();
@@ -26111,9 +26591,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.ShortName)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();
@@ -26193,9 +26671,7 @@ namespace AasCore.Aas3_0
 
                     foreach (var item in that.Definition)
                     {
-                        this.Visit(
-                            item,
-                            writer);
+                        this.Visit(item, writer);
                     }
 
                     writer.WriteEndElement();

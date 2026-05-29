@@ -279,29 +279,33 @@ that.{prop_name} = {casted_name};"""
                 )
             else:
                 assert_never(type_anno.our_type)
+
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            # fmt: off
-            assert (
-                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(
+            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                # We can not enhance primitive types; nothing to do here.
+                continue
+
+            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                    # We can not enhance enumerations; nothing to do here.
+                    continue
+
+                elif isinstance(
+                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                ):
+                    # We can not enhance primitive types; nothing to do here.
+                    continue
+
+                elif isinstance(
                     type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass)
-               )
-            ), (
-                "(mristin, 2023-02-08) We handle only lists of classes in"
-                "the enhancing at the moment. The meta-model does not contain "
-                "any other lists, so we wanted to keep the code as simple as "
-                "possible, and avoid unrolling. Please contact the developers "
-                "if you need this feature."
-            )
-            # fmt: on
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    item_interface_name = csharp_naming.interface_name(
+                        type_anno.items.our_type.name
+                    )
 
-            item_interface_name = csharp_naming.interface_name(
-                type_anno.items.our_type.name
-            )
-
-            wrap_stmt = Stripped(
-                f"""\
+                    wrap_stmt = Stripped(
+                        f"""\
 that.{prop_name} = (
 {I}that.{prop_name}
 {I}.Select(
@@ -316,7 +320,19 @@ that.{prop_name} = (
 {II}}}
 {I})
 ).ToList();"""
-            )
+                    )
+
+                else:
+                    assert_never(type_anno.items.our_type)
+            else:
+                raise NotImplementedError(
+                    f"(mristin) We handle only lists of classes in"
+                    f"the enhancing at the moment. The meta-model does not contain "
+                    f"any other lists, so we wanted to keep the code as simple as "
+                    f"possible, and avoid unrolling. However, you desire a list "
+                    f"of type {type_anno} to be enhanced. "
+                    f"Please contact the developers if you need this feature."
+                )
         else:
             assert_never(type_anno.our_type)
 

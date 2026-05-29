@@ -455,11 +455,11 @@ namespace dummy
             {
                 error = null;
 
-                bool? theSomeBool = null;
-                long? theSomeInt = null;
-                double? theSomeFloat = null;
-                string? theSomeString = null;
-                byte[]? theSomeBytes = null;
+                List<bool>? theSomeBools = null;
+                List<long>? theSomeInts = null;
+                List<double>? theSomeFloats = null;
+                List<string>? theSomeStrings = null;
+                List<byte[]>? theSomeBytes = null;
 
                 if (!isEmptySequence)
                 {
@@ -505,231 +505,182 @@ namespace dummy
 
                         switch (elementName)
                         {
-                            case "someBool":
+                            case "someBools":
                             {
-                                if (isEmptyProperty)
+                                theSomeBools = new List<bool>();
+
+                                if (!isEmptyProperty)
                                 {
-                                    error = new Reporting.Error(
-                                        "The property SomeBool of an instance of class Something " +
-                                        "can not be de-serialized from a self-closing element " +
-                                        "since it needs content");
+                                    SkipNoneWhitespaceAndComments(reader);
+
+                                    int indexSomeBools = 0;
+                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    {
+                                        bool? item = ReadVElementAsBoolean(
+                                            reader, out error);
+
+                                        if (error != null)
+                                        {
+                                            error.PrependSegment(
+                                                new Reporting.IndexSegment(
+                                                    indexSomeBools));
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
-                                            "someBool"));
-                                    return null;
-                                }
-                                else
-                                {
-                                    if (reader.EOF)
-                                    {
-                                        error = new Reporting.Error(
-                                            "Expected an XML content representing " +
-                                            "the property SomeBool of an instance of class Something, " +
-                                            "but reached the end-of-file");
-                                        return null;
-                                    }
-
-                                    try
-                                    {
-                                        theSomeBool = reader.ReadContentAsBoolean();
-                                    }
-                                    catch (System.Exception exception)
-                                    {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property SomeBool of an instance of class Something " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "someBool"));
+                                            "someBools"));
                                             return null;
                                         }
 
-                                        throw;
+                                        theSomeBools.Add(
+                                            item
+                                                ?? throw new System.InvalidOperationException(
+                                                    "Unexpected item null when error null"));
+
+                                        indexSomeBools++;
+                                        SkipNoneWhitespaceAndComments(reader);
                                     }
                                 }
                                 break;
                             }
-                            case "someInt":
+                            case "someInts":
                             {
-                                if (isEmptyProperty)
+                                theSomeInts = new List<long>();
+
+                                if (!isEmptyProperty)
                                 {
-                                    error = new Reporting.Error(
-                                        "The property SomeInt of an instance of class Something " +
-                                        "can not be de-serialized from a self-closing element " +
-                                        "since it needs content");
+                                    SkipNoneWhitespaceAndComments(reader);
+
+                                    int indexSomeInts = 0;
+                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    {
+                                        long? item = ReadVElementAsLong(
+                                            reader, out error);
+
+                                        if (error != null)
+                                        {
+                                            error.PrependSegment(
+                                                new Reporting.IndexSegment(
+                                                    indexSomeInts));
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
-                                            "someInt"));
-                                    return null;
-                                }
-                                else
-                                {
-                                    if (reader.EOF)
-                                    {
-                                        error = new Reporting.Error(
-                                            "Expected an XML content representing " +
-                                            "the property SomeInt of an instance of class Something, " +
-                                            "but reached the end-of-file");
-                                        return null;
-                                    }
-
-                                    try
-                                    {
-                                        theSomeInt = reader.ReadContentAsLong();
-                                    }
-                                    catch (System.Exception exception)
-                                    {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property SomeInt of an instance of class Something " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "someInt"));
+                                            "someInts"));
                                             return null;
                                         }
 
-                                        throw;
+                                        theSomeInts.Add(
+                                            item
+                                                ?? throw new System.InvalidOperationException(
+                                                    "Unexpected item null when error null"));
+
+                                        indexSomeInts++;
+                                        SkipNoneWhitespaceAndComments(reader);
                                     }
                                 }
                                 break;
                             }
-                            case "someFloat":
+                            case "someFloats":
                             {
-                                if (isEmptyProperty)
+                                theSomeFloats = new List<double>();
+
+                                if (!isEmptyProperty)
                                 {
-                                    error = new Reporting.Error(
-                                        "The property SomeFloat of an instance of class Something " +
-                                        "can not be de-serialized from a self-closing element " +
-                                        "since it needs content");
+                                    SkipNoneWhitespaceAndComments(reader);
+
+                                    int indexSomeFloats = 0;
+                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    {
+                                        double? item = ReadVElementAsDouble(
+                                            reader, out error);
+
+                                        if (error != null)
+                                        {
+                                            error.PrependSegment(
+                                                new Reporting.IndexSegment(
+                                                    indexSomeFloats));
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
-                                            "someFloat"));
-                                    return null;
-                                }
-                                else
-                                {
-                                    if (reader.EOF)
-                                    {
-                                        error = new Reporting.Error(
-                                            "Expected an XML content representing " +
-                                            "the property SomeFloat of an instance of class Something, " +
-                                            "but reached the end-of-file");
-                                        return null;
-                                    }
-
-                                    try
-                                    {
-                                        theSomeFloat = reader.ReadContentAsDouble();
-                                    }
-                                    catch (System.Exception exception)
-                                    {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property SomeFloat of an instance of class Something " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "someFloat"));
+                                            "someFloats"));
                                             return null;
                                         }
 
-                                        throw;
+                                        theSomeFloats.Add(
+                                            item
+                                                ?? throw new System.InvalidOperationException(
+                                                    "Unexpected item null when error null"));
+
+                                        indexSomeFloats++;
+                                        SkipNoneWhitespaceAndComments(reader);
                                     }
                                 }
                                 break;
                             }
-                            case "someString":
+                            case "someStrings":
                             {
-                                if (isEmptyProperty)
-                                {
-                                    theSomeString = "";
-                                }
-                                else
-                                {
-                                    if (reader.EOF)
-                                    {
-                                        error = new Reporting.Error(
-                                            "Expected an XML content representing " +
-                                            "the property SomeString of an instance of class Something, " +
-                                            "but reached the end-of-file");
-                                        return null;
-                                    }
+                                theSomeStrings = new List<string>();
 
-                                    try
+                                if (!isEmptyProperty)
+                                {
+                                    SkipNoneWhitespaceAndComments(reader);
+
+                                    int indexSomeStrings = 0;
+                                    while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        theSomeString = reader.ReadContentAsString();
-                                    }
-                                    catch (System.Exception exception)
-                                    {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
+                                        string? item = ReadVElementAsString(
+                                            reader, out error);
+
+                                        if (error != null)
                                         {
-                                            error = new Reporting.Error(
-                                                "The property SomeString of an instance of class Something " +
-                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "someString"));
+                                                new Reporting.IndexSegment(
+                                                    indexSomeStrings));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "someStrings"));
                                             return null;
                                         }
 
-                                        throw;
+                                        theSomeStrings.Add(
+                                            item
+                                                ?? throw new System.InvalidOperationException(
+                                                    "Unexpected item null when error null"));
+
+                                        indexSomeStrings++;
+                                        SkipNoneWhitespaceAndComments(reader);
                                     }
                                 }
                                 break;
                             }
                             case "someBytes":
                             {
-                                if (isEmptyProperty)
+                                theSomeBytes = new List<byte[]>();
+
+                                if (!isEmptyProperty)
                                 {
-                                    error = new Reporting.Error(
-                                        "The property SomeBytes of an instance of class Something " +
-                                        "can not be de-serialized from a self-closing element " +
-                                        "since it needs content");
+                                    SkipNoneWhitespaceAndComments(reader);
+
+                                    int indexSomeBytes = 0;
+                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    {
+                                        byte[]? item = ReadVElementAsBytes(
+                                            reader, out error);
+
+                                        if (error != null)
+                                        {
+                                            error.PrependSegment(
+                                                new Reporting.IndexSegment(
+                                                    indexSomeBytes));
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
                                             "someBytes"));
-                                    return null;
-                                }
-                                else
-                                {
-                                    if (reader.EOF)
-                                    {
-                                        error = new Reporting.Error(
-                                            "Expected an XML content representing " +
-                                            "the property SomeBytes of an instance of class Something, " +
-                                            "but reached the end-of-file");
-                                        return null;
-                                    }
-
-                                    try
-                                    {
-                                        theSomeBytes = DeserializeImplementation.ReadWholeContentAsBase64(
-                                        reader);
-                                    }
-                                    catch (System.Exception exception)
-                                    {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property SomeBytes of an instance of class Something " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "someBytes"));
                                             return null;
                                         }
 
-                                        throw;
+                                        theSomeBytes.Add(
+                                            item
+                                                ?? throw new System.InvalidOperationException(
+                                                    "Unexpected item null when error null"));
+
+                                        indexSomeBytes++;
+                                        SkipNoneWhitespaceAndComments(reader);
                                     }
                                 }
                                 break;
@@ -787,34 +738,34 @@ namespace dummy
                     }
                 }
 
-                if (theSomeBool == null)
+                if (theSomeBools == null)
                 {
                     error = new Reporting.Error(
-                        "The required property SomeBool has not been given " +
+                        "The required property SomeBools has not been given " +
                         "in the XML representation of an instance of class Something");
                     return null;
                 }
 
-                if (theSomeInt == null)
+                if (theSomeInts == null)
                 {
                     error = new Reporting.Error(
-                        "The required property SomeInt has not been given " +
+                        "The required property SomeInts has not been given " +
                         "in the XML representation of an instance of class Something");
                     return null;
                 }
 
-                if (theSomeFloat == null)
+                if (theSomeFloats == null)
                 {
                     error = new Reporting.Error(
-                        "The required property SomeFloat has not been given " +
+                        "The required property SomeFloats has not been given " +
                         "in the XML representation of an instance of class Something");
                     return null;
                 }
 
-                if (theSomeString == null)
+                if (theSomeStrings == null)
                 {
                     error = new Reporting.Error(
-                        "The required property SomeString has not been given " +
+                        "The required property SomeStrings has not been given " +
                         "in the XML representation of an instance of class Something");
                     return null;
                 }
@@ -828,16 +779,16 @@ namespace dummy
                 }
 
                 return new Aas.Something(
-                    theSomeBool
+                    theSomeBools
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theSomeInt
+                    theSomeInts
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theSomeFloat
+                    theSomeFloats
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
-                    theSomeString
+                    theSomeStrings
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theSomeBytes
@@ -1032,38 +983,54 @@ namespace dummy
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
-                    "someBool",
+                    "someBools",
                     NS);
 
-                writer.WriteValue(
-                    that.SomeBool);
+                foreach (var item in that.SomeBools)
+                {
+                    writer.WriteStartElement("v", NS);
+                    writer.WriteValue(item);
+                    writer.WriteEndElement();
+                }
 
                 writer.WriteEndElement();
 
                 writer.WriteStartElement(
-                    "someInt",
+                    "someInts",
                     NS);
 
-                writer.WriteValue(
-                    that.SomeInt);
+                foreach (var item in that.SomeInts)
+                {
+                    writer.WriteStartElement("v", NS);
+                    writer.WriteValue(item);
+                    writer.WriteEndElement();
+                }
 
                 writer.WriteEndElement();
 
                 writer.WriteStartElement(
-                    "someFloat",
+                    "someFloats",
                     NS);
 
-                writer.WriteValue(
-                    that.SomeFloat);
+                foreach (var item in that.SomeFloats)
+                {
+                    writer.WriteStartElement("v", NS);
+                    writer.WriteValue(item);
+                    writer.WriteEndElement();
+                }
 
                 writer.WriteEndElement();
 
                 writer.WriteStartElement(
-                    "someString",
+                    "someStrings",
                     NS);
 
-                writer.WriteValue(
-                    that.SomeString);
+                foreach (var item in that.SomeStrings)
+                {
+                    writer.WriteStartElement("v", NS);
+                    writer.WriteValue(item);
+                    writer.WriteEndElement();
+                }
 
                 writer.WriteEndElement();
 
@@ -1071,10 +1038,12 @@ namespace dummy
                     "someBytes",
                     NS);
 
-                writer.WriteBase64(
-                    that.SomeBytes,
-                    0,
-                    that.SomeBytes.Length);
+                foreach (var item in that.SomeBytes)
+                {
+                    writer.WriteStartElement("v", NS);
+                    writer.WriteBase64(item, 0, item.Length);
+                    writer.WriteEndElement();
+                }
 
                 writer.WriteEndElement();
             }  // private void SomethingToSequence

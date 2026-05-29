@@ -134,19 +134,55 @@ Transform(
                 # noinspection PyTypeChecker
                 assert_never(type_anno.our_type)
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(type_anno.items.our_type, intermediate.Class), (
-                f"(mristin): We handle only lists of classes in the deep "
-                f"equality checks at the moment. The meta-model does not contain "
-                f"any other lists, so we wanted to keep the code as simple as "
-                f"possible, and avoid unrolling. Please contact the developers "
-                f"if you need this feature. The class in question was {cls.name!r} and "
-                f"the property {prop.name!r}."
-            )
+            items_primitive_type = intermediate.try_primitive_type(type_anno.items)
 
-            expr = Stripped(
-                f"""\
+            if items_primitive_type is not None:
+                # NOTE (mristin):
+                # Mypy 2.1.0 still struggled with ``in`` operator.
+                # pylint: disable=consider-using-in
+                if (
+                    items_primitive_type == intermediate.PrimitiveType.BOOL
+                    or items_primitive_type == intermediate.PrimitiveType.INT
+                    or items_primitive_type == intermediate.PrimitiveType.FLOAT
+                    or items_primitive_type == intermediate.PrimitiveType.STR
+                ):
+                    expr = Stripped(
+                        f"""\
+that.{prop_name}.SequenceEqual(
+{I}casted.{prop_name})"""
+                    )
+                elif items_primitive_type == intermediate.PrimitiveType.BYTEARRAY:
+                    expr = Stripped(
+                        f"""\
+that.{prop_name}.Count == casted.{prop_name}.Count
+&& (
+{I}that.{prop_name}
+{II}.Zip(
+{III}casted.{prop_name},
+{III}(left, right) => ByteSpansEqual(left, right))
+{II}.All(item => item))"""
+                    )
+                else:
+                    assert_never(items_primitive_type)
+
+            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                    expr = Stripped(
+                        f"""\
+that.{prop_name}.SequenceEqual(
+{I}casted.{prop_name})"""
+                    )
+                elif isinstance(
+                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                ):
+                    raise AssertionError("Expected to handle this case above")
+
+                elif isinstance(
+                    type_anno.items.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    expr = Stripped(
+                        f"""\
 that.{prop_name}.Count == casted.{prop_name}.Count
 && (
 {I}that.{prop_name}
@@ -154,7 +190,19 @@ that.{prop_name}.Count == casted.{prop_name}.Count
 {III}casted.{prop_name},
 {III}Transform)
 {II}.All(item => item))"""
-            )
+                    )
+                else:
+                    assert_never(type_anno.items.our_type)
+            else:
+                raise NotImplementedError(
+                    f"(mristin): We handle only lists of atomic values in the deep "
+                    f"equality checks at the moment. The meta-model does not contain "
+                    f"any other lists, so we wanted to keep the code as simple as "
+                    f"possible, and avoid unrolling. Please contact the developers "
+                    f"if you need this feature. The class in question was {cls.name!r} "
+                    f"and the property {prop.name!r}."
+                )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
@@ -217,7 +265,7 @@ private static bool ByteSpansEqual(
 {{
 {I}return that.SequenceEqual(other);
 }}"""
-        )
+        ),
     ]  # type: List[Stripped]
 
     for concrete_cls in symbol_table.concrete_classes:
