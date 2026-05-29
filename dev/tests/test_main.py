@@ -455,6 +455,12 @@ class Test_typescript(_TestCase):
             case_name="list_of_classes",
         )
 
+    def test_expected_list_of_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="list_of_primitives",
+        )
+
     def test_expected_primitive_types(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="primitive_types"

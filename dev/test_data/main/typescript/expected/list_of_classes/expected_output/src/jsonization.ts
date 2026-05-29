@@ -413,11 +413,11 @@ export function someItemFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
-    if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.SomeItem>(
-        "Expected a JSON object, but got a JSON array"
-      );
-    }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.SomeItem>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.SomeItem>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -560,11 +560,11 @@ export function anotherItemFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
-    if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.AnotherItem>(
-        "Expected a JSON object, but got a JSON array"
-      );
-    }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.AnotherItem>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.AnotherItem>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -682,11 +682,11 @@ export function simpleFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
-    if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.Simple>(
-        "Expected a JSON object, but got a JSON array"
-      );
-    }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.Simple>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Simple>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -881,11 +881,11 @@ export function somethingFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
-    if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.Something>(
-        "Expected a JSON object, but got a JSON array"
-      );
-    }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.Something>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Something>(
       `Expected a JSON object, but got: ${typeof jsonable}`
