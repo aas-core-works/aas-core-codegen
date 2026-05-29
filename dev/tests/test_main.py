@@ -443,6 +443,12 @@ class Test_typescript(_TestCase):
             case_name="deep_class_hierarchy",
         )
 
+    def test_expected_enum(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="enum",
+        )
+
     def test_expected_primitive_types(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="primitive_types"
