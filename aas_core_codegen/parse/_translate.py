@@ -194,7 +194,7 @@ def _type_annotation(
             return (
                 None,
                 Error(
-                    node.value,
+                    node,
                     f"Expected a string literal "
                     f"if the type annotation is given as a constant, "
                     f"but got: "
@@ -1119,7 +1119,15 @@ def _parse_snapshot(
             ),
         )
 
+    name: str
     if name_node is not None:
+        assert isinstance(name_node, ast.Constant) and isinstance(
+            name_node.value, str
+        ), (
+            "We checked for this above -- "
+            "if name node is set, it must be a string literal."
+        )
+
         name = name_node.value
     elif len(capture_node.args.args) == 1 and name_node is None:
         name = capture_node.args.args[0].arg
@@ -1668,7 +1676,7 @@ def _class_decorator_to_serialization(
                 Error(
                     with_model_type_node,
                     f"Expected the value for ``with_model_type`` parameter "
-                    f"to be a boolean, but got: {with_model_type_node.value}",
+                    f"to be a boolean, but got: {with_model_type_node.value!r}",
                 ),
             )
 
@@ -1921,7 +1929,7 @@ def _classdef_to_enumeration(
                     Error(
                         assign.value,
                         f"Expected a string literal in the enumeration, "
-                        f"but got: {assign.value.value}",
+                        f"but got: {assign.value.value!r}",
                     ),
                 )
 

@@ -147,12 +147,12 @@ class Constant(DBC):
 class ConstantPrimitive(Constant):
     """Represent a constant value in the meta-model of primitive type."""
 
-    value: Final[Union[bool, int, float, str, bytearray]]
+    value: Final[Union[bool, int, float, str, bytes]]
 
     def __init__(
         self,
         name: Identifier,
-        value: Union[bool, int, float, str, bytearray],
+        value: Union[bool, int, float, str, bytes],
         description: Optional[Description],
         node: ast.AnnAssign,
     ) -> None:

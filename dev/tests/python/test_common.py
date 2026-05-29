@@ -75,19 +75,15 @@ class TestStringLiteral(unittest.TestCase):
 
 class TestBytesLiteral(unittest.TestCase):
     def test_empty(self) -> None:
-        self.assertTupleEqual(
-            ('b""', False), python_common.bytes_literal(bytearray(b""))
-        )
+        self.assertTupleEqual(('b""', False), python_common.bytes_literal(b""))
 
     def test_one(self) -> None:
-        self.assertTupleEqual(
-            ('b"\\x00"', False), python_common.bytes_literal(bytearray(b"\x00"))
-        )
+        self.assertTupleEqual(('b"\\x00"', False), python_common.bytes_literal(b"\x00"))
 
     def test_eight(self) -> None:
         self.assertTupleEqual(
             ('b"\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07"', False),
-            python_common.bytes_literal(bytearray(b"\x00\x01\x02\x03\x04\x05\x06\x07")),
+            python_common.bytes_literal(b"\x00\x01\x02\x03\x04\x05\x06\x07"),
         )
 
     def test_nine(self) -> None:
@@ -98,9 +94,7 @@ b"\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07"
 b"\\x08"''',
                 True,
             ),
-            python_common.bytes_literal(
-                bytearray(b"\x00\x01\x02\x03\x04\x05\x06\x07\x08")
-            ),
+            python_common.bytes_literal(b"\x00\x01\x02\x03\x04\x05\x06\x07\x08"),
         )
 
     def test_sixteen(self) -> None:
@@ -112,10 +106,7 @@ b"\\x08\\x09\\x10\\x11\\x12\\x13\\x14\\x15"''',
                 True,
             ),
             python_common.bytes_literal(
-                bytearray(
-                    b"\x00\x01\x02\x03\x04\x05\x06\x07"
-                    b"\x08\x09\x10\x11\x12\x13\x14\x15"
-                )
+                b"\x00\x01\x02\x03\x04\x05\x06\x07" b"\x08\x09\x10\x11\x12\x13\x14\x15"
             ),
         )
 

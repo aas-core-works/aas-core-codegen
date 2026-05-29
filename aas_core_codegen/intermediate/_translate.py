@@ -92,9 +92,9 @@ from aas_core_codegen.intermediate._types import (
     DescriptionOfConstant,
     ConstantUnion,
     ConstantPrimitive,
-    PYTHON_TYPE_TO_PRIMITIVE_TYPE,
     ConstantSetOfPrimitives,
     PRIMITIVE_TYPE_TO_PYTHON_TYPE,
+    PYTHON_CONSTANT_TYPE_TO_PRIMITIVE_TYPE,
     PrimitiveSetLiteral,
     ConstantSetOfEnumerationLiterals,
     Constant,
@@ -1948,7 +1948,7 @@ def _to_constant_primitive(
     parsed: parse.ConstantPrimitive,
 ) -> Tuple[Optional[ConstantPrimitive], Optional[List[Error]]]:
     """Translate the parsed to an intermediate constant primitive."""
-    a_type = PYTHON_TYPE_TO_PRIMITIVE_TYPE.get(type(parsed.value), None)
+    a_type = PYTHON_CONSTANT_TYPE_TO_PRIMITIVE_TYPE.get(type(parsed.value), None)
     if a_type is None:
         return None, [
             Error(

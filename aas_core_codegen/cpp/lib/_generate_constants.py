@@ -147,7 +147,7 @@ const std::wstring {constant_name} = (
         )
 
     elif constant.a_type is intermediate.PrimitiveType.BYTEARRAY:
-        assert isinstance(constant.value, bytearray)
+        assert isinstance(constant.value, bytes)
 
         literal, _ = cpp_common.bytes_literal(value=constant.value)
 
@@ -275,7 +275,7 @@ std::unordered_set<
         )
 
         for literal in constant.literals:
-            assert isinstance(literal.value, bytearray)
+            assert isinstance(literal.value, bytes)
             literal_code, _ = cpp_common.bytes_literal(literal.value)
             literal_codes.append(literal_code)
 

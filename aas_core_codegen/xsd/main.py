@@ -926,11 +926,16 @@ def _generate(
             )
         ]
 
-    # NOTE (mristin, 2022-03-30):
+    # NOTE (mristin):
     # We need to use minidom to extract the ``xmlns`` property as ElementTree removes
     # it.
     # noinspection PyUnresolvedReferences
     minidom_doc = xml.dom.minidom.parseString(root_element_as_text)
+
+    assert minidom_doc.documentElement is not None, (
+        "We expect the root element, which is stringified from ET, to be parsed "
+        "successfully."
+    )
 
     if not minidom_doc.documentElement.hasAttribute("xmlns"):
         return None, [
