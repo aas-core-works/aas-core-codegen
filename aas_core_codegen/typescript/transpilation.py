@@ -410,21 +410,15 @@ AasCommon.at(
         ):
             collection = Stripped(f"({collection})")
 
-        collection_type = self.type_map[node]
-        while isinstance(
-            collection_type, intermediate_type_inference.OptionalTypeAnnotation
-        ):
-            collection_type = collection_type.value
+        collection_type = intermediate_type_inference.beneath_optional(
+            self.type_map[node]
+        )
 
-        if isinstance(
-            collection_type, intermediate_type_inference.PrimitiveTypeAnnotation
-        ) and (collection_type.a_type == intermediate_type_inference.PrimitiveType.STR):
-            return Stripped(f"{collection}.length"), None
+        primitive_type = intermediate_type_inference.try_primitive_type(collection_type)
 
-        elif (
-            isinstance(collection_type, intermediate_type_inference.OurTypeAnnotation)
-            and isinstance(collection_type.our_type, intermediate.ConstrainedPrimitive)
-            and (collection_type.our_type.constrainee == intermediate.PrimitiveType.STR)
+        if primitive_type in (
+            intermediate_type_inference.PrimitiveType.STR,
+            intermediate_type_inference.PrimitiveType.BYTEARRAY,
         ):
             return Stripped(f"{collection}.length"), None
 

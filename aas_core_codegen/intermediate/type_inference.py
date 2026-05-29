@@ -87,6 +87,24 @@ class PrimitiveTypeAnnotation(AtomicTypeAnnotation):
         return str(self.a_type.value)
 
 
+# NOTE (mristin):
+# The types in _types module provide a different set of primitive types,
+# so we have to map here.
+_PRIMITIVE_TYPES_TO_OUR_PRIMITIVE_TYPES: Final[
+    Mapping[_types.PrimitiveType, PrimitiveType]
+] = {
+    _types.PrimitiveType.BOOL: PrimitiveType.BOOL,
+    _types.PrimitiveType.INT: PrimitiveType.INT,
+    _types.PrimitiveType.FLOAT: PrimitiveType.FLOAT,
+    _types.PrimitiveType.STR: PrimitiveType.STR,
+    _types.PrimitiveType.BYTEARRAY: PrimitiveType.BYTEARRAY,
+}
+assert all(
+    literal in _PRIMITIVE_TYPES_TO_OUR_PRIMITIVE_TYPES
+    for literal in _types.PrimitiveType
+)
+
+
 class OurTypeAnnotation(AtomicTypeAnnotation):
     """
     Represent an atomic annotation defined by our type in the meta-model.
@@ -100,6 +118,28 @@ class OurTypeAnnotation(AtomicTypeAnnotation):
 
     def __str__(self) -> str:
         return self.our_type.name
+
+
+def try_primitive_type(
+    type_annotation: "TypeAnnotationUnion",
+) -> Optional[PrimitiveType]:
+    """
+    Try to get the underlying primitive type of the type annotation.
+
+    If it is neither a primitive type annotation nor a constrained primitive,
+    return None.
+    """
+    if isinstance(type_annotation, PrimitiveTypeAnnotation):
+        return type_annotation.a_type
+
+    elif isinstance(type_annotation, OurTypeAnnotation) and isinstance(
+        type_annotation.our_type, _types.ConstrainedPrimitive
+    ):
+        return _PRIMITIVE_TYPES_TO_OUR_PRIMITIVE_TYPES[
+            type_annotation.our_type.constrainee
+        ]
+    else:
+        return None
 
 
 class FunctionTypeAnnotation(AtomicTypeAnnotation):
