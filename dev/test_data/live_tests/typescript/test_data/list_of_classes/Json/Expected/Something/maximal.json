@@ -1,0 +1,20 @@
+{
+  "someItems": [
+    {
+      "modelType": "AnotherItem",
+      "serialNumber": 12345
+    },
+    {
+      "modelType": "SomeItem",
+      "name": "Example Name"
+    }
+  ],
+  "someSimples": [
+    {
+      "name": "ID-001"
+    },
+    {
+      "name": "ID-002"
+    }
+  ]
+}
