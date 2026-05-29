@@ -91,6 +91,16 @@ assert (
 )
 # fmt: on
 
+PYTHON_CONSTANT_TYPE_TO_PRIMITIVE_TYPE: Mapping[
+    Union[Type[bool], Type[int], Type[float], Type[str], Type[bytes]], PrimitiveType
+] = {
+    bool: PrimitiveType.BOOL,
+    int: PrimitiveType.INT,
+    float: PrimitiveType.FLOAT,
+    str: PrimitiveType.STR,
+    bytes: PrimitiveType.BYTEARRAY,
+}
+
 
 class TypeAnnotation(DBC):
     """Represent a general type annotation."""
@@ -2004,7 +2014,7 @@ class ConstantPrimitive(Constant):
     """Represent a constant primitive value in the meta-model."""
 
     #: Value of the constant
-    value: Union[bool, int, float, str, bytearray]
+    value: Union[bool, int, float, str, bytes]
 
     #: Type of the constant
     a_type: Final[PrimitiveType]
@@ -2022,7 +2032,7 @@ class ConstantPrimitive(Constant):
     def __init__(
         self,
         name: Identifier,
-        value: Union[bool, int, float, str, bytearray],
+        value: Union[bool, int, float, str, bytes],
         a_type: PrimitiveType,
         description: Optional[DescriptionOfConstant],
         parsed: parse.ConstantPrimitive,

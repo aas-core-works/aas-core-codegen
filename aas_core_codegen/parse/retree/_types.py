@@ -116,7 +116,7 @@ class Term(Node):
     @require(
         lambda value, quantifier:
         not (
-                value is Symbol
+                isinstance(value, Symbol)
                 and (
                         value.kind is SymbolKind.START
                         or value.kind is SymbolKind.END
