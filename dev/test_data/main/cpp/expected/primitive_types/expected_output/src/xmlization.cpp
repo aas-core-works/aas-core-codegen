@@ -3147,8 +3147,13 @@ void SelfClosingWriter::SerializeDouble(
   } else if(std::isnan(value)) {
     WriteStringWithoutEscapingNorFlushing("NaN");
   } else {
+    // NOTE (mristin):
+    // We have to use a stream to avoid trailing zeros. std::to_string always
+    // outputs trailing zeros up to a certain number of decimal places (usually 6).
+    std::ostringstream oss;
+    oss << value;
     WriteStringWithoutEscapingNorFlushing(
-      std::to_string(value)
+      oss.str()
     );
   }
 }
