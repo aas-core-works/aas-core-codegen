@@ -17,9 +17,6 @@
       <xs:enumeration value="fail"/>
     </xs:restriction>
   </xs:simpleType>
-  <xs:simpleType name="valueDataType">
-    <xs:restriction base="xs:string"/>
-  </xs:simpleType>
   <xs:complexType name="something_t">
     <xs:sequence>
       <xs:group ref="something"/>
