@@ -972,11 +972,106 @@ nlohmann::json SerializeByteArray(
   );
 }
 
+/**
+ * Serialize the given list to a JSON array where item serialization might fail.
+ */
+template<typename T, typename FallibleSerializeItemT>
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeListWithFallible(
+  const std::vector<T>& list,
+  FallibleSerializeItemT&& fallible_serialize_item
+) {
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    list.size()
+  );
+
+  size_t index = 0;
+
+  for (const T& item : list) {
+    common::optional<nlohmann::json> json_item;
+    common::optional<SerializationError> error;
+
+    std::tie(
+      json_item,
+      error
+    ) = fallible_serialize_item(item);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    serialized.emplace_back(
+      std::move(*json_item)
+    );
+
+    ++index;
+  }
+
+  return std::make_pair(
+    std::move(serialized),
+    common::nullopt
+  );
+}
+
+/**
+ * Serialize the given list to a JSON array where item serialization can not fail.
+ */
+template<typename T, typename InfallibleSerializeItemT>
+nlohmann::json SerializeListWithInfallible(
+  const std::vector<T>& list,
+  InfallibleSerializeItemT&& infallible_serialize_item
+) {
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    list.size()
+  );
+
+  for (const T& item : list) {
+    serialized.emplace_back(
+      infallible_serialize_item(item)
+    );
+  }
+
+  return serialized;
+}
+
+/**
+ * Just forward the value as it is.
+ */
+template<typename T>
+const T& Identity(const T& value) {
+  return value;
+}
+
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
 > SerializeIClass(
   const types::IClass& that
+);
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeIClassPtr(
+  const std::shared_ptr<types::IClass>& that
 );
 
 std::pair<
@@ -1061,6 +1156,15 @@ std::pair<
       throw std::invalid_argument(message);
     }
   };
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeIClassPtr(
+  const std::shared_ptr<types::IClass>& that
+) {
+  return SerializeIClass(*that);
 }
 
 nlohmann::json Serialize(

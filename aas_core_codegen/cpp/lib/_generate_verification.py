@@ -810,51 +810,33 @@ std::unique_ptr<impl::IVerificator> AlwaysDoneVerificator::Clone() const {{
     ]
 
 
-@ensure(lambda cls, result: all(id(prop) in cls.property_id_set for prop in result))
-def _collect_constrained_primitive_properties(
-    cls: intermediate.ConcreteClass,
-) -> List[intermediate.Property]:
-    """Select the properties which are annotated as constrained primitives."""
-    result = []  # type: List[intermediate.Property]
-    for prop in cls.properties:
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
+def _find_constrained_primitive(
+    type_annotation: intermediate.TypeAnnotationUnion,
+) -> Optional[intermediate.ConstrainedPrimitive]:
+    """
+    Find the constrained primitive in the given type annotation.
 
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            pass
+    The constrained primitive can be referenced from the type annotation, or contained
+    as its generic parameter.
+    """
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return None
 
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                pass
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        if isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
+            return type_annotation.our_type
 
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                result.append(prop)
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                pass
-
-            else:
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ), (
-                f"NOTE (mristin): We expect only lists of classes "
-                f"at the moment, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            pass
         else:
-            assert_never(type_anno)
+            return None
 
-    return result
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        return _find_constrained_primitive(type_annotation.value)
+
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        return _find_constrained_primitive(type_annotation.items)
+
+    else:
+        assert_never(type_annotation)
 
 
 class VerificatorQualities:
@@ -866,7 +848,7 @@ class VerificatorQualities:
     #: If set, the verificator performs no verification steps.
     is_noop: Final[bool]
 
-    #: List properties which are annotated with an (possibly optional) constrained
+    #: List properties which are annotated with a (possibly optional) constrained
     #: primitive
     constrained_primitive_properties: Final[Sequence[intermediate.Property]]
 
@@ -893,9 +875,11 @@ class VerificatorQualities:
     def __init__(self, cls: intermediate.ConcreteClass) -> None:
         self.cls = cls
 
-        self.constrained_primitive_properties = (
-            _collect_constrained_primitive_properties(cls=cls)
-        )
+        self.constrained_primitive_properties = [
+            prop
+            for prop in cls.properties
+            if _find_constrained_primitive(prop.type_annotation) is not None
+        ]
 
         self.is_noop = (
             len(cls.invariants) == 0 and len(self.constrained_primitive_properties) == 0
@@ -1139,6 +1123,21 @@ index_ = -1;"""
         )
     ]  # type: List[yielding_flow.Node]
 
+    for prop in verificator_qualities.constrained_primitive_properties:
+        if isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.ListTypeAnnotation,
+        ):
+            flow.append(
+                yielding_flow.command_from_text(
+                    """\
+// NOTE (mristin):
+// We reset the index in constrained primitives for easier debugging since this bears
+// negligible overhead.
+index_in_constrained_primitives_ = static_cast<std::size_t>(-1);"""
+                )
+            )
+
     errors = []  # type: List[Error]
     for invariant in verificator_qualities.cls.invariants:
         condition_expr, error = _transpile_class_invariant(
@@ -1177,91 +1176,58 @@ error_ = common::make_unique<Error>(
         )
 
     for prop in verificator_qualities.constrained_primitive_properties:
+        constrained_primitive = _find_constrained_primitive(prop.type_annotation)
+        assert constrained_primitive is not None
+
         type_anno = intermediate.beneath_optional(prop.type_annotation)
-        assert isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-            type_anno.our_type, intermediate.ConstrainedPrimitive
-        )
 
         of_constrained_primitive = cpp_naming.class_name(
-            Identifier(f"Of_{type_anno.our_type.name}")
+            Identifier(f"Of_{constrained_primitive.name}")
         )
-
-        getter_name = cpp_naming.getter_name(prop.name)
 
         property_enum = cpp_naming.enum_name(Identifier("Property"))
         property_literal = cpp_naming.enum_literal_name(prop.name)
 
+        getter_name = cpp_naming.getter_name(prop.name)
+
+        getter_expr: Stripped
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            # NOTE (mristin):
-            # Be careful! You have to keep the following snippet in semantical sync with
-            # the code in the else-clause!
-
-            flow.append(
-                yielding_flow.IfTrue(
-                    f"instance_->{getter_name}().has_value()",
-                    [
-                        yielding_flow.command_from_text(
-                            f"""\
-constrained_primitive_verificator_ = (
-{I}common::make_unique<
-{II}constrained_primitive_verificator::{of_constrained_primitive}
-{I}>(
-{II}*(instance_->{getter_name}())
-{I})
-);
-constrained_primitive_verificator_->Start();"""
-                        ),
-                        yielding_flow.For(
-                            "!constrained_primitive_verificator_->Done()",
-                            "constrained_primitive_verificator_->Next();",
-                            [
-                                yielding_flow.command_from_text(
-                                    f"""\
-// We intentionally take over the ownership of the errors' data members,
-// as we know the implementation in all the detail, and want to avoid a costly
-// copy.
-error_ = common::make_unique<Error>(
-{I}std::move(
-{II}constrained_primitive_verificator_->GetMutable()
-{I})
-);
-
-error_->path.segments.emplace_back(
-{I}common::make_unique<iteration::PropertySegment>(
-{II}iteration::{property_enum}::{property_literal}
-{I})
-);
-
-++index_;"""
-                                ),
-                                yielding_flow.Yield(),
-                            ],
-                        ),
-                        yielding_flow.command_from_text(
-                            "constrained_primitive_verificator_ = nullptr;"
-                        ),
-                    ],
-                )
-            )
+            getter_expr = Stripped(f"*(instance_->{getter_name}())")
         else:
-            # NOTE (mristin):
-            # Be careful! You have to keep the following snippet in semantic sync with
-            # the code in the if-clause!
+            getter_expr = Stripped(f"instance_->{getter_name}()")
 
-            flow.append(
+        flow_for_prop: List[yielding_flow.Node]
+
+        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
+            raise AssertionError(
+                f"Expected only a type annotation for a property containing "
+                f"a constrained primitive, but got: {prop.type_annotation}"
+            )
+
+        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+            assert isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
+            assert type_anno.our_type is constrained_primitive
+
+            # noinspection PyListCreation
+            flow_for_prop = []
+
+            # NOTE (mristin):
+            # We call ``append`` to avoid the double indention with ``extend([...])``.
+
+            flow_for_prop.append(
                 yielding_flow.command_from_text(
                     f"""\
 constrained_primitive_verificator_ = (
 {I}common::make_unique<
 {II}constrained_primitive_verificator::{of_constrained_primitive}
 {I}>(
-{II}instance_->{getter_name}()
+{II}{indent_but_first_line(getter_expr, II)}
 {I})
 );
 constrained_primitive_verificator_->Start();"""
                 )
             )
-            flow.append(
+            flow_for_prop.append(
                 yielding_flow.For(
                     "!constrained_primitive_verificator_->Done()",
                     "constrained_primitive_verificator_->Next();",
@@ -1289,11 +1255,118 @@ error_->path.segments.emplace_back(
                     ],
                 )
             )
-            flow.append(
+            flow_for_prop.append(
                 yielding_flow.command_from_text(
                     "constrained_primitive_verificator_ = nullptr;"
                 )
             )
+
+        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+            if not (
+                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+                and isinstance(
+                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                )
+            ):
+                raise NotImplementedError(
+                    f"NOTE (mristin): We implemented only non-recursive verification of "
+                    f"lists of constrained primitives at the moment, "
+                    f"but we got: {prop.type_annotation}. "
+                    f"Please contact the developers if you need this feature."
+                )
+
+            # noinspection PyListCreation
+            flow_for_prop = []
+
+            # NOTE (mristin):
+            # We call ``append`` to avoid the double indention with ``extend([...])``.
+
+            flow_for_prop.append(
+                yielding_flow.command_from_text(
+                    """\
+index_in_constrained_primitives_ = 0;"""
+                )
+            )
+
+            at_expr = f"({getter_expr}).at(index_in_constrained_primitives_)"
+
+            flow_for_prop.append(
+                yielding_flow.For(
+                    f"index_in_constrained_primitives_ " f"< ({getter_expr}).size()",
+                    "++index_in_constrained_primitives_",
+                    [
+                        yielding_flow.command_from_text(
+                            f"""\
+constrained_primitive_verificator_ = (
+{I}common::make_unique<
+{II}constrained_primitive_verificator::{of_constrained_primitive}
+{I}>(
+{II}{indent_but_first_line(at_expr, II)}
+{I})
+);
+constrained_primitive_verificator_->Start();"""
+                        ),
+                        yielding_flow.For(
+                            "!constrained_primitive_verificator_->Done()",
+                            "constrained_primitive_verificator_->Next();",
+                            [
+                                yielding_flow.command_from_text(
+                                    f"""\
+// We intentionally take over the ownership of the errors' data members,
+// as we know the implementation in all the detail, and want to avoid a costly
+// copy.
+error_ = common::make_unique<Error>(
+{I}std::move(
+{II}constrained_primitive_verificator_->GetMutable()
+{I})
+);
+
+error_->path.segments.emplace_back(
+{I}common::make_unique<iteration::IndexSegment>(
+{II}index_in_constrained_primitives_
+{I})
+);
+
+error_->path.segments.emplace_back(
+{I}common::make_unique<iteration::PropertySegment>(
+{II}iteration::{property_enum}::{property_literal}
+{I})
+);
+
+++index_;"""
+                                ),
+                                yielding_flow.Yield(),
+                            ],
+                        ),
+                        yielding_flow.command_from_text(
+                            "constrained_primitive_verificator_ = nullptr;"
+                        ),
+                    ],
+                )
+            )
+
+            flow_for_prop.append(
+                yielding_flow.command_from_text(
+                    """\
+// NOTE (mristin):
+// We reset the index in constrained primitives for easier debugging since this bears
+// negligible overhead.
+index_in_constrained_primitives_ = static_cast<std::size_t>(-1);"""
+                )
+            )
+
+        else:
+            assert_never(type_anno)
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            flow_for_prop = [
+                yielding_flow.IfTrue(
+                    condition=f"instance_->{getter_name}().has_value()",
+                    body=flow_for_prop,
+                )
+            ]
+
+        flow.extend(flow_for_prop)
 
     flow.append(
         yielding_flow.command_from_text(
@@ -1582,6 +1655,18 @@ std::uint32_t state_;"""
                 "constrained_primitive_verificator_;"
             )
         )
+
+        for prop in verificator_qualities.constrained_primitive_properties:
+            if isinstance(
+                intermediate.beneath_optional(prop.type_annotation),
+                intermediate.ListTypeAnnotation,
+            ):
+                # NOTE (mristin):
+                # Since there is a list of constrained primitives, we will have to
+                # iterate over it.
+                private_data_members.append(
+                    Stripped("std::size_t index_in_constrained_primitives_;")
+                )
 
     private_data_members_joined = "\n".join(private_data_members)
 

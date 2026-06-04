@@ -491,48 +491,24 @@ std::pair<
   );
 }
 
+template <typename T, typename DeserializeItemT>
 std::pair<
-  common::optional<types::Result>,
+  common::optional<std::vector<T> >,
   common::optional<DeserializationError>
-> DeserializeResult(
-  const nlohmann::json& json
+> DeserializeList(
+  const nlohmann::json& json,
+  DeserializeItemT&& deserialize_item
 ) {
-  common::optional<std::wstring> text;
-  common::optional<DeserializationError> error;
-
-  std::tie(
-    text,
-    error
-  ) = DeserializeWstring(
-    json
-  );
-
-  if (error.has_value()) {
-    return std::make_pair<
-      common::optional<types::Result>,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  common::optional<
-    types::Result
-  > literal = std::move(
-    wstringification::ResultFromWstring(
-      *text
-    )
-  );
-
-  if (!literal.has_value()) {
+  if (!json.is_array()) {
     std::wstring message = common::Concat(
-      L"Invalid literal for Result: ",
-      *text
+      L"Expected an array, but got: ",
+      common::Utf8ToWstring(
+        json.type_name()
+      )
     );
 
     return std::make_pair<
-      common::optional<types::Result>,
+      common::optional<std::vector<T> >,
       common::optional<DeserializationError>
     >(
       common::nullopt,
@@ -542,13 +518,45 @@ std::pair<
     );
   }
 
-  return std::make_pair<
-    common::optional<types::Result>,
-    common::optional<DeserializationError>
-    >(
-      std::move(literal),
-      std::nullopt
-    );
+  std::optional<std::vector<T> > list(
+    common::make_optional<std::vector<T> >()
+  );
+
+  list->reserve(json.size());
+
+  size_t index = 0;
+
+  for(const nlohmann::json& item : json) {
+    common::optional<T> deserialized;
+    common::optional<DeserializationError> error;
+
+    std::tie(deserialized, error) = deserialize_item(item);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<std::vector<T> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    list->emplace_back(std::move(*deserialized));
+
+    ++index;
+  }
+
+  return std::make_pair(
+    list,
+    common::nullopt
+  );
 }
 
 /**
@@ -571,7 +579,11 @@ std::pair<
 );
 
 std::set<std::string> kPropertiesInSomething = {
-  "someResult"
+  "someBools",
+  "someInts",
+  "someFloats",
+  "someStrings",
+  "someBytes"
 };
 
 std::pair<
@@ -626,14 +638,62 @@ std::pair<
 
   // region Check required properties
 
-  if (!json.contains("someResult")) {
+  if (!json.contains("someBools")) {
     return std::make_pair<
       common::optional<std::shared_ptr<types::ISomething> >,
       common::optional<DeserializationError>
     >(
       common::nullopt,
       common::make_optional<DeserializationError>(
-        L"The required property someResult is missing"
+        L"The required property someBools is missing"
+      )
+    );
+  }
+
+  if (!json.contains("someInts")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property someInts is missing"
+      )
+    );
+  }
+
+  if (!json.contains("someFloats")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property someFloats is missing"
+      )
+    );
+  }
+
+  if (!json.contains("someStrings")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property someStrings is missing"
+      )
+    );
+  }
+
+  if (!json.contains("someBytes")) {
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        L"The required property someBytes is missing"
       )
     );
   }
@@ -644,23 +704,36 @@ std::pair<
 
   common::optional<DeserializationError> error;
 
-  common::optional<types::Result> the_some_result;
+  common::optional<std::vector<bool> > the_some_bools;
+
+  common::optional<std::vector<int64_t> > the_some_ints;
+
+  common::optional<std::vector<double> > the_some_floats;
+
+  common::optional<std::vector<std::wstring> > the_some_strings;
+
+  common::optional<
+    std::vector<
+      std::vector<std::uint8_t>
+    >
+  > the_some_bytes;
 
   // endregion Initialization
 
-  // region De-serialize someResult
+  // region De-serialize someBools
 
   std::tie(
-    the_some_result,
+    the_some_bools,
     error
-  ) = DeserializeResult(
-    json["someResult"]
+  ) = DeserializeList<bool>(
+    json["someBools"],
+    DeserializeBool
   );
 
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
-        L"someResult"
+        L"someBools"
       )
     );
 
@@ -673,7 +746,119 @@ std::pair<
     );
   }
 
-  // endregion De-serialize someResult
+  // endregion De-serialize someBools
+
+  // region De-serialize someInts
+
+  std::tie(
+    the_some_ints,
+    error
+  ) = DeserializeList<int64_t>(
+    json["someInts"],
+    DeserializeInt64
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"someInts"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion De-serialize someInts
+
+  // region De-serialize someFloats
+
+  std::tie(
+    the_some_floats,
+    error
+  ) = DeserializeList<double>(
+    json["someFloats"],
+    DeserializeDouble
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"someFloats"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion De-serialize someFloats
+
+  // region De-serialize someStrings
+
+  std::tie(
+    the_some_strings,
+    error
+  ) = DeserializeList<std::wstring>(
+    json["someStrings"],
+    DeserializeWstring
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"someStrings"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion De-serialize someStrings
+
+  // region De-serialize someBytes
+
+  std::tie(
+    the_some_bytes,
+    error
+  ) = DeserializeList<std::vector<std::uint8_t>>(
+    json["someBytes"],
+    DeserializeByteArray
+  );
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<PropertySegment>(
+        L"someBytes"
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::shared_ptr<types::ISomething> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // endregion De-serialize someBytes
 
   return std::make_pair(
     common::make_optional<
@@ -683,7 +868,11 @@ std::pair<
       // We deliberately do not use std::make_shared here to avoid an unnecessary
       // upcast.
       new types::Something(
-        std::move(*the_some_result)
+        std::move(*the_some_bools),
+        std::move(*the_some_ints),
+        std::move(*the_some_floats),
+        std::move(*the_some_strings),
+        std::move(*the_some_bytes)
       )
     ),
     common::nullopt
@@ -972,8 +1161,52 @@ std::pair<
 
   common::optional<SerializationError> error;
 
-  result["someResult"] = stringification::to_string(
-    that.some_result()
+  result["someBools"] = SerializeListWithInfallible(
+    that.some_bools(),
+    Identity<bool>
+  );
+
+  common::optional<nlohmann::json> json_some_ints;
+  std::tie(
+    json_some_ints,
+    error
+  ) = SerializeListWithFallible(
+    that.some_ints(),
+    SerializeInt64
+  );
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeInts
+      )
+    );
+
+    return std::make_pair<
+      common::optional<nlohmann::json>,
+      common::optional<SerializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  result["someInts"] = std::move(
+    json_some_ints.value()
+  );
+
+  result["someFloats"] = SerializeListWithInfallible(
+    that.some_floats(),
+    Identity<double>
+  );
+
+  result["someStrings"] = SerializeListWithInfallible(
+    that.some_strings(),
+    SerializeWstring
+  );
+
+  result["someBytes"] = SerializeListWithInfallible(
+    that.some_bytes(),
+    stringification::Base64Encode
   );
 
   return std::make_pair<

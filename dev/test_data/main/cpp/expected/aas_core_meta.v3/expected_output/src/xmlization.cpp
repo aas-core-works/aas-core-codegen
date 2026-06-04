@@ -13874,6 +13874,698 @@ std::pair<
 
 // endregion De-serialize primitives
 
+template <typename T, typename DeserializeT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  ReaderMergingText& reader,
+  const DeserializeT& deserialize_item
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeWstring. "
+      "DeserializeWstring expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<DeserializationError> error;
+
+  error = SkipWhitespace(reader);
+  if (error.has_value()) {
+    return std::make_pair(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // If we encounter the stop element then we reached the end of the list. If this is
+  // the first node we encounter then the list is empty, *i.e.*, contains no items.
+  if (reader.node().kind() == NodeKind::Stop) {
+    return std::make_pair(
+      std::vector<T>(),
+      std::nullopt
+    );
+  } else {
+    // NOTE (mristin):
+    // We use std::deque here as it is a buffered list, while a std::list
+    // would incur a memory allocation on each push. We do not want to use
+    // std::vector as the number of elements in a list can be arbitrarily large
+    // leading potentially to out-of-memory errors since std::vector's double
+    // their size for amortized time complexity of O(1) for insertions.
+
+    std::deque<T> items;
+
+    size_t i = 0;
+
+    while (true) {
+      common::optional<T> item;
+
+      std::tie(
+        item,
+        error
+      ) = deserialize_item(reader);
+
+      if (error.has_value()) {
+        error->path.segments.emplace_front(
+          common::make_unique<IndexSegment>(i)
+        );
+        break;
+      }
+
+      error = SkipWhitespace(reader);
+      if (error.has_value()) {
+        break;
+      }
+
+      items.emplace_back(*item);
+
+      if (reader.node().kind() == NodeKind::Stop) {
+        break;
+      }
+
+      ++i;
+    }
+
+    if (!error.has_value()) {
+      auto result = std::vector<T>();
+      result.reserve(items.size());
+
+      for (auto& item : items) {
+        result.emplace_back(
+          std::move(item)
+        );
+    }
+
+      return std::make_pair(
+        std::move(result),
+        common::nullopt
+      );
+    } else {
+      return std::make_pair(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+  }
+}
+
+std::pair<
+  common::optional<types::ModellingKind>,
+  common::optional<DeserializationError>
+> DeserializeModellingKind(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::ModellingKind
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of ModellingKind: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::ModellingKind
+  > deserialized = wstringification::ModellingKindFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::ModellingKind
+    >(
+      common::Concat(
+        L"Expected a literal of ModellingKind, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::QualifierKind>,
+  common::optional<DeserializationError>
+> DeserializeQualifierKind(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::QualifierKind
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of QualifierKind: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::QualifierKind
+  > deserialized = wstringification::QualifierKindFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::QualifierKind
+    >(
+      common::Concat(
+        L"Expected a literal of QualifierKind, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::AssetKind>,
+  common::optional<DeserializationError>
+> DeserializeAssetKind(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::AssetKind
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of AssetKind: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::AssetKind
+  > deserialized = wstringification::AssetKindFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::AssetKind
+    >(
+      common::Concat(
+        L"Expected a literal of AssetKind, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::AasSubmodelElements>,
+  common::optional<DeserializationError>
+> DeserializeAasSubmodelElements(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::AasSubmodelElements
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of AasSubmodelElements: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::AasSubmodelElements
+  > deserialized = wstringification::AasSubmodelElementsFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::AasSubmodelElements
+    >(
+      common::Concat(
+        L"Expected a literal of AasSubmodelElements, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::EntityType>,
+  common::optional<DeserializationError>
+> DeserializeEntityType(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::EntityType
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of EntityType: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::EntityType
+  > deserialized = wstringification::EntityTypeFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::EntityType
+    >(
+      common::Concat(
+        L"Expected a literal of EntityType, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::Direction>,
+  common::optional<DeserializationError>
+> DeserializeDirection(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::Direction
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of Direction: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::Direction
+  > deserialized = wstringification::DirectionFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::Direction
+    >(
+      common::Concat(
+        L"Expected a literal of Direction, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::StateOfEvent>,
+  common::optional<DeserializationError>
+> DeserializeStateOfEvent(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::StateOfEvent
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of StateOfEvent: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::StateOfEvent
+  > deserialized = wstringification::StateOfEventFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::StateOfEvent
+    >(
+      common::Concat(
+        L"Expected a literal of StateOfEvent, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::ReferenceTypes>,
+  common::optional<DeserializationError>
+> DeserializeReferenceTypes(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::ReferenceTypes
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of ReferenceTypes: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::ReferenceTypes
+  > deserialized = wstringification::ReferenceTypesFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::ReferenceTypes
+    >(
+      common::Concat(
+        L"Expected a literal of ReferenceTypes, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::KeyTypes>,
+  common::optional<DeserializationError>
+> DeserializeKeyTypes(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::KeyTypes
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of KeyTypes: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::KeyTypes
+  > deserialized = wstringification::KeyTypesFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::KeyTypes
+    >(
+      common::Concat(
+        L"Expected a literal of KeyTypes, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::DataTypeDefXsd>,
+  common::optional<DeserializationError>
+> DeserializeDataTypeDefXsd(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::DataTypeDefXsd
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of DataTypeDefXsd: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::DataTypeDefXsd
+  > deserialized = wstringification::DataTypeDefXsdFromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::DataTypeDefXsd
+    >(
+      common::Concat(
+        L"Expected a literal of DataTypeDefXsd, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
+std::pair<
+  common::optional<types::DataTypeIec61360>,
+  common::optional<DeserializationError>
+> DeserializeDataTypeIec61360(
+  ReaderMergingText& reader
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeByteArray. "
+      "DeserializeByteArray expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(reader);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::DataTypeIec61360
+    >(
+      common::Concat(
+        L"Failed to de-serialize a literal of DataTypeIec61360: ",
+        error->cause
+      )
+    );
+  }
+
+  common::optional<
+    types::DataTypeIec61360
+  > deserialized = wstringification::DataTypeIec61360FromWstring(
+    *text
+  );
+
+  if (!deserialized.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      types::DataTypeIec61360
+    >(
+      common::Concat(
+        L"Expected a literal of DataTypeIec61360, but got: ",
+        *text
+      )
+    );
+  }
+
+  return std::make_pair(std::move(deserialized), common::nullopt);
+}
+
 namespace properties {
 
 enum class OfExtension : std::uint32_t {
@@ -15741,158 +16433,46 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfExtension::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfExtension::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
       case properties::OfExtension::kName:
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfExtension::kValueType: {
-        common::optional<std::wstring> text;
+      case properties::OfExtension::kValueType:
         std::tie(
-          text,
+          the_value_type,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_value_type = wstringification::DataTypeDefXsdFromWstring(
-          *text
-        );
-
-        if (!the_value_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of DataTypeDefXsd, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeDataTypeDefXsd(reader);
         break;
-      }
       case properties::OfExtension::kValue:
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfExtension::kRefersTo: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_refers_to = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_refers_to = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_refers_to->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_refers_to->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfExtension::kRefersTo:
+        std::tie(
+          the_refers_to,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16134,63 +16714,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfAdministrativeInformation::kVersion:
         std::tie(
           the_version,
@@ -16459,121 +16993,35 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfQualifier::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfQualifier::kKind: {
-        common::optional<std::wstring> text;
+      case properties::OfQualifier::kSupplementalSemanticIds:
         std::tie(
-          text,
+          the_supplemental_semantic_ids,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_kind = wstringification::QualifierKindFromWstring(
-          *text
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
         );
-
-        if (!the_kind.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of QualifierKind, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
         break;
-      }
+      case properties::OfQualifier::kKind:
+        std::tie(
+          the_kind,
+          error
+        ) = DeserializeQualifierKind(reader);
+        break;
       case properties::OfQualifier::kType:
         std::tie(
           the_type,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQualifier::kValueType: {
-        common::optional<std::wstring> text;
+      case properties::OfQualifier::kValueType:
         std::tie(
-          text,
+          the_value_type,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_value_type = wstringification::DataTypeDefXsdFromWstring(
-          *text
-        );
-
-        if (!the_value_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of DataTypeDefXsd, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeDataTypeDefXsd(reader);
         break;
-      }
       case properties::OfQualifier::kValue:
         std::tie(
           the_value,
@@ -16868,63 +17316,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAssetAdministrationShell::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAssetAdministrationShell::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfAssetAdministrationShell::kCategory:
         std::tie(
           the_category,
@@ -16937,120 +17339,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAssetAdministrationShell::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfAssetAdministrationShell::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAssetAdministrationShell::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfAssetAdministrationShell::kAdministration:
         std::tie(
           the_administration,
@@ -17065,63 +17375,17 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfAssetAdministrationShell::kDerivedFrom:
         std::tie(
           the_derived_from,
@@ -17138,63 +17402,17 @@ std::pair<
           types::IAssetInformation
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kSubmodels: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_submodels = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_submodels = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_submodels->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_submodels->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAssetAdministrationShell::kSubmodels:
+        std::tie(
+          the_submodels,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17449,95 +17667,29 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAssetInformation::kAssetKind: {
-        common::optional<std::wstring> text;
+      case properties::OfAssetInformation::kAssetKind:
         std::tie(
-          text,
+          the_asset_kind,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_asset_kind = wstringification::AssetKindFromWstring(
-          *text
-        );
-
-        if (!the_asset_kind.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of AssetKind, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeAssetKind(reader);
         break;
-      }
       case properties::OfAssetInformation::kGlobalAssetId:
         std::tie(
           the_global_asset_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetInformation::kSpecificAssetIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_specific_asset_ids = std::vector<
-            std::shared_ptr<types::ISpecificAssetId>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISpecificAssetId>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISpecificAssetId>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SpecificAssetIdFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_specific_asset_ids = std::vector<
-              std::shared_ptr<types::ISpecificAssetId>
-            >();
-            the_specific_asset_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_specific_asset_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAssetInformation::kSpecificAssetIds:
+        std::tie(
+          the_specific_asset_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISpecificAssetId>
+        >(
+          reader,
+          SpecificAssetIdFromElement
+        );
         break;
-      }
       case properties::OfAssetInformation::kAssetType:
         std::tie(
           the_asset_type,
@@ -18039,63 +18191,17 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSpecificAssetId::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSpecificAssetId::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
       case properties::OfSpecificAssetId::kName:
         std::tie(
           the_name,
@@ -18406,63 +18512,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodel::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfSubmodel::kCategory:
         std::tie(
           the_category,
@@ -18475,120 +18535,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfSubmodel::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfSubmodel::kAdministration:
         std::tie(
           the_administration,
@@ -18603,32 +18571,12 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kKind: {
-        common::optional<std::wstring> text;
+      case properties::OfSubmodel::kKind:
         std::tie(
-          text,
+          the_kind,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_kind = wstringification::ModellingKindFromWstring(
-          *text
-        );
-
-        if (!the_kind.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of ModellingKind, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeModellingKind(reader);
         break;
-      }
       case properties::OfSubmodel::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -18637,234 +18585,50 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodel::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfSubmodel::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfSubmodel::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
-      case properties::OfSubmodel::kSubmodelElements: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_submodel_elements = std::vector<
-            std::shared_ptr<types::ISubmodelElement>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISubmodelElement>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISubmodelElement>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SubmodelElementFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_submodel_elements = std::vector<
-              std::shared_ptr<types::ISubmodelElement>
-            >();
-            the_submodel_elements->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_submodel_elements->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodel::kSubmodelElements:
+        std::tie(
+          the_submodel_elements,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISubmodelElement>
+        >(
+          reader,
+          SubmodelElementFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19145,63 +18909,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfRelationshipElement::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRelationshipElement::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfRelationshipElement::kCategory:
         std::tie(
           the_category,
@@ -19214,120 +18932,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRelationshipElement::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRelationshipElement::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfRelationshipElement::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRelationshipElement::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfRelationshipElement::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -19336,177 +18962,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRelationshipElement::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRelationshipElement::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfRelationshipElement::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRelationshipElement::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfRelationshipElement::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRelationshipElement::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfRelationshipElement::kFirst:
         std::tie(
           the_first,
@@ -19821,63 +19309,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodelElementList::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementList::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfSubmodelElementList::kCategory:
         std::tie(
           the_category,
@@ -19890,120 +19332,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementList::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementList::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementList::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementList::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfSubmodelElementList::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -20012,177 +19362,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementList::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementList::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementList::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementList::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementList::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementList::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfSubmodelElementList::kOrderRelevant:
         std::tie(
           the_order_relevant,
@@ -20197,115 +19409,29 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementList::kTypeValueListElement: {
-        common::optional<std::wstring> text;
+      case properties::OfSubmodelElementList::kTypeValueListElement:
         std::tie(
-          text,
+          the_type_value_list_element,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_type_value_list_element = wstringification::AasSubmodelElementsFromWstring(
-          *text
-        );
-
-        if (!the_type_value_list_element.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of AasSubmodelElements, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeAasSubmodelElements(reader);
         break;
-      }
-      case properties::OfSubmodelElementList::kValueTypeListElement: {
-        common::optional<std::wstring> text;
+      case properties::OfSubmodelElementList::kValueTypeListElement:
         std::tie(
-          text,
+          the_value_type_list_element,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_value_type_list_element = wstringification::DataTypeDefXsdFromWstring(
-          *text
+        ) = DeserializeDataTypeDefXsd(reader);
+        break;
+      case properties::OfSubmodelElementList::kValue:
+        std::tie(
+          the_value,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISubmodelElement>
+        >(
+          reader,
+          SubmodelElementFromElement
         );
-
-        if (!the_value_type_list_element.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of DataTypeDefXsd, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
         break;
-      }
-      case properties::OfSubmodelElementList::kValue: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_value = std::vector<
-            std::shared_ptr<types::ISubmodelElement>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISubmodelElement>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISubmodelElement>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SubmodelElementFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_value = std::vector<
-              std::shared_ptr<types::ISubmodelElement>
-            >();
-            the_value->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_value->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -20589,63 +19715,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodelElementCollection::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfSubmodelElementCollection::kCategory:
         std::tie(
           the_category,
@@ -20658,120 +19738,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementCollection::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementCollection::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfSubmodelElementCollection::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -20780,234 +19768,50 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementCollection::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementCollection::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
-      case properties::OfSubmodelElementCollection::kValue: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_value = std::vector<
-            std::shared_ptr<types::ISubmodelElement>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISubmodelElement>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISubmodelElement>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SubmodelElementFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_value = std::vector<
-              std::shared_ptr<types::ISubmodelElement>
-            >();
-            the_value->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_value->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSubmodelElementCollection::kValue:
+        std::tie(
+          the_value,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISubmodelElement>
+        >(
+          reader,
+          SubmodelElementFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -21277,63 +20081,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfProperty::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfProperty::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfProperty::kCategory:
         std::tie(
           the_category,
@@ -21346,120 +20104,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfProperty::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfProperty::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfProperty::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfProperty::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -21468,203 +20134,45 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfProperty::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfProperty::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfProperty::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfProperty::kValueType: {
-        common::optional<std::wstring> text;
+      case properties::OfProperty::kSupplementalSemanticIds:
         std::tie(
-          text,
+          the_supplemental_semantic_ids,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_value_type = wstringification::DataTypeDefXsdFromWstring(
-          *text
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
         );
-
-        if (!the_value_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of DataTypeDefXsd, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
         break;
-      }
+      case properties::OfProperty::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
+        break;
+      case properties::OfProperty::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
+        break;
+      case properties::OfProperty::kValueType:
+        std::tie(
+          the_value_type,
+          error
+        ) = DeserializeDataTypeDefXsd(reader);
+        break;
       case properties::OfProperty::kValue:
         std::tie(
           the_value,
@@ -21964,63 +20472,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfMultiLanguageProperty::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfMultiLanguageProperty::kCategory:
         std::tie(
           the_category,
@@ -22033,120 +20495,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfMultiLanguageProperty::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfMultiLanguageProperty::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfMultiLanguageProperty::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -22155,234 +20525,50 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfMultiLanguageProperty::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfMultiLanguageProperty::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
-      case properties::OfMultiLanguageProperty::kValue: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_value = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_value = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_value->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_value->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfMultiLanguageProperty::kValue:
+        std::tie(
+          the_value,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfMultiLanguageProperty::kValueId:
         std::tie(
           the_value_id,
@@ -22659,63 +20845,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfRange::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRange::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfRange::kCategory:
         std::tie(
           the_category,
@@ -22728,120 +20868,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRange::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfRange::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfRange::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfRange::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -22850,203 +20898,45 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRange::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfRange::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfRange::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfRange::kValueType: {
-        common::optional<std::wstring> text;
+      case properties::OfRange::kSupplementalSemanticIds:
         std::tie(
-          text,
+          the_supplemental_semantic_ids,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_value_type = wstringification::DataTypeDefXsdFromWstring(
-          *text
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
         );
-
-        if (!the_value_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of DataTypeDefXsd, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
         break;
-      }
+      case properties::OfRange::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
+        break;
+      case properties::OfRange::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
+        break;
+      case properties::OfRange::kValueType:
+        std::tie(
+          the_value_type,
+          error
+        ) = DeserializeDataTypeDefXsd(reader);
+        break;
       case properties::OfRange::kMin:
         std::tie(
           the_min,
@@ -23338,63 +21228,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfReferenceElement::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReferenceElement::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfReferenceElement::kCategory:
         std::tie(
           the_category,
@@ -23407,120 +21251,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfReferenceElement::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReferenceElement::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfReferenceElement::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReferenceElement::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfReferenceElement::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -23529,177 +21281,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfReferenceElement::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReferenceElement::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfReferenceElement::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReferenceElement::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfReferenceElement::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReferenceElement::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfReferenceElement::kValue:
         std::tie(
           the_value,
@@ -23975,63 +21589,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBlob::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBlob::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfBlob::kCategory:
         std::tie(
           the_category,
@@ -24044,120 +21612,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlob::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBlob::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfBlob::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBlob::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfBlob::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -24166,177 +21642,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBlob::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBlob::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfBlob::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBlob::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfBlob::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBlob::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfBlob::kValue:
         std::tie(
           the_value,
@@ -24627,63 +21965,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfFile::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfFile::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfFile::kCategory:
         std::tie(
           the_category,
@@ -24696,120 +21988,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfFile::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfFile::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfFile::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfFile::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -24818,177 +22018,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfFile::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfFile::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfFile::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfFile::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfFile::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfFile::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfFile::kValue:
         std::tie(
           the_value,
@@ -25285,63 +22347,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAnnotatedRelationshipElement::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfAnnotatedRelationshipElement::kCategory:
         std::tie(
           the_category,
@@ -25354,120 +22370,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfAnnotatedRelationshipElement::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfAnnotatedRelationshipElement::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -25476,177 +22400,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfAnnotatedRelationshipElement::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfAnnotatedRelationshipElement::kFirst:
         std::tie(
           the_first,
@@ -25663,63 +22449,17 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kAnnotations: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_annotations = std::vector<
-            std::shared_ptr<types::IDataElement>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IDataElement>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IDataElement>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = DataElementFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_annotations = std::vector<
-              std::shared_ptr<types::IDataElement>
-            >();
-            the_annotations->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_annotations->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfAnnotatedRelationshipElement::kAnnotations:
+        std::tie(
+          the_annotations,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IDataElement>
+        >(
+          reader,
+          DataElementFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -26019,63 +22759,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEntity::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEntity::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfEntity::kCategory:
         std::tie(
           the_category,
@@ -26088,120 +22782,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEntity::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfEntity::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEntity::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfEntity::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -26210,323 +22812,73 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEntity::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfEntity::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfEntity::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfEntity::kStatements: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_statements = std::vector<
-            std::shared_ptr<types::ISubmodelElement>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISubmodelElement>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISubmodelElement>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SubmodelElementFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_statements = std::vector<
-              std::shared_ptr<types::ISubmodelElement>
-            >();
-            the_statements->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_statements->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
-      case properties::OfEntity::kEntityType: {
-        common::optional<std::wstring> text;
+      case properties::OfEntity::kSupplementalSemanticIds:
         std::tie(
-          text,
+          the_supplemental_semantic_ids,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_entity_type = wstringification::EntityTypeFromWstring(
-          *text
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
         );
-
-        if (!the_entity_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of EntityType, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
         break;
-      }
+      case properties::OfEntity::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
+        break;
+      case properties::OfEntity::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
+        break;
+      case properties::OfEntity::kStatements:
+        std::tie(
+          the_statements,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISubmodelElement>
+        >(
+          reader,
+          SubmodelElementFromElement
+        );
+        break;
+      case properties::OfEntity::kEntityType:
+        std::tie(
+          the_entity_type,
+          error
+        ) = DeserializeEntityType(reader);
+        break;
       case properties::OfEntity::kGlobalAssetId:
         std::tie(
           the_global_asset_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kSpecificAssetIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_specific_asset_ids = std::vector<
-            std::shared_ptr<types::ISpecificAssetId>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISpecificAssetId>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISpecificAssetId>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SpecificAssetIdFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_specific_asset_ids = std::vector<
-              std::shared_ptr<types::ISpecificAssetId>
-            >();
-            the_specific_asset_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_specific_asset_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEntity::kSpecificAssetIds:
+        std::tie(
+          the_specific_asset_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISpecificAssetId>
+        >(
+          reader,
+          SpecificAssetIdFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -27146,63 +23498,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBasicEventElement::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBasicEventElement::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfBasicEventElement::kCategory:
         std::tie(
           the_category,
@@ -27215,120 +23521,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBasicEventElement::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfBasicEventElement::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBasicEventElement::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfBasicEventElement::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -27337,177 +23551,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBasicEventElement::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfBasicEventElement::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBasicEventElement::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfBasicEventElement::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfBasicEventElement::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       case properties::OfBasicEventElement::kObserved:
         std::tie(
           the_observed,
@@ -27516,58 +23592,18 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kDirection: {
-        common::optional<std::wstring> text;
+      case properties::OfBasicEventElement::kDirection:
         std::tie(
-          text,
+          the_direction,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_direction = wstringification::DirectionFromWstring(
-          *text
-        );
-
-        if (!the_direction.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of Direction, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeDirection(reader);
         break;
-      }
-      case properties::OfBasicEventElement::kState: {
-        common::optional<std::wstring> text;
+      case properties::OfBasicEventElement::kState:
         std::tie(
-          text,
+          the_state,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_state = wstringification::StateOfEventFromWstring(
-          *text
-        );
-
-        if (!the_state.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of StateOfEvent, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeStateOfEvent(reader);
         break;
-      }
       case properties::OfBasicEventElement::kMessageTopic:
         std::tie(
           the_message_topic,
@@ -27914,63 +23950,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfOperation::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfOperation::kCategory:
         std::tie(
           the_category,
@@ -27983,120 +23973,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfOperation::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfOperation::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfOperation::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -28105,348 +24003,72 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfOperation::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfOperation::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfOperation::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
-      case properties::OfOperation::kInputVariables: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_input_variables = std::vector<
-            std::shared_ptr<types::IOperationVariable>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IOperationVariable>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IOperationVariable>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = OperationVariableFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_input_variables = std::vector<
-              std::shared_ptr<types::IOperationVariable>
-            >();
-            the_input_variables->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_input_variables->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kInputVariables:
+        std::tie(
+          the_input_variables,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IOperationVariable>
+        >(
+          reader,
+          OperationVariableFromElement
+        );
         break;
-      }
-      case properties::OfOperation::kOutputVariables: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_output_variables = std::vector<
-            std::shared_ptr<types::IOperationVariable>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IOperationVariable>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IOperationVariable>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = OperationVariableFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_output_variables = std::vector<
-              std::shared_ptr<types::IOperationVariable>
-            >();
-            the_output_variables->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_output_variables->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kOutputVariables:
+        std::tie(
+          the_output_variables,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IOperationVariable>
+        >(
+          reader,
+          OperationVariableFromElement
+        );
         break;
-      }
-      case properties::OfOperation::kInoutputVariables: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_inoutput_variables = std::vector<
-            std::shared_ptr<types::IOperationVariable>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IOperationVariable>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IOperationVariable>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = OperationVariableFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_inoutput_variables = std::vector<
-              std::shared_ptr<types::IOperationVariable>
-            >();
-            the_inoutput_variables->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_inoutput_variables->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfOperation::kInoutputVariables:
+        std::tie(
+          the_inoutput_variables,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IOperationVariable>
+        >(
+          reader,
+          OperationVariableFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -28938,63 +24560,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfCapability::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfCapability::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfCapability::kCategory:
         std::tie(
           the_category,
@@ -29007,120 +24583,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfCapability::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfCapability::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfCapability::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfCapability::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfCapability::kSemanticId:
         std::tie(
           the_semantic_id,
@@ -29129,177 +24613,39 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfCapability::kSupplementalSemanticIds: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_supplemental_semantic_ids = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_supplemental_semantic_ids = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_supplemental_semantic_ids->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_supplemental_semantic_ids->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfCapability::kSupplementalSemanticIds:
+        std::tie(
+          the_supplemental_semantic_ids,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
-      case properties::OfCapability::kQualifiers: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_qualifiers = std::vector<
-            std::shared_ptr<types::IQualifier>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IQualifier>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IQualifier>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = QualifierFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_qualifiers = std::vector<
-              std::shared_ptr<types::IQualifier>
-            >();
-            the_qualifiers->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_qualifiers->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfCapability::kQualifiers:
+        std::tie(
+          the_qualifiers,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IQualifier>
+        >(
+          reader,
+          QualifierFromElement
+        );
         break;
-      }
-      case properties::OfCapability::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfCapability::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -29556,63 +24902,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfConceptDescription::kExtensions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_extensions = std::vector<
-            std::shared_ptr<types::IExtension>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IExtension>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IExtension>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ExtensionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_extensions = std::vector<
-              std::shared_ptr<types::IExtension>
-            >();
-            the_extensions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_extensions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfConceptDescription::kExtensions:
+        std::tie(
+          the_extensions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IExtension>
+        >(
+          reader,
+          ExtensionFromElement
+        );
         break;
-      }
       case properties::OfConceptDescription::kCategory:
         std::tie(
           the_category,
@@ -29625,120 +24925,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kDisplayName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_display_name = std::vector<
-            std::shared_ptr<types::ILangStringNameType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringNameType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringNameType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringNameTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_display_name = std::vector<
-              std::shared_ptr<types::ILangStringNameType>
-            >();
-            the_display_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_display_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfConceptDescription::kDisplayName:
+        std::tie(
+          the_display_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringNameType>
+        >(
+          reader,
+          LangStringNameTypeFromElement
+        );
         break;
-      }
-      case properties::OfConceptDescription::kDescription: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_description = std::vector<
-            std::shared_ptr<types::ILangStringTextType>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringTextType>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringTextType>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringTextTypeFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_description = std::vector<
-              std::shared_ptr<types::ILangStringTextType>
-            >();
-            the_description->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_description->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfConceptDescription::kDescription:
+        std::tie(
+          the_description,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringTextType>
+        >(
+          reader,
+          LangStringTextTypeFromElement
+        );
         break;
-      }
       case properties::OfConceptDescription::kAdministration:
         std::tie(
           the_administration,
@@ -29753,120 +24961,28 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kEmbeddedDataSpecifications: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_embedded_data_specifications = std::vector<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = EmbeddedDataSpecificationFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_embedded_data_specifications = std::vector<
-              std::shared_ptr<types::IEmbeddedDataSpecification>
-            >();
-            the_embedded_data_specifications->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_embedded_data_specifications->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfConceptDescription::kEmbeddedDataSpecifications:
+        std::tie(
+          the_embedded_data_specifications,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IEmbeddedDataSpecification>
+        >(
+          reader,
+          EmbeddedDataSpecificationFromElement
+        );
         break;
-      }
-      case properties::OfConceptDescription::kIsCaseOf: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_is_case_of = std::vector<
-            std::shared_ptr<types::IReference>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IReference>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IReference>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ReferenceFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_is_case_of = std::vector<
-              std::shared_ptr<types::IReference>
-            >();
-            the_is_case_of->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_is_case_of->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfConceptDescription::kIsCaseOf:
+        std::tie(
+          the_is_case_of,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IReference>
+        >(
+          reader,
+          ReferenceFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -30107,32 +25223,12 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfReference::kType: {
-        common::optional<std::wstring> text;
+      case properties::OfReference::kType:
         std::tie(
-          text,
+          the_type,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_type = wstringification::ReferenceTypesFromWstring(
-          *text
-        );
-
-        if (!the_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of ReferenceTypes, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeReferenceTypes(reader);
         break;
-      }
       case properties::OfReference::kReferredSemanticId:
         std::tie(
           the_referred_semantic_id,
@@ -30141,63 +25237,17 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfReference::kKeys: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_keys = std::vector<
-            std::shared_ptr<types::IKey>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IKey>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IKey>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = KeyFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_keys = std::vector<
-              std::shared_ptr<types::IKey>
-            >();
-            the_keys->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_keys->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfReference::kKeys:
+        std::tie(
+          the_keys,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IKey>
+        >(
+          reader,
+          KeyFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -30432,32 +25482,12 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfKey::kType: {
-        common::optional<std::wstring> text;
+      case properties::OfKey::kType:
         std::tie(
-          text,
+          the_type,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_type = wstringification::KeyTypesFromWstring(
-          *text
-        );
-
-        if (!the_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of KeyTypes, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
+        ) = DeserializeKeyTypes(reader);
         break;
-      }
       case properties::OfKey::kValue:
         std::tie(
           the_value,
@@ -31201,177 +26231,39 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEnvironment::kAssetAdministrationShells: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_asset_administration_shells = std::vector<
-            std::shared_ptr<types::IAssetAdministrationShell>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IAssetAdministrationShell>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IAssetAdministrationShell>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = AssetAdministrationShellFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_asset_administration_shells = std::vector<
-              std::shared_ptr<types::IAssetAdministrationShell>
-            >();
-            the_asset_administration_shells->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_asset_administration_shells->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEnvironment::kAssetAdministrationShells:
+        std::tie(
+          the_asset_administration_shells,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IAssetAdministrationShell>
+        >(
+          reader,
+          AssetAdministrationShellFromElement
+        );
         break;
-      }
-      case properties::OfEnvironment::kSubmodels: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_submodels = std::vector<
-            std::shared_ptr<types::ISubmodel>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISubmodel>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISubmodel>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SubmodelFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_submodels = std::vector<
-              std::shared_ptr<types::ISubmodel>
-            >();
-            the_submodels->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_submodels->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEnvironment::kSubmodels:
+        std::tie(
+          the_submodels,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISubmodel>
+        >(
+          reader,
+          SubmodelFromElement
+        );
         break;
-      }
-      case properties::OfEnvironment::kConceptDescriptions: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_concept_descriptions = std::vector<
-            std::shared_ptr<types::IConceptDescription>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IConceptDescription>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IConceptDescription>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ConceptDescriptionFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_concept_descriptions = std::vector<
-              std::shared_ptr<types::IConceptDescription>
-            >();
-            the_concept_descriptions->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_concept_descriptions->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfEnvironment::kConceptDescriptions:
+        std::tie(
+          the_concept_descriptions,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IConceptDescription>
+        >(
+          reader,
+          ConceptDescriptionFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -32361,63 +27253,17 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfValueList::kValueReferencePairs: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_value_reference_pairs = std::vector<
-            std::shared_ptr<types::IValueReferencePair>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IValueReferencePair>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IValueReferencePair>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = ValueReferencePairFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_value_reference_pairs = std::vector<
-              std::shared_ptr<types::IValueReferencePair>
-            >();
-            the_value_reference_pairs->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_value_reference_pairs->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfValueList::kValueReferencePairs:
+        std::tie(
+          the_value_reference_pairs,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IValueReferencePair>
+        >(
+          reader,
+          ValueReferencePairFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -33415,120 +28261,28 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfDataSpecificationIec61360::kPreferredName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_preferred_name = std::vector<
-            std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringPreferredNameTypeIec61360FromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_preferred_name = std::vector<
-              std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-            >();
-            the_preferred_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_preferred_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfDataSpecificationIec61360::kPreferredName:
+        std::tie(
+          the_preferred_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+        >(
+          reader,
+          LangStringPreferredNameTypeIec61360FromElement
+        );
         break;
-      }
-      case properties::OfDataSpecificationIec61360::kShortName: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_short_name = std::vector<
-            std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringShortNameTypeIec61360FromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_short_name = std::vector<
-              std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-            >();
-            the_short_name->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_short_name->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfDataSpecificationIec61360::kShortName:
+        std::tie(
+          the_short_name,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+        >(
+          reader,
+          LangStringShortNameTypeIec61360FromElement
+        );
         break;
-      }
       case properties::OfDataSpecificationIec61360::kUnit:
         std::tie(
           the_unit,
@@ -33555,89 +28309,23 @@ std::pair<
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kDataType: {
-        common::optional<std::wstring> text;
+      case properties::OfDataSpecificationIec61360::kDataType:
         std::tie(
-          text,
+          the_data_type,
           error
-        ) = DeserializeWstring(reader);
-
-        if (error.has_value()) {
-          break;
-        }
-
-        the_data_type = wstringification::DataTypeIec61360FromWstring(
-          *text
+        ) = DeserializeDataTypeIec61360(reader);
+        break;
+      case properties::OfDataSpecificationIec61360::kDefinition:
+        std::tie(
+          the_definition,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+        >(
+          reader,
+          LangStringDefinitionTypeIec61360FromElement
         );
-
-        if (!the_data_type.has_value()) {
-          error = common::make_optional<DeserializationError>(
-            common::Concat(
-              L"Expected to parse a literal of DataTypeIec61360, "
-              L"but got: ",
-              *text
-            )
-          );
-        }
         break;
-      }
-      case properties::OfDataSpecificationIec61360::kDefinition: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_definition = std::vector<
-            std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = LangStringDefinitionTypeIec61360FromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_definition = std::vector<
-              std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-            >();
-            the_definition->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_definition->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
-        break;
-      }
       case properties::OfDataSpecificationIec61360::kValueFormat:
         std::tie(
           the_value_format,
@@ -37101,6 +31789,313 @@ void SelfClosingWriter::WriteStringWithoutEscapingNorFlushing(
 
 // endregion SelfClosingWriter
 
+common::optional<SerializationError> SerializeBool(
+  bool value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeBool(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeInt64(
+  int64_t value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeInt64(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeDouble(
+  double value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeDouble(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeWstring(
+  const std::wstring& value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeWstring(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeByteArray(
+  const std::vector<std::uint8_t>& value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeByteArray(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize a list of instances.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializeListOfInstances(
+  const std::vector<T>& list,
+  SelfClosingWriter& writer,
+  const SerializeT& serialize_item
+) {
+  for (size_t i = 0; i < list.size(); ++i) {
+    common::optional<SerializationError> error = serialize_item(
+      list[i],
+      writer
+    );
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(i)
+      );
+
+      return error;
+    }
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of ModellingKind
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeModellingKind(
+  types::ModellingKind that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of QualifierKind
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeQualifierKind(
+  types::QualifierKind that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of AssetKind
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeAssetKind(
+  types::AssetKind that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of AasSubmodelElements
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeAasSubmodelElements(
+  types::AasSubmodelElements that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of EntityType
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeEntityType(
+  types::EntityType that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of Direction
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeDirection(
+  types::Direction that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of StateOfEvent
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeStateOfEvent(
+  types::StateOfEvent that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of ReferenceTypes
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeReferenceTypes(
+  types::ReferenceTypes that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of KeyTypes
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeKeyTypes(
+  types::KeyTypes that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of DataTypeDefXsd
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeDataTypeDefXsd(
+  types::DataTypeDefXsd that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize the literal of DataTypeIec61360
+ * to XML text.
+ */
+common::optional<SerializationError> SerializeDataTypeIec61360(
+  types::DataTypeIec61360 that,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeString(
+    stringification::to_string(
+      that
+    )
+  );
+  if (writer.error()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37111,6 +32106,12 @@ void SelfClosingWriter::WriteStringWithoutEscapingNorFlushing(
  */
 common::optional<SerializationError> SerializeHasSemanticsAsElement(
   const types::IHasSemantics& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeHasSemanticsAsElement(const types::IHasSemantics&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeHasSemanticsPtrAsElement(
+  const std::shared_ptr<types::IHasSemantics>& that,
   SelfClosingWriter& writer
 );
 
@@ -37140,6 +32141,12 @@ common::optional<SerializationError> SerializeExtensionAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeExtensionAsElement(const types::IExtension&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeExtensionPtrAsElement(
+  const std::shared_ptr<types::IExtension>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37150,6 +32157,12 @@ common::optional<SerializationError> SerializeExtensionAsElement(
  */
 common::optional<SerializationError> SerializeHasExtensionsAsElement(
   const types::IHasExtensions& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeHasExtensionsAsElement(const types::IHasExtensions&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeHasExtensionsPtrAsElement(
+  const std::shared_ptr<types::IHasExtensions>& that,
   SelfClosingWriter& writer
 );
 
@@ -37166,6 +32179,12 @@ common::optional<SerializationError> SerializeReferableAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeReferableAsElement(const types::IReferable&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeReferablePtrAsElement(
+  const std::shared_ptr<types::IReferable>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37176,6 +32195,12 @@ common::optional<SerializationError> SerializeReferableAsElement(
  */
 common::optional<SerializationError> SerializeIdentifiableAsElement(
   const types::IIdentifiable& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeIdentifiableAsElement(const types::IIdentifiable&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeIdentifiablePtrAsElement(
+  const std::shared_ptr<types::IIdentifiable>& that,
   SelfClosingWriter& writer
 );
 
@@ -37192,6 +32217,12 @@ common::optional<SerializationError> SerializeHasKindAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeHasKindAsElement(const types::IHasKind&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeHasKindPtrAsElement(
+  const std::shared_ptr<types::IHasKind>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37202,6 +32233,12 @@ common::optional<SerializationError> SerializeHasKindAsElement(
  */
 common::optional<SerializationError> SerializeHasDataSpecificationAsElement(
   const types::IHasDataSpecification& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeHasDataSpecificationAsElement(const types::IHasDataSpecification&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeHasDataSpecificationPtrAsElement(
+  const std::shared_ptr<types::IHasDataSpecification>& that,
   SelfClosingWriter& writer
 );
 
@@ -37231,6 +32268,12 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsElement
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeAdministrativeInformationAsElement(const types::IAdministrativeInformation&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAdministrativeInformationPtrAsElement(
+  const std::shared_ptr<types::IAdministrativeInformation>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37241,6 +32284,12 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsElement
  */
 common::optional<SerializationError> SerializeQualifiableAsElement(
   const types::IQualifiable& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeQualifiableAsElement(const types::IQualifiable&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeQualifiablePtrAsElement(
+  const std::shared_ptr<types::IQualifiable>& that,
   SelfClosingWriter& writer
 );
 
@@ -37270,6 +32319,12 @@ common::optional<SerializationError> SerializeQualifierAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeQualifierAsElement(const types::IQualifier&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeQualifierPtrAsElement(
+  const std::shared_ptr<types::IQualifier>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37293,6 +32348,12 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
  */
 common::optional<SerializationError> SerializeAssetAdministrationShellAsElement(
   const types::IAssetAdministrationShell& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeAssetAdministrationShellAsElement(const types::IAssetAdministrationShell&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAssetAdministrationShellPtrAsElement(
+  const std::shared_ptr<types::IAssetAdministrationShell>& that,
   SelfClosingWriter& writer
 );
 
@@ -37322,6 +32383,12 @@ common::optional<SerializationError> SerializeAssetInformationAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeAssetInformationAsElement(const types::IAssetInformation&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAssetInformationPtrAsElement(
+  const std::shared_ptr<types::IAssetInformation>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37345,6 +32412,12 @@ common::optional<SerializationError> SerializeResourceAsSequence(
  */
 common::optional<SerializationError> SerializeResourceAsElement(
   const types::IResource& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeResourceAsElement(const types::IResource&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeResourcePtrAsElement(
+  const std::shared_ptr<types::IResource>& that,
   SelfClosingWriter& writer
 );
 
@@ -37374,6 +32447,12 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeSpecificAssetIdAsElement(const types::ISpecificAssetId&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSpecificAssetIdPtrAsElement(
+  const std::shared_ptr<types::ISpecificAssetId>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37400,6 +32479,12 @@ common::optional<SerializationError> SerializeSubmodelAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeSubmodelAsElement(const types::ISubmodel&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSubmodelPtrAsElement(
+  const std::shared_ptr<types::ISubmodel>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37410,6 +32495,12 @@ common::optional<SerializationError> SerializeSubmodelAsElement(
  */
 common::optional<SerializationError> SerializeSubmodelElementAsElement(
   const types::ISubmodelElement& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeSubmodelElementAsElement(const types::ISubmodelElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSubmodelElementPtrAsElement(
+  const std::shared_ptr<types::ISubmodelElement>& that,
   SelfClosingWriter& writer
 );
 
@@ -37440,6 +32531,12 @@ common::optional<SerializationError> SerializeRelationshipElementAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeRelationshipElementAsElement(const types::IRelationshipElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeRelationshipElementPtrAsElement(
+  const std::shared_ptr<types::IRelationshipElement>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37463,6 +32560,12 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
  */
 common::optional<SerializationError> SerializeSubmodelElementListAsElement(
   const types::ISubmodelElementList& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeSubmodelElementListAsElement(const types::ISubmodelElementList&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSubmodelElementListPtrAsElement(
+  const std::shared_ptr<types::ISubmodelElementList>& that,
   SelfClosingWriter& writer
 );
 
@@ -37492,6 +32595,12 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsElement
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeSubmodelElementCollectionAsElement(const types::ISubmodelElementCollection&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSubmodelElementCollectionPtrAsElement(
+  const std::shared_ptr<types::ISubmodelElementCollection>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37502,6 +32611,12 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsElement
  */
 common::optional<SerializationError> SerializeDataElementAsElement(
   const types::IDataElement& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeDataElementAsElement(const types::IDataElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeDataElementPtrAsElement(
+  const std::shared_ptr<types::IDataElement>& that,
   SelfClosingWriter& writer
 );
 
@@ -37531,6 +32646,12 @@ common::optional<SerializationError> SerializePropertyAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializePropertyAsElement(const types::IProperty&, SelfClosingWriter& */
+common::optional<SerializationError> SerializePropertyPtrAsElement(
+  const std::shared_ptr<types::IProperty>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37554,6 +32675,12 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
  */
 common::optional<SerializationError> SerializeMultiLanguagePropertyAsElement(
   const types::IMultiLanguageProperty& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeMultiLanguagePropertyAsElement(const types::IMultiLanguageProperty&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeMultiLanguagePropertyPtrAsElement(
+  const std::shared_ptr<types::IMultiLanguageProperty>& that,
   SelfClosingWriter& writer
 );
 
@@ -37583,6 +32710,12 @@ common::optional<SerializationError> SerializeRangeAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeRangeAsElement(const types::IRange&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeRangePtrAsElement(
+  const std::shared_ptr<types::IRange>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37606,6 +32739,12 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
  */
 common::optional<SerializationError> SerializeReferenceElementAsElement(
   const types::IReferenceElement& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeReferenceElementAsElement(const types::IReferenceElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeReferenceElementPtrAsElement(
+  const std::shared_ptr<types::IReferenceElement>& that,
   SelfClosingWriter& writer
 );
 
@@ -37635,6 +32774,12 @@ common::optional<SerializationError> SerializeBlobAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeBlobAsElement(const types::IBlob&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeBlobPtrAsElement(
+  const std::shared_ptr<types::IBlob>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37658,6 +32803,12 @@ common::optional<SerializationError> SerializeFileAsSequence(
  */
 common::optional<SerializationError> SerializeFileAsElement(
   const types::IFile& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeFileAsElement(const types::IFile&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeFilePtrAsElement(
+  const std::shared_ptr<types::IFile>& that,
   SelfClosingWriter& writer
 );
 
@@ -37687,6 +32838,12 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsElem
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeAnnotatedRelationshipElementAsElement(const types::IAnnotatedRelationshipElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAnnotatedRelationshipElementPtrAsElement(
+  const std::shared_ptr<types::IAnnotatedRelationshipElement>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37710,6 +32867,12 @@ common::optional<SerializationError> SerializeEntityAsSequence(
  */
 common::optional<SerializationError> SerializeEntityAsElement(
   const types::IEntity& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeEntityAsElement(const types::IEntity&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeEntityPtrAsElement(
+  const std::shared_ptr<types::IEntity>& that,
   SelfClosingWriter& writer
 );
 
@@ -37739,6 +32902,12 @@ common::optional<SerializationError> SerializeEventPayloadAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeEventPayloadAsElement(const types::IEventPayload&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeEventPayloadPtrAsElement(
+  const std::shared_ptr<types::IEventPayload>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37749,6 +32918,12 @@ common::optional<SerializationError> SerializeEventPayloadAsElement(
  */
 common::optional<SerializationError> SerializeEventElementAsElement(
   const types::IEventElement& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeEventElementAsElement(const types::IEventElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeEventElementPtrAsElement(
+  const std::shared_ptr<types::IEventElement>& that,
   SelfClosingWriter& writer
 );
 
@@ -37778,6 +32953,12 @@ common::optional<SerializationError> SerializeBasicEventElementAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeBasicEventElementAsElement(const types::IBasicEventElement&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeBasicEventElementPtrAsElement(
+  const std::shared_ptr<types::IBasicEventElement>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37801,6 +32982,12 @@ common::optional<SerializationError> SerializeOperationAsSequence(
  */
 common::optional<SerializationError> SerializeOperationAsElement(
   const types::IOperation& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeOperationAsElement(const types::IOperation&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeOperationPtrAsElement(
+  const std::shared_ptr<types::IOperation>& that,
   SelfClosingWriter& writer
 );
 
@@ -37830,6 +33017,12 @@ common::optional<SerializationError> SerializeOperationVariableAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeOperationVariableAsElement(const types::IOperationVariable&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeOperationVariablePtrAsElement(
+  const std::shared_ptr<types::IOperationVariable>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37853,6 +33046,12 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
  */
 common::optional<SerializationError> SerializeCapabilityAsElement(
   const types::ICapability& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeCapabilityAsElement(const types::ICapability&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeCapabilityPtrAsElement(
+  const std::shared_ptr<types::ICapability>& that,
   SelfClosingWriter& writer
 );
 
@@ -37882,6 +33081,12 @@ common::optional<SerializationError> SerializeConceptDescriptionAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeConceptDescriptionAsElement(const types::IConceptDescription&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeConceptDescriptionPtrAsElement(
+  const std::shared_ptr<types::IConceptDescription>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37905,6 +33110,12 @@ common::optional<SerializationError> SerializeReferenceAsSequence(
  */
 common::optional<SerializationError> SerializeReferenceAsElement(
   const types::IReference& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeReferenceAsElement(const types::IReference&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeReferencePtrAsElement(
+  const std::shared_ptr<types::IReference>& that,
   SelfClosingWriter& writer
 );
 
@@ -37934,6 +33145,12 @@ common::optional<SerializationError> SerializeKeyAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeKeyAsElement(const types::IKey&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeKeyPtrAsElement(
+  const std::shared_ptr<types::IKey>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -37944,6 +33161,12 @@ common::optional<SerializationError> SerializeKeyAsElement(
  */
 common::optional<SerializationError> SerializeAbstractLangStringAsElement(
   const types::IAbstractLangString& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeAbstractLangStringAsElement(const types::IAbstractLangString&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAbstractLangStringPtrAsElement(
+  const std::shared_ptr<types::IAbstractLangString>& that,
   SelfClosingWriter& writer
 );
 
@@ -37973,6 +33196,12 @@ common::optional<SerializationError> SerializeLangStringNameTypeAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeLangStringNameTypeAsElement(const types::ILangStringNameType&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeLangStringNameTypePtrAsElement(
+  const std::shared_ptr<types::ILangStringNameType>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -37996,6 +33225,12 @@ common::optional<SerializationError> SerializeLangStringTextTypeAsSequence(
  */
 common::optional<SerializationError> SerializeLangStringTextTypeAsElement(
   const types::ILangStringTextType& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeLangStringTextTypeAsElement(const types::ILangStringTextType&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeLangStringTextTypePtrAsElement(
+  const std::shared_ptr<types::ILangStringTextType>& that,
   SelfClosingWriter& writer
 );
 
@@ -38025,6 +33260,12 @@ common::optional<SerializationError> SerializeEnvironmentAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeEnvironmentAsElement(const types::IEnvironment&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeEnvironmentPtrAsElement(
+  const std::shared_ptr<types::IEnvironment>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -38035,6 +33276,12 @@ common::optional<SerializationError> SerializeEnvironmentAsElement(
  */
 common::optional<SerializationError> SerializeDataSpecificationContentAsElement(
   const types::IDataSpecificationContent& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeDataSpecificationContentAsElement(const types::IDataSpecificationContent&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeDataSpecificationContentPtrAsElement(
+  const std::shared_ptr<types::IDataSpecificationContent>& that,
   SelfClosingWriter& writer
 );
 
@@ -38064,6 +33311,12 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsElement
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeEmbeddedDataSpecificationAsElement(const types::IEmbeddedDataSpecification&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeEmbeddedDataSpecificationPtrAsElement(
+  const std::shared_ptr<types::IEmbeddedDataSpecification>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -38087,6 +33340,12 @@ common::optional<SerializationError> SerializeLevelTypeAsSequence(
  */
 common::optional<SerializationError> SerializeLevelTypeAsElement(
   const types::ILevelType& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeLevelTypeAsElement(const types::ILevelType&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeLevelTypePtrAsElement(
+  const std::shared_ptr<types::ILevelType>& that,
   SelfClosingWriter& writer
 );
 
@@ -38116,6 +33375,12 @@ common::optional<SerializationError> SerializeValueReferencePairAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeValueReferencePairAsElement(const types::IValueReferencePair&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeValueReferencePairPtrAsElement(
+  const std::shared_ptr<types::IValueReferencePair>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -38139,6 +33404,12 @@ common::optional<SerializationError> SerializeValueListAsSequence(
  */
 common::optional<SerializationError> SerializeValueListAsElement(
   const types::IValueList& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeValueListAsElement(const types::IValueList&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeValueListPtrAsElement(
+  const std::shared_ptr<types::IValueList>& that,
   SelfClosingWriter& writer
 );
 
@@ -38168,6 +33439,12 @@ common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec6136
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeLangStringPreferredNameTypeIec61360AsElement(const types::ILangStringPreferredNameTypeIec61360&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec61360PtrAsElement(
+  const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -38191,6 +33468,12 @@ common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360AsS
  */
 common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360AsElement(
   const types::ILangStringShortNameTypeIec61360& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeLangStringShortNameTypeIec61360AsElement(const types::ILangStringShortNameTypeIec61360&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360PtrAsElement(
+  const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& that,
   SelfClosingWriter& writer
 );
 
@@ -38220,6 +33503,12 @@ common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360As
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeLangStringDefinitionTypeIec61360AsElement(const types::ILangStringDefinitionTypeIec61360&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360PtrAsElement(
+  const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -38243,6 +33532,12 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
  */
 common::optional<SerializationError> SerializeDataSpecificationIec61360AsElement(
   const types::IDataSpecificationIec61360& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeDataSpecificationIec61360AsElement(const types::IDataSpecificationIec61360&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeDataSpecificationIec61360PtrAsElement(
+  const std::shared_ptr<types::IDataSpecificationIec61360>& that,
   SelfClosingWriter& writer
 );
 
@@ -38391,6 +33686,13 @@ common::optional<SerializationError> SerializeHasSemanticsAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeHasSemanticsPtrAsElement(
+  const std::shared_ptr<types::IHasSemantics>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeHasSemanticsAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -38406,13 +33708,7 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -38420,7 +33716,7 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -38448,41 +33744,18 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -38508,21 +33781,16 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
     }
   }
 
-  const std::wstring& the_name(
-    that.name()
-  );
   writer.StartElement(
     "name"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_name
+  error = SerializeWstring(
+    that.name(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -38547,27 +33815,17 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
     return error;
   }
 
-  const auto& maybe_value_type(
-    that.value_type()
-  );
-  if (maybe_value_type.has_value()) {
-    types::DataTypeDefXsd the_value_type(
-      *maybe_value_type
-    );
+  if (that.value_type().has_value()) {
     writer.StartElement(
       "valueType"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeString(
-      stringification::to_string(
-        the_value_type
-      )
+    error = SerializeDataTypeDefXsd(
+      *(that.value_type()),
+      writer
     );
-    if (writer.error()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -38593,25 +33851,17 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::wstring& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_value
+    error = SerializeWstring(
+      *(that.value()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -38637,41 +33887,18 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
     }
   }
 
-  const auto& maybe_refers_to(
-    that.refers_to()
-  );
-  if (maybe_refers_to.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_refers_to(
-      *maybe_refers_to
-    );
+  if (that.refers_to().has_value()) {
     writer.StartElement(
       "refersTo"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_refers_to.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_refers_to[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.refers_to()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -38739,6 +33966,13 @@ common::optional<SerializationError> SerializeExtensionAsElement(
   }
 
   return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeExtensionPtrAsElement(
+  const std::shared_ptr<types::IExtension>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeExtensionAsElement(*that, writer);
 }
 
 common::optional<SerializationError> SerializeHasExtensionsAsElement(
@@ -38879,6 +34113,13 @@ common::optional<SerializationError> SerializeHasExtensionsAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeHasExtensionsPtrAsElement(
+  const std::shared_ptr<types::IHasExtensions>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeHasExtensionsAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeReferableAsElement(
   const types::IReferable& that,
   SelfClosingWriter& writer
@@ -39017,6 +34258,13 @@ common::optional<SerializationError> SerializeReferableAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeReferablePtrAsElement(
+  const std::shared_ptr<types::IReferable>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeReferableAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeIdentifiableAsElement(
   const types::IIdentifiable& that,
   SelfClosingWriter& writer
@@ -39057,6 +34305,13 @@ common::optional<SerializationError> SerializeIdentifiableAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeIdentifiablePtrAsElement(
+  const std::shared_ptr<types::IIdentifiable>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeIdentifiableAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeHasKindAsElement(
   const types::IHasKind& that,
   SelfClosingWriter& writer
@@ -39081,6 +34336,13 @@ common::optional<SerializationError> SerializeHasKindAsElement(
         )
       );
   };
+}
+
+common::optional<SerializationError> SerializeHasKindPtrAsElement(
+  const std::shared_ptr<types::IHasKind>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeHasKindAsElement(*that, writer);
 }
 
 common::optional<SerializationError> SerializeHasDataSpecificationAsElement(
@@ -39228,6 +34490,13 @@ common::optional<SerializationError> SerializeHasDataSpecificationAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeHasDataSpecificationPtrAsElement(
+  const std::shared_ptr<types::IHasDataSpecification>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeHasDataSpecificationAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -39243,41 +34512,18 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39303,25 +34549,17 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
     }
   }
 
-  const auto& maybe_version(
-    that.version()
-  );
-  if (maybe_version.has_value()) {
-    const std::wstring& the_version(
-      *maybe_version
-    );
+  if (that.version().has_value()) {
     writer.StartElement(
       "version"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_version
+    error = SerializeWstring(
+      *(that.version()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39347,25 +34585,17 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
     }
   }
 
-  const auto& maybe_revision(
-    that.revision()
-  );
-  if (maybe_revision.has_value()) {
-    const std::wstring& the_revision(
-      *maybe_revision
-    );
+  if (that.revision().has_value()) {
     writer.StartElement(
       "revision"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_revision
+    error = SerializeWstring(
+      *(that.revision()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39391,13 +34621,7 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
     }
   }
 
-  const auto& maybe_creator(
-    that.creator()
-  );
-  if (maybe_creator.has_value()) {
-    const std::shared_ptr<types::IReference>& the_creator(
-      *maybe_creator
-    );
+  if (that.creator().has_value()) {
     writer.StartElement(
       "creator"
     );
@@ -39405,7 +34629,7 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_creator,
+      *(*(that.creator())),
       writer
     );
     if (error.has_value()) {
@@ -39433,25 +34657,17 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
     }
   }
 
-  const auto& maybe_template_id(
-    that.template_id()
-  );
-  if (maybe_template_id.has_value()) {
-    const std::wstring& the_template_id(
-      *maybe_template_id
-    );
+  if (that.template_id().has_value()) {
     writer.StartElement(
       "templateId"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_template_id
+    error = SerializeWstring(
+      *(that.template_id()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39519,6 +34735,13 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsElement
   }
 
   return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeAdministrativeInformationPtrAsElement(
+  const std::shared_ptr<types::IAdministrativeInformation>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAdministrativeInformationAsElement(*that, writer);
 }
 
 common::optional<SerializationError> SerializeQualifiableAsElement(
@@ -39645,6 +34868,13 @@ common::optional<SerializationError> SerializeQualifiableAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeQualifiablePtrAsElement(
+  const std::shared_ptr<types::IQualifiable>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeQualifiableAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -39660,13 +34890,7 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -39674,7 +34898,7 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -39702,41 +34926,18 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39762,27 +34963,17 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
     }
   }
 
-  const auto& maybe_kind(
-    that.kind()
-  );
-  if (maybe_kind.has_value()) {
-    types::QualifierKind the_kind(
-      *maybe_kind
-    );
+  if (that.kind().has_value()) {
     writer.StartElement(
       "kind"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeString(
-      stringification::to_string(
-        the_kind
-      )
+    error = SerializeQualifierKind(
+      *(that.kind()),
+      writer
     );
-    if (writer.error()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39808,21 +34999,16 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
     }
   }
 
-  const std::wstring& the_type(
-    that.type()
-  );
   writer.StartElement(
     "type"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_type
+  error = SerializeWstring(
+    that.type(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -39847,23 +35033,16 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
     return error;
   }
 
-  types::DataTypeDefXsd the_value_type(
-    that.value_type()
-  );
   writer.StartElement(
     "valueType"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_value_type
-    )
+  error = SerializeDataTypeDefXsd(
+    that.value_type(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -39888,25 +35067,17 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
     return error;
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::wstring& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_value
+    error = SerializeWstring(
+      *(that.value()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -39932,13 +35103,7 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
     }
   }
 
-  const auto& maybe_value_id(
-    that.value_id()
-  );
-  if (maybe_value_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_value_id(
-      *maybe_value_id
-    );
+  if (that.value_id().has_value()) {
     writer.StartElement(
       "valueId"
     );
@@ -39946,7 +35111,7 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_value_id,
+      *(*(that.value_id())),
       writer
     );
     if (error.has_value()) {
@@ -40018,6 +35183,13 @@ common::optional<SerializationError> SerializeQualifierAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeQualifierPtrAsElement(
+  const std::shared_ptr<types::IQualifier>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeQualifierAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -40033,41 +35205,18 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40093,25 +35242,17 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40137,25 +35278,17 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40181,41 +35314,18 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40241,41 +35351,18 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40301,13 +35388,7 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const auto& maybe_administration(
-    that.administration()
-  );
-  if (maybe_administration.has_value()) {
-    const std::shared_ptr<types::IAdministrativeInformation>& the_administration(
-      *maybe_administration
-    );
+  if (that.administration().has_value()) {
     writer.StartElement(
       "administration"
     );
@@ -40315,7 +35396,7 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
       return writer.move_error();
     }
     error = SerializeAdministrativeInformationAsSequence(
-      *the_administration,
+      *(*(that.administration())),
       writer
     );
     if (error.has_value()) {
@@ -40343,21 +35424,16 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const std::wstring& the_id(
-    that.id()
-  );
   writer.StartElement(
     "id"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_id
+  error = SerializeWstring(
+    that.id(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -40382,41 +35458,18 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     return error;
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40442,13 +35495,7 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const auto& maybe_derived_from(
-    that.derived_from()
-  );
-  if (maybe_derived_from.has_value()) {
-    const std::shared_ptr<types::IReference>& the_derived_from(
-      *maybe_derived_from
-    );
+  if (that.derived_from().has_value()) {
     writer.StartElement(
       "derivedFrom"
     );
@@ -40456,7 +35503,7 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_derived_from,
+      *(*(that.derived_from())),
       writer
     );
     if (error.has_value()) {
@@ -40484,9 +35531,6 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     }
   }
 
-  const std::shared_ptr<types::IAssetInformation>& the_asset_information(
-    that.asset_information()
-  );
   writer.StartElement(
     "assetInformation"
   );
@@ -40494,7 +35538,7 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     return writer.move_error();
   }
   error = SerializeAssetInformationAsSequence(
-    *the_asset_information,
+    *(that.asset_information()),
     writer
   );
   if (error.has_value()) {
@@ -40521,41 +35565,18 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
     return error;
   }
 
-  const auto& maybe_submodels(
-    that.submodels()
-  );
-  if (maybe_submodels.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_submodels(
-      *maybe_submodels
-    );
+  if (that.submodels().has_value()) {
     writer.StartElement(
       "submodels"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_submodels.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_submodels[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.submodels()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40625,6 +35646,13 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeAssetAdministrationShellPtrAsElement(
+  const std::shared_ptr<types::IAssetAdministrationShell>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAssetAdministrationShellAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -40640,23 +35668,16 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  types::AssetKind the_asset_kind(
-    that.asset_kind()
-  );
   writer.StartElement(
     "assetKind"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_asset_kind
-    )
+  error = SerializeAssetKind(
+    that.asset_kind(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -40681,25 +35702,17 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
     return error;
   }
 
-  const auto& maybe_global_asset_id(
-    that.global_asset_id()
-  );
-  if (maybe_global_asset_id.has_value()) {
-    const std::wstring& the_global_asset_id(
-      *maybe_global_asset_id
-    );
+  if (that.global_asset_id().has_value()) {
     writer.StartElement(
       "globalAssetId"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_global_asset_id
+    error = SerializeWstring(
+      *(that.global_asset_id()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40725,41 +35738,18 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
     }
   }
 
-  const auto& maybe_specific_asset_ids(
-    that.specific_asset_ids()
-  );
-  if (maybe_specific_asset_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISpecificAssetId>
-    >& the_specific_asset_ids(
-      *maybe_specific_asset_ids
-    );
+  if (that.specific_asset_ids().has_value()) {
     writer.StartElement(
       "specificAssetIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_specific_asset_ids.size(); ++i) {
-      const std::shared_ptr<types::ISpecificAssetId>& item(
-        the_specific_asset_ids[i]
-      );
-
-      error = SerializeSpecificAssetIdAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.specific_asset_ids()),
+      writer,
+      SerializeSpecificAssetIdPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40785,25 +35775,17 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
     }
   }
 
-  const auto& maybe_asset_type(
-    that.asset_type()
-  );
-  if (maybe_asset_type.has_value()) {
-    const std::wstring& the_asset_type(
-      *maybe_asset_type
-    );
+  if (that.asset_type().has_value()) {
     writer.StartElement(
       "assetType"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_asset_type
+    error = SerializeWstring(
+      *(that.asset_type()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -40829,13 +35811,7 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
     }
   }
 
-  const auto& maybe_default_thumbnail(
-    that.default_thumbnail()
-  );
-  if (maybe_default_thumbnail.has_value()) {
-    const std::shared_ptr<types::IResource>& the_default_thumbnail(
-      *maybe_default_thumbnail
-    );
+  if (that.default_thumbnail().has_value()) {
     writer.StartElement(
       "defaultThumbnail"
     );
@@ -40843,7 +35819,7 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
       return writer.move_error();
     }
     error = SerializeResourceAsSequence(
-      *the_default_thumbnail,
+      *(*(that.default_thumbnail())),
       writer
     );
     if (error.has_value()) {
@@ -40915,6 +35891,13 @@ common::optional<SerializationError> SerializeAssetInformationAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeAssetInformationPtrAsElement(
+  const std::shared_ptr<types::IAssetInformation>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAssetInformationAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -40930,21 +35913,16 @@ common::optional<SerializationError> SerializeResourceAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_path(
-    that.path()
-  );
   writer.StartElement(
     "path"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_path
+  error = SerializeWstring(
+    that.path(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -40969,25 +35947,17 @@ common::optional<SerializationError> SerializeResourceAsSequence(
     return error;
   }
 
-  const auto& maybe_content_type(
-    that.content_type()
-  );
-  if (maybe_content_type.has_value()) {
-    const std::wstring& the_content_type(
-      *maybe_content_type
-    );
+  if (that.content_type().has_value()) {
     writer.StartElement(
       "contentType"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_content_type
+    error = SerializeWstring(
+      *(that.content_type()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41057,6 +36027,13 @@ common::optional<SerializationError> SerializeResourceAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeResourcePtrAsElement(
+  const std::shared_ptr<types::IResource>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeResourceAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -41072,13 +36049,7 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -41086,7 +36057,7 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -41114,41 +36085,18 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41174,21 +36122,16 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
     }
   }
 
-  const std::wstring& the_name(
-    that.name()
-  );
   writer.StartElement(
     "name"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_name
+  error = SerializeWstring(
+    that.name(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -41213,21 +36156,16 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
     return error;
   }
 
-  const std::wstring& the_value(
-    that.value()
-  );
   writer.StartElement(
     "value"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_value
+  error = SerializeWstring(
+    that.value(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -41252,13 +36190,7 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
     return error;
   }
 
-  const auto& maybe_external_subject_id(
-    that.external_subject_id()
-  );
-  if (maybe_external_subject_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_external_subject_id(
-      *maybe_external_subject_id
-    );
+  if (that.external_subject_id().has_value()) {
     writer.StartElement(
       "externalSubjectId"
     );
@@ -41266,7 +36198,7 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_external_subject_id,
+      *(*(that.external_subject_id())),
       writer
     );
     if (error.has_value()) {
@@ -41338,6 +36270,13 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeSpecificAssetIdPtrAsElement(
+  const std::shared_ptr<types::ISpecificAssetId>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSpecificAssetIdAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -41353,41 +36292,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41413,25 +36329,17 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41457,25 +36365,17 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41501,41 +36401,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41561,41 +36438,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41621,13 +36475,7 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_administration(
-    that.administration()
-  );
-  if (maybe_administration.has_value()) {
-    const std::shared_ptr<types::IAdministrativeInformation>& the_administration(
-      *maybe_administration
-    );
+  if (that.administration().has_value()) {
     writer.StartElement(
       "administration"
     );
@@ -41635,7 +36483,7 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
       return writer.move_error();
     }
     error = SerializeAdministrativeInformationAsSequence(
-      *the_administration,
+      *(*(that.administration())),
       writer
     );
     if (error.has_value()) {
@@ -41663,21 +36511,16 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const std::wstring& the_id(
-    that.id()
-  );
   writer.StartElement(
     "id"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_id
+  error = SerializeWstring(
+    that.id(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -41702,27 +36545,17 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     return error;
   }
 
-  const auto& maybe_kind(
-    that.kind()
-  );
-  if (maybe_kind.has_value()) {
-    types::ModellingKind the_kind(
-      *maybe_kind
-    );
+  if (that.kind().has_value()) {
     writer.StartElement(
       "kind"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeString(
-      stringification::to_string(
-        the_kind
-      )
+    error = SerializeModellingKind(
+      *(that.kind()),
+      writer
     );
-    if (writer.error()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41748,13 +36581,7 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -41762,7 +36589,7 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -41790,41 +36617,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41850,41 +36654,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41910,41 +36691,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -41970,41 +36728,18 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
     }
   }
 
-  const auto& maybe_submodel_elements(
-    that.submodel_elements()
-  );
-  if (maybe_submodel_elements.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    >& the_submodel_elements(
-      *maybe_submodel_elements
-    );
+  if (that.submodel_elements().has_value()) {
     writer.StartElement(
       "submodelElements"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_submodel_elements.size(); ++i) {
-      const std::shared_ptr<types::ISubmodelElement>& item(
-        the_submodel_elements[i]
-      );
-
-      error = SerializeSubmodelElementAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.submodel_elements()),
+      writer,
+      SerializeSubmodelElementPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42072,6 +36807,13 @@ common::optional<SerializationError> SerializeSubmodelAsElement(
   }
 
   return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeSubmodelPtrAsElement(
+  const std::shared_ptr<types::ISubmodel>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSubmodelAsElement(*that, writer);
 }
 
 common::optional<SerializationError> SerializeSubmodelElementAsElement(
@@ -42191,6 +36933,13 @@ common::optional<SerializationError> SerializeSubmodelElementAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeSubmodelElementPtrAsElement(
+  const std::shared_ptr<types::ISubmodelElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSubmodelElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -42206,41 +36955,18 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42266,25 +36992,17 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42310,25 +37028,17 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42354,41 +37064,18 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42414,41 +37101,18 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42474,13 +37138,7 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -42488,7 +37146,7 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -42516,41 +37174,18 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42576,41 +37211,18 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42636,41 +37248,18 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42696,9 +37285,6 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     }
   }
 
-  const std::shared_ptr<types::IReference>& the_first(
-    that.first()
-  );
   writer.StartElement(
     "first"
   );
@@ -42706,7 +37292,7 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_first,
+    *(that.first()),
     writer
   );
   if (error.has_value()) {
@@ -42733,9 +37319,6 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     return error;
   }
 
-  const std::shared_ptr<types::IReference>& the_second(
-    that.second()
-  );
   writer.StartElement(
     "second"
   );
@@ -42743,7 +37326,7 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_second,
+    *(that.second()),
     writer
   );
   if (error.has_value()) {
@@ -42856,6 +37439,13 @@ common::optional<SerializationError> SerializeRelationshipElementAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeRelationshipElementPtrAsElement(
+  const std::shared_ptr<types::IRelationshipElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeRelationshipElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -42871,41 +37461,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42931,25 +37498,17 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -42975,25 +37534,17 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43019,41 +37570,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43079,41 +37607,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43139,13 +37644,7 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -43153,7 +37652,7 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -43181,41 +37680,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43241,41 +37717,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43301,41 +37754,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43361,25 +37791,17 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_order_relevant(
-    that.order_relevant()
-  );
-  if (maybe_order_relevant.has_value()) {
-    bool the_order_relevant(
-      *maybe_order_relevant
-    );
+  if (that.order_relevant().has_value()) {
     writer.StartElement(
       "orderRelevant"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeBool(
-      the_order_relevant
+    error = SerializeBool(
+      *(that.order_relevant()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43405,13 +37827,7 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id_list_element(
-    that.semantic_id_list_element()
-  );
-  if (maybe_semantic_id_list_element.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id_list_element(
-      *maybe_semantic_id_list_element
-    );
+  if (that.semantic_id_list_element().has_value()) {
     writer.StartElement(
       "semanticIdListElement"
     );
@@ -43419,7 +37835,7 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id_list_element,
+      *(*(that.semantic_id_list_element())),
       writer
     );
     if (error.has_value()) {
@@ -43447,23 +37863,16 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  types::AasSubmodelElements the_type_value_list_element(
-    that.type_value_list_element()
-  );
   writer.StartElement(
     "typeValueListElement"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_type_value_list_element
-    )
+  error = SerializeAasSubmodelElements(
+    that.type_value_list_element(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -43488,27 +37897,17 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     return error;
   }
 
-  const auto& maybe_value_type_list_element(
-    that.value_type_list_element()
-  );
-  if (maybe_value_type_list_element.has_value()) {
-    types::DataTypeDefXsd the_value_type_list_element(
-      *maybe_value_type_list_element
-    );
+  if (that.value_type_list_element().has_value()) {
     writer.StartElement(
       "valueTypeListElement"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeString(
-      stringification::to_string(
-        the_value_type_list_element
-      )
+    error = SerializeDataTypeDefXsd(
+      *(that.value_type_list_element()),
+      writer
     );
-    if (writer.error()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43534,41 +37933,18 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    >& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_value.size(); ++i) {
-      const std::shared_ptr<types::ISubmodelElement>& item(
-        the_value[i]
-      );
-
-      error = SerializeSubmodelElementAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.value()),
+      writer,
+      SerializeSubmodelElementPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43638,6 +38014,13 @@ common::optional<SerializationError> SerializeSubmodelElementListAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeSubmodelElementListPtrAsElement(
+  const std::shared_ptr<types::ISubmodelElementList>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSubmodelElementListAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -43653,41 +38036,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43713,25 +38073,17 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43757,25 +38109,17 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43801,41 +38145,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43861,41 +38182,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -43921,13 +38219,7 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -43935,7 +38227,7 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -43963,41 +38255,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44023,41 +38292,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44083,41 +38329,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44143,41 +38366,18 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    >& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_value.size(); ++i) {
-      const std::shared_ptr<types::ISubmodelElement>& item(
-        the_value[i]
-      );
-
-      error = SerializeSubmodelElementAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.value()),
+      writer,
+      SerializeSubmodelElementPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44247,6 +38447,13 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsElement
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeSubmodelElementCollectionPtrAsElement(
+  const std::shared_ptr<types::ISubmodelElementCollection>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSubmodelElementCollectionAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeDataElementAsElement(
   const types::IDataElement& that,
   SelfClosingWriter& writer
@@ -44308,6 +38515,13 @@ common::optional<SerializationError> SerializeDataElementAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeDataElementPtrAsElement(
+  const std::shared_ptr<types::IDataElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeDataElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -44323,41 +38537,18 @@ common::optional<SerializationError> SerializePropertyAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44383,25 +38574,17 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44427,25 +38610,17 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44471,41 +38646,18 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44531,41 +38683,18 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44591,13 +38720,7 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -44605,7 +38728,7 @@ common::optional<SerializationError> SerializePropertyAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -44633,41 +38756,18 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44693,41 +38793,18 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44753,41 +38830,18 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44813,23 +38867,16 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  types::DataTypeDefXsd the_value_type(
-    that.value_type()
-  );
   writer.StartElement(
     "valueType"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_value_type
-    )
+  error = SerializeDataTypeDefXsd(
+    that.value_type(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -44854,25 +38901,17 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     return error;
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::wstring& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_value
+    error = SerializeWstring(
+      *(that.value()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -44898,13 +38937,7 @@ common::optional<SerializationError> SerializePropertyAsSequence(
     }
   }
 
-  const auto& maybe_value_id(
-    that.value_id()
-  );
-  if (maybe_value_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_value_id(
-      *maybe_value_id
-    );
+  if (that.value_id().has_value()) {
     writer.StartElement(
       "valueId"
     );
@@ -44912,7 +38945,7 @@ common::optional<SerializationError> SerializePropertyAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_value_id,
+      *(*(that.value_id())),
       writer
     );
     if (error.has_value()) {
@@ -44984,6 +39017,13 @@ common::optional<SerializationError> SerializePropertyAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializePropertyPtrAsElement(
+  const std::shared_ptr<types::IProperty>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializePropertyAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -44999,41 +39039,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45059,25 +39076,17 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45103,25 +39112,17 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45147,41 +39148,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45207,41 +39185,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45267,13 +39222,7 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -45281,7 +39230,7 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -45309,41 +39258,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45369,41 +39295,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45429,41 +39332,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45489,41 +39369,18 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_value.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_value[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.value()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45549,13 +39406,7 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
     }
   }
 
-  const auto& maybe_value_id(
-    that.value_id()
-  );
-  if (maybe_value_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_value_id(
-      *maybe_value_id
-    );
+  if (that.value_id().has_value()) {
     writer.StartElement(
       "valueId"
     );
@@ -45563,7 +39414,7 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_value_id,
+      *(*(that.value_id())),
       writer
     );
     if (error.has_value()) {
@@ -45635,6 +39486,13 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeMultiLanguagePropertyPtrAsElement(
+  const std::shared_ptr<types::IMultiLanguageProperty>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeMultiLanguagePropertyAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -45650,41 +39508,18 @@ common::optional<SerializationError> SerializeRangeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45710,25 +39545,17 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45754,25 +39581,17 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45798,41 +39617,18 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45858,41 +39654,18 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -45918,13 +39691,7 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -45932,7 +39699,7 @@ common::optional<SerializationError> SerializeRangeAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -45960,41 +39727,18 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46020,41 +39764,18 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46080,41 +39801,18 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46140,23 +39838,16 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  types::DataTypeDefXsd the_value_type(
-    that.value_type()
-  );
   writer.StartElement(
     "valueType"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_value_type
-    )
+  error = SerializeDataTypeDefXsd(
+    that.value_type(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -46181,25 +39872,17 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     return error;
   }
 
-  const auto& maybe_min(
-    that.min()
-  );
-  if (maybe_min.has_value()) {
-    const std::wstring& the_min(
-      *maybe_min
-    );
+  if (that.min().has_value()) {
     writer.StartElement(
       "min"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_min
+    error = SerializeWstring(
+      *(that.min()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46225,25 +39908,17 @@ common::optional<SerializationError> SerializeRangeAsSequence(
     }
   }
 
-  const auto& maybe_max(
-    that.max()
-  );
-  if (maybe_max.has_value()) {
-    const std::wstring& the_max(
-      *maybe_max
-    );
+  if (that.max().has_value()) {
     writer.StartElement(
       "max"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_max
+    error = SerializeWstring(
+      *(that.max()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46313,6 +39988,13 @@ common::optional<SerializationError> SerializeRangeAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeRangePtrAsElement(
+  const std::shared_ptr<types::IRange>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeRangeAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -46328,41 +40010,18 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46388,25 +40047,17 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46432,25 +40083,17 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46476,41 +40119,18 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46536,41 +40156,18 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46596,13 +40193,7 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -46610,7 +40201,7 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -46638,41 +40229,18 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46698,41 +40266,18 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46758,41 +40303,18 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46818,13 +40340,7 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::shared_ptr<types::IReference>& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
@@ -46832,7 +40348,7 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_value,
+      *(*(that.value())),
       writer
     );
     if (error.has_value()) {
@@ -46904,6 +40420,13 @@ common::optional<SerializationError> SerializeReferenceElementAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeReferenceElementPtrAsElement(
+  const std::shared_ptr<types::IReferenceElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeReferenceElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -46919,41 +40442,18 @@ common::optional<SerializationError> SerializeBlobAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -46979,25 +40479,17 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47023,25 +40515,17 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47067,41 +40551,18 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47127,41 +40588,18 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47187,13 +40625,7 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -47201,7 +40633,7 @@ common::optional<SerializationError> SerializeBlobAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -47229,41 +40661,18 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47289,41 +40698,18 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47349,41 +40735,18 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47409,25 +40772,17 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::vector<std::uint8_t>& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeByteArray(
-      the_value
+    error = SerializeByteArray(
+      *(that.value()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47453,21 +40808,16 @@ common::optional<SerializationError> SerializeBlobAsSequence(
     }
   }
 
-  const std::wstring& the_content_type(
-    that.content_type()
-  );
   writer.StartElement(
     "contentType"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_content_type
+  error = SerializeWstring(
+    that.content_type(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -47536,6 +40886,13 @@ common::optional<SerializationError> SerializeBlobAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeBlobPtrAsElement(
+  const std::shared_ptr<types::IBlob>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeBlobAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -47551,41 +40908,18 @@ common::optional<SerializationError> SerializeFileAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47611,25 +40945,17 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47655,25 +40981,17 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47699,41 +41017,18 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47759,41 +41054,18 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47819,13 +41091,7 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -47833,7 +41099,7 @@ common::optional<SerializationError> SerializeFileAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -47861,41 +41127,18 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47921,41 +41164,18 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -47981,41 +41201,18 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48041,25 +41238,17 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::wstring& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_value
+    error = SerializeWstring(
+      *(that.value()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48085,21 +41274,16 @@ common::optional<SerializationError> SerializeFileAsSequence(
     }
   }
 
-  const std::wstring& the_content_type(
-    that.content_type()
-  );
   writer.StartElement(
     "contentType"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_content_type
+  error = SerializeWstring(
+    that.content_type(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -48168,6 +41352,13 @@ common::optional<SerializationError> SerializeFileAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeFilePtrAsElement(
+  const std::shared_ptr<types::IFile>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeFileAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -48183,41 +41374,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48243,25 +41411,17 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48287,25 +41447,17 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48331,41 +41483,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48391,41 +41520,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48451,13 +41557,7 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -48465,7 +41565,7 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -48493,41 +41593,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48553,41 +41630,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48613,41 +41667,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48673,9 +41704,6 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     }
   }
 
-  const std::shared_ptr<types::IReference>& the_first(
-    that.first()
-  );
   writer.StartElement(
     "first"
   );
@@ -48683,7 +41711,7 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_first,
+    *(that.first()),
     writer
   );
   if (error.has_value()) {
@@ -48710,9 +41738,6 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     return error;
   }
 
-  const std::shared_ptr<types::IReference>& the_second(
-    that.second()
-  );
   writer.StartElement(
     "second"
   );
@@ -48720,7 +41745,7 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_second,
+    *(that.second()),
     writer
   );
   if (error.has_value()) {
@@ -48747,41 +41772,18 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
     return error;
   }
 
-  const auto& maybe_annotations(
-    that.annotations()
-  );
-  if (maybe_annotations.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IDataElement>
-    >& the_annotations(
-      *maybe_annotations
-    );
+  if (that.annotations().has_value()) {
     writer.StartElement(
       "annotations"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_annotations.size(); ++i) {
-      const std::shared_ptr<types::IDataElement>& item(
-        the_annotations[i]
-      );
-
-      error = SerializeDataElementAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.annotations()),
+      writer,
+      SerializeDataElementPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48851,6 +41853,13 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsElem
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeAnnotatedRelationshipElementPtrAsElement(
+  const std::shared_ptr<types::IAnnotatedRelationshipElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAnnotatedRelationshipElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -48866,41 +41875,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48926,25 +41912,17 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -48970,25 +41948,17 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49014,41 +41984,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49074,41 +42021,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49134,13 +42058,7 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -49148,7 +42066,7 @@ common::optional<SerializationError> SerializeEntityAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -49176,41 +42094,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49236,41 +42131,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49296,41 +42168,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49356,41 +42205,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_statements(
-    that.statements()
-  );
-  if (maybe_statements.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISubmodelElement>
-    >& the_statements(
-      *maybe_statements
-    );
+  if (that.statements().has_value()) {
     writer.StartElement(
       "statements"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_statements.size(); ++i) {
-      const std::shared_ptr<types::ISubmodelElement>& item(
-        the_statements[i]
-      );
-
-      error = SerializeSubmodelElementAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.statements()),
+      writer,
+      SerializeSubmodelElementPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49416,23 +42242,16 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  types::EntityType the_entity_type(
-    that.entity_type()
-  );
   writer.StartElement(
     "entityType"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_entity_type
-    )
+  error = SerializeEntityType(
+    that.entity_type(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -49457,25 +42276,17 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     return error;
   }
 
-  const auto& maybe_global_asset_id(
-    that.global_asset_id()
-  );
-  if (maybe_global_asset_id.has_value()) {
-    const std::wstring& the_global_asset_id(
-      *maybe_global_asset_id
-    );
+  if (that.global_asset_id().has_value()) {
     writer.StartElement(
       "globalAssetId"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_global_asset_id
+    error = SerializeWstring(
+      *(that.global_asset_id()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49501,41 +42312,18 @@ common::optional<SerializationError> SerializeEntityAsSequence(
     }
   }
 
-  const auto& maybe_specific_asset_ids(
-    that.specific_asset_ids()
-  );
-  if (maybe_specific_asset_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISpecificAssetId>
-    >& the_specific_asset_ids(
-      *maybe_specific_asset_ids
-    );
+  if (that.specific_asset_ids().has_value()) {
     writer.StartElement(
       "specificAssetIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_specific_asset_ids.size(); ++i) {
-      const std::shared_ptr<types::ISpecificAssetId>& item(
-        the_specific_asset_ids[i]
-      );
-
-      error = SerializeSpecificAssetIdAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.specific_asset_ids()),
+      writer,
+      SerializeSpecificAssetIdPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49605,6 +42393,13 @@ common::optional<SerializationError> SerializeEntityAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeEntityPtrAsElement(
+  const std::shared_ptr<types::IEntity>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeEntityAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -49620,9 +42415,6 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::shared_ptr<types::IReference>& the_source(
-    that.source()
-  );
   writer.StartElement(
     "source"
   );
@@ -49630,7 +42422,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_source,
+    *(that.source()),
     writer
   );
   if (error.has_value()) {
@@ -49657,13 +42449,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     return error;
   }
 
-  const auto& maybe_source_semantic_id(
-    that.source_semantic_id()
-  );
-  if (maybe_source_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_source_semantic_id(
-      *maybe_source_semantic_id
-    );
+  if (that.source_semantic_id().has_value()) {
     writer.StartElement(
       "sourceSemanticId"
     );
@@ -49671,7 +42457,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_source_semantic_id,
+      *(*(that.source_semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -49699,9 +42485,6 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     }
   }
 
-  const std::shared_ptr<types::IReference>& the_observable_reference(
-    that.observable_reference()
-  );
   writer.StartElement(
     "observableReference"
   );
@@ -49709,7 +42492,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_observable_reference,
+    *(that.observable_reference()),
     writer
   );
   if (error.has_value()) {
@@ -49736,13 +42519,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     return error;
   }
 
-  const auto& maybe_observable_semantic_id(
-    that.observable_semantic_id()
-  );
-  if (maybe_observable_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_observable_semantic_id(
-      *maybe_observable_semantic_id
-    );
+  if (that.observable_semantic_id().has_value()) {
     writer.StartElement(
       "observableSemanticId"
     );
@@ -49750,7 +42527,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_observable_semantic_id,
+      *(*(that.observable_semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -49778,25 +42555,17 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     }
   }
 
-  const auto& maybe_topic(
-    that.topic()
-  );
-  if (maybe_topic.has_value()) {
-    const std::wstring& the_topic(
-      *maybe_topic
-    );
+  if (that.topic().has_value()) {
     writer.StartElement(
       "topic"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_topic
+    error = SerializeWstring(
+      *(that.topic()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49822,13 +42591,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     }
   }
 
-  const auto& maybe_subject_id(
-    that.subject_id()
-  );
-  if (maybe_subject_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_subject_id(
-      *maybe_subject_id
-    );
+  if (that.subject_id().has_value()) {
     writer.StartElement(
       "subjectId"
     );
@@ -49836,7 +42599,7 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_subject_id,
+      *(*(that.subject_id())),
       writer
     );
     if (error.has_value()) {
@@ -49864,21 +42627,16 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     }
   }
 
-  const std::wstring& the_time_stamp(
-    that.time_stamp()
-  );
   writer.StartElement(
     "timeStamp"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_time_stamp
+  error = SerializeWstring(
+    that.time_stamp(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -49903,25 +42661,17 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
     return error;
   }
 
-  const auto& maybe_payload(
-    that.payload()
-  );
-  if (maybe_payload.has_value()) {
-    const std::vector<std::uint8_t>& the_payload(
-      *maybe_payload
-    );
+  if (that.payload().has_value()) {
     writer.StartElement(
       "payload"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeByteArray(
-      the_payload
+    error = SerializeByteArray(
+      *(that.payload()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -49991,6 +42741,13 @@ common::optional<SerializationError> SerializeEventPayloadAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeEventPayloadPtrAsElement(
+  const std::shared_ptr<types::IEventPayload>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeEventPayloadAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeEventElementAsElement(
   const types::IEventElement& that,
   SelfClosingWriter& writer
@@ -50017,6 +42774,13 @@ common::optional<SerializationError> SerializeEventElementAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeEventElementPtrAsElement(
+  const std::shared_ptr<types::IEventElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeEventElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -50032,41 +42796,18 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50092,25 +42833,17 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50136,25 +42869,17 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50180,41 +42905,18 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50240,41 +42942,18 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50300,13 +42979,7 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -50314,7 +42987,7 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -50342,41 +43015,18 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50402,41 +43052,18 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50462,41 +43089,18 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50522,9 +43126,6 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const std::shared_ptr<types::IReference>& the_observed(
-    that.observed()
-  );
   writer.StartElement(
     "observed"
   );
@@ -50532,7 +43133,7 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_observed,
+    *(that.observed()),
     writer
   );
   if (error.has_value()) {
@@ -50559,23 +43160,16 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     return error;
   }
 
-  types::Direction the_direction(
-    that.direction()
-  );
   writer.StartElement(
     "direction"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_direction
-    )
+  error = SerializeDirection(
+    that.direction(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -50600,23 +43194,16 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     return error;
   }
 
-  types::StateOfEvent the_state(
-    that.state()
-  );
   writer.StartElement(
     "state"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_state
-    )
+  error = SerializeStateOfEvent(
+    that.state(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -50641,25 +43228,17 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     return error;
   }
 
-  const auto& maybe_message_topic(
-    that.message_topic()
-  );
-  if (maybe_message_topic.has_value()) {
-    const std::wstring& the_message_topic(
-      *maybe_message_topic
-    );
+  if (that.message_topic().has_value()) {
     writer.StartElement(
       "messageTopic"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_message_topic
+    error = SerializeWstring(
+      *(that.message_topic()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50685,13 +43264,7 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_message_broker(
-    that.message_broker()
-  );
-  if (maybe_message_broker.has_value()) {
-    const std::shared_ptr<types::IReference>& the_message_broker(
-      *maybe_message_broker
-    );
+  if (that.message_broker().has_value()) {
     writer.StartElement(
       "messageBroker"
     );
@@ -50699,7 +43272,7 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_message_broker,
+      *(*(that.message_broker())),
       writer
     );
     if (error.has_value()) {
@@ -50727,25 +43300,17 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_last_update(
-    that.last_update()
-  );
-  if (maybe_last_update.has_value()) {
-    const std::wstring& the_last_update(
-      *maybe_last_update
-    );
+  if (that.last_update().has_value()) {
     writer.StartElement(
       "lastUpdate"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_last_update
+    error = SerializeWstring(
+      *(that.last_update()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50771,25 +43336,17 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_min_interval(
-    that.min_interval()
-  );
-  if (maybe_min_interval.has_value()) {
-    const std::wstring& the_min_interval(
-      *maybe_min_interval
-    );
+  if (that.min_interval().has_value()) {
     writer.StartElement(
       "minInterval"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_min_interval
+    error = SerializeWstring(
+      *(that.min_interval()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50815,25 +43372,17 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
     }
   }
 
-  const auto& maybe_max_interval(
-    that.max_interval()
-  );
-  if (maybe_max_interval.has_value()) {
-    const std::wstring& the_max_interval(
-      *maybe_max_interval
-    );
+  if (that.max_interval().has_value()) {
     writer.StartElement(
       "maxInterval"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_max_interval
+    error = SerializeWstring(
+      *(that.max_interval()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50903,6 +43452,13 @@ common::optional<SerializationError> SerializeBasicEventElementAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeBasicEventElementPtrAsElement(
+  const std::shared_ptr<types::IBasicEventElement>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeBasicEventElementAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -50918,41 +43474,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -50978,25 +43511,17 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51022,25 +43547,17 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51066,41 +43583,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51126,41 +43620,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51186,13 +43657,7 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -51200,7 +43665,7 @@ common::optional<SerializationError> SerializeOperationAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -51228,41 +43693,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51288,41 +43730,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51348,41 +43767,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51408,41 +43804,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_input_variables(
-    that.input_variables()
-  );
-  if (maybe_input_variables.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IOperationVariable>
-    >& the_input_variables(
-      *maybe_input_variables
-    );
+  if (that.input_variables().has_value()) {
     writer.StartElement(
       "inputVariables"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_input_variables.size(); ++i) {
-      const std::shared_ptr<types::IOperationVariable>& item(
-        the_input_variables[i]
-      );
-
-      error = SerializeOperationVariableAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.input_variables()),
+      writer,
+      SerializeOperationVariablePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51468,41 +43841,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_output_variables(
-    that.output_variables()
-  );
-  if (maybe_output_variables.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IOperationVariable>
-    >& the_output_variables(
-      *maybe_output_variables
-    );
+  if (that.output_variables().has_value()) {
     writer.StartElement(
       "outputVariables"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_output_variables.size(); ++i) {
-      const std::shared_ptr<types::IOperationVariable>& item(
-        the_output_variables[i]
-      );
-
-      error = SerializeOperationVariableAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.output_variables()),
+      writer,
+      SerializeOperationVariablePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51528,41 +43878,18 @@ common::optional<SerializationError> SerializeOperationAsSequence(
     }
   }
 
-  const auto& maybe_inoutput_variables(
-    that.inoutput_variables()
-  );
-  if (maybe_inoutput_variables.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IOperationVariable>
-    >& the_inoutput_variables(
-      *maybe_inoutput_variables
-    );
+  if (that.inoutput_variables().has_value()) {
     writer.StartElement(
       "inoutputVariables"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_inoutput_variables.size(); ++i) {
-      const std::shared_ptr<types::IOperationVariable>& item(
-        the_inoutput_variables[i]
-      );
-
-      error = SerializeOperationVariableAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.inoutput_variables()),
+      writer,
+      SerializeOperationVariablePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51632,6 +43959,13 @@ common::optional<SerializationError> SerializeOperationAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeOperationPtrAsElement(
+  const std::shared_ptr<types::IOperation>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeOperationAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -51647,9 +43981,6 @@ common::optional<SerializationError> SerializeOperationVariableAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::shared_ptr<types::ISubmodelElement>& the_value(
-    that.value()
-  );
   writer.StartElement(
     "value"
   );
@@ -51657,7 +43988,7 @@ common::optional<SerializationError> SerializeOperationVariableAsSequence(
     return writer.move_error();
   }
   error = SerializeSubmodelElementAsElement(
-    *the_value,
+    *(that.value()),
     writer
   );
   if (error.has_value()) {
@@ -51728,6 +44059,13 @@ common::optional<SerializationError> SerializeOperationVariableAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeOperationVariablePtrAsElement(
+  const std::shared_ptr<types::IOperationVariable>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeOperationVariableAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -51743,41 +44081,18 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51803,25 +44118,17 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51847,25 +44154,17 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51891,41 +44190,18 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -51951,41 +44227,18 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52011,13 +44264,7 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_semantic_id(
-    that.semantic_id()
-  );
-  if (maybe_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_semantic_id(
-      *maybe_semantic_id
-    );
+  if (that.semantic_id().has_value()) {
     writer.StartElement(
       "semanticId"
     );
@@ -52025,7 +44272,7 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_semantic_id,
+      *(*(that.semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -52053,41 +44300,18 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_supplemental_semantic_ids(
-    that.supplemental_semantic_ids()
-  );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_supplemental_semantic_ids(
-      *maybe_supplemental_semantic_ids
-    );
+  if (that.supplemental_semantic_ids().has_value()) {
     writer.StartElement(
       "supplementalSemanticIds"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_supplemental_semantic_ids.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_supplemental_semantic_ids[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.supplemental_semantic_ids()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52113,41 +44337,18 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_qualifiers(
-    that.qualifiers()
-  );
-  if (maybe_qualifiers.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IQualifier>
-    >& the_qualifiers(
-      *maybe_qualifiers
-    );
+  if (that.qualifiers().has_value()) {
     writer.StartElement(
       "qualifiers"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_qualifiers.size(); ++i) {
-      const std::shared_ptr<types::IQualifier>& item(
-        the_qualifiers[i]
-      );
-
-      error = SerializeQualifierAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.qualifiers()),
+      writer,
+      SerializeQualifierPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52173,41 +44374,18 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
     }
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52277,6 +44455,13 @@ common::optional<SerializationError> SerializeCapabilityAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeCapabilityPtrAsElement(
+  const std::shared_ptr<types::ICapability>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeCapabilityAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -52292,41 +44477,18 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_extensions(
-    that.extensions()
-  );
-  if (maybe_extensions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IExtension>
-    >& the_extensions(
-      *maybe_extensions
-    );
+  if (that.extensions().has_value()) {
     writer.StartElement(
       "extensions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_extensions.size(); ++i) {
-      const std::shared_ptr<types::IExtension>& item(
-        the_extensions[i]
-      );
-
-      error = SerializeExtensionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.extensions()),
+      writer,
+      SerializeExtensionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52352,25 +44514,17 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const auto& maybe_category(
-    that.category()
-  );
-  if (maybe_category.has_value()) {
-    const std::wstring& the_category(
-      *maybe_category
-    );
+  if (that.category().has_value()) {
     writer.StartElement(
       "category"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_category
+    error = SerializeWstring(
+      *(that.category()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52396,25 +44550,17 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const auto& maybe_id_short(
-    that.id_short()
-  );
-  if (maybe_id_short.has_value()) {
-    const std::wstring& the_id_short(
-      *maybe_id_short
-    );
+  if (that.id_short().has_value()) {
     writer.StartElement(
       "idShort"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_id_short
+    error = SerializeWstring(
+      *(that.id_short()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52440,41 +44586,18 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const auto& maybe_display_name(
-    that.display_name()
-  );
-  if (maybe_display_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringNameType>
-    >& the_display_name(
-      *maybe_display_name
-    );
+  if (that.display_name().has_value()) {
     writer.StartElement(
       "displayName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_display_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringNameType>& item(
-        the_display_name[i]
-      );
-
-      error = SerializeLangStringNameTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.display_name()),
+      writer,
+      SerializeLangStringNameTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52500,41 +44623,18 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const auto& maybe_description(
-    that.description()
-  );
-  if (maybe_description.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringTextType>
-    >& the_description(
-      *maybe_description
-    );
+  if (that.description().has_value()) {
     writer.StartElement(
       "description"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_description.size(); ++i) {
-      const std::shared_ptr<types::ILangStringTextType>& item(
-        the_description[i]
-      );
-
-      error = SerializeLangStringTextTypeAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.description()),
+      writer,
+      SerializeLangStringTextTypePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52560,13 +44660,7 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const auto& maybe_administration(
-    that.administration()
-  );
-  if (maybe_administration.has_value()) {
-    const std::shared_ptr<types::IAdministrativeInformation>& the_administration(
-      *maybe_administration
-    );
+  if (that.administration().has_value()) {
     writer.StartElement(
       "administration"
     );
@@ -52574,7 +44668,7 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
       return writer.move_error();
     }
     error = SerializeAdministrativeInformationAsSequence(
-      *the_administration,
+      *(*(that.administration())),
       writer
     );
     if (error.has_value()) {
@@ -52602,21 +44696,16 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const std::wstring& the_id(
-    that.id()
-  );
   writer.StartElement(
     "id"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_id
+  error = SerializeWstring(
+    that.id(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -52641,41 +44730,18 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     return error;
   }
 
-  const auto& maybe_embedded_data_specifications(
-    that.embedded_data_specifications()
-  );
-  if (maybe_embedded_data_specifications.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >& the_embedded_data_specifications(
-      *maybe_embedded_data_specifications
-    );
+  if (that.embedded_data_specifications().has_value()) {
     writer.StartElement(
       "embeddedDataSpecifications"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_embedded_data_specifications.size(); ++i) {
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item(
-        the_embedded_data_specifications[i]
-      );
-
-      error = SerializeEmbeddedDataSpecificationAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.embedded_data_specifications()),
+      writer,
+      SerializeEmbeddedDataSpecificationPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52701,41 +44767,18 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
     }
   }
 
-  const auto& maybe_is_case_of(
-    that.is_case_of()
-  );
-  if (maybe_is_case_of.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IReference>
-    >& the_is_case_of(
-      *maybe_is_case_of
-    );
+  if (that.is_case_of().has_value()) {
     writer.StartElement(
       "isCaseOf"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_is_case_of.size(); ++i) {
-      const std::shared_ptr<types::IReference>& item(
-        the_is_case_of[i]
-      );
-
-      error = SerializeReferenceAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.is_case_of()),
+      writer,
+      SerializeReferencePtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -52805,6 +44848,13 @@ common::optional<SerializationError> SerializeConceptDescriptionAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeConceptDescriptionPtrAsElement(
+  const std::shared_ptr<types::IConceptDescription>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeConceptDescriptionAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -52820,23 +44870,16 @@ common::optional<SerializationError> SerializeReferenceAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  types::ReferenceTypes the_type(
-    that.type()
-  );
   writer.StartElement(
     "type"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_type
-    )
+  error = SerializeReferenceTypes(
+    that.type(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -52861,13 +44904,7 @@ common::optional<SerializationError> SerializeReferenceAsSequence(
     return error;
   }
 
-  const auto& maybe_referred_semantic_id(
-    that.referred_semantic_id()
-  );
-  if (maybe_referred_semantic_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_referred_semantic_id(
-      *maybe_referred_semantic_id
-    );
+  if (that.referred_semantic_id().has_value()) {
     writer.StartElement(
       "referredSemanticId"
     );
@@ -52875,7 +44912,7 @@ common::optional<SerializationError> SerializeReferenceAsSequence(
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_referred_semantic_id,
+      *(*(that.referred_semantic_id())),
       writer
     );
     if (error.has_value()) {
@@ -52903,37 +44940,17 @@ common::optional<SerializationError> SerializeReferenceAsSequence(
     }
   }
 
-  const std::vector<
-    std::shared_ptr<types::IKey>
-  >& the_keys(
-    that.keys()
-  );
   writer.StartElement(
     "keys"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  for (size_t i = 0; i < the_keys.size(); ++i) {
-    const std::shared_ptr<types::IKey>& item(
-      the_keys[i]
-    );
-
-    error = SerializeKeyAsElement(
-      *item,
-      writer
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          i
-        )
-      );
-
-      break;
-    }
-  }
+  error = SerializeListOfInstances(
+    that.keys(),
+    writer,
+    SerializeKeyPtrAsElement
+  );
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53002,6 +45019,13 @@ common::optional<SerializationError> SerializeReferenceAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeReferencePtrAsElement(
+  const std::shared_ptr<types::IReference>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeReferenceAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -53017,23 +45041,16 @@ common::optional<SerializationError> SerializeKeyAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  types::KeyTypes the_type(
-    that.type()
-  );
   writer.StartElement(
     "type"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeString(
-    stringification::to_string(
-      the_type
-    )
+  error = SerializeKeyTypes(
+    that.type(),
+    writer
   );
-  if (writer.error()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53058,21 +45075,16 @@ common::optional<SerializationError> SerializeKeyAsSequence(
     return error;
   }
 
-  const std::wstring& the_value(
-    that.value()
-  );
   writer.StartElement(
     "value"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_value
+  error = SerializeWstring(
+    that.value(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53141,6 +45153,13 @@ common::optional<SerializationError> SerializeKeyAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeKeyPtrAsElement(
+  const std::shared_ptr<types::IKey>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeKeyAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeAbstractLangStringAsElement(
   const types::IAbstractLangString& that,
   SelfClosingWriter& writer
@@ -53195,6 +45214,13 @@ common::optional<SerializationError> SerializeAbstractLangStringAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeAbstractLangStringPtrAsElement(
+  const std::shared_ptr<types::IAbstractLangString>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAbstractLangStringAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -53210,21 +45236,16 @@ common::optional<SerializationError> SerializeLangStringNameTypeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_language(
-    that.language()
-  );
   writer.StartElement(
     "language"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_language
+  error = SerializeWstring(
+    that.language(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53249,21 +45270,16 @@ common::optional<SerializationError> SerializeLangStringNameTypeAsSequence(
     return error;
   }
 
-  const std::wstring& the_text(
-    that.text()
-  );
   writer.StartElement(
     "text"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_text
+  error = SerializeWstring(
+    that.text(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53332,6 +45348,13 @@ common::optional<SerializationError> SerializeLangStringNameTypeAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeLangStringNameTypePtrAsElement(
+  const std::shared_ptr<types::ILangStringNameType>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeLangStringNameTypeAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -53347,21 +45370,16 @@ common::optional<SerializationError> SerializeLangStringTextTypeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_language(
-    that.language()
-  );
   writer.StartElement(
     "language"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_language
+  error = SerializeWstring(
+    that.language(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53386,21 +45404,16 @@ common::optional<SerializationError> SerializeLangStringTextTypeAsSequence(
     return error;
   }
 
-  const std::wstring& the_text(
-    that.text()
-  );
   writer.StartElement(
     "text"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_text
+  error = SerializeWstring(
+    that.text(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53469,6 +45482,13 @@ common::optional<SerializationError> SerializeLangStringTextTypeAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeLangStringTextTypePtrAsElement(
+  const std::shared_ptr<types::ILangStringTextType>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeLangStringTextTypeAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -53484,41 +45504,18 @@ common::optional<SerializationError> SerializeEnvironmentAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const auto& maybe_asset_administration_shells(
-    that.asset_administration_shells()
-  );
-  if (maybe_asset_administration_shells.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >& the_asset_administration_shells(
-      *maybe_asset_administration_shells
-    );
+  if (that.asset_administration_shells().has_value()) {
     writer.StartElement(
       "assetAdministrationShells"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_asset_administration_shells.size(); ++i) {
-      const std::shared_ptr<types::IAssetAdministrationShell>& item(
-        the_asset_administration_shells[i]
-      );
-
-      error = SerializeAssetAdministrationShellAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.asset_administration_shells()),
+      writer,
+      SerializeAssetAdministrationShellPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -53544,41 +45541,18 @@ common::optional<SerializationError> SerializeEnvironmentAsSequence(
     }
   }
 
-  const auto& maybe_submodels(
-    that.submodels()
-  );
-  if (maybe_submodels.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ISubmodel>
-    >& the_submodels(
-      *maybe_submodels
-    );
+  if (that.submodels().has_value()) {
     writer.StartElement(
       "submodels"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_submodels.size(); ++i) {
-      const std::shared_ptr<types::ISubmodel>& item(
-        the_submodels[i]
-      );
-
-      error = SerializeSubmodelAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.submodels()),
+      writer,
+      SerializeSubmodelPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -53604,41 +45578,18 @@ common::optional<SerializationError> SerializeEnvironmentAsSequence(
     }
   }
 
-  const auto& maybe_concept_descriptions(
-    that.concept_descriptions()
-  );
-  if (maybe_concept_descriptions.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::IConceptDescription>
-    >& the_concept_descriptions(
-      *maybe_concept_descriptions
-    );
+  if (that.concept_descriptions().has_value()) {
     writer.StartElement(
       "conceptDescriptions"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_concept_descriptions.size(); ++i) {
-      const std::shared_ptr<types::IConceptDescription>& item(
-        the_concept_descriptions[i]
-      );
-
-      error = SerializeConceptDescriptionAsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.concept_descriptions()),
+      writer,
+      SerializeConceptDescriptionPtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -53708,6 +45659,13 @@ common::optional<SerializationError> SerializeEnvironmentAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeEnvironmentPtrAsElement(
+  const std::shared_ptr<types::IEnvironment>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeEnvironmentAsElement(*that, writer);
+}
+
 common::optional<SerializationError> SerializeDataSpecificationContentAsElement(
   const types::IDataSpecificationContent& that,
   SelfClosingWriter& writer
@@ -53734,6 +45692,13 @@ common::optional<SerializationError> SerializeDataSpecificationContentAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeDataSpecificationContentPtrAsElement(
+  const std::shared_ptr<types::IDataSpecificationContent>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeDataSpecificationContentAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -53749,9 +45714,6 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  const std::shared_ptr<types::IReference>& the_data_specification(
-    that.data_specification()
-  );
   writer.StartElement(
     "dataSpecification"
   );
@@ -53759,7 +45721,7 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_data_specification,
+    *(that.data_specification()),
     writer
   );
   if (error.has_value()) {
@@ -53786,9 +45748,6 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
     return error;
   }
 
-  const std::shared_ptr<types::IDataSpecificationContent>& the_data_specification_content(
-    that.data_specification_content()
-  );
   writer.StartElement(
     "dataSpecificationContent"
   );
@@ -53796,7 +45755,7 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
     return writer.move_error();
   }
   error = SerializeDataSpecificationContentAsElement(
-    *the_data_specification_content,
+    *(that.data_specification_content()),
     writer
   );
   if (error.has_value()) {
@@ -53867,6 +45826,13 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsElement
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeEmbeddedDataSpecificationPtrAsElement(
+  const std::shared_ptr<types::IEmbeddedDataSpecification>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeEmbeddedDataSpecificationAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -53882,21 +45848,16 @@ common::optional<SerializationError> SerializeLevelTypeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  bool the_min(
-    that.min()
-  );
   writer.StartElement(
     "min"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeBool(
-    the_min
+  error = SerializeBool(
+    that.min(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53921,21 +45882,16 @@ common::optional<SerializationError> SerializeLevelTypeAsSequence(
     return error;
   }
 
-  bool the_nom(
-    that.nom()
-  );
   writer.StartElement(
     "nom"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeBool(
-    the_nom
+  error = SerializeBool(
+    that.nom(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53960,21 +45916,16 @@ common::optional<SerializationError> SerializeLevelTypeAsSequence(
     return error;
   }
 
-  bool the_typ(
-    that.typ()
-  );
   writer.StartElement(
     "typ"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeBool(
-    the_typ
+  error = SerializeBool(
+    that.typ(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -53999,21 +45950,16 @@ common::optional<SerializationError> SerializeLevelTypeAsSequence(
     return error;
   }
 
-  bool the_max(
-    that.max()
-  );
   writer.StartElement(
     "max"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeBool(
-    the_max
+  error = SerializeBool(
+    that.max(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54082,6 +46028,13 @@ common::optional<SerializationError> SerializeLevelTypeAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeLevelTypePtrAsElement(
+  const std::shared_ptr<types::ILevelType>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeLevelTypeAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -54097,21 +46050,16 @@ common::optional<SerializationError> SerializeValueReferencePairAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_value(
-    that.value()
-  );
   writer.StartElement(
     "value"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_value
+  error = SerializeWstring(
+    that.value(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54136,9 +46084,6 @@ common::optional<SerializationError> SerializeValueReferencePairAsSequence(
     return error;
   }
 
-  const std::shared_ptr<types::IReference>& the_value_id(
-    that.value_id()
-  );
   writer.StartElement(
     "valueId"
   );
@@ -54146,7 +46091,7 @@ common::optional<SerializationError> SerializeValueReferencePairAsSequence(
     return writer.move_error();
   }
   error = SerializeReferenceAsSequence(
-    *the_value_id,
+    *(that.value_id()),
     writer
   );
   if (error.has_value()) {
@@ -54217,6 +46162,13 @@ common::optional<SerializationError> SerializeValueReferencePairAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeValueReferencePairPtrAsElement(
+  const std::shared_ptr<types::IValueReferencePair>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeValueReferencePairAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -54232,37 +46184,17 @@ common::optional<SerializationError> SerializeValueListAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::vector<
-    std::shared_ptr<types::IValueReferencePair>
-  >& the_value_reference_pairs(
-    that.value_reference_pairs()
-  );
   writer.StartElement(
     "valueReferencePairs"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  for (size_t i = 0; i < the_value_reference_pairs.size(); ++i) {
-    const std::shared_ptr<types::IValueReferencePair>& item(
-      the_value_reference_pairs[i]
-    );
-
-    error = SerializeValueReferencePairAsElement(
-      *item,
-      writer
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          i
-        )
-      );
-
-      break;
-    }
-  }
+  error = SerializeListOfInstances(
+    that.value_reference_pairs(),
+    writer,
+    SerializeValueReferencePairPtrAsElement
+  );
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54331,6 +46263,13 @@ common::optional<SerializationError> SerializeValueListAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeValueListPtrAsElement(
+  const std::shared_ptr<types::IValueList>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeValueListAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -54346,21 +46285,16 @@ common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec6136
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_language(
-    that.language()
-  );
   writer.StartElement(
     "language"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_language
+  error = SerializeWstring(
+    that.language(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54385,21 +46319,16 @@ common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec6136
     return error;
   }
 
-  const std::wstring& the_text(
-    that.text()
-  );
   writer.StartElement(
     "text"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_text
+  error = SerializeWstring(
+    that.text(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54468,6 +46397,13 @@ common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec6136
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec61360PtrAsElement(
+  const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeLangStringPreferredNameTypeIec61360AsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -54483,21 +46419,16 @@ common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360AsS
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_language(
-    that.language()
-  );
   writer.StartElement(
     "language"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_language
+  error = SerializeWstring(
+    that.language(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54522,21 +46453,16 @@ common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360AsS
     return error;
   }
 
-  const std::wstring& the_text(
-    that.text()
-  );
   writer.StartElement(
     "text"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_text
+  error = SerializeWstring(
+    that.text(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54605,6 +46531,13 @@ common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360AsE
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360PtrAsElement(
+  const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeLangStringShortNameTypeIec61360AsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -54620,21 +46553,16 @@ common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360As
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_language(
-    that.language()
-  );
   writer.StartElement(
     "language"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_language
+  error = SerializeWstring(
+    that.language(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54659,21 +46587,16 @@ common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360As
     return error;
   }
 
-  const std::wstring& the_text(
-    that.text()
-  );
   writer.StartElement(
     "text"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_text
+  error = SerializeWstring(
+    that.text(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54742,6 +46665,13 @@ common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360As
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360PtrAsElement(
+  const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeLangStringDefinitionTypeIec61360AsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -54757,37 +46687,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  const std::vector<
-    std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-  >& the_preferred_name(
-    that.preferred_name()
-  );
   writer.StartElement(
     "preferredName"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  for (size_t i = 0; i < the_preferred_name.size(); ++i) {
-    const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& item(
-      the_preferred_name[i]
-    );
-
-    error = SerializeLangStringPreferredNameTypeIec61360AsElement(
-      *item,
-      writer
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          i
-        )
-      );
-
-      break;
-    }
-  }
+  error = SerializeListOfInstances(
+    that.preferred_name(),
+    writer,
+    SerializeLangStringPreferredNameTypeIec61360PtrAsElement
+  );
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -54812,41 +46722,18 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     return error;
   }
 
-  const auto& maybe_short_name(
-    that.short_name()
-  );
-  if (maybe_short_name.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >& the_short_name(
-      *maybe_short_name
-    );
+  if (that.short_name().has_value()) {
     writer.StartElement(
       "shortName"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_short_name.size(); ++i) {
-      const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& item(
-        the_short_name[i]
-      );
-
-      error = SerializeLangStringShortNameTypeIec61360AsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.short_name()),
+      writer,
+      SerializeLangStringShortNameTypeIec61360PtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -54872,25 +46759,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_unit(
-    that.unit()
-  );
-  if (maybe_unit.has_value()) {
-    const std::wstring& the_unit(
-      *maybe_unit
-    );
+  if (that.unit().has_value()) {
     writer.StartElement(
       "unit"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_unit
+    error = SerializeWstring(
+      *(that.unit()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -54916,13 +46795,7 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_unit_id(
-    that.unit_id()
-  );
-  if (maybe_unit_id.has_value()) {
-    const std::shared_ptr<types::IReference>& the_unit_id(
-      *maybe_unit_id
-    );
+  if (that.unit_id().has_value()) {
     writer.StartElement(
       "unitId"
     );
@@ -54930,7 +46803,7 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
       return writer.move_error();
     }
     error = SerializeReferenceAsSequence(
-      *the_unit_id,
+      *(*(that.unit_id())),
       writer
     );
     if (error.has_value()) {
@@ -54958,25 +46831,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_source_of_definition(
-    that.source_of_definition()
-  );
-  if (maybe_source_of_definition.has_value()) {
-    const std::wstring& the_source_of_definition(
-      *maybe_source_of_definition
-    );
+  if (that.source_of_definition().has_value()) {
     writer.StartElement(
       "sourceOfDefinition"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_source_of_definition
+    error = SerializeWstring(
+      *(that.source_of_definition()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -55002,25 +46867,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_symbol(
-    that.symbol()
-  );
-  if (maybe_symbol.has_value()) {
-    const std::wstring& the_symbol(
-      *maybe_symbol
-    );
+  if (that.symbol().has_value()) {
     writer.StartElement(
       "symbol"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_symbol
+    error = SerializeWstring(
+      *(that.symbol()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -55046,27 +46903,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_data_type(
-    that.data_type()
-  );
-  if (maybe_data_type.has_value()) {
-    types::DataTypeIec61360 the_data_type(
-      *maybe_data_type
-    );
+  if (that.data_type().has_value()) {
     writer.StartElement(
       "dataType"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeString(
-      stringification::to_string(
-        the_data_type
-      )
+    error = SerializeDataTypeIec61360(
+      *(that.data_type()),
+      writer
     );
-    if (writer.error()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -55092,41 +46939,18 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_definition(
-    that.definition()
-  );
-  if (maybe_definition.has_value()) {
-    const std::vector<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >& the_definition(
-      *maybe_definition
-    );
+  if (that.definition().has_value()) {
     writer.StartElement(
       "definition"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    for (size_t i = 0; i < the_definition.size(); ++i) {
-      const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& item(
-        the_definition[i]
-      );
-
-      error = SerializeLangStringDefinitionTypeIec61360AsElement(
-        *item,
-        writer
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            i
-          )
-        );
-
-        break;
-      }
-    }
+    error = SerializeListOfInstances(
+      *(that.definition()),
+      writer,
+      SerializeLangStringDefinitionTypeIec61360PtrAsElement
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -55152,25 +46976,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_value_format(
-    that.value_format()
-  );
-  if (maybe_value_format.has_value()) {
-    const std::wstring& the_value_format(
-      *maybe_value_format
-    );
+  if (that.value_format().has_value()) {
     writer.StartElement(
       "valueFormat"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_value_format
+    error = SerializeWstring(
+      *(that.value_format()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -55196,13 +47012,7 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_value_list(
-    that.value_list()
-  );
-  if (maybe_value_list.has_value()) {
-    const std::shared_ptr<types::IValueList>& the_value_list(
-      *maybe_value_list
-    );
+  if (that.value_list().has_value()) {
     writer.StartElement(
       "valueList"
     );
@@ -55210,7 +47020,7 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
       return writer.move_error();
     }
     error = SerializeValueListAsSequence(
-      *the_value_list,
+      *(*(that.value_list())),
       writer
     );
     if (error.has_value()) {
@@ -55238,25 +47048,17 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_value(
-    that.value()
-  );
-  if (maybe_value.has_value()) {
-    const std::wstring& the_value(
-      *maybe_value
-    );
+  if (that.value().has_value()) {
     writer.StartElement(
       "value"
     );
     if (writer.error().has_value()) {
       return writer.move_error();
     }
-    writer.SerializeWstring(
-      the_value
+    error = SerializeWstring(
+      *(that.value()),
+      writer
     );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-    }
     if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
@@ -55282,13 +47084,7 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
     }
   }
 
-  const auto& maybe_level_type(
-    that.level_type()
-  );
-  if (maybe_level_type.has_value()) {
-    const std::shared_ptr<types::ILevelType>& the_level_type(
-      *maybe_level_type
-    );
+  if (that.level_type().has_value()) {
     writer.StartElement(
       "levelType"
     );
@@ -55296,7 +47092,7 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
       return writer.move_error();
     }
     error = SerializeLevelTypeAsSequence(
-      *the_level_type,
+      *(*(that.level_type())),
       writer
     );
     if (error.has_value()) {
@@ -55366,6 +47162,13 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsElement
   }
 
   return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeDataSpecificationIec61360PtrAsElement(
+  const std::shared_ptr<types::IDataSpecificationIec61360>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeDataSpecificationIec61360AsElement(*that, writer);
 }
 
 void Serialize(

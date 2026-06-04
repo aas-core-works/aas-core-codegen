@@ -2342,64 +2342,214 @@ std::pair<
 
 // endregion De-serialize primitives
 
+template <typename T, typename DeserializeT>
 std::pair<
-  common::optional<types::Result>,
+  common::optional<T>,
   common::optional<DeserializationError>
-> DeserializeResult(
-  ReaderMergingText& reader
+> DeserializeValueFromVElement(
+  ReaderMergingText& reader,
+  const DeserializeT& deserialize_content
 ) {
   #ifdef DEBUG
   if (reader.node().kind() == NodeKind::Error) {
     throw std::logic_error(
-      "Unexpected unhandled XML error in DeserializeByteArray. "
-      "DeserializeByteArray expects no error node."
+      "Unexpected unhandled XML error in DeserializeWstring. "
+      "DeserializeWstring expects no error node."
     );
   }
   #endif
 
-  common::optional<std::wstring> text;
-  common::optional<DeserializationError> error;
-
-  std::tie(
-    text,
-    error
-  ) = DeserializeWstring(reader);
-
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      types::Result
-    >(
+  if (reader.node().kind() != NodeKind::Start) {
+    return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Failed to de-serialize a literal of Result: ",
-        error->cause
+        L"Expected a start element <v> enclosing a value, but got ",
+        NodeToHumanReadableWstring(reader.node())
       )
     );
   }
 
-  common::optional<
-    types::Result
-  > deserialized = wstringification::ResultFromWstring(
-    *text
+  const std::string& start_name(
+    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+      const StartNode&
+    >(reader.node()).name
   );
 
-  if (!deserialized.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      types::Result
-    >(
+  if (start_name != "v") {
+    return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a literal of Result, but got: ",
-        *text
+        L"Expected a start element <v> enclosing a value, but got ",
+        NodeToHumanReadableWstring(reader.node())
       )
     );
   }
 
-  return std::make_pair(std::move(deserialized), common::nullopt);
+  // NOTE (mristin):
+  // We consume the <v>.
+  reader.Read();
+
+  if (reader.node().kind() == NodeKind::Error) {
+    return NoInstanceAndDeserializationErrorFromReader<T>(reader);
+  }
+
+  common::optional<T> value;
+  common::optional<DeserializationError> error;
+  std::tie(
+    value,
+    error
+  ) = deserialize_content(reader);
+
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<ElementSegment>(L"v")
+    );
+
+    return NoInstanceAndDeserializationError<T>(
+      std::move(*error)
+    );
+  }
+
+  if (reader.node().kind() != NodeKind::Stop) {
+    return NoInstanceAndDeserializationErrorWithCause<T>(
+      common::Concat(
+        L"Expected a closing element </v> closing a value, but got ",
+        NodeToHumanReadableWstring(reader.node())
+      )
+    );
+  }
+
+  const std::string& stop_name(
+    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+      const StopNode&
+    >(reader.node()).name
+  );
+
+
+  if (stop_name != "v") {
+    return NoInstanceAndDeserializationErrorWithCause<T>(
+      common::Concat(
+        L"Expected a stop element </v> closing a value, but got ",
+        NodeToHumanReadableWstring(reader.node())
+      )
+    );
+  }
+
+  // NOTE (mristin):
+  // We consume the </v>.
+  reader.Read();
+
+  if (reader.node().kind() == NodeKind::Error) {
+    return NoInstanceAndDeserializationErrorFromReader<T>(reader);
+  }
+
+  return std::make_pair(std::move(value), common::nullopt);
+}
+
+template <typename T, typename DeserializeT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  ReaderMergingText& reader,
+  const DeserializeT& deserialize_item
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeWstring. "
+      "DeserializeWstring expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<DeserializationError> error;
+
+  error = SkipWhitespace(reader);
+  if (error.has_value()) {
+    return std::make_pair(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // If we encounter the stop element then we reached the end of the list. If this is
+  // the first node we encounter then the list is empty, *i.e.*, contains no items.
+  if (reader.node().kind() == NodeKind::Stop) {
+    return std::make_pair(
+      std::vector<T>(),
+      std::nullopt
+    );
+  } else {
+    // NOTE (mristin):
+    // We use std::deque here as it is a buffered list, while a std::list
+    // would incur a memory allocation on each push. We do not want to use
+    // std::vector as the number of elements in a list can be arbitrarily large
+    // leading potentially to out-of-memory errors since std::vector's double
+    // their size for amortized time complexity of O(1) for insertions.
+
+    std::deque<T> items;
+
+    size_t i = 0;
+
+    while (true) {
+      common::optional<T> item;
+
+      std::tie(
+        item,
+        error
+      ) = deserialize_item(reader);
+
+      if (error.has_value()) {
+        error->path.segments.emplace_front(
+          common::make_unique<IndexSegment>(i)
+        );
+        break;
+      }
+
+      error = SkipWhitespace(reader);
+      if (error.has_value()) {
+        break;
+      }
+
+      items.emplace_back(*item);
+
+      if (reader.node().kind() == NodeKind::Stop) {
+        break;
+      }
+
+      ++i;
+    }
+
+    if (!error.has_value()) {
+      auto result = std::vector<T>();
+      result.reserve(items.size());
+
+      for (auto& item : items) {
+        result.emplace_back(
+          std::move(item)
+        );
+    }
+
+      return std::make_pair(
+        std::move(result),
+        common::nullopt
+      );
+    } else {
+      return std::make_pair(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+  }
 }
 
 namespace properties {
 
 enum class OfSomething : std::uint32_t {
-  kSomeResult = 0
+  kSomeBools = 0,
+  kSomeInts = 1,
+  kSomeFloats = 2,
+  kSomeStrings = 3,
+  kSomeBytes = 4
 };  // enum class OfSomething
 
 const std::unordered_map<
@@ -2407,8 +2557,24 @@ const std::unordered_map<
   OfSomething
 > kMapOfSomething = {
   {
-    "someResult",
-    OfSomething::kSomeResult
+    "someBools",
+    OfSomething::kSomeBools
+  },
+  {
+    "someInts",
+    OfSomething::kSomeInts
+  },
+  {
+    "someFloats",
+    OfSomething::kSomeFloats
+  },
+  {
+    "someStrings",
+    OfSomething::kSomeStrings
+  },
+  {
+    "someBytes",
+    OfSomething::kSomeBytes
   }
 };
 
@@ -2448,7 +2614,19 @@ std::pair<
 
   // region Initialization
 
-  common::optional<types::Result> the_some_result;
+  common::optional<std::vector<bool> > the_some_bools;
+
+  common::optional<std::vector<int64_t> > the_some_ints;
+
+  common::optional<std::vector<double> > the_some_floats;
+
+  common::optional<std::vector<std::wstring> > the_some_strings;
+
+  common::optional<
+    std::vector<
+      std::vector<std::uint8_t>
+    >
+  > the_some_bytes;
 
   // endregion Initialization
 
@@ -2527,11 +2705,95 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeResult:
+      case properties::OfSomething::kSomeBools:
         std::tie(
-          the_some_result,
+          the_some_bools,
           error
-        ) = DeserializeResult(reader);
+        ) = DeserializeList<
+          bool
+        >(
+          reader,
+          [](ReaderMergingText& a_reader) {
+            return DeserializeValueFromVElement<
+              bool
+            >(
+              a_reader,
+              DeserializeBool
+            );
+          }
+        );
+        break;
+      case properties::OfSomething::kSomeInts:
+        std::tie(
+          the_some_ints,
+          error
+        ) = DeserializeList<
+          int64_t
+        >(
+          reader,
+          [](ReaderMergingText& a_reader) {
+            return DeserializeValueFromVElement<
+              int64_t
+            >(
+              a_reader,
+              DeserializeInt64
+            );
+          }
+        );
+        break;
+      case properties::OfSomething::kSomeFloats:
+        std::tie(
+          the_some_floats,
+          error
+        ) = DeserializeList<
+          double
+        >(
+          reader,
+          [](ReaderMergingText& a_reader) {
+            return DeserializeValueFromVElement<
+              double
+            >(
+              a_reader,
+              DeserializeDouble
+            );
+          }
+        );
+        break;
+      case properties::OfSomething::kSomeStrings:
+        std::tie(
+          the_some_strings,
+          error
+        ) = DeserializeList<
+          std::wstring
+        >(
+          reader,
+          [](ReaderMergingText& a_reader) {
+            return DeserializeValueFromVElement<
+              std::wstring
+            >(
+              a_reader,
+              DeserializeWstring
+            );
+          }
+        );
+        break;
+      case properties::OfSomething::kSomeBytes:
+        std::tie(
+          the_some_bytes,
+          error
+        ) = DeserializeList<
+          std::vector<std::uint8_t>
+        >(
+          reader,
+          [](ReaderMergingText& a_reader) {
+            return DeserializeValueFromVElement<
+              std::vector<std::uint8_t>
+            >(
+              a_reader,
+              DeserializeByteArray
+            );
+          }
+        );
         break;
       default:
         throw std::logic_error(
@@ -2617,11 +2879,43 @@ std::pair<
 
   // region Check required properties
 
-  if (!the_some_result.has_value()) {
+  if (!the_some_bools.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
       std::shared_ptr<T>
     >(
-      L"The required property someResult is missing"
+      L"The required property someBools is missing"
+    );
+  }
+
+  if (!the_some_ints.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property someInts is missing"
+    );
+  }
+
+  if (!the_some_floats.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property someFloats is missing"
+    );
+  }
+
+  if (!the_some_strings.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property someStrings is missing"
+    );
+  }
+
+  if (!the_some_bytes.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<T>
+    >(
+      L"The required property someBytes is missing"
     );
   }
 
@@ -2635,7 +2929,11 @@ std::pair<
       // We deliberately do not use std::make_shared here to avoid an unnecessary
       // upcast.
       new types::Something(
-        std::move(*the_some_result)
+        std::move(*the_some_bools),
+        std::move(*the_some_ints),
+        std::move(*the_some_floats),
+        std::move(*the_some_strings),
+        std::move(*the_some_bytes)
       )
     ),
     common::nullopt
@@ -3568,20 +3866,47 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
- * Serialize the literal of Result
- * to XML text.
+ * Serialize a list of items enclosed in <v> elements.
  */
-common::optional<SerializationError> SerializeResult(
-  types::Result that,
-  SelfClosingWriter& writer
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializeListOfVElements(
+  const std::vector<T>& list,
+  SelfClosingWriter& writer,
+  const SerializeT& serialize_item
 ) {
-  writer.SerializeString(
-    stringification::to_string(
-      that
-    )
-  );
-  if (writer.error()) {
-    return writer.move_error();
+  for (size_t i = 0; i < list.size(); ++i) {
+    writer.StartElement("v");
+    if (writer.error().has_value()) {
+      common::optional<SerializationError>&& error = writer.move_error();
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(i)
+      );
+
+      return error;
+    }
+
+    common::optional<SerializationError> error = serialize_item(
+      list[i],
+      writer
+    );
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(i)
+      );
+
+      return error;
+    }
+
+    writer.StopElement("v");
+    if (writer.error().has_value()) {
+      common::optional<SerializationError>&& error = writer.move_error();
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(i)
+      );
+
+      return error;
+    }
   }
 
   return common::nullopt;
@@ -3635,33 +3960,174 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
   common::optional<SerializationError> error;
 
   writer.StartElement(
-    "someResult"
+    "someBools"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  error = SerializeResult(
-    that.some_result(),
-    writer
+  error = SerializeListOfVElements(
+    that.some_bools(),
+    writer,
+    SerializeBool
   );
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeResult
+        iteration::Property::kSomeBools
       )
     );
 
     return error;
   }
   writer.StopElement(
-    "someResult"
+    "someBools"
   );
   if (writer.error().has_value()) {
     error = writer.move_error();
 
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeResult
+        iteration::Property::kSomeBools
+      )
+    );
+
+    return error;
+  }
+
+  writer.StartElement(
+    "someInts"
+  );
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+  error = SerializeListOfVElements(
+    that.some_ints(),
+    writer,
+    SerializeInt64
+  );
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeInts
+      )
+    );
+
+    return error;
+  }
+  writer.StopElement(
+    "someInts"
+  );
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeInts
+      )
+    );
+
+    return error;
+  }
+
+  writer.StartElement(
+    "someFloats"
+  );
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+  error = SerializeListOfVElements(
+    that.some_floats(),
+    writer,
+    SerializeDouble
+  );
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeFloats
+      )
+    );
+
+    return error;
+  }
+  writer.StopElement(
+    "someFloats"
+  );
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeFloats
+      )
+    );
+
+    return error;
+  }
+
+  writer.StartElement(
+    "someStrings"
+  );
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+  error = SerializeListOfVElements(
+    that.some_strings(),
+    writer,
+    SerializeWstring
+  );
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeStrings
+      )
+    );
+
+    return error;
+  }
+  writer.StopElement(
+    "someStrings"
+  );
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeStrings
+      )
+    );
+
+    return error;
+  }
+
+  writer.StartElement(
+    "someBytes"
+  );
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+  error = SerializeListOfVElements(
+    that.some_bytes(),
+    writer,
+    SerializeByteArray
+  );
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeBytes
+      )
+    );
+
+    return error;
+  }
+  writer.StopElement(
+    "someBytes"
+  );
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kSomeBytes
       )
     );
 

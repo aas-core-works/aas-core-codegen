@@ -492,12 +492,33 @@ def is_referencable(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
     if primitive_type is not None:
         return primitive_type_is_referencable(primitive_type)
 
-    if isinstance(type_annotation, intermediate.OurTypeAnnotation) and isinstance(
-        type_annotation.our_type, intermediate.Enumeration
-    ):
-        return False
+    else:
+        if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+            raise AssertionError("Expected to handle this case before")
 
-    return True
+        elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+            if isinstance(type_annotation.our_type, intermediate.Enumeration):
+                return False
+
+            elif isinstance(
+                type_annotation.our_type, intermediate.ConstrainedPrimitive
+            ):
+                raise AssertionError("Expected to handle this case before")
+
+            elif isinstance(
+                type_annotation.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                return True
+
+            else:
+                assert_never(type_annotation.our_type)
+
+        elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+            return True
+
+        else:
+            assert_never(type_annotation)
 
 
 def generate_type_with_const_ref_if_applicable(
