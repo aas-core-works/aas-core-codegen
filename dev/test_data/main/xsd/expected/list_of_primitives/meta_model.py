@@ -2,14 +2,6 @@ from typing import List
 
 from icontract import DBC
 
-# NOTE (mristin):
-# The XSD generator expects the constrained primitive Value data type to be defined
-# since we had to hard-wire it. If we remove that hard-wiring, we can also remove
-# this definition as well.
-
-class Value_data_type(str, DBC):
-    pass
-
 
 class Something(DBC):
     some_bools: List[bool]

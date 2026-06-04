@@ -17,9 +17,6 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
-  <xs:simpleType name="valueDataType">
-    <xs:restriction base="xs:string"/>
-  </xs:simpleType>
   <xs:complexType name="something_t">
     <xs:sequence>
       <xs:group ref="something"/>

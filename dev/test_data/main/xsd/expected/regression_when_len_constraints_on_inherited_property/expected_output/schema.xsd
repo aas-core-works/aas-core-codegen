@@ -22,9 +22,6 @@
       <xs:group ref="abstractLangString"/>
     </xs:sequence>
   </xs:group>
-  <xs:simpleType name="valueDataType">
-    <xs:restriction base="xs:string"/>
-  </xs:simpleType>
   <xs:complexType name="abstractLangString_t">
     <xs:sequence>
       <xs:group ref="abstractLangString"/>

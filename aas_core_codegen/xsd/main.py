@@ -367,9 +367,9 @@ def _value_to_type_element_or_type_identifier(
     """
     if isinstance(type_annotation, intermediate.OurTypeAnnotation):
         if type_annotation.our_type.name == "Value_data_type":
-            # NOTE (mristin, 2022-11-10):
-            # Please see :py:const:`_EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE`
-            # for the explanation why we hard-wire the ``Value_data_type`` here.
+            # NOTE (mristin):
+            # Please see the note regarding the value data type above for the
+            # explanation why we hard-wire the ``Value_data_type`` here.
             return _TypeElementOrTypeIdentifier(tajp="valueDataType"), None
 
     primitive_type = intermediate.try_primitive_type(type_annotation)
@@ -878,26 +878,6 @@ def _sort_by_tags_and_names_in_place(root: ET.Element) -> None:
     root[:] = children
 
 
-_EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE = (
-    "(mristin, 2022-09-02) "
-    'We provide an internal data type ``valueDataType`` to correspond to "any XSD '
-    'atomic type as specified via DataTypeDefXsd". We need this type since we '
-    "hard-wire ``Value_data_type`` to it. We could have made "
-    "the class ``Value_data_type``implementation-specific and defined its "
-    "representation manually as a snippet, including ``valueDataType``.\n\n"
-    "However, we decided against that. This would be a major hurdle for "
-    "other code and test data generators (which can treat ``Value_data_type`` "
-    "simply as string). Therefore, we make the XSD generator "
-    "a bit more hacky instead of complicating the other generators.\n\n"
-    "If in the future, for whatever reason, the semantic of ``Value_data_type`` "
-    "changes (or the type is renamed), be careful to maintain backwards "
-    "compatibility here! You probably want to distinguish different versions "
-    "of the meta-model and act accordingly. At that point, it might also make "
-    "sense to refactor this schema generator to a separate repository, and "
-    "fix it to a particular range of meta-model versions."
-)
-
-
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate(
     symbol_table: intermediate.SymbolTable,
@@ -1024,27 +1004,39 @@ def _generate(
     if some_errors is not None:
         errors.extend(some_errors)
 
-    # NOTE (mristin, 2022-11-10):
-    # Please see :py:const:`_EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE` for
-    # the explanation why we retrieve the ``Value_data_type`` here
+    # NOTE (mristin):
+    # We provide an internal data type ``valueDataType`` corresponding to any XSD
+    # atomic type specified through ``DataTypeDefXsd``. We need this type because
+    # ``Value_data_type`` is hard-wired to it.
+    #
+    # We could have made ``Value_data_type`` implementation-specific and defined its
+    # representation manually as a snippet, including ``valueDataType``. However,
+    # we decided against that. Doing so would create a major hurdle for other code
+    # and test-data generators, which can currently treat ``Value_data_type`` simply
+    # as a string. Therefore, we accept a somewhat hackier XSD generator rather than
+    # complicating the other generators.
+    #
+    # If the semantics of ``Value_data_type`` ever change, or if the type is
+    # renamed, be careful to preserve backward compatibility here. You will
+    # probably want to distinguish between different meta-model versions and act
+    # accordingly. At that point, it might also make sense to move this schema
+    # generator into a separate repository and pin it to a particular range of
+    # meta-model versions.
+
     value_data_type_cls = symbol_table.find_our_type(Identifier("Value_data_type"))
 
     if value_data_type_cls is None:
-        errors.append(
-            Error(
-                None,
-                "XSD generator expected to find our type ``Value_data_type``, but it "
-                "was not present in the meta-model.\n\n"
-                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE,
-            )
-        )
+        # NOTE (mristin):
+        # The meta-model does not need the value data type so we do not have to do
+        # anything about it.
+        pass
+
     elif not isinstance(value_data_type_cls, intermediate.ConstrainedPrimitive):
         errors.append(
             Error(
                 None,
-                "XSD generator expected ``Value_data_type`` to be "
-                "a constrained primitive,  but got: {type(value_data_type_cls)}.\n\n"
-                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE,
+                f"XSD generator expected ``Value_data_type`` to be "
+                f"a constrained primitive,  but got: {type(value_data_type_cls)}",
             )
         )
     elif value_data_type_cls.constrainee != intermediate.PrimitiveType.STR:
@@ -1053,8 +1045,7 @@ def _generate(
                 None,
                 f"XSD generator expected ``Value_data_type`` to be a constrained "
                 f"primitive of strings, "
-                f"but got: {value_data_type_cls.constrainee}.\n\n"
-                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE,
+                f"but got: {value_data_type_cls.constrainee}",
             )
         )
     else:
@@ -1072,28 +1063,31 @@ def _generate(
 
     # region Specify ``valueDataType``
 
-    assert value_data_type_cls is not None
+    if value_data_type_cls is not None:
+        # NOTE (mristin):
+        # Please see the note regarding the value data type above for the
+        # explanation why we hard-wire the ``Value_data_type`` here.
 
-    value_data_type_element = ET.Element(
-        "xs:simpleType", attrib={"name": "valueDataType"}
-    )
-
-    value_data_type_element.append(
-        ET.Element(
-            "xs:restriction",
-            attrib={"base": "xs:string"},
+        value_data_type_element = ET.Element(
+            "xs:simpleType", attrib={"name": "valueDataType"}
         )
-    )
 
-    root.append(value_data_type_element)
+        value_data_type_element.append(
+            ET.Element(
+                "xs:restriction",
+                attrib={"base": "xs:string"},
+            )
+        )
+
+        root.append(value_data_type_element)
 
     # endregion
 
     for our_type in symbol_table.our_types:
         if our_type.name == "Value_data_type":
-            # NOTE (mristin, 2022-11-10):
-            # Please see :py:const:`_EXPLANATION_ABOUT_WHY_WE_EXPECT_VALUE_DATA_TYPE`
-            # for the explanation why we hard-wire the ``Value_data_type`` here
+            # NOTE (mristin):
+            # Please see the note regarding the value data type above for the
+            # explanation why we hard-wire the ``Value_data_type`` here.
             continue
 
         elements: Optional[List[ET.Element]]
