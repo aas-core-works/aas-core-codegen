@@ -181,6 +181,14 @@ go 1.18
             subprocess.check_call(cmd, cwd=module_dir)
 
             case_test_data_dir = live_tests_golang_dir / "test_data" / case_dir.name
+
+            if not case_test_data_dir.exists():
+                # NOTE (mristin):
+                # We fall back to the shared test data.
+                case_test_data_dir = live_tests_common.common_test_data_dir_for_case(
+                    case_name=case_dir.name
+                )
+
             if case_test_data_dir.exists():
                 # NOTE (mristin):
                 # Go expects the test data in ``testdata`` (no underscore) directory.
