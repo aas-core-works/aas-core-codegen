@@ -3541,6 +3541,66 @@ void SelfClosingWriter::WriteStringWithoutEscapingNorFlushing(
 
 // endregion SelfClosingWriter
 
+common::optional<SerializationError> SerializeBool(
+  bool value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeBool(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeInt64(
+  int64_t value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeInt64(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeDouble(
+  double value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeDouble(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeWstring(
+  const std::wstring& value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeWstring(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeByteArray(
+  const std::vector<std::uint8_t>& value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeByteArray(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -3567,6 +3627,12 @@ common::optional<SerializationError> SerializeSomethingAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeSomethingAsElement(const types::ISomething&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSomethingPtrAsElement(
+  const std::shared_ptr<types::ISomething>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -3582,21 +3648,16 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  bool the_some_bool(
-    that.some_bool()
-  );
   writer.StartElement(
     "someBool"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeBool(
-    the_some_bool
+  error = SerializeBool(
+    that.some_bool(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -3621,21 +3682,16 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
     return error;
   }
 
-  int64_t the_some_int(
-    that.some_int()
-  );
   writer.StartElement(
     "someInt"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeInt64(
-    the_some_int
+  error = SerializeInt64(
+    that.some_int(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -3660,21 +3716,16 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
     return error;
   }
 
-  double the_some_float(
-    that.some_float()
-  );
   writer.StartElement(
     "someFloat"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeDouble(
-    the_some_float
+  error = SerializeDouble(
+    that.some_float(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -3699,21 +3750,16 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
     return error;
   }
 
-  const std::wstring& the_some_string(
-    that.some_string()
-  );
   writer.StartElement(
     "someString"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_some_string
+  error = SerializeWstring(
+    that.some_string(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -3738,21 +3784,16 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
     return error;
   }
 
-  const std::vector<std::uint8_t>& the_some_bytes(
-    that.some_bytes()
-  );
   writer.StartElement(
     "someBytes"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeByteArray(
-    the_some_bytes
+  error = SerializeByteArray(
+    that.some_bytes(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -3819,6 +3860,13 @@ common::optional<SerializationError> SerializeSomethingAsElement(
   }
 
   return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeSomethingPtrAsElement(
+  const std::shared_ptr<types::ISomething>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSomethingAsElement(*that, writer);
 }
 
 void Serialize(

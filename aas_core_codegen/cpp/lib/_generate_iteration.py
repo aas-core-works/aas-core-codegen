@@ -775,30 +775,59 @@ class IteratorQualities:
         for prop in cls.properties:
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-            if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                relevant_properties.append(prop)
+            if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
+                pass
+
+            elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+                if isinstance(type_anno.our_type, intermediate.Enumeration):
+                    pass
+
+                elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
+                    pass
+
+                elif isinstance(
+                    type_anno.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    relevant_properties.append(prop)
+
+                else:
+                    assert_never(type_anno.our_type)
 
             elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                assert isinstance(
-                    type_anno.items, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ), (
-                    f"NOTE (mristin): We expect only lists of classes "
-                    f"at the moment, but you specified {prop.type_annotation} "
-                    f"in class {cls.name!r} and property {prop.name!r}. "
-                    f"Please contact the developers if you need this feature."
-                )
+                if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                    pass
 
-                cls_contains_a_list_property = True
+                elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                    if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                        pass
 
-                relevant_properties.append(prop)
+                    elif isinstance(
+                        type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                    ):
+                        pass
+
+                    elif isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    ):
+                        cls_contains_a_list_property = True
+
+                        relevant_properties.append(prop)
+
+                    else:
+                        assert_never(type_anno.items.our_type)
+
+                else:
+                    raise NotImplementedError(
+                        f"NOTE (mristin): We expect only lists of atomic values "
+                        f"at the moment, but you specified {prop.type_annotation} "
+                        f"in class {cls.name!r} and property {prop.name!r}. "
+                        f"Please contact the developers if you need this feature."
+                    )
+
             else:
-                pass
+                assert_never(type_anno)
 
         self.cls = cls
         self.relevant_properties = relevant_properties

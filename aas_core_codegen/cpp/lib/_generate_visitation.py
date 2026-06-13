@@ -341,31 +341,48 @@ Visit(
             # noinspection PyTypeChecker
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(
-            type_anno.items, intermediate.OurTypeAnnotation
-        ) and isinstance(
-            type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
-        ), (
-            f"NOTE (mristin): We expect only lists of classes "
-            f"at the moment, but you specified {type_anno}. "
-            f"Please contact the developers if you need this feature."
-        )
+        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+            # No visits to primitive values.
+            return Stripped("")
 
-        item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-            type_annotation=type_anno.items,
-            types_namespace=cpp_common.TYPES_NAMESPACE,
-        )
+        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                # No visits to enumerations.
+                return Stripped("")
 
-        code = Stripped(
-            f"""\
+            elif isinstance(
+                type_anno.items.our_type, intermediate.ConstrainedPrimitive
+            ):
+                # No visits to primitive values.
+                return Stripped("")
+
+            elif isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                item_type = cpp_common.generate_type_with_const_ref_if_applicable(
+                    type_annotation=type_anno.items,
+                    types_namespace=cpp_common.TYPES_NAMESPACE,
+                )
+
+                code = Stripped(
+                    f"""\
 for (
 {I}{indent_but_first_line(item_type, I)} item :
 {I}{indent_but_first_line(get_expr, I)}
 ) {{
 {I}Visit(item);
 }}"""
-        )
+                )
+            else:
+                assert_never(type_anno.items.our_type)
+
+        else:
+            raise NotImplementedError(
+                "NOTE (mristin): We currently generate the visitation only for "
+                f"lists of atomic values, but you provided {prop.type_annotation}. "
+                f"Please contact the developers if you need this feature."
+            )
 
     else:
         # noinspection PyTypeChecker

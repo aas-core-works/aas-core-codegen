@@ -3245,6 +3245,104 @@ std::pair<
 
 // endregion De-serialize primitives
 
+template <typename T, typename DeserializeT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  ReaderMergingText& reader,
+  const DeserializeT& deserialize_item
+) {
+  #ifdef DEBUG
+  if (reader.node().kind() == NodeKind::Error) {
+    throw std::logic_error(
+      "Unexpected unhandled XML error in DeserializeWstring. "
+      "DeserializeWstring expects no error node."
+    );
+  }
+  #endif
+
+  common::optional<DeserializationError> error;
+
+  error = SkipWhitespace(reader);
+  if (error.has_value()) {
+    return std::make_pair(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  // If we encounter the stop element then we reached the end of the list. If this is
+  // the first node we encounter then the list is empty, *i.e.*, contains no items.
+  if (reader.node().kind() == NodeKind::Stop) {
+    return std::make_pair(
+      std::vector<T>(),
+      std::nullopt
+    );
+  } else {
+    // NOTE (mristin):
+    // We use std::deque here as it is a buffered list, while a std::list
+    // would incur a memory allocation on each push. We do not want to use
+    // std::vector as the number of elements in a list can be arbitrarily large
+    // leading potentially to out-of-memory errors since std::vector's double
+    // their size for amortized time complexity of O(1) for insertions.
+
+    std::deque<T> items;
+
+    size_t i = 0;
+
+    while (true) {
+      common::optional<T> item;
+
+      std::tie(
+        item,
+        error
+      ) = deserialize_item(reader);
+
+      if (error.has_value()) {
+        error->path.segments.emplace_front(
+          common::make_unique<IndexSegment>(i)
+        );
+        break;
+      }
+
+      error = SkipWhitespace(reader);
+      if (error.has_value()) {
+        break;
+      }
+
+      items.emplace_back(*item);
+
+      if (reader.node().kind() == NodeKind::Stop) {
+        break;
+      }
+
+      ++i;
+    }
+
+    if (!error.has_value()) {
+      auto result = std::vector<T>();
+      result.reserve(items.size());
+
+      for (auto& item : items) {
+        result.emplace_back(
+          std::move(item)
+        );
+    }
+
+      return std::make_pair(
+        std::move(result),
+        common::nullopt
+      );
+    } else {
+      return std::make_pair(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+  }
+}
+
 namespace properties {
 
 enum class OfSomeItem : std::uint32_t {
@@ -4117,120 +4215,28 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeItems: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_some_items = std::vector<
-            std::shared_ptr<types::IAbstractItem>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::IAbstractItem>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::IAbstractItem>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = AbstractItemFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_some_items = std::vector<
-              std::shared_ptr<types::IAbstractItem>
-            >();
-            the_some_items->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_some_items->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSomething::kSomeItems:
+        std::tie(
+          the_some_items,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::IAbstractItem>
+        >(
+          reader,
+          AbstractItemFromElement
+        );
         break;
-      }
-      case properties::OfSomething::kSomeSimples: {
-        if (reader.node().kind() == NodeKind::Stop) {
-          the_some_simples = std::vector<
-            std::shared_ptr<types::ISimple>
-          >();
-        } else {
-          std::deque<
-            std::shared_ptr<types::ISimple>
-          > items;
-          size_t i = 0;
-          
-          while (true) {
-            common::optional<
-              std::shared_ptr<types::ISimple>
-            > item;
-          
-            std::tie(
-              item,
-              error
-            ) = SimpleFromElement(reader);
-          
-            if (error.has_value()) {
-              error->path.segments.emplace_front(
-                common::make_unique<IndexSegment>(i)
-              );
-              break;
-            }
-          
-            error = SkipWhitespace(reader);
-            if (error.has_value()) {
-              break;
-            }
-          
-            items.emplace_back(*item);
-          
-            if (reader.node().kind() == NodeKind::Stop) {
-              break;
-            }
-          
-            ++i;
-          }
-          
-          if (!error.has_value()) {
-            the_some_simples = std::vector<
-              std::shared_ptr<types::ISimple>
-            >();
-            the_some_simples->reserve(items.size());
-            
-            for (auto& item : items) {
-              the_some_simples->emplace_back(
-                std::move(item)
-              );
-            }
-          }
-        }
+      case properties::OfSomething::kSomeSimples:
+        std::tie(
+          the_some_simples,
+          error
+        ) = DeserializeList<
+          std::shared_ptr<types::ISimple>
+        >(
+          reader,
+          SimpleFromElement
+        );
         break;
-      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -5414,6 +5420,93 @@ void SelfClosingWriter::WriteStringWithoutEscapingNorFlushing(
 
 // endregion SelfClosingWriter
 
+common::optional<SerializationError> SerializeBool(
+  bool value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeBool(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeInt64(
+  int64_t value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeInt64(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeDouble(
+  double value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeDouble(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeWstring(
+  const std::wstring& value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeWstring(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeByteArray(
+  const std::vector<std::uint8_t>& value,
+  SelfClosingWriter& writer
+) {
+  writer.SerializeByteArray(value);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  return common::nullopt;
+}
+
+/**
+ * Serialize a list of instances.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializeListOfInstances(
+  const std::vector<T>& list,
+  SelfClosingWriter& writer,
+  const SerializeT& serialize_item
+) {
+  for (size_t i = 0; i < list.size(); ++i) {
+    common::optional<SerializationError> error = serialize_item(
+      list[i],
+      writer
+    );
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(i)
+      );
+
+      return error;
+    }
+  }
+
+  return common::nullopt;
+}
+
 /**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -5424,6 +5517,12 @@ void SelfClosingWriter::WriteStringWithoutEscapingNorFlushing(
  */
 common::optional<SerializationError> SerializeAbstractItemAsElement(
   const types::IAbstractItem& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeAbstractItemAsElement(const types::IAbstractItem&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAbstractItemPtrAsElement(
+  const std::shared_ptr<types::IAbstractItem>& that,
   SelfClosingWriter& writer
 );
 
@@ -5453,6 +5552,12 @@ common::optional<SerializationError> SerializeSomeItemAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeSomeItemAsElement(const types::ISomeItem&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSomeItemPtrAsElement(
+  const std::shared_ptr<types::ISomeItem>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -5476,6 +5581,12 @@ common::optional<SerializationError> SerializeAnotherItemAsSequence(
  */
 common::optional<SerializationError> SerializeAnotherItemAsElement(
   const types::IAnotherItem& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeAnotherItemAsElement(const types::IAnotherItem&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeAnotherItemPtrAsElement(
+  const std::shared_ptr<types::IAnotherItem>& that,
   SelfClosingWriter& writer
 );
 
@@ -5505,6 +5616,12 @@ common::optional<SerializationError> SerializeSimpleAsElement(
   SelfClosingWriter& writer
 );
 
+/** @copybrief SerializeSimpleAsElement(const types::ISimple&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSimplePtrAsElement(
+  const std::shared_ptr<types::ISimple>& that,
+  SelfClosingWriter& writer
+);
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -5528,6 +5645,12 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
  */
 common::optional<SerializationError> SerializeSomethingAsElement(
   const types::ISomething& that,
+  SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeSomethingAsElement(const types::ISomething&, SelfClosingWriter& */
+common::optional<SerializationError> SerializeSomethingPtrAsElement(
+  const std::shared_ptr<types::ISomething>& that,
   SelfClosingWriter& writer
 );
 
@@ -5564,6 +5687,13 @@ common::optional<SerializationError> SerializeAbstractItemAsElement(
   };
 }
 
+common::optional<SerializationError> SerializeAbstractItemPtrAsElement(
+  const std::shared_ptr<types::IAbstractItem>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAbstractItemAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -5579,21 +5709,16 @@ common::optional<SerializationError> SerializeSomeItemAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_name(
-    that.name()
-  );
   writer.StartElement(
     "name"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_name
+  error = SerializeWstring(
+    that.name(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -5662,6 +5787,13 @@ common::optional<SerializationError> SerializeSomeItemAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeSomeItemPtrAsElement(
+  const std::shared_ptr<types::ISomeItem>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSomeItemAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -5677,21 +5809,16 @@ common::optional<SerializationError> SerializeAnotherItemAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  int64_t the_serial_number(
-    that.serial_number()
-  );
   writer.StartElement(
     "serialNumber"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeInt64(
-    the_serial_number
+  error = SerializeInt64(
+    that.serial_number(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -5760,6 +5887,13 @@ common::optional<SerializationError> SerializeAnotherItemAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeAnotherItemPtrAsElement(
+  const std::shared_ptr<types::IAnotherItem>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeAnotherItemAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -5775,21 +5909,16 @@ common::optional<SerializationError> SerializeSimpleAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::wstring& the_name(
-    that.name()
-  );
   writer.StartElement(
     "name"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  writer.SerializeWstring(
-    the_name
+  error = SerializeWstring(
+    that.name(),
+    writer
   );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-  }
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -5858,6 +5987,13 @@ common::optional<SerializationError> SerializeSimpleAsElement(
   return common::nullopt;
 }
 
+common::optional<SerializationError> SerializeSimplePtrAsElement(
+  const std::shared_ptr<types::ISimple>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSimpleAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -5873,37 +6009,17 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  const std::vector<
-    std::shared_ptr<types::IAbstractItem>
-  >& the_some_items(
-    that.some_items()
-  );
   writer.StartElement(
     "someItems"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  for (size_t i = 0; i < the_some_items.size(); ++i) {
-    const std::shared_ptr<types::IAbstractItem>& item(
-      the_some_items[i]
-    );
-
-    error = SerializeAbstractItemAsElement(
-      *item,
-      writer
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          i
-        )
-      );
-
-      break;
-    }
-  }
+  error = SerializeListOfInstances(
+    that.some_items(),
+    writer,
+    SerializeAbstractItemPtrAsElement
+  );
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -5928,37 +6044,17 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
     return error;
   }
 
-  const std::vector<
-    std::shared_ptr<types::ISimple>
-  >& the_some_simples(
-    that.some_simples()
-  );
   writer.StartElement(
     "someSimples"
   );
   if (writer.error().has_value()) {
     return writer.move_error();
   }
-  for (size_t i = 0; i < the_some_simples.size(); ++i) {
-    const std::shared_ptr<types::ISimple>& item(
-      the_some_simples[i]
-    );
-
-    error = SerializeSimpleAsElement(
-      *item,
-      writer
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          i
-        )
-      );
-
-      break;
-    }
-  }
+  error = SerializeListOfInstances(
+    that.some_simples(),
+    writer,
+    SerializeSimplePtrAsElement
+  );
   if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<iteration::PropertySegment>(
@@ -6025,6 +6121,13 @@ common::optional<SerializationError> SerializeSomethingAsElement(
   }
 
   return common::nullopt;
+}
+
+common::optional<SerializationError> SerializeSomethingPtrAsElement(
+  const std::shared_ptr<types::ISomething>& that,
+  SelfClosingWriter& writer
+) {
+  return SerializeSomethingAsElement(*that, writer);
 }
 
 void Serialize(

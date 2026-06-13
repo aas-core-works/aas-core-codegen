@@ -492,6 +492,734 @@ std::pair<
   );
 }
 
+template <typename T, typename DeserializeItemT>
+std::pair<
+  common::optional<std::vector<T> >,
+  common::optional<DeserializationError>
+> DeserializeList(
+  const nlohmann::json& json,
+  DeserializeItemT&& deserialize_item
+) {
+  if (!json.is_array()) {
+    std::wstring message = common::Concat(
+      L"Expected an array, but got: ",
+      common::Utf8ToWstring(
+        json.type_name()
+      )
+    );
+
+    return std::make_pair<
+      common::optional<std::vector<T> >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  std::optional<std::vector<T> > list(
+    common::make_optional<std::vector<T> >()
+  );
+
+  list->reserve(json.size());
+
+  size_t index = 0;
+
+  for(const nlohmann::json& item : json) {
+    common::optional<T> deserialized;
+    common::optional<DeserializationError> error;
+
+    std::tie(deserialized, error) = deserialize_item(item);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<std::vector<T> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    list->emplace_back(std::move(*deserialized));
+
+    ++index;
+  }
+
+  return std::make_pair(
+    list,
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<types::ModellingKind>,
+  common::optional<DeserializationError>
+> DeserializeModellingKind(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::ModellingKind>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::ModellingKind
+  > literal = std::move(
+    wstringification::ModellingKindFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for ModellingKind: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::ModellingKind>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::ModellingKind>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::QualifierKind>,
+  common::optional<DeserializationError>
+> DeserializeQualifierKind(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::QualifierKind>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::QualifierKind
+  > literal = std::move(
+    wstringification::QualifierKindFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for QualifierKind: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::QualifierKind>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::QualifierKind>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::AssetKind>,
+  common::optional<DeserializationError>
+> DeserializeAssetKind(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::AssetKind>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::AssetKind
+  > literal = std::move(
+    wstringification::AssetKindFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for AssetKind: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::AssetKind>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::AssetKind>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::AasSubmodelElements>,
+  common::optional<DeserializationError>
+> DeserializeAasSubmodelElements(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::AasSubmodelElements>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::AasSubmodelElements
+  > literal = std::move(
+    wstringification::AasSubmodelElementsFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for AasSubmodelElements: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::AasSubmodelElements>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::AasSubmodelElements>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::EntityType>,
+  common::optional<DeserializationError>
+> DeserializeEntityType(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::EntityType>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::EntityType
+  > literal = std::move(
+    wstringification::EntityTypeFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for EntityType: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::EntityType>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::EntityType>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::Direction>,
+  common::optional<DeserializationError>
+> DeserializeDirection(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::Direction>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::Direction
+  > literal = std::move(
+    wstringification::DirectionFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for Direction: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::Direction>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::Direction>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::StateOfEvent>,
+  common::optional<DeserializationError>
+> DeserializeStateOfEvent(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::StateOfEvent>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::StateOfEvent
+  > literal = std::move(
+    wstringification::StateOfEventFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for StateOfEvent: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::StateOfEvent>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::StateOfEvent>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::ReferenceTypes>,
+  common::optional<DeserializationError>
+> DeserializeReferenceTypes(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::ReferenceTypes>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::ReferenceTypes
+  > literal = std::move(
+    wstringification::ReferenceTypesFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for ReferenceTypes: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::ReferenceTypes>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::ReferenceTypes>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::KeyTypes>,
+  common::optional<DeserializationError>
+> DeserializeKeyTypes(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::KeyTypes>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::KeyTypes
+  > literal = std::move(
+    wstringification::KeyTypesFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for KeyTypes: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::KeyTypes>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::KeyTypes>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::DataTypeDefXsd>,
+  common::optional<DeserializationError>
+> DeserializeDataTypeDefXsd(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::DataTypeDefXsd>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::DataTypeDefXsd
+  > literal = std::move(
+    wstringification::DataTypeDefXsdFromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for DataTypeDefXsd: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::DataTypeDefXsd>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::DataTypeDefXsd>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
+std::pair<
+  common::optional<types::DataTypeIec61360>,
+  common::optional<DeserializationError>
+> DeserializeDataTypeIec61360(
+  const nlohmann::json& json
+) {
+  common::optional<std::wstring> text;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    text,
+    error
+  ) = DeserializeWstring(
+    json
+  );
+
+  if (error.has_value()) {
+    return std::make_pair<
+      common::optional<types::DataTypeIec61360>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  common::optional<
+    types::DataTypeIec61360
+  > literal = std::move(
+    wstringification::DataTypeIec61360FromWstring(
+      *text
+    )
+  );
+
+  if (!literal.has_value()) {
+    std::wstring message = common::Concat(
+      L"Invalid literal for DataTypeIec61360: ",
+      *text
+    );
+
+    return std::make_pair<
+      common::optional<types::DataTypeIec61360>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  return std::make_pair<
+    common::optional<types::DataTypeIec61360>,
+    common::optional<DeserializationError>
+    >(
+      std::move(literal),
+      std::nullopt
+    );
+}
+
 /**
  * \brief Dispatch the deserialization for an instance
  * of types::IHasSemantics.
@@ -1878,19 +2606,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -1904,61 +2630,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
     }
   }
 
@@ -1994,45 +2665,14 @@ std::pair<
   // region De-serialize valueType
 
   if (json.contains("valueType")) {
-    common::optional<std::wstring> text_value_type;
-
     std::tie(
-      text_value_type,
+      the_value_type,
       error
-    ) = DeserializeWstring(
+    ) = DeserializeDataTypeDefXsd(
       json["valueType"]
     );
 
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"valueType"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<T> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_value_type = std::move(
-      wstringification::DataTypeDefXsdFromWstring(
-        *text_value_type
-      )
-    );
-    if (!the_value_type.has_value()) {
-      std::wstring message = common::Concat(
-        L"Invalid literal for DataTypeDefXsd: ",
-        *text_value_type
-      );
-
-      error = common::make_optional<DeserializationError>(
-        message
-      );
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"valueType"
@@ -2083,19 +2723,17 @@ std::pair<
   // region De-serialize refersTo
 
   if (json.contains("refersTo")) {
-    const nlohmann::json& json_refers_to(
-      json["refersTo"]
+    std::tie(
+      the_refers_to,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["refersTo"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_refers_to.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_refers_to.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"refersTo"
@@ -2109,61 +2747,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_refers_to = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_refers_to->reserve(json_refers_to.size());
-
-    size_t index_refers_to = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_refers_to
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_refers_to
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"refersTo"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_refers_to->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_refers_to;
     }
   }
 
@@ -2917,19 +3500,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -2943,61 +3524,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -3443,19 +3969,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -3470,61 +3994,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -3532,45 +4001,14 @@ std::pair<
   // region De-serialize kind
 
   if (json.contains("kind")) {
-    common::optional<std::wstring> text_kind;
-
     std::tie(
-      text_kind,
+      the_kind,
       error
-    ) = DeserializeWstring(
+    ) = DeserializeQualifierKind(
       json["kind"]
     );
 
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"kind"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<T> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_kind = std::move(
-      wstringification::QualifierKindFromWstring(
-        *text_kind
-      )
-    );
-    if (!the_kind.has_value()) {
-      std::wstring message = common::Concat(
-        L"Invalid literal for QualifierKind: ",
-        *text_kind
-      );
-
-      error = common::make_optional<DeserializationError>(
-        message
-      );
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"kind"
@@ -3618,45 +4056,14 @@ std::pair<
 
   // region De-serialize valueType
 
-  common::optional<std::wstring> text_value_type;
-
   std::tie(
-    text_value_type,
+    the_value_type,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeDataTypeDefXsd(
     json["valueType"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"valueType"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_value_type = std::move(
-    wstringification::DataTypeDefXsdFromWstring(
-      *text_value_type
-    )
-  );
-  if (!the_value_type.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for DataTypeDefXsd: ",
-      *text_value_type
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"valueType"
@@ -3918,19 +4325,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -3944,63 +4351,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -4067,19 +4417,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -4094,63 +4444,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -4158,19 +4451,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -4184,63 +4477,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -4308,19 +4544,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -4334,61 +4568,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -4455,19 +4634,17 @@ std::pair<
   // region De-serialize submodels
 
   if (json.contains("submodels")) {
-    const nlohmann::json& json_submodels(
-      json["submodels"]
+    std::tie(
+      the_submodels,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["submodels"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_submodels.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_submodels.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"submodels"
@@ -4481,61 +4658,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_submodels = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_submodels->reserve(json_submodels.size());
-
-    size_t index_submodels = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_submodels
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_submodels
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"submodels"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_submodels->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_submodels;
     }
   }
 
@@ -4716,45 +4838,14 @@ std::pair<
 
   // region De-serialize assetKind
 
-  common::optional<std::wstring> text_asset_kind;
-
   std::tie(
-    text_asset_kind,
+    the_asset_kind,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeAssetKind(
     json["assetKind"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"assetKind"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<types::IAssetInformation> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_asset_kind = std::move(
-    wstringification::AssetKindFromWstring(
-      *text_asset_kind
-    )
-  );
-  if (!the_asset_kind.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for AssetKind: ",
-      *text_asset_kind
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"assetKind"
@@ -4804,19 +4895,19 @@ std::pair<
   // region De-serialize specificAssetIds
 
   if (json.contains("specificAssetIds")) {
-    const nlohmann::json& json_specific_asset_ids(
-      json["specificAssetIds"]
+    std::tie(
+      the_specific_asset_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISpecificAssetId>>(
+      json["specificAssetIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSpecificAssetId<
+        types::ISpecificAssetId
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_specific_asset_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_specific_asset_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"specificAssetIds"
@@ -4830,63 +4921,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_specific_asset_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISpecificAssetId>
-      >
-    >();
-
-    the_specific_asset_ids->reserve(json_specific_asset_ids.size());
-
-    size_t index_specific_asset_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_specific_asset_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISpecificAssetId>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSpecificAssetId<
-        types::ISpecificAssetId
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_specific_asset_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"specificAssetIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<types::IAssetInformation> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_specific_asset_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_specific_asset_ids;
     }
   }
 
@@ -5270,19 +5304,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -5296,61 +5328,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
     }
   }
 
@@ -5625,19 +5602,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -5651,63 +5628,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -5774,19 +5694,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -5801,63 +5721,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -5865,19 +5728,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -5891,63 +5754,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -6015,45 +5821,14 @@ std::pair<
   // region De-serialize kind
 
   if (json.contains("kind")) {
-    common::optional<std::wstring> text_kind;
-
     std::tie(
-      text_kind,
+      the_kind,
       error
-    ) = DeserializeWstring(
+    ) = DeserializeModellingKind(
       json["kind"]
     );
 
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"kind"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<T> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_kind = std::move(
-      wstringification::ModellingKindFromWstring(
-        *text_kind
-      )
-    );
-    if (!the_kind.has_value()) {
-      std::wstring message = common::Concat(
-        L"Invalid literal for ModellingKind: ",
-        *text_kind
-      );
-
-      error = common::make_optional<DeserializationError>(
-        message
-      );
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"kind"
@@ -6105,19 +5880,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -6132,61 +5905,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -6194,19 +5912,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -6221,63 +5939,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -6285,19 +5946,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -6312,61 +5971,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
@@ -6374,19 +5978,17 @@ std::pair<
   // region De-serialize submodelElements
 
   if (json.contains("submodelElements")) {
-    const nlohmann::json& json_submodel_elements(
-      json["submodelElements"]
+    std::tie(
+      the_submodel_elements,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISubmodelElement>>(
+      json["submodelElements"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSubmodelElement(a_json, additional_properties);
+      }
     );
-    if (!json_submodel_elements.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_submodel_elements.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"submodelElements"
@@ -6400,61 +6002,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_submodel_elements = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >
-    >();
-
-    the_submodel_elements->reserve(json_submodel_elements.size());
-
-    size_t index_submodel_elements = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_submodel_elements
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISubmodelElement>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSubmodelElement(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_submodel_elements
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"submodelElements"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_submodel_elements->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_submodel_elements;
     }
   }
 
@@ -6850,19 +6397,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -6876,63 +6423,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -6999,19 +6489,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -7026,63 +6516,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -7090,19 +6523,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -7116,63 +6549,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -7211,19 +6587,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -7238,61 +6612,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -7300,19 +6619,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -7327,63 +6646,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -7391,19 +6653,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -7417,61 +6677,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -7852,19 +7057,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -7878,63 +7083,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -8001,19 +7149,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -8028,63 +7176,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -8092,19 +7183,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -8118,63 +7209,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -8213,19 +7247,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -8240,61 +7272,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -8302,19 +7279,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -8329,63 +7306,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -8393,19 +7313,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -8419,61 +7337,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -8540,45 +7403,14 @@ std::pair<
 
   // region De-serialize typeValueListElement
 
-  common::optional<std::wstring> text_type_value_list_element;
-
   std::tie(
-    text_type_value_list_element,
+    the_type_value_list_element,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeAasSubmodelElements(
     json["typeValueListElement"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"typeValueListElement"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_type_value_list_element = std::move(
-    wstringification::AasSubmodelElementsFromWstring(
-      *text_type_value_list_element
-    )
-  );
-  if (!the_type_value_list_element.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for AasSubmodelElements: ",
-      *text_type_value_list_element
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"typeValueListElement"
@@ -8599,45 +7431,14 @@ std::pair<
   // region De-serialize valueTypeListElement
 
   if (json.contains("valueTypeListElement")) {
-    common::optional<std::wstring> text_value_type_list_element;
-
     std::tie(
-      text_value_type_list_element,
+      the_value_type_list_element,
       error
-    ) = DeserializeWstring(
+    ) = DeserializeDataTypeDefXsd(
       json["valueTypeListElement"]
     );
 
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"valueTypeListElement"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<T> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_value_type_list_element = std::move(
-      wstringification::DataTypeDefXsdFromWstring(
-        *text_value_type_list_element
-      )
-    );
-    if (!the_value_type_list_element.has_value()) {
-      std::wstring message = common::Concat(
-        L"Invalid literal for DataTypeDefXsd: ",
-        *text_value_type_list_element
-      );
-
-      error = common::make_optional<DeserializationError>(
-        message
-      );
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"valueTypeListElement"
@@ -8659,19 +7460,17 @@ std::pair<
   // region De-serialize value
 
   if (json.contains("value")) {
-    const nlohmann::json& json_value(
-      json["value"]
+    std::tie(
+      the_value,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISubmodelElement>>(
+      json["value"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSubmodelElement(a_json, additional_properties);
+      }
     );
-    if (!json_value.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_value.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"value"
@@ -8685,61 +7484,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_value = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >
-    >();
-
-    the_value->reserve(json_value.size());
-
-    size_t index_value = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_value
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISubmodelElement>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSubmodelElement(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_value
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"value"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_value->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_value;
     }
   }
 
@@ -8968,19 +7712,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -8994,63 +7738,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -9117,19 +7804,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -9144,63 +7831,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -9208,19 +7838,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -9234,63 +7864,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -9329,19 +7902,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -9356,61 +7927,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -9418,19 +7934,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -9445,63 +7961,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -9509,19 +7968,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -9536,61 +7993,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
@@ -9598,19 +8000,17 @@ std::pair<
   // region De-serialize value
 
   if (json.contains("value")) {
-    const nlohmann::json& json_value(
-      json["value"]
+    std::tie(
+      the_value,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISubmodelElement>>(
+      json["value"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSubmodelElement(a_json, additional_properties);
+      }
     );
-    if (!json_value.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_value.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"value"
@@ -9624,61 +8024,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_value = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >
-    >();
-
-    the_value->reserve(json_value.size());
-
-    size_t index_value = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_value
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISubmodelElement>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSubmodelElement(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_value
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"value"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_value->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_value;
     }
   }
 
@@ -10016,19 +8361,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -10042,63 +8387,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -10165,19 +8453,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -10192,63 +8480,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -10256,19 +8487,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -10282,63 +8513,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -10377,19 +8551,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -10404,61 +8576,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -10466,19 +8583,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -10493,63 +8610,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -10557,19 +8617,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -10584,106 +8642,20 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
 
   // region De-serialize valueType
 
-  common::optional<std::wstring> text_value_type;
-
   std::tie(
-    text_value_type,
+    the_value_type,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeDataTypeDefXsd(
     json["valueType"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"valueType"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_value_type = std::move(
-    wstringification::DataTypeDefXsdFromWstring(
-      *text_value_type
-    )
-  );
-  if (!the_value_type.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for DataTypeDefXsd: ",
-      *text_value_type
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"valueType"
@@ -10986,19 +8958,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -11012,63 +8984,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -11135,19 +9050,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -11162,63 +9077,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -11226,19 +9084,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -11252,63 +9110,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -11347,19 +9148,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -11374,61 +9173,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -11436,19 +9180,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -11463,63 +9207,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -11527,19 +9214,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -11554,61 +9239,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
@@ -11616,19 +9246,19 @@ std::pair<
   // region De-serialize value
 
   if (json.contains("value")) {
-    const nlohmann::json& json_value(
-      json["value"]
+    std::tie(
+      the_value,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["value"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_value.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_value.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"value"
@@ -11642,63 +9272,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_value = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_value->reserve(json_value.size());
-
-    size_t index_value = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_value
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_value
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"value"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_value->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_value;
     }
   }
 
@@ -11968,19 +9541,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -11994,63 +9567,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -12117,19 +9633,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -12144,63 +9660,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -12208,19 +9667,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -12234,63 +9693,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -12329,19 +9731,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -12356,61 +9756,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -12418,19 +9763,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -12445,63 +9790,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -12509,19 +9797,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -12536,106 +9822,20 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
 
   // region De-serialize valueType
 
-  common::optional<std::wstring> text_value_type;
-
   std::tie(
-    text_value_type,
+    the_value_type,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeDataTypeDefXsd(
     json["valueType"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"valueType"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_value_type = std::move(
-    wstringification::DataTypeDefXsdFromWstring(
-      *text_value_type
-    )
-  );
-  if (!the_value_type.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for DataTypeDefXsd: ",
-      *text_value_type
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"valueType"
@@ -12930,19 +10130,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -12956,63 +10156,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -13079,19 +10222,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -13106,63 +10249,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -13170,19 +10256,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -13196,63 +10282,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -13291,19 +10320,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -13318,61 +10345,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -13380,19 +10352,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -13407,63 +10379,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -13471,19 +10386,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -13497,61 +10410,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -13819,19 +10677,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -13845,63 +10703,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -13968,19 +10769,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -13995,63 +10796,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -14059,19 +10803,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -14085,63 +10829,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -14180,19 +10867,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -14207,61 +10892,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -14269,19 +10899,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -14296,63 +10926,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -14360,19 +10933,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -14386,61 +10957,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -14733,19 +11249,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -14759,63 +11275,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -14882,19 +11341,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -14909,63 +11368,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -14973,19 +11375,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -14999,63 +11401,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -15094,19 +11439,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -15121,61 +11464,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -15183,19 +11471,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -15210,63 +11498,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -15274,19 +11505,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -15300,61 +11529,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -15666,19 +11840,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -15692,63 +11866,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -15815,19 +11932,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -15842,63 +11959,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -15906,19 +11966,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -15932,63 +11992,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -16027,19 +12030,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -16054,61 +12055,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -16116,19 +12062,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -16143,63 +12089,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -16207,19 +12096,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -16233,61 +12120,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -16352,19 +12184,17 @@ std::pair<
   // region De-serialize annotations
 
   if (json.contains("annotations")) {
-    const nlohmann::json& json_annotations(
-      json["annotations"]
+    std::tie(
+      the_annotations,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IDataElement>>(
+      json["annotations"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeDataElement(a_json, additional_properties);
+      }
     );
-    if (!json_annotations.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_annotations.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"annotations"
@@ -16378,61 +12208,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_annotations = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IDataElement>
-      >
-    >();
-
-    the_annotations->reserve(json_annotations.size());
-
-    size_t index_annotations = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_annotations
-    ) {
-      common::optional<
-        std::shared_ptr<types::IDataElement>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeDataElement(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_annotations
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"annotations"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_annotations->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_annotations;
     }
   }
 
@@ -16684,19 +12459,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -16710,63 +12485,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -16833,19 +12551,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -16860,63 +12578,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -16924,19 +12585,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -16950,63 +12611,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -17045,19 +12649,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -17072,61 +12674,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -17134,19 +12681,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -17161,63 +12708,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -17225,19 +12715,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -17252,61 +12740,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
@@ -17314,19 +12747,17 @@ std::pair<
   // region De-serialize statements
 
   if (json.contains("statements")) {
-    const nlohmann::json& json_statements(
-      json["statements"]
+    std::tie(
+      the_statements,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISubmodelElement>>(
+      json["statements"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSubmodelElement(a_json, additional_properties);
+      }
     );
-    if (!json_statements.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_statements.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"statements"
@@ -17341,106 +12772,20 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_statements = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISubmodelElement>
-      >
-    >();
-
-    the_statements->reserve(json_statements.size());
-
-    size_t index_statements = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_statements
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISubmodelElement>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSubmodelElement(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_statements
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"statements"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_statements->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_statements;
-    }
   }
 
   // endregion De-serialize statements
 
   // region De-serialize entityType
 
-  common::optional<std::wstring> text_entity_type;
-
   std::tie(
-    text_entity_type,
+    the_entity_type,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeEntityType(
     json["entityType"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"entityType"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_entity_type = std::move(
-    wstringification::EntityTypeFromWstring(
-      *text_entity_type
-    )
-  );
-  if (!the_entity_type.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for EntityType: ",
-      *text_entity_type
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"entityType"
@@ -17490,19 +12835,19 @@ std::pair<
   // region De-serialize specificAssetIds
 
   if (json.contains("specificAssetIds")) {
-    const nlohmann::json& json_specific_asset_ids(
-      json["specificAssetIds"]
+    std::tie(
+      the_specific_asset_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISpecificAssetId>>(
+      json["specificAssetIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSpecificAssetId<
+        types::ISpecificAssetId
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_specific_asset_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_specific_asset_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"specificAssetIds"
@@ -17516,63 +12861,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_specific_asset_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISpecificAssetId>
-      >
-    >();
-
-    the_specific_asset_ids->reserve(json_specific_asset_ids.size());
-
-    size_t index_specific_asset_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_specific_asset_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISpecificAssetId>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSpecificAssetId<
-        types::ISpecificAssetId
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_specific_asset_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"specificAssetIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_specific_asset_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_specific_asset_ids;
     }
   }
 
@@ -18306,19 +13594,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -18332,63 +13620,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -18455,19 +13686,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -18482,63 +13713,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -18546,19 +13720,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -18572,63 +13746,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -18667,19 +13784,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -18694,61 +13809,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -18756,19 +13816,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -18783,63 +13843,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -18847,19 +13850,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -18873,61 +13874,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -18963,12 +13909,10 @@ std::pair<
 
   // region De-serialize direction
 
-  common::optional<std::wstring> text_direction;
-
   std::tie(
-    text_direction,
+    the_direction,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeDirection(
     json["direction"]
   );
 
@@ -18988,78 +13932,18 @@ std::pair<
     );
   }
 
-  the_direction = std::move(
-    wstringification::DirectionFromWstring(
-      *text_direction
-    )
-  );
-  if (!the_direction.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for Direction: ",
-      *text_direction
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"direction"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
   // endregion De-serialize direction
 
   // region De-serialize state
 
-  common::optional<std::wstring> text_state;
-
   std::tie(
-    text_state,
+    the_state,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeStateOfEvent(
     json["state"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"state"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<T> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_state = std::move(
-    wstringification::StateOfEventFromWstring(
-      *text_state
-    )
-  );
-  if (!the_state.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for StateOfEvent: ",
-      *text_state
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"state"
@@ -19463,19 +14347,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -19489,63 +14373,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -19612,19 +14439,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -19639,63 +14466,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -19703,19 +14473,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -19729,63 +14499,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -19824,19 +14537,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -19851,61 +14562,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -19913,19 +14569,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -19940,63 +14596,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -20004,19 +14603,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -20031,61 +14628,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
@@ -20093,19 +14635,17 @@ std::pair<
   // region De-serialize inputVariables
 
   if (json.contains("inputVariables")) {
-    const nlohmann::json& json_input_variables(
-      json["inputVariables"]
+    std::tie(
+      the_input_variables,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IOperationVariable>>(
+      json["inputVariables"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeOperationVariable(a_json, additional_properties);
+      }
     );
-    if (!json_input_variables.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_input_variables.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"inputVariables"
@@ -20120,61 +14660,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_input_variables = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IOperationVariable>
-      >
-    >();
-
-    the_input_variables->reserve(json_input_variables.size());
-
-    size_t index_input_variables = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_input_variables
-    ) {
-      common::optional<
-        std::shared_ptr<types::IOperationVariable>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeOperationVariable(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_input_variables
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"inputVariables"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_input_variables->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_input_variables;
-    }
   }
 
   // endregion De-serialize inputVariables
@@ -20182,19 +14667,17 @@ std::pair<
   // region De-serialize outputVariables
 
   if (json.contains("outputVariables")) {
-    const nlohmann::json& json_output_variables(
-      json["outputVariables"]
+    std::tie(
+      the_output_variables,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IOperationVariable>>(
+      json["outputVariables"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeOperationVariable(a_json, additional_properties);
+      }
     );
-    if (!json_output_variables.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_output_variables.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"outputVariables"
@@ -20209,61 +14692,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_output_variables = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IOperationVariable>
-      >
-    >();
-
-    the_output_variables->reserve(json_output_variables.size());
-
-    size_t index_output_variables = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_output_variables
-    ) {
-      common::optional<
-        std::shared_ptr<types::IOperationVariable>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeOperationVariable(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_output_variables
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"outputVariables"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_output_variables->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_output_variables;
-    }
   }
 
   // endregion De-serialize outputVariables
@@ -20271,19 +14699,17 @@ std::pair<
   // region De-serialize inoutputVariables
 
   if (json.contains("inoutputVariables")) {
-    const nlohmann::json& json_inoutput_variables(
-      json["inoutputVariables"]
+    std::tie(
+      the_inoutput_variables,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IOperationVariable>>(
+      json["inoutputVariables"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeOperationVariable(a_json, additional_properties);
+      }
     );
-    if (!json_inoutput_variables.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_inoutput_variables.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"inoutputVariables"
@@ -20297,61 +14723,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_inoutput_variables = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IOperationVariable>
-      >
-    >();
-
-    the_inoutput_variables->reserve(json_inoutput_variables.size());
-
-    size_t index_inoutput_variables = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_inoutput_variables
-    ) {
-      common::optional<
-        std::shared_ptr<types::IOperationVariable>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeOperationVariable(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_inoutput_variables
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"inoutputVariables"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_inoutput_variables->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_inoutput_variables;
     }
   }
 
@@ -20692,19 +15063,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -20718,63 +15089,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -20841,19 +15155,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -20868,63 +15182,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -20932,19 +15189,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -20958,63 +15215,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -21053,19 +15253,17 @@ std::pair<
   // region De-serialize supplementalSemanticIds
 
   if (json.contains("supplementalSemanticIds")) {
-    const nlohmann::json& json_supplemental_semantic_ids(
-      json["supplementalSemanticIds"]
+    std::tie(
+      the_supplemental_semantic_ids,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["supplementalSemanticIds"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_supplemental_semantic_ids.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_supplemental_semantic_ids.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"supplementalSemanticIds"
@@ -21080,61 +15278,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_supplemental_semantic_ids = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
-
-    size_t index_supplemental_semantic_ids = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_supplemental_semantic_ids
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"supplementalSemanticIds"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_supplemental_semantic_ids->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_supplemental_semantic_ids;
-    }
   }
 
   // endregion De-serialize supplementalSemanticIds
@@ -21142,19 +15285,19 @@ std::pair<
   // region De-serialize qualifiers
 
   if (json.contains("qualifiers")) {
-    const nlohmann::json& json_qualifiers(
-      json["qualifiers"]
+    std::tie(
+      the_qualifiers,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IQualifier>>(
+      json["qualifiers"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeQualifier<
+        types::IQualifier
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_qualifiers.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_qualifiers.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"qualifiers"
@@ -21169,63 +15312,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_qualifiers = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IQualifier>
-      >
-    >();
-
-    the_qualifiers->reserve(json_qualifiers.size());
-
-    size_t index_qualifiers = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_qualifiers
-    ) {
-      common::optional<
-        std::shared_ptr<types::IQualifier>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeQualifier<
-        types::IQualifier
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"qualifiers"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_qualifiers->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_qualifiers;
-    }
   }
 
   // endregion De-serialize qualifiers
@@ -21233,19 +15319,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -21259,61 +15343,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
     }
   }
 
@@ -21538,19 +15567,19 @@ std::pair<
   // region De-serialize extensions
 
   if (json.contains("extensions")) {
-    const nlohmann::json& json_extensions(
-      json["extensions"]
+    std::tie(
+      the_extensions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IExtension>>(
+      json["extensions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeExtension<
+        types::IExtension
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_extensions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_extensions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"extensions"
@@ -21564,63 +15593,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_extensions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IExtension>
-      >
-    >();
-
-    the_extensions->reserve(json_extensions.size());
-
-    size_t index_extensions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_extensions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IExtension>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeExtension<
-        types::IExtension
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"extensions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_extensions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_extensions;
     }
   }
 
@@ -21687,19 +15659,19 @@ std::pair<
   // region De-serialize displayName
 
   if (json.contains("displayName")) {
-    const nlohmann::json& json_display_name(
-      json["displayName"]
+    std::tie(
+      the_display_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringNameType>>(
+      json["displayName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringNameType<
+        types::ILangStringNameType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_display_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_display_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"displayName"
@@ -21714,63 +15686,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_display_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringNameType>
-      >
-    >();
-
-    the_display_name->reserve(json_display_name.size());
-
-    size_t index_display_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_display_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringNameType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringNameType<
-        types::ILangStringNameType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"displayName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_display_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_display_name;
-    }
   }
 
   // endregion De-serialize displayName
@@ -21778,19 +15693,19 @@ std::pair<
   // region De-serialize description
 
   if (json.contains("description")) {
-    const nlohmann::json& json_description(
-      json["description"]
+    std::tie(
+      the_description,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringTextType>>(
+      json["description"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringTextType<
+        types::ILangStringTextType
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_description.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_description.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"description"
@@ -21804,63 +15719,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_description = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringTextType>
-      >
-    >();
-
-    the_description->reserve(json_description.size());
-
-    size_t index_description = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_description
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringTextType>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringTextType<
-        types::ILangStringTextType
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"description"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_description->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_description;
     }
   }
 
@@ -21928,19 +15786,17 @@ std::pair<
   // region De-serialize embeddedDataSpecifications
 
   if (json.contains("embeddedDataSpecifications")) {
-    const nlohmann::json& json_embedded_data_specifications(
-      json["embeddedDataSpecifications"]
+    std::tie(
+      the_embedded_data_specifications,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IEmbeddedDataSpecification>>(
+      json["embeddedDataSpecifications"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeEmbeddedDataSpecification(a_json, additional_properties);
+      }
     );
-    if (!json_embedded_data_specifications.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_embedded_data_specifications.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"embeddedDataSpecifications"
@@ -21955,61 +15811,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_embedded_data_specifications = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >
-    >();
-
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
-
-    size_t index_embedded_data_specifications = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_embedded_data_specifications
-    ) {
-      common::optional<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeEmbeddedDataSpecification(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"embeddedDataSpecifications"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_embedded_data_specifications->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_embedded_data_specifications;
-    }
   }
 
   // endregion De-serialize embeddedDataSpecifications
@@ -22017,19 +15818,17 @@ std::pair<
   // region De-serialize isCaseOf
 
   if (json.contains("isCaseOf")) {
-    const nlohmann::json& json_is_case_of(
-      json["isCaseOf"]
+    std::tie(
+      the_is_case_of,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IReference>>(
+      json["isCaseOf"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeReference(a_json, additional_properties);
+      }
     );
-    if (!json_is_case_of.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_is_case_of.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"isCaseOf"
@@ -22043,61 +15842,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_is_case_of = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IReference>
-      >
-    >();
-
-    the_is_case_of->reserve(json_is_case_of.size());
-
-    size_t index_is_case_of = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_is_case_of
-    ) {
-      common::optional<
-        std::shared_ptr<types::IReference>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeReference(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_is_case_of
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"isCaseOf"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_is_case_of->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_is_case_of;
     }
   }
 
@@ -22282,45 +16026,14 @@ std::pair<
 
   // region De-serialize type
 
-  common::optional<std::wstring> text_type;
-
   std::tie(
-    text_type,
+    the_type,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeReferenceTypes(
     json["type"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"type"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<types::IReference> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_type = std::move(
-    wstringification::ReferenceTypesFromWstring(
-      *text_type
-    )
-  );
-  if (!the_type.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for ReferenceTypes: ",
-      *text_type
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"type"
@@ -22370,19 +16083,17 @@ std::pair<
 
   // region De-serialize keys
 
-  const nlohmann::json& json_keys(
-    json["keys"]
+  std::tie(
+    the_keys,
+    error
+  ) = DeserializeList<std::shared_ptr<types::IKey>>(
+    json["keys"],
+    [&additional_properties](const nlohmann::json& a_json) {
+      return DeserializeKey(a_json, additional_properties);
+    }
   );
-  if (!json_keys.is_array()) {
-    error = common::make_optional<DeserializationError>(
-      common::Concat(
-        L"Expected an array, but got: ",
-        common::Utf8ToWstring(
-          json_keys.type_name()
-        )
-      )
-    );
 
+  if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"keys"
@@ -22396,61 +16107,6 @@ std::pair<
       common::nullopt,
       std::move(error)
     );
-  }
-
-  the_keys = common::make_optional<
-    std::vector<
-      std::shared_ptr<types::IKey>
-    >
-  >();
-
-  the_keys->reserve(json_keys.size());
-
-  size_t index_keys = 0;
-
-  for (
-    const nlohmann::json& item
-    : json_keys
-  ) {
-    common::optional<
-      std::shared_ptr<types::IKey>
-    > deserialized;
-
-    std::tie(
-      deserialized,
-      error
-    ) = DeserializeKey(
-      item,
-      additional_properties
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<IndexSegment>(
-          index_keys
-        )
-      );
-
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"keys"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<types::IReference> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_keys->emplace_back(
-      std::move(*deserialized)
-    );
-
-    ++index_keys;
   }
 
   // endregion De-serialize keys
@@ -22567,45 +16223,14 @@ std::pair<
 
   // region De-serialize type
 
-  common::optional<std::wstring> text_type;
-
   std::tie(
-    text_type,
+    the_type,
     error
-  ) = DeserializeWstring(
+  ) = DeserializeKeyTypes(
     json["type"]
   );
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"type"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<types::IKey> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  the_type = std::move(
-    wstringification::KeyTypesFromWstring(
-      *text_type
-    )
-  );
-  if (!the_type.has_value()) {
-    std::wstring message = common::Concat(
-      L"Invalid literal for KeyTypes: ",
-      *text_type
-    );
-
-    error = common::make_optional<DeserializationError>(
-      message
-    );
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"type"
@@ -23174,19 +16799,19 @@ std::pair<
   // region De-serialize assetAdministrationShells
 
   if (json.contains("assetAdministrationShells")) {
-    const nlohmann::json& json_asset_administration_shells(
-      json["assetAdministrationShells"]
+    std::tie(
+      the_asset_administration_shells,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IAssetAdministrationShell>>(
+      json["assetAdministrationShells"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeAssetAdministrationShell<
+        types::IAssetAdministrationShell
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_asset_administration_shells.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_asset_administration_shells.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"assetAdministrationShells"
@@ -23201,63 +16826,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_asset_administration_shells = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IAssetAdministrationShell>
-      >
-    >();
-
-    the_asset_administration_shells->reserve(json_asset_administration_shells.size());
-
-    size_t index_asset_administration_shells = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_asset_administration_shells
-    ) {
-      common::optional<
-        std::shared_ptr<types::IAssetAdministrationShell>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeAssetAdministrationShell<
-        types::IAssetAdministrationShell
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_asset_administration_shells
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"assetAdministrationShells"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<types::IEnvironment> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_asset_administration_shells->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_asset_administration_shells;
-    }
   }
 
   // endregion De-serialize assetAdministrationShells
@@ -23265,19 +16833,19 @@ std::pair<
   // region De-serialize submodels
 
   if (json.contains("submodels")) {
-    const nlohmann::json& json_submodels(
-      json["submodels"]
+    std::tie(
+      the_submodels,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ISubmodel>>(
+      json["submodels"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeSubmodel<
+        types::ISubmodel
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_submodels.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_submodels.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"submodels"
@@ -23292,63 +16860,6 @@ std::pair<
         std::move(error)
       );
     }
-
-    the_submodels = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ISubmodel>
-      >
-    >();
-
-    the_submodels->reserve(json_submodels.size());
-
-    size_t index_submodels = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_submodels
-    ) {
-      common::optional<
-        std::shared_ptr<types::ISubmodel>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeSubmodel<
-        types::ISubmodel
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_submodels
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"submodels"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<types::IEnvironment> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_submodels->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_submodels;
-    }
   }
 
   // endregion De-serialize submodels
@@ -23356,19 +16867,19 @@ std::pair<
   // region De-serialize conceptDescriptions
 
   if (json.contains("conceptDescriptions")) {
-    const nlohmann::json& json_concept_descriptions(
-      json["conceptDescriptions"]
+    std::tie(
+      the_concept_descriptions,
+      error
+    ) = DeserializeList<std::shared_ptr<types::IConceptDescription>>(
+      json["conceptDescriptions"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeConceptDescription<
+        types::IConceptDescription
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_concept_descriptions.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_concept_descriptions.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"conceptDescriptions"
@@ -23382,63 +16893,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_concept_descriptions = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::IConceptDescription>
-      >
-    >();
-
-    the_concept_descriptions->reserve(json_concept_descriptions.size());
-
-    size_t index_concept_descriptions = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_concept_descriptions
-    ) {
-      common::optional<
-        std::shared_ptr<types::IConceptDescription>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeConceptDescription<
-        types::IConceptDescription
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_concept_descriptions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"conceptDescriptions"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<types::IEnvironment> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_concept_descriptions->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_concept_descriptions;
     }
   }
 
@@ -24190,19 +17644,17 @@ std::pair<
 
   // region De-serialize valueReferencePairs
 
-  const nlohmann::json& json_value_reference_pairs(
-    json["valueReferencePairs"]
+  std::tie(
+    the_value_reference_pairs,
+    error
+  ) = DeserializeList<std::shared_ptr<types::IValueReferencePair>>(
+    json["valueReferencePairs"],
+    [&additional_properties](const nlohmann::json& a_json) {
+      return DeserializeValueReferencePair(a_json, additional_properties);
+    }
   );
-  if (!json_value_reference_pairs.is_array()) {
-    error = common::make_optional<DeserializationError>(
-      common::Concat(
-        L"Expected an array, but got: ",
-        common::Utf8ToWstring(
-          json_value_reference_pairs.type_name()
-        )
-      )
-    );
 
+  if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"valueReferencePairs"
@@ -24216,61 +17668,6 @@ std::pair<
       common::nullopt,
       std::move(error)
     );
-  }
-
-  the_value_reference_pairs = common::make_optional<
-    std::vector<
-      std::shared_ptr<types::IValueReferencePair>
-    >
-  >();
-
-  the_value_reference_pairs->reserve(json_value_reference_pairs.size());
-
-  size_t index_value_reference_pairs = 0;
-
-  for (
-    const nlohmann::json& item
-    : json_value_reference_pairs
-  ) {
-    common::optional<
-      std::shared_ptr<types::IValueReferencePair>
-    > deserialized;
-
-    std::tie(
-      deserialized,
-      error
-    ) = DeserializeValueReferencePair(
-      item,
-      additional_properties
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<IndexSegment>(
-          index_value_reference_pairs
-        )
-      );
-
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"valueReferencePairs"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<types::IValueList> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_value_reference_pairs->emplace_back(
-      std::move(*deserialized)
-    );
-
-    ++index_value_reference_pairs;
   }
 
   // endregion De-serialize valueReferencePairs
@@ -24939,19 +18336,19 @@ std::pair<
 
   // region De-serialize preferredName
 
-  const nlohmann::json& json_preferred_name(
-    json["preferredName"]
+  std::tie(
+    the_preferred_name,
+    error
+  ) = DeserializeList<std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>>(
+    json["preferredName"],
+    [&additional_properties](const nlohmann::json& a_json) {
+      return DeserializeLangStringPreferredNameTypeIec61360<
+      types::ILangStringPreferredNameTypeIec61360
+    >(a_json, additional_properties);
+    }
   );
-  if (!json_preferred_name.is_array()) {
-    error = common::make_optional<DeserializationError>(
-      common::Concat(
-        L"Expected an array, but got: ",
-        common::Utf8ToWstring(
-          json_preferred_name.type_name()
-        )
-      )
-    );
 
+  if (error.has_value()) {
     error->path.segments.emplace_front(
       common::make_unique<PropertySegment>(
         L"preferredName"
@@ -24967,81 +18364,24 @@ std::pair<
     );
   }
 
-  the_preferred_name = common::make_optional<
-    std::vector<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >
-  >();
-
-  the_preferred_name->reserve(json_preferred_name.size());
-
-  size_t index_preferred_name = 0;
-
-  for (
-    const nlohmann::json& item
-    : json_preferred_name
-  ) {
-    common::optional<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    > deserialized;
-
-    std::tie(
-      deserialized,
-      error
-    ) = DeserializeLangStringPreferredNameTypeIec61360<
-      types::ILangStringPreferredNameTypeIec61360
-    >(
-      item,
-      additional_properties
-    );
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<IndexSegment>(
-          index_preferred_name
-        )
-      );
-
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"preferredName"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<T> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_preferred_name->emplace_back(
-      std::move(*deserialized)
-    );
-
-    ++index_preferred_name;
-  }
-
   // endregion De-serialize preferredName
 
   // region De-serialize shortName
 
   if (json.contains("shortName")) {
-    const nlohmann::json& json_short_name(
-      json["shortName"]
+    std::tie(
+      the_short_name,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringShortNameTypeIec61360>>(
+      json["shortName"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringShortNameTypeIec61360<
+        types::ILangStringShortNameTypeIec61360
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_short_name.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_short_name.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"shortName"
@@ -25055,63 +18395,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_short_name = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-      >
-    >();
-
-    the_short_name->reserve(json_short_name.size());
-
-    size_t index_short_name = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_short_name
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringShortNameTypeIec61360<
-        types::ILangStringShortNameTypeIec61360
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_short_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"shortName"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_short_name->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_short_name;
     }
   }
 
@@ -25237,45 +18520,14 @@ std::pair<
   // region De-serialize dataType
 
   if (json.contains("dataType")) {
-    common::optional<std::wstring> text_data_type;
-
     std::tie(
-      text_data_type,
+      the_data_type,
       error
-    ) = DeserializeWstring(
+    ) = DeserializeDataTypeIec61360(
       json["dataType"]
     );
 
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<PropertySegment>(
-          L"dataType"
-        )
-      );
-
-      return std::make_pair<
-        common::optional<std::shared_ptr<T> >,
-        common::optional<DeserializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    the_data_type = std::move(
-      wstringification::DataTypeIec61360FromWstring(
-        *text_data_type
-      )
-    );
-    if (!the_data_type.has_value()) {
-      std::wstring message = common::Concat(
-        L"Invalid literal for DataTypeIec61360: ",
-        *text_data_type
-      );
-
-      error = common::make_optional<DeserializationError>(
-        message
-      );
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"dataType"
@@ -25297,19 +18549,19 @@ std::pair<
   // region De-serialize definition
 
   if (json.contains("definition")) {
-    const nlohmann::json& json_definition(
-      json["definition"]
+    std::tie(
+      the_definition,
+      error
+    ) = DeserializeList<std::shared_ptr<types::ILangStringDefinitionTypeIec61360>>(
+      json["definition"],
+      [&additional_properties](const nlohmann::json& a_json) {
+        return DeserializeLangStringDefinitionTypeIec61360<
+        types::ILangStringDefinitionTypeIec61360
+      >(a_json, additional_properties);
+      }
     );
-    if (!json_definition.is_array()) {
-      error = common::make_optional<DeserializationError>(
-        common::Concat(
-          L"Expected an array, but got: ",
-          common::Utf8ToWstring(
-            json_definition.type_name()
-          )
-        )
-      );
 
+    if (error.has_value()) {
       error->path.segments.emplace_front(
         common::make_unique<PropertySegment>(
           L"definition"
@@ -25323,63 +18575,6 @@ std::pair<
         common::nullopt,
         std::move(error)
       );
-    }
-
-    the_definition = common::make_optional<
-      std::vector<
-        std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-      >
-    >();
-
-    the_definition->reserve(json_definition.size());
-
-    size_t index_definition = 0;
-
-    for (
-      const nlohmann::json& item
-      : json_definition
-    ) {
-      common::optional<
-        std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-      > deserialized;
-
-      std::tie(
-        deserialized,
-        error
-      ) = DeserializeLangStringDefinitionTypeIec61360<
-        types::ILangStringDefinitionTypeIec61360
-      >(
-        item,
-        additional_properties
-      );
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<IndexSegment>(
-            index_definition
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<PropertySegment>(
-            L"definition"
-          )
-        );
-
-        return std::make_pair<
-          common::optional<std::shared_ptr<T> >,
-          common::optional<DeserializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      the_definition->emplace_back(
-        std::move(*deserialized)
-      );
-
-      ++index_definition;
     }
   }
 
@@ -27518,11 +20713,106 @@ nlohmann::json SerializeByteArray(
   );
 }
 
+/**
+ * Serialize the given list to a JSON array where item serialization might fail.
+ */
+template<typename T, typename FallibleSerializeItemT>
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeListWithFallible(
+  const std::vector<T>& list,
+  FallibleSerializeItemT&& fallible_serialize_item
+) {
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    list.size()
+  );
+
+  size_t index = 0;
+
+  for (const T& item : list) {
+    common::optional<nlohmann::json> json_item;
+    common::optional<SerializationError> error;
+
+    std::tie(
+      json_item,
+      error
+    ) = fallible_serialize_item(item);
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::IndexSegment>(
+          index
+        )
+      );
+
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    serialized.emplace_back(
+      std::move(*json_item)
+    );
+
+    ++index;
+  }
+
+  return std::make_pair(
+    std::move(serialized),
+    common::nullopt
+  );
+}
+
+/**
+ * Serialize the given list to a JSON array where item serialization can not fail.
+ */
+template<typename T, typename InfallibleSerializeItemT>
+nlohmann::json SerializeListWithInfallible(
+  const std::vector<T>& list,
+  InfallibleSerializeItemT&& infallible_serialize_item
+) {
+  nlohmann::json serialized = nlohmann::json::array();
+
+  serialized.get_ptr<nlohmann::json::array_t*>()->reserve(
+    list.size()
+  );
+
+  for (const T& item : list) {
+    serialized.emplace_back(
+      infallible_serialize_item(item)
+    );
+  }
+
+  return serialized;
+}
+
+/**
+ * Just forward the value as it is.
+ */
+template<typename T>
+const T& Identity(const T& value) {
+  return value;
+}
+
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
 > SerializeIClass(
   const types::IClass& that
+);
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeIClassPtr(
+  const std::shared_ptr<types::IClass>& that
 );
 
 std::pair<
@@ -27540,7 +20830,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -27576,52 +20866,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -27632,7 +20903,7 @@ std::pair<
   const common::optional<types::DataTypeDefXsd>& maybe_value_type(
     that.value_type()
   );
-  if (maybe_value_type.has_value()) {
+  if (that.value_type().has_value()) {
     result["valueType"] = stringification::to_string(
       *maybe_value_type
     );
@@ -27641,7 +20912,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     result["value"] = SerializeWstring(
       *maybe_value
     );
@@ -27654,52 +20925,33 @@ std::pair<
   >& maybe_refers_to(
     that.refers_to()
   );
-  if (maybe_refers_to.has_value()) {
-    nlohmann::json json_refers_to = nlohmann::json::array();
-    json_refers_to.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_refers_to->size()
+  if (that.refers_to().has_value()) {
+    common::optional<nlohmann::json> json_refers_to;
+    std::tie(
+      json_refers_to,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_refers_to,
+      SerializeIClassPtr
     );
-    size_t index_refers_to = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_refers_to
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_refers_to
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kRefersTo
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_refers_to.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kRefersTo
+        )
       );
 
-      ++index_refers_to;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["refersTo"] = std::move(
-      json_refers_to
+      json_refers_to.value()
     );
   }
 
@@ -27729,59 +20981,40 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_version(
     that.version()
   );
-  if (maybe_version.has_value()) {
+  if (that.version().has_value()) {
     result["version"] = SerializeWstring(
       *maybe_version
     );
@@ -27790,7 +21023,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_revision(
     that.revision()
   );
-  if (maybe_revision.has_value()) {
+  if (that.revision().has_value()) {
     result["revision"] = SerializeWstring(
       *maybe_revision
     );
@@ -27801,7 +21034,7 @@ std::pair<
   >& maybe_creator(
     that.creator()
   );
-  if (maybe_creator.has_value()) {
+  if (that.creator().has_value()) {
     common::optional<nlohmann::json> json_creator;
     std::tie(
       json_creator,
@@ -27833,7 +21066,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_template_id(
     that.template_id()
   );
-  if (maybe_template_id.has_value()) {
+  if (that.template_id().has_value()) {
     result["templateId"] = SerializeWstring(
       *maybe_template_id
     );
@@ -27863,7 +21096,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -27899,59 +21132,40 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
   const common::optional<types::QualifierKind>& maybe_kind(
     that.kind()
   );
-  if (maybe_kind.has_value()) {
+  if (that.kind().has_value()) {
     result["kind"] = stringification::to_string(
       *maybe_kind
     );
@@ -27968,7 +21182,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     result["value"] = SerializeWstring(
       *maybe_value
     );
@@ -27979,7 +21193,7 @@ std::pair<
   >& maybe_value_id(
     that.value_id()
   );
-  if (maybe_value_id.has_value()) {
+  if (that.value_id().has_value()) {
     common::optional<nlohmann::json> json_value_id;
     std::tie(
       json_value_id,
@@ -28034,59 +21248,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -28095,7 +21290,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -28108,52 +21303,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -28164,52 +21340,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -28218,7 +21375,7 @@ std::pair<
   >& maybe_administration(
     that.administration()
   );
-  if (maybe_administration.has_value()) {
+  if (that.administration().has_value()) {
     common::optional<nlohmann::json> json_administration;
     std::tie(
       json_administration,
@@ -28258,52 +21415,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -28312,7 +21450,7 @@ std::pair<
   >& maybe_derived_from(
     that.derived_from()
   );
-  if (maybe_derived_from.has_value()) {
+  if (that.derived_from().has_value()) {
     common::optional<nlohmann::json> json_derived_from;
     std::tie(
       json_derived_from,
@@ -28375,52 +21513,33 @@ std::pair<
   >& maybe_submodels(
     that.submodels()
   );
-  if (maybe_submodels.has_value()) {
-    nlohmann::json json_submodels = nlohmann::json::array();
-    json_submodels.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_submodels->size()
+  if (that.submodels().has_value()) {
+    common::optional<nlohmann::json> json_submodels;
+    std::tie(
+      json_submodels,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_submodels,
+      SerializeIClassPtr
     );
-    size_t index_submodels = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_submodels
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_submodels
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSubmodels
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_submodels.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSubmodels
+        )
       );
 
-      ++index_submodels;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["submodels"] = std::move(
-      json_submodels
+      json_submodels.value()
     );
   }
 
@@ -28452,7 +21571,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_global_asset_id(
     that.global_asset_id()
   );
-  if (maybe_global_asset_id.has_value()) {
+  if (that.global_asset_id().has_value()) {
     result["globalAssetId"] = SerializeWstring(
       *maybe_global_asset_id
     );
@@ -28465,59 +21584,40 @@ std::pair<
   >& maybe_specific_asset_ids(
     that.specific_asset_ids()
   );
-  if (maybe_specific_asset_ids.has_value()) {
-    nlohmann::json json_specific_asset_ids = nlohmann::json::array();
-    json_specific_asset_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_specific_asset_ids->size()
+  if (that.specific_asset_ids().has_value()) {
+    common::optional<nlohmann::json> json_specific_asset_ids;
+    std::tie(
+      json_specific_asset_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_specific_asset_ids,
+      SerializeIClassPtr
     );
-    size_t index_specific_asset_ids = 0;
-    for (
-      const std::shared_ptr<types::ISpecificAssetId>& item
-      : *maybe_specific_asset_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_specific_asset_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSpecificAssetIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_specific_asset_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSpecificAssetIds
+        )
       );
 
-      ++index_specific_asset_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["specificAssetIds"] = std::move(
-      json_specific_asset_ids
+      json_specific_asset_ids.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_asset_type(
     that.asset_type()
   );
-  if (maybe_asset_type.has_value()) {
+  if (that.asset_type().has_value()) {
     result["assetType"] = SerializeWstring(
       *maybe_asset_type
     );
@@ -28528,7 +21628,7 @@ std::pair<
   >& maybe_default_thumbnail(
     that.default_thumbnail()
   );
-  if (maybe_default_thumbnail.has_value()) {
+  if (that.default_thumbnail().has_value()) {
     common::optional<nlohmann::json> json_default_thumbnail;
     std::tie(
       json_default_thumbnail,
@@ -28583,7 +21683,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_content_type(
     that.content_type()
   );
-  if (maybe_content_type.has_value()) {
+  if (that.content_type().has_value()) {
     result["contentType"] = SerializeWstring(
       *maybe_content_type
     );
@@ -28613,7 +21713,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -28649,52 +21749,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -28711,7 +21792,7 @@ std::pair<
   >& maybe_external_subject_id(
     that.external_subject_id()
   );
-  if (maybe_external_subject_id.has_value()) {
+  if (that.external_subject_id().has_value()) {
     common::optional<nlohmann::json> json_external_subject_id;
     std::tie(
       json_external_subject_id,
@@ -28766,59 +21847,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -28827,7 +21889,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -28840,52 +21902,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -28896,52 +21939,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -28950,7 +21974,7 @@ std::pair<
   >& maybe_administration(
     that.administration()
   );
-  if (maybe_administration.has_value()) {
+  if (that.administration().has_value()) {
     common::optional<nlohmann::json> json_administration;
     std::tie(
       json_administration,
@@ -28986,7 +22010,7 @@ std::pair<
   const common::optional<types::ModellingKind>& maybe_kind(
     that.kind()
   );
-  if (maybe_kind.has_value()) {
+  if (that.kind().has_value()) {
     result["kind"] = stringification::to_string(
       *maybe_kind
     );
@@ -28997,7 +22021,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -29033,52 +22057,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -29089,52 +22094,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -29145,52 +22131,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -29201,52 +22168,33 @@ std::pair<
   >& maybe_submodel_elements(
     that.submodel_elements()
   );
-  if (maybe_submodel_elements.has_value()) {
-    nlohmann::json json_submodel_elements = nlohmann::json::array();
-    json_submodel_elements.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_submodel_elements->size()
+  if (that.submodel_elements().has_value()) {
+    common::optional<nlohmann::json> json_submodel_elements;
+    std::tie(
+      json_submodel_elements,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_submodel_elements,
+      SerializeIClassPtr
     );
-    size_t index_submodel_elements = 0;
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : *maybe_submodel_elements
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_submodel_elements
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSubmodelElements
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_submodel_elements.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSubmodelElements
+        )
       );
 
-      ++index_submodel_elements;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["submodelElements"] = std::move(
-      json_submodel_elements
+      json_submodel_elements.value()
     );
   }
 
@@ -29278,59 +22226,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -29339,7 +22268,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -29352,52 +22281,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -29408,52 +22318,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -29462,7 +22353,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -29498,52 +22389,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -29554,52 +22426,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -29610,52 +22463,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -29741,59 +22575,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -29802,7 +22617,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -29815,52 +22630,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -29871,52 +22667,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -29925,7 +22702,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -29961,52 +22738,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -30017,52 +22775,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -30073,59 +22812,40 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
   const common::optional<bool>& maybe_order_relevant(
     that.order_relevant()
   );
-  if (maybe_order_relevant.has_value()) {
+  if (that.order_relevant().has_value()) {
     result["orderRelevant"] = *maybe_order_relevant;
   }
 
@@ -30134,7 +22854,7 @@ std::pair<
   >& maybe_semantic_id_list_element(
     that.semantic_id_list_element()
   );
-  if (maybe_semantic_id_list_element.has_value()) {
+  if (that.semantic_id_list_element().has_value()) {
     common::optional<nlohmann::json> json_semantic_id_list_element;
     std::tie(
       json_semantic_id_list_element,
@@ -30170,7 +22890,7 @@ std::pair<
   const common::optional<types::DataTypeDefXsd>& maybe_value_type_list_element(
     that.value_type_list_element()
   );
-  if (maybe_value_type_list_element.has_value()) {
+  if (that.value_type_list_element().has_value()) {
     result["valueTypeListElement"] = stringification::to_string(
       *maybe_value_type_list_element
     );
@@ -30183,52 +22903,33 @@ std::pair<
   >& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
-    nlohmann::json json_value = nlohmann::json::array();
-    json_value.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_value->size()
+  if (that.value().has_value()) {
+    common::optional<nlohmann::json> json_value;
+    std::tie(
+      json_value,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_value,
+      SerializeIClassPtr
     );
-    size_t index_value = 0;
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : *maybe_value
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_value
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kValue
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_value.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kValue
+        )
       );
 
-      ++index_value;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["value"] = std::move(
-      json_value
+      json_value.value()
     );
   }
 
@@ -30260,59 +22961,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -30321,7 +23003,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -30334,52 +23016,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -30390,52 +23053,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -30444,7 +23088,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -30480,52 +23124,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -30536,52 +23161,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -30592,52 +23198,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -30648,52 +23235,33 @@ std::pair<
   >& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
-    nlohmann::json json_value = nlohmann::json::array();
-    json_value.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_value->size()
+  if (that.value().has_value()) {
+    common::optional<nlohmann::json> json_value;
+    std::tie(
+      json_value,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_value,
+      SerializeIClassPtr
     );
-    size_t index_value = 0;
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : *maybe_value
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_value
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kValue
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_value.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kValue
+        )
       );
 
-      ++index_value;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["value"] = std::move(
-      json_value
+      json_value.value()
     );
   }
 
@@ -30725,59 +23293,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -30786,7 +23335,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -30799,52 +23348,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -30855,52 +23385,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -30909,7 +23420,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -30945,52 +23456,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -31001,52 +23493,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -31057,52 +23530,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -31113,7 +23567,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     result["value"] = SerializeWstring(
       *maybe_value
     );
@@ -31124,7 +23578,7 @@ std::pair<
   >& maybe_value_id(
     that.value_id()
   );
-  if (maybe_value_id.has_value()) {
+  if (that.value_id().has_value()) {
     common::optional<nlohmann::json> json_value_id;
     std::tie(
       json_value_id,
@@ -31181,59 +23635,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -31242,7 +23677,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -31255,52 +23690,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -31311,52 +23727,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -31365,7 +23762,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -31401,52 +23798,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -31457,52 +23835,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -31513,52 +23872,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -31569,52 +23909,33 @@ std::pair<
   >& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
-    nlohmann::json json_value = nlohmann::json::array();
-    json_value.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_value->size()
+  if (that.value().has_value()) {
+    common::optional<nlohmann::json> json_value;
+    std::tie(
+      json_value,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_value,
+      SerializeIClassPtr
     );
-    size_t index_value = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_value
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_value
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kValue
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_value.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kValue
+        )
       );
 
-      ++index_value;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["value"] = std::move(
-      json_value
+      json_value.value()
     );
   }
 
@@ -31623,7 +23944,7 @@ std::pair<
   >& maybe_value_id(
     that.value_id()
   );
-  if (maybe_value_id.has_value()) {
+  if (that.value_id().has_value()) {
     common::optional<nlohmann::json> json_value_id;
     std::tie(
       json_value_id,
@@ -31680,59 +24001,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -31741,7 +24043,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -31754,52 +24056,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -31810,52 +24093,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -31864,7 +24128,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -31900,52 +24164,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -31956,52 +24201,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -32012,52 +24238,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -32068,7 +24275,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_min(
     that.min()
   );
-  if (maybe_min.has_value()) {
+  if (that.min().has_value()) {
     result["min"] = SerializeWstring(
       *maybe_min
     );
@@ -32077,7 +24284,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_max(
     that.max()
   );
-  if (maybe_max.has_value()) {
+  if (that.max().has_value()) {
     result["max"] = SerializeWstring(
       *maybe_max
     );
@@ -32111,59 +24318,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -32172,7 +24360,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -32185,52 +24373,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -32241,52 +24410,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -32295,7 +24445,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -32331,52 +24481,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -32387,52 +24518,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -32443,52 +24555,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -32497,7 +24590,7 @@ std::pair<
   >& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     common::optional<nlohmann::json> json_value;
     std::tie(
       json_value,
@@ -32554,59 +24647,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -32615,7 +24689,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -32628,52 +24702,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -32684,52 +24739,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -32738,7 +24774,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -32774,52 +24810,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -32830,52 +24847,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -32886,52 +24884,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -32940,7 +24919,7 @@ std::pair<
   >& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     result["value"] = stringification::Base64Encode(
       *maybe_value
     );
@@ -32978,59 +24957,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -33039,7 +24999,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -33052,52 +25012,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -33108,52 +25049,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -33162,7 +25084,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -33198,52 +25120,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -33254,52 +25157,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -33310,59 +25194,40 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     result["value"] = SerializeWstring(
       *maybe_value
     );
@@ -33400,59 +25265,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -33461,7 +25307,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -33474,52 +25320,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -33530,52 +25357,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -33584,7 +25392,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -33620,52 +25428,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -33676,52 +25465,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -33732,52 +25502,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -33842,52 +25593,33 @@ std::pair<
   >& maybe_annotations(
     that.annotations()
   );
-  if (maybe_annotations.has_value()) {
-    nlohmann::json json_annotations = nlohmann::json::array();
-    json_annotations.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_annotations->size()
+  if (that.annotations().has_value()) {
+    common::optional<nlohmann::json> json_annotations;
+    std::tie(
+      json_annotations,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_annotations,
+      SerializeIClassPtr
     );
-    size_t index_annotations = 0;
-    for (
-      const std::shared_ptr<types::IDataElement>& item
-      : *maybe_annotations
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_annotations
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kAnnotations
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_annotations.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kAnnotations
+        )
       );
 
-      ++index_annotations;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["annotations"] = std::move(
-      json_annotations
+      json_annotations.value()
     );
   }
 
@@ -33919,59 +25651,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -33980,7 +25693,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -33993,52 +25706,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -34049,52 +25743,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -34103,7 +25778,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -34139,52 +25814,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -34195,52 +25851,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -34251,52 +25888,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -34307,52 +25925,33 @@ std::pair<
   >& maybe_statements(
     that.statements()
   );
-  if (maybe_statements.has_value()) {
-    nlohmann::json json_statements = nlohmann::json::array();
-    json_statements.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_statements->size()
+  if (that.statements().has_value()) {
+    common::optional<nlohmann::json> json_statements;
+    std::tie(
+      json_statements,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_statements,
+      SerializeIClassPtr
     );
-    size_t index_statements = 0;
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item
-      : *maybe_statements
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_statements
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kStatements
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_statements.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kStatements
+        )
       );
 
-      ++index_statements;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["statements"] = std::move(
-      json_statements
+      json_statements.value()
     );
   }
 
@@ -34363,7 +25962,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_global_asset_id(
     that.global_asset_id()
   );
-  if (maybe_global_asset_id.has_value()) {
+  if (that.global_asset_id().has_value()) {
     result["globalAssetId"] = SerializeWstring(
       *maybe_global_asset_id
     );
@@ -34376,52 +25975,33 @@ std::pair<
   >& maybe_specific_asset_ids(
     that.specific_asset_ids()
   );
-  if (maybe_specific_asset_ids.has_value()) {
-    nlohmann::json json_specific_asset_ids = nlohmann::json::array();
-    json_specific_asset_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_specific_asset_ids->size()
+  if (that.specific_asset_ids().has_value()) {
+    common::optional<nlohmann::json> json_specific_asset_ids;
+    std::tie(
+      json_specific_asset_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_specific_asset_ids,
+      SerializeIClassPtr
     );
-    size_t index_specific_asset_ids = 0;
-    for (
-      const std::shared_ptr<types::ISpecificAssetId>& item
-      : *maybe_specific_asset_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_specific_asset_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSpecificAssetIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_specific_asset_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSpecificAssetIds
+        )
       );
 
-      ++index_specific_asset_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["specificAssetIds"] = std::move(
-      json_specific_asset_ids
+      json_specific_asset_ids.value()
     );
   }
 
@@ -34478,7 +26058,7 @@ std::pair<
   >& maybe_source_semantic_id(
     that.source_semantic_id()
   );
-  if (maybe_source_semantic_id.has_value()) {
+  if (that.source_semantic_id().has_value()) {
     common::optional<nlohmann::json> json_source_semantic_id;
     std::tie(
       json_source_semantic_id,
@@ -34539,7 +26119,7 @@ std::pair<
   >& maybe_observable_semantic_id(
     that.observable_semantic_id()
   );
-  if (maybe_observable_semantic_id.has_value()) {
+  if (that.observable_semantic_id().has_value()) {
     common::optional<nlohmann::json> json_observable_semantic_id;
     std::tie(
       json_observable_semantic_id,
@@ -34571,7 +26151,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_topic(
     that.topic()
   );
-  if (maybe_topic.has_value()) {
+  if (that.topic().has_value()) {
     result["topic"] = SerializeWstring(
       *maybe_topic
     );
@@ -34582,7 +26162,7 @@ std::pair<
   >& maybe_subject_id(
     that.subject_id()
   );
-  if (maybe_subject_id.has_value()) {
+  if (that.subject_id().has_value()) {
     common::optional<nlohmann::json> json_subject_id;
     std::tie(
       json_subject_id,
@@ -34620,7 +26200,7 @@ std::pair<
   >& maybe_payload(
     that.payload()
   );
-  if (maybe_payload.has_value()) {
+  if (that.payload().has_value()) {
     result["payload"] = stringification::Base64Encode(
       *maybe_payload
     );
@@ -34652,59 +26232,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -34713,7 +26274,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -34726,52 +26287,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -34782,52 +26324,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -34836,7 +26359,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -34872,52 +26395,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -34928,52 +26432,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -34984,52 +26469,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -35071,7 +26537,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_message_topic(
     that.message_topic()
   );
-  if (maybe_message_topic.has_value()) {
+  if (that.message_topic().has_value()) {
     result["messageTopic"] = SerializeWstring(
       *maybe_message_topic
     );
@@ -35082,7 +26548,7 @@ std::pair<
   >& maybe_message_broker(
     that.message_broker()
   );
-  if (maybe_message_broker.has_value()) {
+  if (that.message_broker().has_value()) {
     common::optional<nlohmann::json> json_message_broker;
     std::tie(
       json_message_broker,
@@ -35114,7 +26580,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_last_update(
     that.last_update()
   );
-  if (maybe_last_update.has_value()) {
+  if (that.last_update().has_value()) {
     result["lastUpdate"] = SerializeWstring(
       *maybe_last_update
     );
@@ -35123,7 +26589,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_min_interval(
     that.min_interval()
   );
-  if (maybe_min_interval.has_value()) {
+  if (that.min_interval().has_value()) {
     result["minInterval"] = SerializeWstring(
       *maybe_min_interval
     );
@@ -35132,7 +26598,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_max_interval(
     that.max_interval()
   );
-  if (maybe_max_interval.has_value()) {
+  if (that.max_interval().has_value()) {
     result["maxInterval"] = SerializeWstring(
       *maybe_max_interval
     );
@@ -35166,59 +26632,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -35227,7 +26674,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -35240,52 +26687,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -35296,52 +26724,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -35350,7 +26759,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -35386,52 +26795,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -35442,52 +26832,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -35498,52 +26869,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -35554,52 +26906,33 @@ std::pair<
   >& maybe_input_variables(
     that.input_variables()
   );
-  if (maybe_input_variables.has_value()) {
-    nlohmann::json json_input_variables = nlohmann::json::array();
-    json_input_variables.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_input_variables->size()
+  if (that.input_variables().has_value()) {
+    common::optional<nlohmann::json> json_input_variables;
+    std::tie(
+      json_input_variables,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_input_variables,
+      SerializeIClassPtr
     );
-    size_t index_input_variables = 0;
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item
-      : *maybe_input_variables
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_input_variables
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kInputVariables
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_input_variables.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kInputVariables
+        )
       );
 
-      ++index_input_variables;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["inputVariables"] = std::move(
-      json_input_variables
+      json_input_variables.value()
     );
   }
 
@@ -35610,52 +26943,33 @@ std::pair<
   >& maybe_output_variables(
     that.output_variables()
   );
-  if (maybe_output_variables.has_value()) {
-    nlohmann::json json_output_variables = nlohmann::json::array();
-    json_output_variables.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_output_variables->size()
+  if (that.output_variables().has_value()) {
+    common::optional<nlohmann::json> json_output_variables;
+    std::tie(
+      json_output_variables,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_output_variables,
+      SerializeIClassPtr
     );
-    size_t index_output_variables = 0;
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item
-      : *maybe_output_variables
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_output_variables
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kOutputVariables
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_output_variables.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kOutputVariables
+        )
       );
 
-      ++index_output_variables;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["outputVariables"] = std::move(
-      json_output_variables
+      json_output_variables.value()
     );
   }
 
@@ -35666,52 +26980,33 @@ std::pair<
   >& maybe_inoutput_variables(
     that.inoutput_variables()
   );
-  if (maybe_inoutput_variables.has_value()) {
-    nlohmann::json json_inoutput_variables = nlohmann::json::array();
-    json_inoutput_variables.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_inoutput_variables->size()
+  if (that.inoutput_variables().has_value()) {
+    common::optional<nlohmann::json> json_inoutput_variables;
+    std::tie(
+      json_inoutput_variables,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_inoutput_variables,
+      SerializeIClassPtr
     );
-    size_t index_inoutput_variables = 0;
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item
-      : *maybe_inoutput_variables
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_inoutput_variables
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kInoutputVariables
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_inoutput_variables.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kInoutputVariables
+        )
       );
 
-      ++index_inoutput_variables;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["inoutputVariables"] = std::move(
-      json_inoutput_variables
+      json_inoutput_variables.value()
     );
   }
 
@@ -35789,59 +27084,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -35850,7 +27126,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -35863,52 +27139,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -35919,52 +27176,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -35973,7 +27211,7 @@ std::pair<
   >& maybe_semantic_id(
     that.semantic_id()
   );
-  if (maybe_semantic_id.has_value()) {
+  if (that.semantic_id().has_value()) {
     common::optional<nlohmann::json> json_semantic_id;
     std::tie(
       json_semantic_id,
@@ -36009,52 +27247,33 @@ std::pair<
   >& maybe_supplemental_semantic_ids(
     that.supplemental_semantic_ids()
   );
-  if (maybe_supplemental_semantic_ids.has_value()) {
-    nlohmann::json json_supplemental_semantic_ids = nlohmann::json::array();
-    json_supplemental_semantic_ids.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_supplemental_semantic_ids->size()
+  if (that.supplemental_semantic_ids().has_value()) {
+    common::optional<nlohmann::json> json_supplemental_semantic_ids;
+    std::tie(
+      json_supplemental_semantic_ids,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_supplemental_semantic_ids,
+      SerializeIClassPtr
     );
-    size_t index_supplemental_semantic_ids = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_supplemental_semantic_ids
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_supplemental_semantic_ids
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSupplementalSemanticIds
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_supplemental_semantic_ids.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSupplementalSemanticIds
+        )
       );
 
-      ++index_supplemental_semantic_ids;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["supplementalSemanticIds"] = std::move(
-      json_supplemental_semantic_ids
+      json_supplemental_semantic_ids.value()
     );
   }
 
@@ -36065,52 +27284,33 @@ std::pair<
   >& maybe_qualifiers(
     that.qualifiers()
   );
-  if (maybe_qualifiers.has_value()) {
-    nlohmann::json json_qualifiers = nlohmann::json::array();
-    json_qualifiers.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_qualifiers->size()
+  if (that.qualifiers().has_value()) {
+    common::optional<nlohmann::json> json_qualifiers;
+    std::tie(
+      json_qualifiers,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_qualifiers,
+      SerializeIClassPtr
     );
-    size_t index_qualifiers = 0;
-    for (
-      const std::shared_ptr<types::IQualifier>& item
-      : *maybe_qualifiers
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_qualifiers
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kQualifiers
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_qualifiers.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kQualifiers
+        )
       );
 
-      ++index_qualifiers;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["qualifiers"] = std::move(
-      json_qualifiers
+      json_qualifiers.value()
     );
   }
 
@@ -36121,52 +27321,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -36198,59 +27379,40 @@ std::pair<
   >& maybe_extensions(
     that.extensions()
   );
-  if (maybe_extensions.has_value()) {
-    nlohmann::json json_extensions = nlohmann::json::array();
-    json_extensions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_extensions->size()
+  if (that.extensions().has_value()) {
+    common::optional<nlohmann::json> json_extensions;
+    std::tie(
+      json_extensions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_extensions,
+      SerializeIClassPtr
     );
-    size_t index_extensions = 0;
-    for (
-      const std::shared_ptr<types::IExtension>& item
-      : *maybe_extensions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_extensions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kExtensions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_extensions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kExtensions
+        )
       );
 
-      ++index_extensions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["extensions"] = std::move(
-      json_extensions
+      json_extensions.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_category(
     that.category()
   );
-  if (maybe_category.has_value()) {
+  if (that.category().has_value()) {
     result["category"] = SerializeWstring(
       *maybe_category
     );
@@ -36259,7 +27421,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_id_short(
     that.id_short()
   );
-  if (maybe_id_short.has_value()) {
+  if (that.id_short().has_value()) {
     result["idShort"] = SerializeWstring(
       *maybe_id_short
     );
@@ -36272,52 +27434,33 @@ std::pair<
   >& maybe_display_name(
     that.display_name()
   );
-  if (maybe_display_name.has_value()) {
-    nlohmann::json json_display_name = nlohmann::json::array();
-    json_display_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_display_name->size()
+  if (that.display_name().has_value()) {
+    common::optional<nlohmann::json> json_display_name;
+    std::tie(
+      json_display_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_display_name,
+      SerializeIClassPtr
     );
-    size_t index_display_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item
-      : *maybe_display_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_display_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDisplayName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_display_name.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDisplayName
+        )
       );
 
-      ++index_display_name;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["displayName"] = std::move(
-      json_display_name
+      json_display_name.value()
     );
   }
 
@@ -36328,52 +27471,33 @@ std::pair<
   >& maybe_description(
     that.description()
   );
-  if (maybe_description.has_value()) {
-    nlohmann::json json_description = nlohmann::json::array();
-    json_description.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_description->size()
+  if (that.description().has_value()) {
+    common::optional<nlohmann::json> json_description;
+    std::tie(
+      json_description,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_description,
+      SerializeIClassPtr
     );
-    size_t index_description = 0;
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item
-      : *maybe_description
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_description
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDescription
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_description.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDescription
+        )
       );
 
-      ++index_description;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["description"] = std::move(
-      json_description
+      json_description.value()
     );
   }
 
@@ -36382,7 +27506,7 @@ std::pair<
   >& maybe_administration(
     that.administration()
   );
-  if (maybe_administration.has_value()) {
+  if (that.administration().has_value()) {
     common::optional<nlohmann::json> json_administration;
     std::tie(
       json_administration,
@@ -36422,52 +27546,33 @@ std::pair<
   >& maybe_embedded_data_specifications(
     that.embedded_data_specifications()
   );
-  if (maybe_embedded_data_specifications.has_value()) {
-    nlohmann::json json_embedded_data_specifications = nlohmann::json::array();
-    json_embedded_data_specifications.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_embedded_data_specifications->size()
+  if (that.embedded_data_specifications().has_value()) {
+    common::optional<nlohmann::json> json_embedded_data_specifications;
+    std::tie(
+      json_embedded_data_specifications,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_embedded_data_specifications,
+      SerializeIClassPtr
     );
-    size_t index_embedded_data_specifications = 0;
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item
-      : *maybe_embedded_data_specifications
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_embedded_data_specifications
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kEmbeddedDataSpecifications
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_embedded_data_specifications.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kEmbeddedDataSpecifications
+        )
       );
 
-      ++index_embedded_data_specifications;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["embeddedDataSpecifications"] = std::move(
-      json_embedded_data_specifications
+      json_embedded_data_specifications.value()
     );
   }
 
@@ -36478,52 +27583,33 @@ std::pair<
   >& maybe_is_case_of(
     that.is_case_of()
   );
-  if (maybe_is_case_of.has_value()) {
-    nlohmann::json json_is_case_of = nlohmann::json::array();
-    json_is_case_of.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_is_case_of->size()
+  if (that.is_case_of().has_value()) {
+    common::optional<nlohmann::json> json_is_case_of;
+    std::tie(
+      json_is_case_of,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_is_case_of,
+      SerializeIClassPtr
     );
-    size_t index_is_case_of = 0;
-    for (
-      const std::shared_ptr<types::IReference>& item
-      : *maybe_is_case_of
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_is_case_of
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kIsCaseOf
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_is_case_of.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kIsCaseOf
+        )
       );
 
-      ++index_is_case_of;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["isCaseOf"] = std::move(
-      json_is_case_of
+      json_is_case_of.value()
     );
   }
 
@@ -36557,7 +27643,7 @@ std::pair<
   >& maybe_referred_semantic_id(
     that.referred_semantic_id()
   );
-  if (maybe_referred_semantic_id.has_value()) {
+  if (that.referred_semantic_id().has_value()) {
     common::optional<nlohmann::json> json_referred_semantic_id;
     std::tie(
       json_referred_semantic_id,
@@ -36586,51 +27672,32 @@ std::pair<
     );
   }
 
-  nlohmann::json json_keys = nlohmann::json::array();
-  json_keys.get_ptr<nlohmann::json::array_t*>()->reserve(
-    that.keys().size()
+  common::optional<nlohmann::json> json_keys;
+  std::tie(
+    json_keys,
+    error
+  ) = SerializeListWithFallible(
+    that.keys(),
+    SerializeIClassPtr
   );
-  size_t index_keys = 0;
-  for (
-    const std::shared_ptr<types::IKey>& item
-    : that.keys()
-  ) {
-    common::optional<nlohmann::json> json_item;
-    std::tie(
-      json_item,
-      error
-    ) = SerializeIClass(*item);
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          index_keys
-        )
-      );
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kKeys
-        )
-      );
-
-      return std::make_pair<
-        common::optional<nlohmann::json>,
-        common::optional<SerializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    json_keys.emplace_back(
-      std::move(*json_item)
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kKeys
+      )
     );
 
-    ++index_keys;
+    return std::make_pair<
+      common::optional<nlohmann::json>,
+      common::optional<SerializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
   }
+
   result["keys"] = std::move(
-    json_keys
+    json_keys.value()
   );
 
   return std::make_pair<
@@ -36740,52 +27807,33 @@ std::pair<
   >& maybe_asset_administration_shells(
     that.asset_administration_shells()
   );
-  if (maybe_asset_administration_shells.has_value()) {
-    nlohmann::json json_asset_administration_shells = nlohmann::json::array();
-    json_asset_administration_shells.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_asset_administration_shells->size()
+  if (that.asset_administration_shells().has_value()) {
+    common::optional<nlohmann::json> json_asset_administration_shells;
+    std::tie(
+      json_asset_administration_shells,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_asset_administration_shells,
+      SerializeIClassPtr
     );
-    size_t index_asset_administration_shells = 0;
-    for (
-      const std::shared_ptr<types::IAssetAdministrationShell>& item
-      : *maybe_asset_administration_shells
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_asset_administration_shells
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kAssetAdministrationShells
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_asset_administration_shells.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kAssetAdministrationShells
+        )
       );
 
-      ++index_asset_administration_shells;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["assetAdministrationShells"] = std::move(
-      json_asset_administration_shells
+      json_asset_administration_shells.value()
     );
   }
 
@@ -36796,52 +27844,33 @@ std::pair<
   >& maybe_submodels(
     that.submodels()
   );
-  if (maybe_submodels.has_value()) {
-    nlohmann::json json_submodels = nlohmann::json::array();
-    json_submodels.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_submodels->size()
+  if (that.submodels().has_value()) {
+    common::optional<nlohmann::json> json_submodels;
+    std::tie(
+      json_submodels,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_submodels,
+      SerializeIClassPtr
     );
-    size_t index_submodels = 0;
-    for (
-      const std::shared_ptr<types::ISubmodel>& item
-      : *maybe_submodels
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_submodels
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kSubmodels
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_submodels.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kSubmodels
+        )
       );
 
-      ++index_submodels;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["submodels"] = std::move(
-      json_submodels
+      json_submodels.value()
     );
   }
 
@@ -36852,52 +27881,33 @@ std::pair<
   >& maybe_concept_descriptions(
     that.concept_descriptions()
   );
-  if (maybe_concept_descriptions.has_value()) {
-    nlohmann::json json_concept_descriptions = nlohmann::json::array();
-    json_concept_descriptions.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_concept_descriptions->size()
+  if (that.concept_descriptions().has_value()) {
+    common::optional<nlohmann::json> json_concept_descriptions;
+    std::tie(
+      json_concept_descriptions,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_concept_descriptions,
+      SerializeIClassPtr
     );
-    size_t index_concept_descriptions = 0;
-    for (
-      const std::shared_ptr<types::IConceptDescription>& item
-      : *maybe_concept_descriptions
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_concept_descriptions
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kConceptDescriptions
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_concept_descriptions.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kConceptDescriptions
+        )
       );
 
-      ++index_concept_descriptions;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["conceptDescriptions"] = std::move(
-      json_concept_descriptions
+      json_concept_descriptions.value()
     );
   }
 
@@ -37068,51 +28078,32 @@ std::pair<
 
   common::optional<SerializationError> error;
 
-  nlohmann::json json_value_reference_pairs = nlohmann::json::array();
-  json_value_reference_pairs.get_ptr<nlohmann::json::array_t*>()->reserve(
-    that.value_reference_pairs().size()
+  common::optional<nlohmann::json> json_value_reference_pairs;
+  std::tie(
+    json_value_reference_pairs,
+    error
+  ) = SerializeListWithFallible(
+    that.value_reference_pairs(),
+    SerializeIClassPtr
   );
-  size_t index_value_reference_pairs = 0;
-  for (
-    const std::shared_ptr<types::IValueReferencePair>& item
-    : that.value_reference_pairs()
-  ) {
-    common::optional<nlohmann::json> json_item;
-    std::tie(
-      json_item,
-      error
-    ) = SerializeIClass(*item);
-
-    if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          index_value_reference_pairs
-        )
-      );
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueReferencePairs
-        )
-      );
-
-      return std::make_pair<
-        common::optional<nlohmann::json>,
-        common::optional<SerializationError>
-      >(
-        common::nullopt,
-        std::move(error)
-      );
-    }
-
-    json_value_reference_pairs.emplace_back(
-      std::move(*json_item)
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kValueReferencePairs
+      )
     );
 
-    ++index_value_reference_pairs;
+    return std::make_pair<
+      common::optional<nlohmann::json>,
+      common::optional<SerializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
   }
+
   result["valueReferencePairs"] = std::move(
-    json_value_reference_pairs
+    json_value_reference_pairs.value()
   );
 
   return std::make_pair<
@@ -37215,31 +28206,54 @@ std::pair<
 
   common::optional<SerializationError> error;
 
-  nlohmann::json json_preferred_name = nlohmann::json::array();
-  json_preferred_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-    that.preferred_name().size()
+  common::optional<nlohmann::json> json_preferred_name;
+  std::tie(
+    json_preferred_name,
+    error
+  ) = SerializeListWithFallible(
+    that.preferred_name(),
+    SerializeIClassPtr
   );
-  size_t index_preferred_name = 0;
-  for (
-    const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& item
-    : that.preferred_name()
-  ) {
-    common::optional<nlohmann::json> json_item;
-    std::tie(
-      json_item,
-      error
-    ) = SerializeIClass(*item);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(
+        iteration::Property::kPreferredName
+      )
+    );
 
+    return std::make_pair<
+      common::optional<nlohmann::json>,
+      common::optional<SerializationError>
+    >(
+      common::nullopt,
+      std::move(error)
+    );
+  }
+
+  result["preferredName"] = std::move(
+    json_preferred_name.value()
+  );
+
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+    >
+  >& maybe_short_name(
+    that.short_name()
+  );
+  if (that.short_name().has_value()) {
+    common::optional<nlohmann::json> json_short_name;
+    std::tie(
+      json_short_name,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_short_name,
+      SerializeIClassPtr
+    );
     if (error.has_value()) {
       error->path.segments.emplace_front(
-        common::make_unique<iteration::IndexSegment>(
-          index_preferred_name
-        )
-      );
-
-      error->path.segments.emplace_front(
         common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kPreferredName
+          iteration::Property::kShortName
         )
       );
 
@@ -37252,76 +28266,15 @@ std::pair<
       );
     }
 
-    json_preferred_name.emplace_back(
-      std::move(*json_item)
-    );
-
-    ++index_preferred_name;
-  }
-  result["preferredName"] = std::move(
-    json_preferred_name
-  );
-
-  const common::optional<
-    std::vector<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >
-  >& maybe_short_name(
-    that.short_name()
-  );
-  if (maybe_short_name.has_value()) {
-    nlohmann::json json_short_name = nlohmann::json::array();
-    json_short_name.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_short_name->size()
-    );
-    size_t index_short_name = 0;
-    for (
-      const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& item
-      : *maybe_short_name
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_short_name
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kShortName
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_short_name.emplace_back(
-        std::move(*json_item)
-      );
-
-      ++index_short_name;
-    }
     result["shortName"] = std::move(
-      json_short_name
+      json_short_name.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_unit(
     that.unit()
   );
-  if (maybe_unit.has_value()) {
+  if (that.unit().has_value()) {
     result["unit"] = SerializeWstring(
       *maybe_unit
     );
@@ -37332,7 +28285,7 @@ std::pair<
   >& maybe_unit_id(
     that.unit_id()
   );
-  if (maybe_unit_id.has_value()) {
+  if (that.unit_id().has_value()) {
     common::optional<nlohmann::json> json_unit_id;
     std::tie(
       json_unit_id,
@@ -37364,7 +28317,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_source_of_definition(
     that.source_of_definition()
   );
-  if (maybe_source_of_definition.has_value()) {
+  if (that.source_of_definition().has_value()) {
     result["sourceOfDefinition"] = SerializeWstring(
       *maybe_source_of_definition
     );
@@ -37373,7 +28326,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_symbol(
     that.symbol()
   );
-  if (maybe_symbol.has_value()) {
+  if (that.symbol().has_value()) {
     result["symbol"] = SerializeWstring(
       *maybe_symbol
     );
@@ -37382,7 +28335,7 @@ std::pair<
   const common::optional<types::DataTypeIec61360>& maybe_data_type(
     that.data_type()
   );
-  if (maybe_data_type.has_value()) {
+  if (that.data_type().has_value()) {
     result["dataType"] = stringification::to_string(
       *maybe_data_type
     );
@@ -37395,59 +28348,40 @@ std::pair<
   >& maybe_definition(
     that.definition()
   );
-  if (maybe_definition.has_value()) {
-    nlohmann::json json_definition = nlohmann::json::array();
-    json_definition.get_ptr<nlohmann::json::array_t*>()->reserve(
-      maybe_definition->size()
+  if (that.definition().has_value()) {
+    common::optional<nlohmann::json> json_definition;
+    std::tie(
+      json_definition,
+      error
+    ) = SerializeListWithFallible(
+      *maybe_definition,
+      SerializeIClassPtr
     );
-    size_t index_definition = 0;
-    for (
-      const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& item
-      : *maybe_definition
-    ) {
-      common::optional<nlohmann::json> json_item;
-      std::tie(
-        json_item,
-        error
-      ) = SerializeIClass(*item);
-
-      if (error.has_value()) {
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::IndexSegment>(
-            index_definition
-          )
-        );
-
-        error->path.segments.emplace_front(
-          common::make_unique<iteration::PropertySegment>(
-            iteration::Property::kDefinition
-          )
-        );
-
-        return std::make_pair<
-          common::optional<nlohmann::json>,
-          common::optional<SerializationError>
-        >(
-          common::nullopt,
-          std::move(error)
-        );
-      }
-
-      json_definition.emplace_back(
-        std::move(*json_item)
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDefinition
+        )
       );
 
-      ++index_definition;
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
     }
+
     result["definition"] = std::move(
-      json_definition
+      json_definition.value()
     );
   }
 
   const common::optional<std::wstring>& maybe_value_format(
     that.value_format()
   );
-  if (maybe_value_format.has_value()) {
+  if (that.value_format().has_value()) {
     result["valueFormat"] = SerializeWstring(
       *maybe_value_format
     );
@@ -37458,7 +28392,7 @@ std::pair<
   >& maybe_value_list(
     that.value_list()
   );
-  if (maybe_value_list.has_value()) {
+  if (that.value_list().has_value()) {
     common::optional<nlohmann::json> json_value_list;
     std::tie(
       json_value_list,
@@ -37490,7 +28424,7 @@ std::pair<
   const common::optional<std::wstring>& maybe_value(
     that.value()
   );
-  if (maybe_value.has_value()) {
+  if (that.value().has_value()) {
     result["value"] = SerializeWstring(
       *maybe_value
     );
@@ -37501,7 +28435,7 @@ std::pair<
   >& maybe_level_type(
     that.level_type()
   );
-  if (maybe_level_type.has_value()) {
+  if (that.level_type().has_value()) {
     common::optional<nlohmann::json> json_level_type;
     std::tie(
       json_level_type,
@@ -37713,6 +28647,15 @@ std::pair<
       throw std::invalid_argument(message);
     }
   };
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeIClassPtr(
+  const std::shared_ptr<types::IClass>& that
+) {
+  return SerializeIClass(*that);
 }
 
 nlohmann::json Serialize(
