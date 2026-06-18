@@ -1,0 +1,18 @@
+{
+  "node": {
+    "identifier": "some-identifier",
+    "description": "some-description"
+  },
+  "something": {
+    "someChoice": {
+      "modelType": "Branch",
+      "identifier": "some-identifier",
+      "description": "some-description"
+    },
+    "somethingWithoutChoice": {
+      "modelType": "Branch",
+      "identifier": "some-identifier",
+      "description": "some-description"
+    }
+  }
+}

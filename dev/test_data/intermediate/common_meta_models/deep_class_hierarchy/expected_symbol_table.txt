@@ -1,0 +1,674 @@
+SymbolTable(
+  our_types=[
+    AbstractClass(
+      name='Node',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=Interface(
+        base='Reference to AbstractClass Node',
+        name='Node',
+        inheritances=[],
+        implementers=[
+          'Reference to ConcreteClass Branch',
+          'Reference to ConcreteClass Leaf',
+          'Reference to ConcreteClass Blossom'],
+        properties=[
+          Property(
+            name='identifier',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            description=None,
+            specified_for='Reference to AbstractClass Node',
+            parsed=...)],
+        signatures=[],
+        description=None,
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Branch',
+        'Reference to ConcreteClass Leaf',
+        'Reference to ConcreteClass Blossom'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Branch',
+        'Reference to ConcreteClass Leaf',
+        'Reference to ConcreteClass Blossom'],
+      properties=[
+        Property(
+          name='identifier',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Node',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='identifier',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='identifier',
+              argument='identifier',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='identifier',
+              argument='identifier',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Branch',
+      inheritances=[
+        'Reference to AbstractClass Node'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Node'],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=Interface(
+        base='Reference to ConcreteClass Branch',
+        name='Branch',
+        inheritances=[
+          'Reference to Interface Node'],
+        implementers=[
+          'Reference to ConcreteClass Leaf',
+          'Reference to ConcreteClass Blossom',
+          'Reference to ConcreteClass Branch'],
+        properties=[
+          Property(
+            name='description',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            description=None,
+            specified_for='Reference to ConcreteClass Branch',
+            parsed=...)],
+        signatures=[],
+        description=None,
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Leaf',
+        'Reference to ConcreteClass Blossom'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Leaf',
+        'Reference to ConcreteClass Blossom'],
+      properties=[
+        Property(
+          name='identifier',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Node',
+          parsed=...),
+        Property(
+          name='description',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Branch',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='identifier',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='description',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Node')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='description',
+              argument='description',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='identifier',
+              argument='identifier',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='description',
+              argument='description',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Leaf',
+      inheritances=[
+        'Reference to ConcreteClass Branch'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Node',
+        'Reference to ConcreteClass Branch'],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=Interface(
+        base='Reference to ConcreteClass Leaf',
+        name='Leaf',
+        inheritances=[
+          'Reference to Interface Branch'],
+        implementers=[
+          'Reference to ConcreteClass Blossom',
+          'Reference to ConcreteClass Leaf'],
+        properties=[
+          Property(
+            name='value',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            description=None,
+            specified_for='Reference to ConcreteClass Leaf',
+            parsed=...)],
+        signatures=[],
+        description=None,
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Blossom'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Blossom'],
+      properties=[
+        Property(
+          name='identifier',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Node',
+          parsed=...),
+        Property(
+          name='description',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Branch',
+          parsed=...),
+        Property(
+          name='value',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Leaf',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='identifier',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='description',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='value',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Branch')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='identifier',
+              argument='identifier',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='description',
+              argument='description',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Blossom',
+      inheritances=[
+        'Reference to ConcreteClass Leaf'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Node',
+        'Reference to ConcreteClass Branch',
+        'Reference to ConcreteClass Leaf'],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='identifier',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Node',
+          parsed=...),
+        Property(
+          name='description',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Branch',
+          parsed=...),
+        Property(
+          name='value',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Leaf',
+          parsed=...),
+        Property(
+          name='details',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Blossom',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='identifier',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='description',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='value',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='details',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Leaf')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='details',
+              argument='details',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='identifier',
+              argument='identifier',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='description',
+              argument='description',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='details',
+              argument='details',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Something',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='some_choice',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Node',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Property(
+          name='something_without_choice',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Branch',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='some_choice',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Node',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='something_without_choice',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Branch',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_choice',
+              argument='some_choice',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='something_without_choice',
+              argument='something_without_choice',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_choice',
+              argument='some_choice',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='something_without_choice',
+              argument='something_without_choice',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Container',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='node',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Node',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Property(
+          name='something',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Something',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='node',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Node',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='something',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Something',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='node',
+              argument='node',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='something',
+              argument='something',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='node',
+              argument='node',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='something',
+              argument='something',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...)],
+  our_types_topologically_sorted=[
+    'Reference to our type Node',
+    'Reference to our type Branch',
+    'Reference to our type Leaf',
+    'Reference to our type Blossom',
+    'Reference to our type Container',
+    'Reference to our type Something'],
+  enumerations=[],
+  constrained_primitives=[],
+  classes=[
+    'Reference to our type Node',
+    'Reference to our type Branch',
+    'Reference to our type Leaf',
+    'Reference to our type Blossom',
+    'Reference to our type Something',
+    'Reference to our type Container'],
+  concrete_classes=[
+    'Reference to our type Branch',
+    'Reference to our type Leaf',
+    'Reference to our type Blossom',
+    'Reference to our type Something',
+    'Reference to our type Container'],
+  constants=[],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    version='dummy',
+    xml_namespace='https://dummy.com'))

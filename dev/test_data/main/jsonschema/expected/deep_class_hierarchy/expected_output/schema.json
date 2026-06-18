@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "Blossom": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Leaf_abstract"
+        },
+        {
+          "properties": {
+            "details": {
+              "type": "string"
+            },
+            "modelType": {
+              "const": "Blossom"
+            }
+          },
+          "required": [
+            "details"
+          ]
+        }
+      ]
+    },
+    "Branch": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Branch_abstract"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "Branch"
+            }
+          }
+        }
+      ]
+    },
+    "Branch_abstract": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Node"
+        },
+        {
+          "properties": {
+            "description": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "description"
+          ]
+        }
+      ]
+    },
+    "Branch_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Branch"
+        },
+        {
+          "$ref": "#/definitions/Leaf"
+        },
+        {
+          "$ref": "#/definitions/Blossom"
+        }
+      ]
+    },
+    "Container": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/Node_choice"
+        },
+        "something": {
+          "$ref": "#/definitions/Something"
+        }
+      },
+      "required": [
+        "node",
+        "something"
+      ]
+    },
+    "Leaf": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Leaf_abstract"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "Leaf"
+            }
+          }
+        }
+      ]
+    },
+    "Leaf_abstract": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Branch_abstract"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      ]
+    },
+    "Leaf_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Leaf"
+        },
+        {
+          "$ref": "#/definitions/Blossom"
+        }
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "Blossom",
+        "Branch",
+        "Leaf"
+      ]
+    },
+    "Node": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "identifier",
+        "modelType"
+      ]
+    },
+    "Node_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Branch"
+        },
+        {
+          "$ref": "#/definitions/Leaf"
+        },
+        {
+          "$ref": "#/definitions/Blossom"
+        }
+      ]
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "someChoice": {
+          "$ref": "#/definitions/Node_choice"
+        },
+        "somethingWithoutChoice": {
+          "$ref": "#/definitions/Branch_choice"
+        }
+      },
+      "required": [
+        "someChoice",
+        "somethingWithoutChoice"
+      ]
+    }
+  }
+}

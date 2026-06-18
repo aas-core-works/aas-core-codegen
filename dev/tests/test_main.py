@@ -13,7 +13,6 @@ import unittest
 from typing import List, MutableMapping, Set
 
 import aas_core_codegen.main
-
 import tests.common
 
 _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
@@ -254,6 +253,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="constrained_primitives"
         )
 
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="deep_class_hierarchy"
+        )
+
     def test_expected_enum(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="enum"
@@ -285,6 +289,11 @@ class Test_csharp(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP,
             case_name="constrained_primitives",
+        )
+
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="deep_class_hierarchy"
         )
 
     def test_expected_enum(self) -> None:
@@ -320,6 +329,11 @@ class Test_golang(_TestCase):
             case_name="constrained_primitives",
         )
 
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="deep_class_hierarchy"
+        )
+
     def test_expected_enum(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="enum"
@@ -352,6 +366,23 @@ class Test_jsonschema(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_constrained_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="constrained_primitives",
+        )
+
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="deep_class_hierarchy",
+        )
+
+    def test_expected_enum(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="enum"
         )
 
     def test_expected_list_of_classes(self) -> None:
@@ -414,6 +445,11 @@ class Test_jsonschema(_TestCase):
             case_name="list_of_primitives_with_invariants",
         )
 
+    def test_expected_primitive_types(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="primitive_types"
+        )
+
     def test_expected_regression_when_len_constraints_on_inherited_property(
         self,
     ) -> None:
@@ -427,6 +463,22 @@ class Test_python(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_constrained_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="constrained_primitives",
+        )
+
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="deep_class_hierarchy"
+        )
+
+    def test_expected_enum(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="enum"
         )
 
     def test_expected_list_of_classes(self) -> None:
@@ -493,6 +545,21 @@ class Test_xsd(_TestCase):
             target=aas_core_codegen.main.Target.XSD, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_constrained_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="constrained_primitives"
+        )
+
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="deep_class_hierarchy"
+        )
+
+    def test_expected_enum(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="enum"
+        )
+
     def test_expected_list_of_classes(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="list_of_classes"
@@ -548,6 +615,11 @@ class Test_xsd(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD,
             case_name="list_of_primitives_with_invariants",
+        )
+
+    def test_expected_primitive_types(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="primitive_types"
         )
 
     def test_expected_regression_when_len_constraints_on_inherited_property(

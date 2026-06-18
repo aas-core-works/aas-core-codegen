@@ -55,9 +55,6 @@ def main() -> int:
     assert main_csharp_expected_dir.exists() and main_csharp_expected_dir.is_dir()
 
     live_tests_csharp_dir = repo_root / "dev" / "test_data" / "live_tests" / "csharp"
-    assert (
-        live_tests_csharp_dir.exists() and live_tests_csharp_dir.is_dir()
-    ), live_tests_csharp_dir
 
     with contextlib.ExitStack() as exit_stack:
         # pylint: disable=consider-using-with

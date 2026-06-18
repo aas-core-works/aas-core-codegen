@@ -2,6 +2,7 @@
 import os
 import pathlib
 import unittest
+from typing import Optional
 
 import xmlschema
 
@@ -112,7 +113,7 @@ class Test_examples(unittest.TestCase):
             schema = xmlschema.XMLSchema(str(schema_pth))
 
             for data_pth in sorted(
-                (case_dir / "examples" / "expected").glob("**/*.xml")
+                (case_dir / "examples" / "Expected").glob("**/*.xml")
             ):
                 try:
                     schema.validate(str(data_pth))
@@ -120,6 +121,21 @@ class Test_examples(unittest.TestCase):
                     raise AssertionError(
                         f"Failed to validate {data_pth} against {schema_pth}"
                     ) from err
+
+            for data_pth in sorted(
+                (case_dir / "examples" / "Unexpected").glob("**/*.xml")
+            ):
+                schema_exception = None  # type: Optional[xmlschema.XMLSchemaException]
+                try:
+                    schema.validate(str(data_pth))
+                except xmlschema.XMLSchemaException as err:
+                    schema_exception = err
+
+                if schema_exception is None:
+                    raise AssertionError(
+                        f"Expected the data from {data_pth} to fail with validation "
+                        f"of {schema_pth}, but no schema exception was observed."
+                    )
 
 
 if __name__ == "__main__":

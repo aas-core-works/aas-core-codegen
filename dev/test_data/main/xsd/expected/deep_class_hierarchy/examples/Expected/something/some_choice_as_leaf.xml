@@ -1,0 +1,1 @@
+<something xmlns="https://dummy.com"><someChoice><leaf><identifier>some-identifier</identifier><description>some-description</description><value>1234</value></leaf></someChoice><somethingWithoutChoice><branch><identifier>some-identifier</identifier><description>some-description</description></branch></somethingWithoutChoice></something>

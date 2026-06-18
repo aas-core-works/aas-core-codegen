@@ -1,0 +1,20 @@
+{
+  "node": {
+    "modelType": "Leaf",
+    "identifier": "some-identifier",
+    "description": "some-description",
+    "value": 1234
+  },
+  "something": {
+    "someChoice": {
+      "modelType": "Branch",
+      "identifier": "some-identifier",
+      "description": "some-description"
+    },
+    "somethingWithoutChoice": {
+      "modelType": "Branch",
+      "identifier": "some-identifier",
+      "description": "some-description"
+    }
+  }
+}

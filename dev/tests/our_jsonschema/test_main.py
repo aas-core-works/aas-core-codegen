@@ -5,6 +5,7 @@ import os
 import pathlib
 import unittest
 import warnings
+from typing import Optional
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -38,18 +39,40 @@ class Test_examples(unittest.TestCase):
             with schema_pth.open("rt", encoding="utf-8") as fid:
                 schema = json.load(fid)
 
-            for data_pth in sorted(
-                (case_dir / "examples" / "expected").glob("**/*.json")
-            ):
-                with data_pth.open("rt", encoding="utf-8") as fid:
-                    instance = json.load(fid)
+            expected_dir = case_dir / "examples" / "Expected"
 
-                try:
-                    jsonschema.validate(instance=instance, schema=schema)
-                except jsonschema.ValidationError as err:
-                    raise AssertionError(
-                        f"Failed to validate {data_pth} against {schema_pth}"
-                    ) from err
+            if expected_dir.exists():
+                for data_pth in sorted(expected_dir.glob("**/*.json")):
+                    with data_pth.open("rt", encoding="utf-8") as fid:
+                        instance = json.load(fid)
+
+                    try:
+                        jsonschema.validate(instance=instance, schema=schema)
+                    except jsonschema.ValidationError as err:
+                        raise AssertionError(
+                            f"Failed to validate {data_pth} against {schema_pth}"
+                        ) from err
+
+            unexpected_dir = case_dir / "examples" / "Unexpected"
+
+            if unexpected_dir.exists():
+                for data_pth in sorted(unexpected_dir.glob("**/*.json")):
+                    with data_pth.open("rt", encoding="utf-8") as fid:
+                        instance = json.load(fid)
+
+                    validation_error = (
+                        None
+                    )  # type: Optional[jsonschema.ValidationError]
+                    try:
+                        jsonschema.validate(instance=instance, schema=schema)
+                    except jsonschema.ValidationError as err:
+                        validation_error = err
+
+                    if validation_error is None:
+                        raise AssertionError(
+                            f"Expected validation error on {data_pth} "
+                            f"against {schema_pth}, but got no error"
+                        )
 
 
 class Test_pattern_transpilation(unittest.TestCase):
