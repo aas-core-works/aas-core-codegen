@@ -1,0 +1,333 @@
+SymbolTable(
+  our_types=[
+    ConstrainedPrimitive(
+      name='ConstrainedBool',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendants=[],
+      descendant_id_set=...,
+      constrainee='BOOL',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='Always true',
+          body=textwrap.dedent("""\
+            Name(
+              identifier='self',
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive ConstrainedBool',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConstrainedPrimitive(
+      name='PositiveInt',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendants=[],
+      descendant_id_set=...,
+      constrainee='INT',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='Larger than zero',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=Name(
+                identifier='self',
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive PositiveInt',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConstrainedPrimitive(
+      name='PositiveFloat',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendants=[],
+      descendant_id_set=...,
+      constrainee='FLOAT',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='Larger than zero',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=Name(
+                identifier='self',
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0.0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive PositiveFloat',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConstrainedPrimitive(
+      name='NonEmptyString',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendants=[],
+      descendant_id_set=...,
+      constrainee='STR',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='At least one character',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive NonEmptyString',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConstrainedPrimitive(
+      name='NonEmptyBytes',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendants=[],
+      descendant_id_set=...,
+      constrainee='BYTEARRAY',
+      is_implementation_specific=False,
+      invariants=[
+        Invariant(
+          description='At least one byte',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive NonEmptyBytes',
+          parsed=...)],
+      invariant_id_set=...,
+      description=None,
+      parsed=...),
+    ConcreteClass(
+      name='Something',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='some_bool',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type ConstrainedBool',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Property(
+          name='some_int',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type PositiveInt',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Property(
+          name='some_float',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type PositiveFloat',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Property(
+          name='some_string',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type NonEmptyString',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Property(
+          name='some_bytes',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type NonEmptyBytes',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='some_bool',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type ConstrainedBool',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='some_int',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type PositiveInt',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='some_float',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type PositiveFloat',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='some_string',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type NonEmptyString',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='some_bytes',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type NonEmptyBytes',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_bool',
+              argument='some_bool',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_int',
+              argument='some_int',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_float',
+              argument='some_float',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_string',
+              argument='some_string',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_bytes',
+              argument='some_bytes',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_bool',
+              argument='some_bool',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_int',
+              argument='some_int',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_float',
+              argument='some_float',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_string',
+              argument='some_string',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_bytes',
+              argument='some_bytes',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...)],
+  our_types_topologically_sorted=[
+    'Reference to our type ConstrainedBool',
+    'Reference to our type NonEmptyBytes',
+    'Reference to our type NonEmptyString',
+    'Reference to our type PositiveFloat',
+    'Reference to our type PositiveInt',
+    'Reference to our type Something'],
+  enumerations=[],
+  constrained_primitives=[
+    'Reference to our type ConstrainedBool',
+    'Reference to our type PositiveInt',
+    'Reference to our type PositiveFloat',
+    'Reference to our type NonEmptyString',
+    'Reference to our type NonEmptyBytes'],
+  classes=[
+    'Reference to our type Something'],
+  concrete_classes=[
+    'Reference to our type Something'],
+  constants=[],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    version='dummy',
+    xml_namespace='https://dummy.com'))

@@ -1,0 +1,11 @@
+{
+  "someChoice": {
+    "modelType": "Branch",
+    "identifier": "some-identifier",
+    "description": "some-description"
+  },
+  "somethingWithoutChoice": {
+    "identifier": "some-identifier",
+    "description": "some-description"
+  }
+}

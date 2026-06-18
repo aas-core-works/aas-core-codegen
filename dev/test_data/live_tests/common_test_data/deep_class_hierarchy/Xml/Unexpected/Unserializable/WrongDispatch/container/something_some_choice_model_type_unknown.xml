@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<container xmlns="https://dummy.com">
+    <node><branch><identifier>some-identifier</identifier><description>some-description</description></branch></node>
+    <something><someChoice><nonexistent><identifier>some-identifier</identifier><description>some-description</description></nonexistent></someChoice><somethingWithoutChoice><branch><identifier>some-identifier</identifier><description>some-description</description></branch></somethingWithoutChoice></something>
+</container>

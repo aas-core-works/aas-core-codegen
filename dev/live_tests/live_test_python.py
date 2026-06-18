@@ -54,9 +54,6 @@ def main() -> int:
     assert main_python_expected_dir.exists() and main_python_expected_dir.is_dir()
 
     live_tests_python_dir = repo_root / "dev" / "test_data" / "live_tests" / "python"
-    assert (
-        live_tests_python_dir.exists() and live_tests_python_dir.is_dir()
-    ), live_tests_python_dir
 
     with contextlib.ExitStack() as exit_stack:
         # pylint: disable=consider-using-with
@@ -170,18 +167,34 @@ packages = [
 
             pylint_rc = project_dir / "dev" / "pylint.rc"
 
-            # pylint: disable=line-too-long
+            pylint_disables = (
+                "too-few-public-methods,len-as-condition,duplicate-code,no-else-raise,"
+                "no-else-return,too-many-locals,too-many-branches,"
+                "too-many-nested-blocks,too-many-return-statements,"
+                "unsubscriptable-object,not-an-iterable,broad-except,"
+                "too-many-statements,protected-access,unnecessary-pass,"
+                "too-many-statements,too-many-arguments,no-member,"
+                "too-many-instance-attributes,too-many-lines,undefined-variable,"
+                "unnecessary-lambda,assignment-from-none,useless-return,"
+                "unused-argument,too-many-boolean-expressions,"
+                "consider-using-f-string,use-dict-literal,invalid-name,"
+                "no-else-continue,no-else-break,unneeded-not,"
+                "too-many-public-methods,line-too-long,too-many-ancestors,"
+                "wrong-import-position,too-many-positional-arguments,"
+                "wrong-import-order,unused-import,missing-docstring,"
+                "superfluous-parens"
+            )
+
             pylint_rc.write_text(
-                """\
+                f"""\
 [FORMAT]
 max-line-length=120
 
 [MESSAGES CONTROL]
-disable=too-few-public-methods,len-as-condition,duplicate-code,no-else-raise,no-else-return,too-many-locals,too-many-branches,too-many-nested-blocks,too-many-return-statements,unsubscriptable-object,not-an-iterable,broad-except,too-many-statements,protected-access,unnecessary-pass,too-many-statements,too-many-arguments,no-member,too-many-instance-attributes,too-many-lines,undefined-variable,unnecessary-lambda,assignment-from-none,useless-return,unused-argument,too-many-boolean-expressions,consider-using-f-string,use-dict-literal,invalid-name,no-else-continue,no-else-break,unneeded-not,too-many-public-methods,line-too-long,too-many-ancestors,wrong-import-position,too-many-positional-arguments,wrong-import-order,unused-import,missing-docstring
+disable={pylint_disables}
 """,
                 encoding="utf-8",
             )
-            # pylint: enable=line-too-long
 
             (project_dir / qualified_module_name / "py.typed").write_text(
                 """\

@@ -314,6 +314,7 @@ class Test_against_recorded(unittest.TestCase):
             symbol_table_str = intermediate.dump(symbol_table)
 
             if tests.common.RERECORD:
+                expected_symbol_table_pth.parent.mkdir(exist_ok=True, parents=True)
                 expected_symbol_table_pth.write_text(symbol_table_str, encoding="utf-8")
             else:
                 try:

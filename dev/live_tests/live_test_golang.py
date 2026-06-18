@@ -93,9 +93,6 @@ def main() -> int:
     assert main_golang_expected_dir.exists() and main_golang_expected_dir.is_dir()
 
     live_tests_golang_dir = repo_root / "dev" / "test_data" / "live_tests" / "golang"
-    assert (
-        live_tests_golang_dir.exists() and live_tests_golang_dir.is_dir()
-    ), live_tests_golang_dir
 
     with contextlib.ExitStack() as exit_stack:
         # pylint: disable=consider-using-with

@@ -1,0 +1,25 @@
+{
+  "node": {
+    "modelType": "Blossom",
+    "identifier": "some-identifier",
+    "description": "some-description",
+    "value": 1234,
+    "details": "some-details"
+  },
+  "something": {
+    "someChoice": {
+      "modelType": "Blossom",
+      "identifier": "some-identifier",
+      "description": "some-description",
+      "value": 1234,
+      "details": "some-details"
+    },
+    "somethingWithoutChoice": {
+      "modelType": "Blossom",
+      "identifier": "some-identifier",
+      "description": "some-description",
+      "value": 1234,
+      "details": "some-details"
+    }
+  }
+}

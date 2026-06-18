@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<something xmlns="https://dummy.com">
+    <someChoice><nonexistent><identifier>some-identifier</identifier><description>some-description</description></nonexistent></someChoice>
+    <somethingWithoutChoice><branch><identifier>some-identifier</identifier><description>some-description</description></branch></somethingWithoutChoice>
+</something>
