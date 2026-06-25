@@ -1664,49 +1664,49 @@ class _Serializer(aas_types.AbstractVisitor):
         """
         self.stream.write(f'<{name}/>')
 
-    def _write_bool_property(
+    def _write_bool_as_element(
             self,
             name: str,
             value: bool
     ) -> None:
         """
-        Write the :paramref:`value` of a boolean property enclosed in
+        Write the :paramref:`value` of a boolean enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
         self.stream.write('true' if value else 'false')
         self._write_end_element(name)
 
-    def _write_int_property(
+    def _write_int_as_element(
             self,
             name: str,
             value: int
     ) -> None:
         """
-        Write the :paramref:`value` of an integer property enclosed in
+        Write the :paramref:`value` of an integer enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
         self.stream.write(str(value))
         self._write_end_element(name)
 
-    def _write_float_property(
+    def _write_float_as_element(
             self,
             name: str,
             value: float
     ) -> None:
         """
-        Write the :paramref:`value` of a floating-point property enclosed in
+        Write the :paramref:`value` of a floating-point number enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
 
@@ -1726,43 +1726,43 @@ class _Serializer(aas_types.AbstractVisitor):
 
         self._write_end_element(name)
 
-    def _write_str_property(
+    def _write_str_as_element(
             self,
             name: str,
             value: str
     ) -> None:
         """
-        Write the :paramref:`value` of a string property enclosed in
+        Write the :paramref:`value` of a string enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
         self._escape_and_write_text(value)
         self._write_end_element(name)
 
-    def _write_bytes_property(
+    def _write_bytes_as_element(
             self,
             name: str,
             value: bytes
     ) -> None:
         """
-        Write the :paramref:`value` of a binary-content property enclosed in
+        Write the :paramref:`value` of a binary content enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
 
-        # NOTE (mristin, 2022-10-14):
+        # NOTE (mristin):
         # We need to decode the result of the base64-encoding to ASCII since we are
         # writing to an XML *text* stream. ``base64.b64encode(.)`` gives us bytes,
         # not a string.
         encoded = base64.b64encode(value).decode('ascii')
 
-        # NOTE (mristin, 2022-10-14):
+        # NOTE (mristin):
         # Base64 alphabet excludes ``<``, ``>`` and ``&``, so we can directly
         # write the ``encoded`` content to the stream as XML text.
         #
@@ -1808,7 +1808,7 @@ class _Serializer(aas_types.AbstractVisitor):
         else:
             self._write_start_element('someBools')
             for an_item in that.some_bools:
-                self._write_bool_property('v', an_item)
+                self._write_bool_as_element('v', an_item)
             self._write_end_element('someBools')
 
         if len(that.some_ints) == 0:
@@ -1816,7 +1816,7 @@ class _Serializer(aas_types.AbstractVisitor):
         else:
             self._write_start_element('someInts')
             for another_item in that.some_ints:
-                self._write_int_property('v', another_item)
+                self._write_int_as_element('v', another_item)
             self._write_end_element('someInts')
 
         if len(that.some_floats) == 0:
@@ -1824,7 +1824,7 @@ class _Serializer(aas_types.AbstractVisitor):
         else:
             self._write_start_element('someFloats')
             for yet_another_item in that.some_floats:
-                self._write_float_property('v', yet_another_item)
+                self._write_float_as_element('v', yet_another_item)
             self._write_end_element('someFloats')
 
         if len(that.some_strings) == 0:
@@ -1832,7 +1832,7 @@ class _Serializer(aas_types.AbstractVisitor):
         else:
             self._write_start_element('someStrings')
             for yet_yet_another_item in that.some_strings:
-                self._write_str_property('v', yet_yet_another_item)
+                self._write_str_as_element('v', yet_yet_another_item)
             self._write_end_element('someStrings')
 
         if len(that.some_bytes) == 0:
@@ -1840,7 +1840,7 @@ class _Serializer(aas_types.AbstractVisitor):
         else:
             self._write_start_element('someBytes')
             for yet_yet_yet_another_item in that.some_bytes:
-                self._write_bytes_property('v', yet_yet_yet_another_item)
+                self._write_bytes_as_element('v', yet_yet_yet_another_item)
             self._write_end_element('someBytes')
 
     def visit_something(

@@ -828,12 +828,52 @@ for error in self.transform(
             "see the note above in the code."
         )
 
-        # NOTE (mristin, 2022-10-01):
-        # We only descend into our classes here.
-        if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+        loop_variable = next(generator_for_loop_variables)
+
+        for_error: Stripped
+
+        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+            # NOTE (mristin):
+            # There is nothing to verify about the primitive types.
             return Stripped(""), None
 
-        loop_variable = next(generator_for_loop_variables)
+        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                # NOTE (mristin):
+                # There is nothing to verify about the enumeration.
+                return Stripped(""), None
+
+            elif isinstance(
+                type_anno.items.our_type, intermediate.ConstrainedPrimitive
+            ):
+                raise NotImplementedError(
+                    "The verification of lists of constrained primitives has "
+                    "to be implemented yet."
+                )
+
+            elif isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                for_error = Stripped(
+                    f"""for error in self.transform({loop_variable})"""
+                )
+
+                if len(for_error) > 70:
+                    for_error = Stripped(
+                        f"""\
+for error in self.transform(
+{II}{loop_variable}
+)"""
+                    )
+
+            else:
+                # noinspection PyTypeChecker
+                assert_never(type_anno.items.our_type)
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(type_anno.items)
 
         for_i_item_in_that_prop = (
             f"for i, {loop_variable} in enumerate(that.{prop_name})"
@@ -846,18 +886,11 @@ for i, {loop_variable} in enumerate(
 {II}that.{prop_name}
 )"""
 
-        for_error_in_self_transform = f"for error in self.transform({loop_variable})"
-        if len(for_error_in_self_transform) > 70:
-            for_error_in_self_transform = f"""\
-for error in self.transform(
-{II}{loop_variable}
-)"""
-
         stmts.append(
             Stripped(
                 f"""\
 {for_i_item_in_that_prop}:
-{I}{indent_but_first_line(for_error_in_self_transform, I)}:
+{I}{indent_but_first_line(for_error, I)}:
 {II}error.path._prepend(
 {III}IndexSegment(
 {IIII}that.{prop_name},

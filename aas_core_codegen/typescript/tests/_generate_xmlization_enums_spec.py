@@ -62,10 +62,12 @@ import * as TestCommonXmlization from "./commonXmlization";"""
                 break
 
         if carrier_cls is None or carrier_prop is None:
-            raise AssertionError(
-                f"Expected an enum carrier property for XML round-trip tests, "
-                f"but found none for: {enumeration.name}"
-            )
+            # NOTE (mristin):
+            # The enumeration is not contained in a property, but might be contained,
+            # say, in a list of enumeration literals. Since we can not access
+            # the enumeration literal directly as a property, we can not generate
+            # the tests using the current logic.
+            continue
 
         prop_name_typescript = typescript_naming.property_name(carrier_prop.name)
         load_maximal_name = typescript_naming.function_name(

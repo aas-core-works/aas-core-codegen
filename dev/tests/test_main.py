@@ -268,6 +268,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="list_of_classes"
         )
 
+    def test_expected_list_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="list_of_enums"
+        )
+
     def test_expected_list_of_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="list_of_primitives"
@@ -306,6 +311,11 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="list_of_classes"
         )
 
+    def test_expected_list_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="list_of_enums"
+        )
+
     def test_expected_list_of_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="list_of_primitives"
@@ -342,6 +352,11 @@ class Test_golang(_TestCase):
     def test_expected_list_of_classes(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="list_of_classes"
+        )
+
+    def test_expected_list_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="list_of_enums"
         )
 
     def test_expected_list_of_primitives(self) -> None:
@@ -486,6 +501,11 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="list_of_classes"
         )
 
+    def test_expected_list_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="list_of_enums"
+        )
+
     def test_expected_list_of_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="list_of_primitives"
@@ -525,6 +545,12 @@ class Test_typescript(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
             case_name="list_of_classes",
+        )
+
+    def test_expected_list_of_enums(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="list_of_enums",
         )
 
     def test_expected_list_of_primitives(self) -> None:
