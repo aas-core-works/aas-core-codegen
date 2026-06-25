@@ -102,9 +102,10 @@ namespace AasCore.Aas3_0
             }
 
             /// <summary>
-            /// Consume a <c>&lt;v&gt;</c> element from the reader.
+            /// Consume a <c>&lt;v&gt;</c> element from the reader and return whether
+            /// it was a self-closing (empty) element.
             /// </summary>
-            private static void ReadVElement(
+            private static bool ReadVElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error
                 )
@@ -112,7 +113,7 @@ namespace AasCore.Aas3_0
                 if (reader.EOF) {
                     error = new Reporting.Error(
                         "Expected a <v> element, but got an end-of-file.");
-                    return;
+                    return false;
                 }
 
                 if (reader.NodeType != Xml.XmlNodeType.Element)
@@ -121,25 +122,28 @@ namespace AasCore.Aas3_0
                         "Expected a <v> start element, " +
                         $"but got the node of type {reader.NodeType} " +
                         $"with the value {reader.Value}");
-                    return;
+                    return false;
                 }
 
                 string elementName = TryElementName(
                     reader, out error);
                 if (error != null)
                 {
-                    return;
+                    return false;
                 }
                 if (elementName != "v")
                 {
                     error = new Reporting.Error(
                         "Expected a <v> element, " +
                         $"but got an element {elementName}");
-                    return;
+                    return false;
                 }
+
+                bool isEmpty = reader.IsEmptyElement;
 
                 // We can consume now the start element.
                 reader.Read();
+                return isEmpty;
             }
 
             /// <summary>
@@ -192,14 +196,14 @@ namespace AasCore.Aas3_0
                 out Reporting.Error? error
                 )
             {
-                ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, out error);
                 if (error != null)
                 {
                     return null;
                 }
 
                 bool? result = null;
-                if (!reader.IsEmptyElement)
+                if (!isEmptyVElement)
                 {
                     if (reader.EOF)
                     {
@@ -219,12 +223,12 @@ namespace AasCore.Aas3_0
                             $"The content could not be de-serialized as bool: {exception}");
                         return null;
                     }
-                }
 
-                ReadVEndElement(reader, out error);
-                if (error != null)
-                {
-                    return null;
+                    ReadVEndElement(reader, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
                 }
 
                 if (result == null)
@@ -244,14 +248,14 @@ namespace AasCore.Aas3_0
                 out Reporting.Error? error
                 )
             {
-                ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, out error);
                 if (error != null)
                 {
                     return null;
                 }
 
                 long? result = null;
-                if (!reader.IsEmptyElement)
+                if (!isEmptyVElement)
                 {
                     if (reader.EOF)
                     {
@@ -271,12 +275,12 @@ namespace AasCore.Aas3_0
                             $"The content could not be de-serialized as long: {exception}");
                         return null;
                     }
-                }
 
-                ReadVEndElement(reader, out error);
-                if (error != null)
-                {
-                    return null;
+                    ReadVEndElement(reader, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
                 }
 
                 if (result == null)
@@ -296,14 +300,14 @@ namespace AasCore.Aas3_0
                 out Reporting.Error? error
                 )
             {
-                ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, out error);
                 if (error != null)
                 {
                     return null;
                 }
 
                 double? result = null;
-                if (!reader.IsEmptyElement)
+                if (!isEmptyVElement)
                 {
                     if (reader.EOF)
                     {
@@ -323,12 +327,12 @@ namespace AasCore.Aas3_0
                             $"The content could not be de-serialized as double: {exception}");
                         return null;
                     }
-                }
 
-                ReadVEndElement(reader, out error);
-                if (error != null)
-                {
-                    return null;
+                    ReadVEndElement(reader, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
                 }
 
                 if (result == null)
@@ -348,14 +352,14 @@ namespace AasCore.Aas3_0
                 out Reporting.Error? error
                 )
             {
-                ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, out error);
                 if (error != null)
                 {
                     return null;
                 }
 
-                string? result = null;
-                if (!reader.IsEmptyElement)
+                string result;
+                if (!isEmptyVElement)
                 {
                     if (reader.EOF)
                     {
@@ -375,19 +379,18 @@ namespace AasCore.Aas3_0
                             $"The content could not be de-serialized as string: {exception}");
                         return null;
                     }
+
+                    ReadVEndElement(reader, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    result = "";
                 }
 
-                ReadVEndElement(reader, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-
-                if (result == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected result null when there is no error.");
-                }
                 return result;
             }
 
@@ -399,17 +402,19 @@ namespace AasCore.Aas3_0
                 out Reporting.Error? error
                 )
             {
-                ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, out error);
                 if (error != null)
                 {
                     return null;
                 }
 
                 byte[]? result;
-                if (reader.IsEmptyElement)
+                if (isEmptyVElement)
                 {
                     result = new byte[0];
-                } else {
+                }
+                else
+                {
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
@@ -429,12 +434,12 @@ namespace AasCore.Aas3_0
                             $"base64-encoded bytes: {exception}");
                         return null;
                     }
-                }
 
-                ReadVEndElement(reader, out error);
-                if (error != null)
-                {
-                    return null;
+                    ReadVEndElement(reader, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
                 }
 
                 return result;

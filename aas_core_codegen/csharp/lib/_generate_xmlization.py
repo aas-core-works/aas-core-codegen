@@ -112,9 +112,10 @@ def _generate_read_v_element() -> Stripped:
     return Stripped(
         f"""\
 /// <summary>
-/// Consume a <c>&lt;v&gt;</c> element from the reader.
+/// Consume a <c>&lt;v&gt;</c> element from the reader and return whether
+/// it was a self-closing (empty) element.
 /// </summary>
-private static void ReadVElement(
+private static bool ReadVElement(
 {I}Xml.XmlReader reader,
 {I}out Reporting.Error? error
 {I})
@@ -122,7 +123,7 @@ private static void ReadVElement(
 {I}if (reader.EOF) {{
 {II}error = new Reporting.Error(
 {III}"Expected a <v> element, but got an end-of-file.");
-{II}return;
+{II}return false;
 {I}}}
 
 {I}if (reader.NodeType != Xml.XmlNodeType.Element)
@@ -131,25 +132,28 @@ private static void ReadVElement(
 {III}"Expected a <v> start element, " +
 {III}$"but got the node of type {{reader.NodeType}} " +
 {III}$"with the value {{reader.Value}}");
-{II}return;
+{II}return false;
 {I}}}
 
 {I}string elementName = TryElementName(
 {II}reader, out error);
 {I}if (error != null)
 {I}{{
-{II}return;
+{II}return false;
 {I}}}
 {I}if (elementName != "v")
 {I}{{
 {II}error = new Reporting.Error(
 {III}"Expected a <v> element, " +
 {III}$"but got an element {{elementName}}");
-{II}return;
+{II}return false;
 {I}}}
+
+{I}bool isEmpty = reader.IsEmptyElement;
 
 {I}// We can consume now the start element.
 {I}reader.Read();
+{I}return isEmpty;
 }}"""
     )
 
@@ -207,7 +211,6 @@ def _generate_read_v_element_as_primitive_functions() -> List[Stripped]:
         ("ReadVElementAsBoolean", "bool", "reader.ReadContentAsBoolean()"),
         ("ReadVElementAsLong", "long", "reader.ReadContentAsLong()"),
         ("ReadVElementAsDouble", "double", "reader.ReadContentAsDouble()"),
-        ("ReadVElementAsString", "string", "reader.ReadContentAsString()"),
     ):
         result.append(
             Stripped(
@@ -221,14 +224,14 @@ private static {result_type}? {function_name}(
 {I}out Reporting.Error? error
 {I})
 {{
-{I}ReadVElement(reader, out error);
+{I}bool isEmptyVElement = ReadVElement(reader, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
 {I}}}
 
 {I}{result_type}? result = null;
-{I}if (!reader.IsEmptyElement)
+{I}if (!isEmptyVElement)
 {I}{{
 {II}if (reader.EOF)
 {II}{{
@@ -248,12 +251,12 @@ private static {result_type}? {function_name}(
 {IIII}$"The content could not be de-serialized as {result_type}: {{exception}}");
 {III}return null;
 {II}}}
-{I}}}
 
-{I}ReadVEndElement(reader, out error);
-{I}if (error != null)
-{I}{{
-{II}return null;
+{II}ReadVEndElement(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}return null;
+{II}}}
 {I}}}
 
 {I}if (result == null)
@@ -266,6 +269,63 @@ private static {result_type}? {function_name}(
             )
         )
 
+    # A self-closing <v /> represents an empty string.
+    result.append(
+        Stripped(
+            f"""\
+/// <summary>
+/// Read the content of a <c>&lt;v&gt;</c> element
+/// and parse it as string.
+/// </summary>
+private static string? ReadVElementAsString(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}bool isEmptyVElement = ReadVElement(reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}string result;
+{I}if (!isEmptyVElement)
+{I}{{
+{II}if (reader.EOF)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an XML content representing string, " +
+{IIII}"but reached the end-of-file");
+{III}return null;
+{II}}}
+
+{II}try
+{II}{{
+{III}result = reader.ReadContentAsString();
+{II}}}
+{II}catch (System.FormatException exception)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}$"The content could not be de-serialized as string: {{exception}}");
+{III}return null;
+{II}}}
+
+{II}ReadVEndElement(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}return null;
+{II}}}
+{I}}}
+{I}else
+{I}{{
+{II}result = "";
+{I}}}
+
+{I}return result;
+}}"""
+        )
+    )
+
     result.append(
         Stripped(
             f"""\
@@ -277,17 +337,19 @@ private static byte[]? ReadVElementAsBytes(
 {I}out Reporting.Error? error
 {I})
 {{
-{I}ReadVElement(reader, out error);
+{I}bool isEmptyVElement = ReadVElement(reader, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
 {I}}}
 
 {I}byte[]? result;
-{I}if (reader.IsEmptyElement)
+{I}if (isEmptyVElement)
 {I}{{
 {II}result = new byte[0];
-{I}}} else {{
+{I}}}
+{I}else
+{I}{{
 {II}if (reader.EOF)
 {II}{{
 {III}error = new Reporting.Error(
@@ -307,12 +369,12 @@ private static byte[]? ReadVElementAsBytes(
 {IIII}$"base64-encoded bytes: {{exception}}");
 {III}return null;
 {II}}}
-{I}}}
 
-{I}ReadVEndElement(reader, out error);
-{I}if (error != null)
-{I}{{
-{II}return null;
+{II}ReadVEndElement(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}return null;
+{II}}}
 {I}}}
 
 {I}return result;

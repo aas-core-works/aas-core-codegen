@@ -2933,7 +2933,7 @@ std::pair<
 {I}if (reader.node().kind() == NodeKind::Stop) {{
 {II}return std::make_pair(
 {III}std::vector<T>(),
-{III}std::nullopt
+{III}common::nullopt
 {II});
 {I}}} else {{
 {II}// NOTE (mristin):

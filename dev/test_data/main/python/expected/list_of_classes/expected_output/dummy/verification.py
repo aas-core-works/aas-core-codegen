@@ -26,6 +26,7 @@ import re
 import struct
 import sys
 from typing import (
+    Any,
     Callable,
     Iterable,
     Iterator,
@@ -75,14 +76,14 @@ class IndexSegment:
     """Represent an index access on a path to an erroneous value."""
 
     #: Sequence containing the item at :py:attr:`~index`
-    sequence: Final[Sequence[aas_types.Class]]
+    sequence: Final[Sequence[Any]]
 
     #: Index of the item
     index: Final[int]
 
     def __init__(
             self,
-            sequence: Sequence[aas_types.Class],
+            sequence: Sequence[Any],
             index: int
     ) -> None:
         """Initialize with the given values."""

@@ -3277,7 +3277,7 @@ std::pair<
   if (reader.node().kind() == NodeKind::Stop) {
     return std::make_pair(
       std::vector<T>(),
-      std::nullopt
+      common::nullopt
     );
   } else {
     // NOTE (mristin):

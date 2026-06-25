@@ -1292,8 +1292,8 @@ index_in_constrained_primitives_ = 0;"""
 
             flow_for_prop.append(
                 yielding_flow.For(
-                    f"index_in_constrained_primitives_ " f"< ({getter_expr}).size()",
-                    "++index_in_constrained_primitives_",
+                    f"index_in_constrained_primitives_ < ({getter_expr}).size()",
+                    "++index_in_constrained_primitives_;",
                     [
                         yielding_flow.command_from_text(
                             f"""\
@@ -1342,16 +1342,6 @@ error_->path.segments.emplace_back(
                             "constrained_primitive_verificator_ = nullptr;"
                         ),
                     ],
-                )
-            )
-
-            flow_for_prop.append(
-                yielding_flow.command_from_text(
-                    """\
-// NOTE (mristin):
-// We reset the index in constrained primitives for easier debugging since this bears
-// negligible overhead.
-index_in_constrained_primitives_ = static_cast<std::size_t>(-1);"""
                 )
             )
 
