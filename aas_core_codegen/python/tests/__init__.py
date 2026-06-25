@@ -11,6 +11,7 @@ from aas_core_codegen.python.tests import (
     _generate_test_jsonization_of_enums,
     _generate_test_for_over_x_or_empty,
     _generate_test_for_x_or_default,
+    _generate_test_verification,
     _generate_test_xmlization_of_classes_with_descendants,
     _generate_test_xmlization_of_concrete_classes,
 )
@@ -31,6 +32,7 @@ generate_test_jsonization_of_concrete_classes = (
 generate_test_jsonization_of_enums = _generate_test_jsonization_of_enums.generate
 generate_test_for_over_x_or_empty = _generate_test_for_over_x_or_empty.generate
 generate_test_for_x_or_default = _generate_test_for_x_or_default.generate
+generate_test_verification = _generate_test_verification.generate
 generate_test_xmlization_of_classes_with_descendants = (
     _generate_test_xmlization_of_classes_with_descendants.generate
 )

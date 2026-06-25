@@ -260,6 +260,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             ),
         ),
         (
+            tests_rel_path / "test_verification.py",
+            lambda: (
+                python_tests.generate_test_verification(
+                    symbol_table=context.symbol_table,
+                    qualified_module_name=qualified_module_name,
+                ),
+                None,
+            ),
+        ),
+        (
             tests_rel_path / "test_xmlization_of_classes_with_descendants.py",
             lambda: (
                 python_tests.generate_test_xmlization_of_classes_with_descendants(
