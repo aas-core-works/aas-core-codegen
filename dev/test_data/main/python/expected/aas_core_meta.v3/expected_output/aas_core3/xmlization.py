@@ -27666,49 +27666,49 @@ class _Serializer(aas_types.AbstractVisitor):
         """
         self.stream.write(f'<{name}/>')
 
-    def _write_bool_property(
+    def _write_bool_as_element(
             self,
             name: str,
             value: bool
     ) -> None:
         """
-        Write the :paramref:`value` of a boolean property enclosed in
+        Write the :paramref:`value` of a boolean enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
         self.stream.write('true' if value else 'false')
         self._write_end_element(name)
 
-    def _write_int_property(
+    def _write_int_as_element(
             self,
             name: str,
             value: int
     ) -> None:
         """
-        Write the :paramref:`value` of an integer property enclosed in
+        Write the :paramref:`value` of an integer enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
         self.stream.write(str(value))
         self._write_end_element(name)
 
-    def _write_float_property(
+    def _write_float_as_element(
             self,
             name: str,
             value: float
     ) -> None:
         """
-        Write the :paramref:`value` of a floating-point property enclosed in
+        Write the :paramref:`value` of a floating-point number enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
 
@@ -27728,43 +27728,43 @@ class _Serializer(aas_types.AbstractVisitor):
 
         self._write_end_element(name)
 
-    def _write_str_property(
+    def _write_str_as_element(
             self,
             name: str,
             value: str
     ) -> None:
         """
-        Write the :paramref:`value` of a string property enclosed in
+        Write the :paramref:`value` of a string enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
         self._escape_and_write_text(value)
         self._write_end_element(name)
 
-    def _write_bytes_property(
+    def _write_bytes_as_element(
             self,
             name: str,
             value: bytes
     ) -> None:
         """
-        Write the :paramref:`value` of a binary-content property enclosed in
+        Write the :paramref:`value` of a binary content enclosed in
         the :paramref:`name` element.
 
         :param name: of the corresponding element tag
-        :param value: of the property
+        :param value: to be serialized
         """
         self._write_start_element(name)
 
-        # NOTE (mristin, 2022-10-14):
+        # NOTE (mristin):
         # We need to decode the result of the base64-encoding to ASCII since we are
         # writing to an XML *text* stream. ``base64.b64encode(.)`` gives us bytes,
         # not a string.
         encoded = base64.b64encode(value).decode('ascii')
 
-        # NOTE (mristin, 2022-10-14):
+        # NOTE (mristin):
         # Base64 alphabet excludes ``<``, ``>`` and ``&``, so we can directly
         # write the ``encoded`` content to the stream as XML text.
         #
@@ -27821,19 +27821,19 @@ class _Serializer(aas_types.AbstractVisitor):
                     self.visit(an_item)
                 self._write_end_element('supplementalSemanticIds')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'name',
             that.name
         )
 
         if that.value_type is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'valueType',
                 that.value_type.value
             )
 
         if that.value is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'value',
                 that.value
             )
@@ -27888,13 +27888,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('embeddedDataSpecifications')
 
         if that.version is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'version',
                 that.version
             )
 
         if that.revision is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'revision',
                 that.revision
             )
@@ -27907,7 +27907,7 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('creator')
 
         if that.template_id is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'templateId',
                 that.template_id
             )
@@ -27973,23 +27973,23 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('supplementalSemanticIds')
 
         if that.kind is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'kind',
                 that.kind.value
             )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'type',
             that.type
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'valueType',
             that.value_type.value
         )
 
         if that.value is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'value',
                 that.value
             )
@@ -28042,13 +28042,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -28092,7 +28092,7 @@ class _Serializer(aas_types.AbstractVisitor):
                 )
                 self._write_end_element('administration')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'id',
             that.id
         )
@@ -28159,13 +28159,13 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'assetKind',
             that.asset_kind.value
         )
 
         if that.global_asset_id is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'globalAssetId',
                 that.global_asset_id
             )
@@ -28180,7 +28180,7 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('specificAssetIds')
 
         if that.asset_type is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'assetType',
                 that.asset_type
             )
@@ -28223,13 +28223,13 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'path',
             that.path
         )
 
         if that.content_type is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'contentType',
                 that.content_type
             )
@@ -28281,12 +28281,12 @@ class _Serializer(aas_types.AbstractVisitor):
                     self.visit(an_item)
                 self._write_end_element('supplementalSemanticIds')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'name',
             that.name
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'value',
             that.value
         )
@@ -28339,13 +28339,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -28389,13 +28389,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 )
                 self._write_end_element('administration')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'id',
             that.id
         )
 
         if that.kind is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'kind',
                 that.kind.value
             )
@@ -28484,13 +28484,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -28600,13 +28600,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -28664,7 +28664,7 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('embeddedDataSpecifications')
 
         if that.order_relevant is not None:
-            self._write_bool_property(
+            self._write_bool_as_element(
                 'orderRelevant',
                 that.order_relevant
             )
@@ -28676,13 +28676,13 @@ class _Serializer(aas_types.AbstractVisitor):
             )
             self._write_end_element('semanticIdListElement')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'typeValueListElement',
             that.type_value_list_element.value
         )
 
         if that.value_type_list_element is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'valueTypeListElement',
                 that.value_type_list_element.value
             )
@@ -28737,13 +28737,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -28868,13 +28868,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -28931,13 +28931,13 @@ class _Serializer(aas_types.AbstractVisitor):
                     self.visit(yet_yet_yet_yet_another_item)
                 self._write_end_element('embeddedDataSpecifications')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'valueType',
             that.value_type.value
         )
 
         if that.value is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'value',
                 that.value
             )
@@ -28990,13 +28990,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29129,13 +29129,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29192,19 +29192,19 @@ class _Serializer(aas_types.AbstractVisitor):
                     self.visit(yet_yet_yet_yet_another_item)
                 self._write_end_element('embeddedDataSpecifications')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'valueType',
             that.value_type.value
         )
 
         if that.min is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'min',
                 that.min
             )
 
         if that.max is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'max',
                 that.max
             )
@@ -29250,13 +29250,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29379,13 +29379,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29443,12 +29443,12 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('embeddedDataSpecifications')
 
         if that.value is not None:
-            self._write_bytes_property(
+            self._write_bytes_as_element(
                 'value',
                 that.value
             )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'contentType',
             that.content_type
         )
@@ -29494,13 +29494,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29558,12 +29558,12 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('embeddedDataSpecifications')
 
         if that.value is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'value',
                 that.value
             )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'contentType',
             that.content_type
         )
@@ -29609,13 +29609,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29734,13 +29734,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -29806,13 +29806,13 @@ class _Serializer(aas_types.AbstractVisitor):
                     self.visit(yet_yet_yet_yet_yet_another_item)
                 self._write_end_element('statements')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'entityType',
             that.entity_type.value
         )
 
         if that.global_asset_id is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'globalAssetId',
                 that.global_asset_id
             )
@@ -29884,7 +29884,7 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('observableSemanticId')
 
         if that.topic is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'topic',
                 that.topic
             )
@@ -29896,13 +29896,13 @@ class _Serializer(aas_types.AbstractVisitor):
             )
             self._write_end_element('subjectId')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'timeStamp',
             that.time_stamp
         )
 
         if that.payload is not None:
-            self._write_bytes_property(
+            self._write_bytes_as_element(
                 'payload',
                 that.payload
             )
@@ -29948,13 +29948,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -30017,18 +30017,18 @@ class _Serializer(aas_types.AbstractVisitor):
         )
         self._write_end_element('observed')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'direction',
             that.direction.value
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'state',
             that.state.value
         )
 
         if that.message_topic is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'messageTopic',
                 that.message_topic
             )
@@ -30041,19 +30041,19 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('messageBroker')
 
         if that.last_update is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'lastUpdate',
                 that.last_update
             )
 
         if that.min_interval is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'minInterval',
                 that.min_interval
             )
 
         if that.max_interval is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'maxInterval',
                 that.max_interval
             )
@@ -30099,13 +30099,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -30285,13 +30285,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -30406,13 +30406,13 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('extensions')
 
         if that.category is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'category',
                 that.category
             )
 
         if that.id_short is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'idShort',
                 that.id_short
             )
@@ -30456,7 +30456,7 @@ class _Serializer(aas_types.AbstractVisitor):
                 )
                 self._write_end_element('administration')
 
-        self._write_str_property(
+        self._write_str_as_element(
             'id',
             that.id
         )
@@ -30510,7 +30510,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'type',
             that.type.value
         )
@@ -30561,12 +30561,12 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'type',
             that.type.value
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'value',
             that.value
         )
@@ -30602,12 +30602,12 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'language',
             that.language
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'text',
             that.text
         )
@@ -30643,12 +30643,12 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'language',
             that.language
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'text',
             that.text
         )
@@ -30794,22 +30794,22 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_bool_property(
+        self._write_bool_as_element(
             'min',
             that.min
         )
 
-        self._write_bool_property(
+        self._write_bool_as_element(
             'nom',
             that.nom
         )
 
-        self._write_bool_property(
+        self._write_bool_as_element(
             'typ',
             that.typ
         )
 
-        self._write_bool_property(
+        self._write_bool_as_element(
             'max',
             that.max
         )
@@ -30845,7 +30845,7 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'value',
             that.value
         )
@@ -30926,12 +30926,12 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'language',
             that.language
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'text',
             that.text
         )
@@ -30967,12 +30967,12 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'language',
             that.language
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'text',
             that.text
         )
@@ -31008,12 +31008,12 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        self._write_str_property(
+        self._write_str_as_element(
             'language',
             that.language
         )
 
-        self._write_str_property(
+        self._write_str_as_element(
             'text',
             that.text
         )
@@ -31067,7 +31067,7 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('shortName')
 
         if that.unit is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'unit',
                 that.unit
             )
@@ -31080,19 +31080,19 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('unitId')
 
         if that.source_of_definition is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'sourceOfDefinition',
                 that.source_of_definition
             )
 
         if that.symbol is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'symbol',
                 that.symbol
             )
 
         if that.data_type is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'dataType',
                 that.data_type.value
             )
@@ -31107,7 +31107,7 @@ class _Serializer(aas_types.AbstractVisitor):
                 self._write_end_element('definition')
 
         if that.value_format is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'valueFormat',
                 that.value_format
             )
@@ -31120,7 +31120,7 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('valueList')
 
         if that.value is not None:
-            self._write_str_property(
+            self._write_str_as_element(
                 'value',
                 that.value
             )

@@ -947,32 +947,54 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                     )
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            if isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                read_item_cls_as_element = python_naming.function_name(
-                    Identifier(f"_read_{type_anno.items.our_type.name}_as_element")
-                )
+            items_primitive_type = intermediate.try_primitive_type(type_anno.items)
 
-                items_type = python_common.generate_type(
-                    type_anno.items, types_module=Identifier("aas_types")
+            if items_primitive_type is not None:
+                read_item = Identifier(
+                    _READ_FUNCTION_BY_PRIMITIVE_TYPE[items_primitive_type]
                 )
-            elif isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                read_item_cls_as_element = Identifier(
-                    _READ_FUNCTION_BY_PRIMITIVE_TYPE[type_anno.items.a_type]
-                )
-                items_type = python_common.PRIMITIVE_TYPE_MAP[type_anno.items.a_type]
             else:
-                raise AssertionError(
-                    "(mristin, 2022-10-09) We handle only lists of classes and primitive types"
-                    "in the XML de-serialization at the moment. The meta-model does not contain "
-                    "any other lists, so we wanted to keep the code as simple as "
-                    "possible, and avoid unrolling. Please contact the developers "
-                    "if you need this feature."
-                )
+                if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
+                    raise AssertionError("Expected to handle this case before")
+
+                elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+                    if isinstance(type_anno.items.our_type, intermediate.Enumeration):
+                        read_item = python_naming.private_function_name(
+                            Identifier(
+                                f"read_{type_anno.items.our_type.name}_from_element_text"
+                            )
+                        )
+
+                    elif isinstance(
+                        type_anno.items.our_type, intermediate.ConstrainedPrimitive
+                    ):
+                        raise AssertionError("Expected to handle this case before")
+
+                    elif isinstance(
+                        type_anno.items.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    ):
+                        read_item = python_naming.function_name(
+                            Identifier(
+                                f"_read_{type_anno.items.our_type.name}_as_element"
+                            )
+                        )
+                    else:
+                        # noinspection PyTypeChecker
+                        assert_never(type_anno.items.our_type)
+
+                else:
+                    raise AssertionError(
+                        "(mristin) We handle only lists of primitives types and "
+                        "our types in the XML de-serialization at the moment. "
+                        "The meta-model does not contain any other lists, so we wanted "
+                        "to keep the code as simple as possible, and avoid unrolling. "
+                        "Please contact the developers if you need this feature."
+                    )
+
+            items_type = python_common.generate_type(
+                type_anno.items, types_module=Identifier("aas_types")
+            )
 
             method_body = Stripped(
                 f"""\
@@ -1008,7 +1030,7 @@ while True:
 {II})
 
 {I}try:
-{II}item = {read_item_cls_as_element}(
+{II}item = {read_item}(
 {III}next_element,
 {III}iterator
 {II})
@@ -1464,11 +1486,11 @@ def _generate_reader_and_setter_map(cls: intermediate.ConcreteClass) -> Stripped
 
 
 _WRITE_METHOD_BY_PRIMITIVE_TYPE = {
-    intermediate.PrimitiveType.BOOL: "_write_bool_property",
-    intermediate.PrimitiveType.INT: "_write_int_property",
-    intermediate.PrimitiveType.FLOAT: "_write_float_property",
-    intermediate.PrimitiveType.STR: "_write_str_property",
-    intermediate.PrimitiveType.BYTEARRAY: "_write_bytes_property",
+    intermediate.PrimitiveType.BOOL: "_write_bool_as_element",
+    intermediate.PrimitiveType.INT: "_write_int_as_element",
+    intermediate.PrimitiveType.FLOAT: "_write_float_as_element",
+    intermediate.PrimitiveType.STR: "_write_str_as_element",
+    intermediate.PrimitiveType.BYTEARRAY: "_write_bytes_as_element",
 }
 assert all(
     literal in _WRITE_METHOD_BY_PRIMITIVE_TYPE for literal in intermediate.PrimitiveType
@@ -1638,7 +1660,7 @@ self.{write_method}(
                     if isinstance(our_type, intermediate.Enumeration):
                         write_prop = Stripped(
                             f"""\
-self._write_str_property(
+self._write_str_as_element(
 {I}{xml_prop_literal},
 {I}that.{prop_name}.value
 )"""
@@ -1678,28 +1700,13 @@ self._write_end_element({xml_prop_literal})"""
                 elif isinstance(type_anno, intermediate.ListTypeAnnotation):
                     variable = next(generator_for_loop_variables)
 
-                    if isinstance(
-                        type_anno.items, intermediate.OurTypeAnnotation
-                    ) and isinstance(
-                        type_anno.items.our_type,
-                        (intermediate.AbstractClass, intermediate.ConcreteClass),
-                    ):
-                        write_prop = Stripped(
-                            f"""\
-if len(that.{prop_name}) == 0:
-{I}self._write_empty_element({xml_prop_literal})
-else:
-{I}self._write_start_element({xml_prop_literal})
-{I}for {variable} in that.{prop_name}:
-{II}self.visit({variable})
-{I}self._write_end_element({xml_prop_literal})"""
-                        )
+                    items_primitive_type = intermediate.try_primitive_type(
+                        type_anno.items
+                    )
 
-                    elif isinstance(
-                        type_anno.items, intermediate.PrimitiveTypeAnnotation
-                    ):
+                    if items_primitive_type is not None:
                         write_method = _WRITE_METHOD_BY_PRIMITIVE_TYPE[
-                            type_anno.items.a_type
+                            items_primitive_type
                         ]
                         write_prop = Stripped(
                             f"""\
@@ -1711,13 +1718,65 @@ else:
 {II}self.{write_method}('v', {variable})
 {I}self._write_end_element({xml_prop_literal})"""
                         )
-
                     else:
-                        raise NotImplementedError(
-                            f"We only handle lists of class instances and primitive values, "
-                            f"but you supplied the following type: {type_anno}. Please contact the developers "
-                            f"if you need this feature."
-                        )
+                        if isinstance(
+                            type_anno.items, intermediate.PrimitiveTypeAnnotation
+                        ):
+                            raise AssertionError("Expected to be handled before")
+
+                        elif isinstance(
+                            type_anno.items, intermediate.OurTypeAnnotation
+                        ):
+                            if isinstance(
+                                type_anno.items.our_type, intermediate.Enumeration
+                            ):
+                                write_prop = Stripped(
+                                    f"""\
+if len(that.{prop_name}) == 0:
+{I}self._write_empty_element({xml_prop_literal})
+else:
+{I}self._write_start_element({xml_prop_literal})
+{I}for {variable} in that.{prop_name}:
+{II}self._write_str_as_element('v', {variable}.value)
+{I}self._write_end_element({xml_prop_literal})"""
+                                )
+
+                            elif isinstance(
+                                type_anno.items.our_type,
+                                intermediate.ConstrainedPrimitive,
+                            ):
+                                raise AssertionError("Expected to be handled before")
+
+                            elif isinstance(
+                                type_anno.items.our_type,
+                                (
+                                    intermediate.AbstractClass,
+                                    intermediate.ConcreteClass,
+                                ),
+                            ):
+                                write_prop = Stripped(
+                                    f"""\
+if len(that.{prop_name}) == 0:
+{I}self._write_empty_element({xml_prop_literal})
+else:
+{I}self._write_start_element({xml_prop_literal})
+{I}for {variable} in that.{prop_name}:
+{II}self.visit({variable})
+{I}self._write_end_element({xml_prop_literal})"""
+                                )
+
+                            else:
+                                # noinspection PyTypeChecker
+                                assert_never(type_anno.items.our_type)
+
+                        else:
+                            raise NotImplementedError(
+                                f"(mristin) We currently generate only "
+                                f"the XML serialization for lists of primitive types "
+                                f"and our types, but you supplied the following "
+                                f"type: {type_anno}. "
+                                f"Please contact the developers if you need this feature."
+                            )
 
                 else:
                     assert_never(type_anno)
@@ -2059,17 +2118,17 @@ def _write_empty_element_without_namespace(
         ),
         Stripped(
             f"""\
-def _write_bool_property(
+def _write_bool_as_element(
 {II}self,
 {II}name: str,
 {II}value: bool
 ) -> None:
 {I}\"\"\"
-{I}Write the :paramref:`value` of a boolean property enclosed in
+{I}Write the :paramref:`value` of a boolean enclosed in
 {I}the :paramref:`name` element.
 
 {I}:param name: of the corresponding element tag
-{I}:param value: of the property
+{I}:param value: to be serialized
 {I}\"\"\"
 {I}self._write_start_element(name)
 {I}self.stream.write('true' if value else 'false')
@@ -2077,17 +2136,17 @@ def _write_bool_property(
         ),
         Stripped(
             f"""\
-def _write_int_property(
+def _write_int_as_element(
 {II}self,
 {II}name: str,
 {II}value: int
 ) -> None:
 {I}\"\"\"
-{I}Write the :paramref:`value` of an integer property enclosed in
+{I}Write the :paramref:`value` of an integer enclosed in
 {I}the :paramref:`name` element.
 
 {I}:param name: of the corresponding element tag
-{I}:param value: of the property
+{I}:param value: to be serialized
 {I}\"\"\"
 {I}self._write_start_element(name)
 {I}self.stream.write(str(value))
@@ -2095,17 +2154,17 @@ def _write_int_property(
         ),
         Stripped(
             f"""\
-def _write_float_property(
+def _write_float_as_element(
 {II}self,
 {II}name: str,
 {II}value: float
 ) -> None:
 {I}\"\"\"
-{I}Write the :paramref:`value` of a floating-point property enclosed in
+{I}Write the :paramref:`value` of a floating-point number enclosed in
 {I}the :paramref:`name` element.
 
 {I}:param name: of the corresponding element tag
-{I}:param value: of the property
+{I}:param value: to be serialized
 {I}\"\"\"
 {I}self._write_start_element(name)
 
@@ -2127,17 +2186,17 @@ def _write_float_property(
         ),
         Stripped(
             f"""\
-def _write_str_property(
+def _write_str_as_element(
 {II}self,
 {II}name: str,
 {II}value: str
 ) -> None:
 {I}\"\"\"
-{I}Write the :paramref:`value` of a string property enclosed in
+{I}Write the :paramref:`value` of a string enclosed in
 {I}the :paramref:`name` element.
 
 {I}:param name: of the corresponding element tag
-{I}:param value: of the property
+{I}:param value: to be serialized
 {I}\"\"\"
 {I}self._write_start_element(name)
 {I}self._escape_and_write_text(value)
@@ -2145,27 +2204,27 @@ def _write_str_property(
         ),
         Stripped(
             f"""\
-def _write_bytes_property(
+def _write_bytes_as_element(
 {II}self,
 {II}name: str,
 {II}value: bytes
 ) -> None:
 {I}\"\"\"
-{I}Write the :paramref:`value` of a binary-content property enclosed in
+{I}Write the :paramref:`value` of a binary content enclosed in
 {I}the :paramref:`name` element.
 
 {I}:param name: of the corresponding element tag
-{I}:param value: of the property
+{I}:param value: to be serialized
 {I}\"\"\"
 {I}self._write_start_element(name)
 
-{I}# NOTE (mristin, 2022-10-14):
+{I}# NOTE (mristin):
 {I}# We need to decode the result of the base64-encoding to ASCII since we are
 {I}# writing to an XML *text* stream. ``base64.b64encode(.)`` gives us bytes,
 {I}# not a string.
 {I}encoded = base64.b64encode(value).decode('ascii')
 
-{I}# NOTE (mristin, 2022-10-14):
+{I}# NOTE (mristin):
 {I}# Base64 alphabet excludes ``<``, ``>`` and ``&``, so we can directly
 {I}# write the ``encoded`` content to the stream as XML text.
 {I}#

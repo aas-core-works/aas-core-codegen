@@ -2384,7 +2384,19 @@ def _generate_serialize_list_property(
             if isinstance(type_anno.items.our_type, intermediate.Enumeration):
                 serialize_list = "SerializeListWithInfallible"
 
-                serialize_item_expr = Stripped("stringification::to_string")
+                enum_name = cpp_naming.enum_name(type_anno.items.our_type.name)
+
+                # NOTE (mristin):
+                # We have to make a lambda since passing
+                # stringification::to_string<enum name> results in ambiguous grammar
+                # in C++: the ``<`` and ``>`` are interpreted as less and greater
+                # operators.
+                serialize_item_expr = Stripped(
+                    f"""\
+[](const types::{enum_name}& an_item) {{
+{I}return stringification::to_string(an_item);
+}}"""
+                )
 
             elif isinstance(
                 type_anno.items.our_type, intermediate.ConstrainedPrimitive
@@ -2419,7 +2431,7 @@ def _generate_serialize_list_property(
             f"""\
 result[{json_prop_name_literal}] = {serialize_list}(
 {I}{indent_but_first_line(getter_expr, I)},
-{I}{serialize_item_expr}
+{I}{indent_but_first_line(serialize_item_expr, I)}
 );"""
         )
 

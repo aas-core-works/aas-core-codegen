@@ -60,9 +60,6 @@ def main() -> int:
     live_tests_typescript_dir = (
         repo_root / "dev" / "test_data" / "live_tests" / "typescript"
     )
-    assert (
-        live_tests_typescript_dir.exists() and live_tests_typescript_dir.is_dir()
-    ), live_tests_typescript_dir
 
     with contextlib.ExitStack() as exit_stack:
         # pylint: disable=consider-using-with
