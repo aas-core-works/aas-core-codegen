@@ -860,7 +860,7 @@ for (const error of this.transformWithContext(
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        item_error_generation_expr: str
+        item_error_generation_expr: Stripped
 
         if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
             # Lists of primitives are verified at the level of class invariants.
@@ -875,9 +875,11 @@ for (const error of this.transformWithContext(
             elif isinstance(
                 type_anno.items.our_type, intermediate.ConstrainedPrimitive
             ):
-                item_error_generation_expr = typescript_naming.function_name(
-                    Identifier(f"verify_{type_anno.items.our_type.name}(item)")
+                verify_function = typescript_naming.function_name(
+                    Identifier(f"verify_{type_anno.items.our_type.name}")
                 )
+
+                item_error_generation_expr = Stripped(f"{verify_function}(item)")
 
             elif isinstance(
                 type_anno.items.our_type,
@@ -1408,14 +1410,14 @@ export class IndexSegment {{
 {I}/**
 {I} * Sequence containing the item at {{@link index}}
 {I} */
-{I}readonly sequence: Array<AasTypes.Class>;
+{I}readonly sequence: ReadonlyArray<unknown>;
 
 {I}/**
 {I} * Index of the item in the {{@link sequence}}
 {I} */
 {I}readonly index: number;
 
-{I}constructor(sequence: Array<AasTypes.Class>, index: number) {{
+{I}constructor(sequence: ReadonlyArray<unknown>, index: number) {{
 {II}this.sequence = sequence;
 {II}this.index = index;
 {I}}}

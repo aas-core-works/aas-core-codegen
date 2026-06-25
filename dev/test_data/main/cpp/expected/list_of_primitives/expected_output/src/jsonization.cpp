@@ -518,7 +518,7 @@ std::pair<
     );
   }
 
-  std::optional<std::vector<T> > list(
+  common::optional<std::vector<T> > list(
     common::make_optional<std::vector<T> >()
   );
 

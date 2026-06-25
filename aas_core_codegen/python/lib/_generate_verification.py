@@ -846,10 +846,20 @@ for error in self.transform(
             elif isinstance(
                 type_anno.items.our_type, intermediate.ConstrainedPrimitive
             ):
-                raise NotImplementedError(
-                    "The verification of lists of constrained primitives has "
-                    "to be implemented yet."
+                function_name = python_naming.function_name(
+                    Identifier(f"verify_{type_anno.items.our_type.name}")
                 )
+
+                for_error = Stripped(f"for error in {function_name}({loop_variable})")
+
+                # Heuristic to break the lines, very rudimentary
+                if len(for_error) > 70:
+                    for_error = Stripped(
+                        f"""\
+for error in {function_name}(
+{II}{loop_variable}
+)"""
+                    )
 
             elif isinstance(
                 type_anno.items.our_type,
@@ -1261,6 +1271,7 @@ import re
 import struct
 import sys
 from typing import (
+{I}Any,
 {I}Callable,
 {I}Iterable,
 {I}Iterator,
@@ -1312,14 +1323,14 @@ class IndexSegment:
 {I}\"\"\"Represent an index access on a path to an erroneous value.\"\"\"
 
 {I}#: Sequence containing the item at :py:attr:`~index`
-{I}sequence: Final[Sequence[aas_types.Class]]
+{I}sequence: Final[Sequence[Any]]
 
 {I}#: Index of the item
 {I}index: Final[int]
 
 {I}def __init__(
 {III}self,
-{III}sequence: Sequence[aas_types.Class],
+{III}sequence: Sequence[Any],
 {III}index: int
 {I}) -> None:
 {II}\"\"\"Initialize with the given values.\"\"\"

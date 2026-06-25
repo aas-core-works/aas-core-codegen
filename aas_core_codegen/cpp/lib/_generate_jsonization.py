@@ -773,7 +773,7 @@ std::pair<
 {II});
 {I}}}
 
-{I}std::optional<std::vector<T> > list(
+{I}common::optional<std::vector<T> > list(
 {II}common::make_optional<std::vector<T> >()
 {I});
 
@@ -983,7 +983,7 @@ std::pair<
 {II}common::optional<DeserializationError>
 {II}>(
 {III}std::move(literal),
-{III}std::nullopt
+{III}common::nullopt
 {II});
 }}"""
     )

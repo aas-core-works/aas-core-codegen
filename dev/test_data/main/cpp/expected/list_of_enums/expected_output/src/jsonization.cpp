@@ -518,7 +518,7 @@ std::pair<
     );
   }
 
-  std::optional<std::vector<T> > list(
+  common::optional<std::vector<T> > list(
     common::make_optional<std::vector<T> >()
   );
 
@@ -615,7 +615,7 @@ std::pair<
     common::optional<DeserializationError>
     >(
       std::move(literal),
-      std::nullopt
+      common::nullopt
     );
 }
 

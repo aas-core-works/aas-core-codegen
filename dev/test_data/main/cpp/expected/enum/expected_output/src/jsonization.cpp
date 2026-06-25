@@ -547,7 +547,7 @@ std::pair<
     common::optional<DeserializationError>
     >(
       std::move(literal),
-      std::nullopt
+      common::nullopt
     );
 }
 

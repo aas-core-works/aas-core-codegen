@@ -60,14 +60,14 @@ export class IndexSegment {
   /**
    * Sequence containing the item at {@link index}
    */
-  readonly sequence: Array<AasTypes.Class>;
+  readonly sequence: ReadonlyArray<unknown>;
 
   /**
    * Index of the item in the {@link sequence}
    */
   readonly index: number;
 
-  constructor(sequence: Array<AasTypes.Class>, index: number) {
+  constructor(sequence: ReadonlyArray<unknown>, index: number) {
     this.sequence = sequence;
     this.index = index;
   }
