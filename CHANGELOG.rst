@@ -3,6 +3,42 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.26 (2026-07-17)
+===================
+* Refactor enum checking to a function in Golang (#634)
+* Unify tests for lists of classes (#635)
+* Decompose XML de/serialization in Golang (#636)
+* Add support for list of primitives in Golang (#637)
+* Transpile length of bytearray in C# (#638)
+* Test live in C# enums and lists of classes (#639)
+* Remove support for Python 3.9 (#641)
+* Add support for list of primitives in C# (#642)
+* Add support for list of primitives in TypeScript (#646)
+* Unify XML serialization of doubles (#647)
+* Allow for missing value data type in XSD (#649)
+* Add support for lists of primitives in C++ (#653)
+* Introduce lists of constrained primitives (#656)
+
+This version completes the support for lists of primitives across all
+the SDK generators (Golang, C#, TypeScript and C++ -- Python already
+had it), including lists of constrained primitives and lists of
+enumeration literals (#637, #642, #646, #653, #656, #655).
+
+We also fixed a discrepancy where the C++ SDK serialized doubles in
+XML with trailing zeros, unlike the other generated SDKs (#647),
+and fixed the length transpilation of byte arrays in C# (#638).
+
+We fixed the XSD generator so that it can handle a constrained
+primitive with a missing ``Value_data_type``, which allows us to
+share the same meta-models across the tests without special-casing
+XSD (#649).
+
+We also discovered and fixed an omission where the verification test
+generator was never ported to Python from aas-core3.0-python (#657).
+
+Finally, we drop the support for Python 3.9, which is no longer
+supported by mypy and other tools we depend on (#641).
+
 0.0.25 (2026-05-19)
 ===================
 * Increase TypeScript SDK Code Coverage (#632)
