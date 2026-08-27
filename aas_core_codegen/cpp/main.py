@@ -14,6 +14,16 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         symbol_table=context.symbol_table
     )
 
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to verify the intermediate symbol table "
+            f"for generation of C++ code "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
     assert verified_ir_table is not None
 
     unsupported_contracts_errors = (

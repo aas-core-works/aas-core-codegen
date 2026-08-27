@@ -1,0 +1,4 @@
+Failed to verify the intermediate symbol table for generation of Python code based on <path to meta_model.py>:
+* At line 11 and column 2: Naming collision(s) in Python code for our type 'Something'
+    At line 13 and column 6: Python property 'something_to_url' corresponding to the meta-model property 'something_to_URL' collides with the Python property 'something_to_url' corresponding to the meta-model property 'something_to_url'
+    At line 15 and column 48: Python argument 'something_to_url' corresponding to the meta-model constructor argument 'something_to_URL' collides with the Python argument 'something_to_url' corresponding to the meta-model constructor argument 'something_to_url'

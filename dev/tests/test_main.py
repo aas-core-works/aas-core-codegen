@@ -169,12 +169,16 @@ class _TestCase(unittest.TestCase):
                 0, return_code, "Expected non-zero return code on invalid inputs"
             )
 
-            normalized_stdout = stdout.getvalue().replace(
-                str(output_dir), "<output dir>"
+            normalized_stdout = (
+                stdout.getvalue()
+                .replace(str(output_dir), "<output dir>")
+                .replace(str(meta_model_path), f"<path to {meta_model_path.name}>")
             )
 
-            normalized_stderr = stderr.getvalue().replace(
-                str(output_dir), "<output dir>"
+            normalized_stderr = (
+                stderr.getvalue()
+                .replace(str(output_dir), "<output dir>")
+                .replace(str(meta_model_path), f"<path to {meta_model_path.name}>")
             )
 
             expected_stdout_path = expected_output_dir / "stdout.txt"
@@ -289,6 +293,17 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="primitive_types"
         )
 
+    def test_expected_problematic_keywords(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="problematic_keywords"
+        )
+
+    def test_unexpected_conflict_between_constructor_arguments(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="conflict_between_constructor_arguments",
+        )
+
 
 class Test_csharp(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
@@ -336,6 +351,17 @@ class Test_csharp(_TestCase):
     def test_expected_primitive_types(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="primitive_types"
+        )
+
+    def test_expected_problematic_keywords(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="problematic_keywords"
+        )
+
+    def test_unexpected_conflict_between_transformed_keyword_and_property(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="conflict_between_transformed_keyword_and_property",
         )
 
 
@@ -387,11 +413,33 @@ class Test_golang(_TestCase):
             target=aas_core_codegen.main.Target.GOLANG, case_name="primitive_types"
         )
 
+    def test_expected_problematic_keywords(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="problematic_keywords"
+        )
+
+    def test_unexpected_conflict_between_transformed_keyword_and_property(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="conflict_between_transformed_keyword_and_property",
+        )
+
 
 class Test_java(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_problematic_keywords(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="problematic_keywords"
+        )
+
+    def test_unexpected_conflict_between_constructor_arguments(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="conflict_between_constructor_arguments",
         )
 
 
@@ -540,11 +588,28 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="primitive_types"
         )
 
+    def test_expected_problematic_keywords(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="problematic_keywords"
+        )
+
+    def test_unexpected_conflict_between_constructor_arguments(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="conflict_between_constructor_arguments",
+        )
+
 
 class Test_typescript(_TestCase):
     def test_expected_aas_core_meta_v3(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="aas_core_meta.v3"
+        )
+
+    def test_expected_conflict_with_utility_types(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="conflict_with_utility_types",
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -592,6 +657,18 @@ class Test_typescript(_TestCase):
     def test_expected_primitive_types(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="primitive_types"
+        )
+
+    def test_expected_problematic_keywords(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="problematic_keywords",
+        )
+
+    def test_unexpected_conflict_between_constructor_arguments(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="conflict_between_constructor_arguments",
         )
 
 
