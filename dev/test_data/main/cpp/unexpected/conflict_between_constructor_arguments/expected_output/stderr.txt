@@ -1,0 +1,7 @@
+Failed to verify the intermediate symbol table for generation of C++ code based on /home/marko/workspace/aas-core-works/aas-core-codegen/dev/test_data/main/cpp/unexpected/conflict_between_constructor_arguments/meta_model.py:
+* At line 11 and column 2: Naming collision(s) in C++ code for our type 'Something'
+    At line 13 and column 6: C++ getter 'something_to_url' corresponding to the meta-model property 'something_to_URL' collides with the C++ getter 'something_to_url' corresponding to the meta-model property 'something_to_url'
+    At line 13 and column 6: C++ mutable getter 'mutable_something_to_url' corresponding to the meta-model property 'something_to_URL' collides with the C++ mutable getter 'mutable_something_to_url' corresponding to the meta-model property 'something_to_url'
+    At line 13 and column 6: C++ setter 'set_something_to_url' corresponding to the meta-model property 'something_to_URL' collides with the C++ setter 'set_something_to_url' corresponding to the meta-model property 'something_to_url'
+    At line 13 and column 6: C++ private property 'something_to_url_' corresponding to the meta-model property 'something_to_URL' collides with the C++ private property 'something_to_url_' corresponding to the meta-model property 'something_to_url'
+    At line 15 and column 48: C++ argument 'something_to_url' corresponding to the meta-model constructor argument 'something_to_URL' collides with the C++ argument 'something_to_url' corresponding to the meta-model constructor argument 'something_to_url'

@@ -1,0 +1,4 @@
+Failed to verify the intermediate symbol table for generation of Golang code based on /home/marko/workspace/aas-core-works/aas-core-codegen/dev/test_data/main/golang/unexpected/conflict_between_transformed_keyword_and_property/meta_model.py:
+* At line 9 and column 2: Naming collision(s) in Golang code for our type 'Something'
+    At line 11 and column 6: Golang private property 'interfacE' corresponding to the meta-model property 'interfac_e' collides with the Golang private property 'interfacE' corresponding to the meta-model property 'interface'
+    At line 13 and column 41: Golang argument 'interfacE' corresponding to the meta-model constructor argument 'interfac_e' collides with the Golang argument 'interfacE' corresponding to the meta-model constructor argument 'interface'

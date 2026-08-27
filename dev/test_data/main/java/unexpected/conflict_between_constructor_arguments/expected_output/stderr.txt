@@ -1,0 +1,4 @@
+Failed to verify the intermediate symbol table for generation of Java code based on /home/marko/workspace/aas-core-works/aas-core-codegen/dev/test_data/main/java/unexpected/conflict_between_constructor_arguments/meta_model.py:
+* At line 13 and column 2: Naming collision(s) in Java code for our type 'Something'
+    At line 15 and column 6: Java property 'somethingToUrl' corresponding to the meta-model property 'something_to_URL' collides with the Java property 'somethingToUrl' corresponding to the meta-model property 'something_to_url'
+    At line 17 and column 48: Java argument 'somethingToUrl' corresponding to the meta-model constructor argument 'something_to_URL' collides with the Java argument 'somethingToUrl' corresponding to the meta-model constructor argument 'something_to_url'
