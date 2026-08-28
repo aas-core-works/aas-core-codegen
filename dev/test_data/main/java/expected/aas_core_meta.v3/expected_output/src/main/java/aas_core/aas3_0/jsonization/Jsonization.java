@@ -44,31 +44,31 @@ public class Jsonization {
       /** Convert {@code value} to a string.
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<String> tryStringFrom(JsonNode value) {
+      private static _ParsingResult<String> tryStringFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(value.asText());
+        return _ParsingResult.success(value.asText());
       }
 
       /** Convert {@code value} to a boolean.
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<Boolean> tryBooleanFrom(JsonNode value) {
+      private static _ParsingResult<Boolean> tryBooleanFrom(JsonNode value) {
         if (!value.isBoolean()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Boolean, but got " + value.getNodeType());
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(value.asBoolean());
+        return _ParsingResult.success(value.asBoolean());
       }
 
       /** Convert {@code value} to a long 64-bit integer.
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<Long> tryLongFrom(JsonNode value) {
+      private static _ParsingResult<Long> tryLongFrom(JsonNode value) {
         // NOTE (mristin):
         // We use ``isIntegralNumber`` instead of ``isLong`` since Jackson parses
         // a small enough JSON integer (such as ``42``) as an ``IntNode``, and
@@ -77,28 +77,28 @@ public class Jsonization {
         if (!value.isIntegralNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Long, but got " + value.getNodeType());
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(value.asLong());
+        return _ParsingResult.success(value.asLong());
       }
 
       /** Convert {@code value} to a double-precision 64-bit float.
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<Double> tryDoubleFrom(JsonNode value) {
+      private static _ParsingResult<Double> tryDoubleFrom(JsonNode value) {
         if (!value.isDouble()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Double, but got " + value.getNodeType());
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(value.asDouble());
+        return _ParsingResult.success(value.asDouble());
       }
 
-      private static ParsingResult<byte[]> tryBytesFrom(JsonNode value) {
+      private static _ParsingResult<byte[]> tryBytesFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
         final byte[] decodedData;
         Base64.Decoder decoder = Base64.getDecoder();
@@ -109,10 +109,10 @@ public class Jsonization {
           final Reporting.Error error = new Reporting.Error(
             "Expected Base-64 encoded bytes, but the conversion failed " +
               "because: " + exception.getMessage());
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(decodedData);
+        return _ParsingResult.success(decodedData);
       }
 
       /**
@@ -121,20 +121,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IHasSemantics> tryIHasSemanticsFrom(JsonNode node) {
+      public static _ParsingResult<? extends IHasSemantics> tryIHasSemanticsFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IHasSemantics.class);
         }
@@ -180,7 +180,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IHasSemantics: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -191,11 +191,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Extension> tryExtensionFrom(JsonNode node) {
+      private static _ParsingResult<Extension> tryExtensionFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theName = null;
@@ -214,13 +214,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theNameParsingResult = tryStringFrom(currentNode.getValue());
-              if (theNameParsingResult.isError()) {
-                theNameParsingResult.getError()
+              final _ParsingResult<? extends String> theName_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theName_ParsingResult.isError()) {
+                theName_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("name"));
-                return theNameParsingResult.castTo(Extension.class);
+                return theName_ParsingResult.castTo(Extension.class);
               }
-              theName = theNameParsingResult.getResult();
+              theName = theName_ParsingResult.getResult();
               break;
             }
             case "semanticId": {
@@ -228,13 +228,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Extension.class);
+                return theSemanticId_ParsingResult.castTo(Extension.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -249,7 +249,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -264,9 +264,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -292,13 +292,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends DataTypeDefXsd> theValueTypeParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
-              if (theValueTypeParsingResult.isError()) {
-                theValueTypeParsingResult.getError()
+              final _ParsingResult<? extends DataTypeDefXsd> theValueType_ParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
+              if (theValueType_ParsingResult.isError()) {
+                theValueType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueType"));
-                return theValueTypeParsingResult.castTo(Extension.class);
+                return theValueType_ParsingResult.castTo(Extension.class);
               }
-              theValueType = theValueTypeParsingResult.getResult();
+              theValueType = theValueType_ParsingResult.getResult();
               break;
             }
             case "value": {
@@ -306,13 +306,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(Extension.class);
+                return theValue_ParsingResult.castTo(Extension.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "refersTo": {
@@ -327,7 +327,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "refersTo"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theRefersTo = new ArrayList<>(
                 arrayRefersTo.size());
@@ -342,9 +342,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "refersTo"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -368,7 +368,7 @@ public class Jsonization {
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -376,10 +376,10 @@ public class Jsonization {
         if (theName == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"name\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Extension(
+        return _ParsingResult.success(new Extension(
           theName,
           theSemanticId,
           theSupplementalSemanticIds,
@@ -394,20 +394,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IHasExtensions> tryIHasExtensionsFrom(JsonNode node) {
+      public static _ParsingResult<? extends IHasExtensions> tryIHasExtensionsFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IHasExtensions.class);
         }
@@ -451,7 +451,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IHasExtensions: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -462,20 +462,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IReferable> tryIReferableFrom(JsonNode node) {
+      public static _ParsingResult<? extends IReferable> tryIReferableFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IReferable.class);
         }
@@ -519,7 +519,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IReferable: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -530,20 +530,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IIdentifiable> tryIIdentifiableFrom(JsonNode node) {
+      public static _ParsingResult<? extends IIdentifiable> tryIIdentifiableFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IIdentifiable.class);
         }
@@ -559,7 +559,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IIdentifiable: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -569,17 +569,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<ModellingKind> tryModellingKindFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<ModellingKind> tryModellingKindFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(ModellingKind.class);
         }
         final Optional<ModellingKind> modellingKind = Stringification.modellingKindFromString(textResult.getResult());
         if (!modellingKind.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of ModellingKind");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(modellingKind.get());
+        return _ParsingResult.success(modellingKind.get());
       }
 
       /**
@@ -588,20 +588,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IHasKind> tryIHasKindFrom(JsonNode node) {
+      public static _ParsingResult<? extends IHasKind> tryIHasKindFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IHasKind.class);
         }
@@ -613,7 +613,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IHasKind: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -624,20 +624,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IHasDataSpecification> tryIHasDataSpecificationFrom(JsonNode node) {
+      public static _ParsingResult<? extends IHasDataSpecification> tryIHasDataSpecificationFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IHasDataSpecification.class);
         }
@@ -683,7 +683,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IHasDataSpecification: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -694,11 +694,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<AdministrativeInformation> tryAdministrativeInformationFrom(JsonNode node) {
+      private static _ParsingResult<AdministrativeInformation> tryAdministrativeInformationFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
@@ -723,7 +723,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -738,9 +738,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -766,13 +766,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theVersionParsingResult = tryStringFrom(currentNode.getValue());
-              if (theVersionParsingResult.isError()) {
-                theVersionParsingResult.getError()
+              final _ParsingResult<? extends String> theVersion_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theVersion_ParsingResult.isError()) {
+                theVersion_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("version"));
-                return theVersionParsingResult.castTo(AdministrativeInformation.class);
+                return theVersion_ParsingResult.castTo(AdministrativeInformation.class);
               }
-              theVersion = theVersionParsingResult.getResult();
+              theVersion = theVersion_ParsingResult.getResult();
               break;
             }
             case "revision": {
@@ -780,13 +780,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theRevisionParsingResult = tryStringFrom(currentNode.getValue());
-              if (theRevisionParsingResult.isError()) {
-                theRevisionParsingResult.getError()
+              final _ParsingResult<? extends String> theRevision_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theRevision_ParsingResult.isError()) {
+                theRevision_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("revision"));
-                return theRevisionParsingResult.castTo(AdministrativeInformation.class);
+                return theRevision_ParsingResult.castTo(AdministrativeInformation.class);
               }
-              theRevision = theRevisionParsingResult.getResult();
+              theRevision = theRevision_ParsingResult.getResult();
               break;
             }
             case "creator": {
@@ -794,13 +794,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theCreatorParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theCreatorParsingResult.isError()) {
-                theCreatorParsingResult.getError()
+              final _ParsingResult<? extends IReference> theCreator_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theCreator_ParsingResult.isError()) {
+                theCreator_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("creator"));
-                return theCreatorParsingResult.castTo(AdministrativeInformation.class);
+                return theCreator_ParsingResult.castTo(AdministrativeInformation.class);
               }
-              theCreator = theCreatorParsingResult.getResult();
+              theCreator = theCreator_ParsingResult.getResult();
               break;
             }
             case "templateId": {
@@ -808,26 +808,26 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTemplateIdParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTemplateIdParsingResult.isError()) {
-                theTemplateIdParsingResult.getError()
+              final _ParsingResult<? extends String> theTemplateId_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theTemplateId_ParsingResult.isError()) {
+                theTemplateId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("templateId"));
-                return theTemplateIdParsingResult.castTo(AdministrativeInformation.class);
+                return theTemplateId_ParsingResult.castTo(AdministrativeInformation.class);
               }
-              theTemplateId = theTemplateIdParsingResult.getResult();
+              theTemplateId = theTemplateId_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
 
 
 
-        return ParsingResult.success(new AdministrativeInformation(
+        return _ParsingResult.success(new AdministrativeInformation(
           theEmbeddedDataSpecifications,
           theVersion,
           theRevision,
@@ -841,20 +841,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IQualifiable> tryIQualifiableFrom(JsonNode node) {
+      public static _ParsingResult<? extends IQualifiable> tryIQualifiableFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IQualifiable.class);
         }
@@ -894,7 +894,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IQualifiable: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -904,17 +904,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<QualifierKind> tryQualifierKindFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<QualifierKind> tryQualifierKindFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(QualifierKind.class);
         }
         final Optional<QualifierKind> qualifierKind = Stringification.qualifierKindFromString(textResult.getResult());
         if (!qualifierKind.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of QualifierKind");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(qualifierKind.get());
+        return _ParsingResult.success(qualifierKind.get());
       }
 
       /**
@@ -923,11 +923,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Qualifier> tryQualifierFrom(JsonNode node) {
+      private static _ParsingResult<Qualifier> tryQualifierFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theType = null;
@@ -947,13 +947,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTypeParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTypeParsingResult.isError()) {
-                theTypeParsingResult.getError()
+              final _ParsingResult<? extends String> theType_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theType_ParsingResult.isError()) {
+                theType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("type"));
-                return theTypeParsingResult.castTo(Qualifier.class);
+                return theType_ParsingResult.castTo(Qualifier.class);
               }
-              theType = theTypeParsingResult.getResult();
+              theType = theType_ParsingResult.getResult();
               break;
             }
             case "valueType": {
@@ -961,13 +961,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends DataTypeDefXsd> theValueTypeParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
-              if (theValueTypeParsingResult.isError()) {
-                theValueTypeParsingResult.getError()
+              final _ParsingResult<? extends DataTypeDefXsd> theValueType_ParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
+              if (theValueType_ParsingResult.isError()) {
+                theValueType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueType"));
-                return theValueTypeParsingResult.castTo(Qualifier.class);
+                return theValueType_ParsingResult.castTo(Qualifier.class);
               }
-              theValueType = theValueTypeParsingResult.getResult();
+              theValueType = theValueType_ParsingResult.getResult();
               break;
             }
             case "semanticId": {
@@ -975,13 +975,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Qualifier.class);
+                return theSemanticId_ParsingResult.castTo(Qualifier.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -996,7 +996,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -1011,9 +1011,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1039,13 +1039,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends QualifierKind> theKindParsingResult = tryQualifierKindFrom(currentNode.getValue());
-              if (theKindParsingResult.isError()) {
-                theKindParsingResult.getError()
+              final _ParsingResult<? extends QualifierKind> theKind_ParsingResult = tryQualifierKindFrom(currentNode.getValue());
+              if (theKind_ParsingResult.isError()) {
+                theKind_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("kind"));
-                return theKindParsingResult.castTo(Qualifier.class);
+                return theKind_ParsingResult.castTo(Qualifier.class);
               }
-              theKind = theKindParsingResult.getResult();
+              theKind = theKind_ParsingResult.getResult();
               break;
             }
             case "value": {
@@ -1053,13 +1053,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(Qualifier.class);
+                return theValue_ParsingResult.castTo(Qualifier.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "valueId": {
@@ -1067,19 +1067,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theValueIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theValueIdParsingResult.isError()) {
-                theValueIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theValueId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theValueId_ParsingResult.isError()) {
+                theValueId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueId"));
-                return theValueIdParsingResult.castTo(Qualifier.class);
+                return theValueId_ParsingResult.castTo(Qualifier.class);
               }
-              theValueId = theValueIdParsingResult.getResult();
+              theValueId = theValueId_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -1087,16 +1087,16 @@ public class Jsonization {
         if (theType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"type\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theValueType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"valueType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Qualifier(
+        return _ParsingResult.success(new Qualifier(
           theType,
           theValueType,
           theSemanticId,
@@ -1112,11 +1112,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<AssetAdministrationShell> tryAssetAdministrationShellFrom(JsonNode node) {
+      private static _ParsingResult<AssetAdministrationShell> tryAssetAdministrationShellFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theId = null;
@@ -1142,13 +1142,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdParsingResult.isError()) {
-                theIdParsingResult.getError()
+              final _ParsingResult<? extends String> theId_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theId_ParsingResult.isError()) {
+                theId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("id"));
-                return theIdParsingResult.castTo(AssetAdministrationShell.class);
+                return theId_ParsingResult.castTo(AssetAdministrationShell.class);
               }
-              theId = theIdParsingResult.getResult();
+              theId = theId_ParsingResult.getResult();
               break;
             }
             case "assetInformation": {
@@ -1156,13 +1156,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IAssetInformation> theAssetInformationParsingResult = tryAssetInformationFrom(currentNode.getValue());
-              if (theAssetInformationParsingResult.isError()) {
-                theAssetInformationParsingResult.getError()
+              final _ParsingResult<? extends IAssetInformation> theAssetInformation_ParsingResult = tryAssetInformationFrom(currentNode.getValue());
+              if (theAssetInformation_ParsingResult.isError()) {
+                theAssetInformation_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("assetInformation"));
-                return theAssetInformationParsingResult.castTo(AssetAdministrationShell.class);
+                return theAssetInformation_ParsingResult.castTo(AssetAdministrationShell.class);
               }
-              theAssetInformation = theAssetInformationParsingResult.getResult();
+              theAssetInformation = theAssetInformation_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -1177,7 +1177,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -1192,9 +1192,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1220,13 +1220,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(AssetAdministrationShell.class);
+                return theCategory_ParsingResult.castTo(AssetAdministrationShell.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -1234,13 +1234,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(AssetAdministrationShell.class);
+                return theIdShort_ParsingResult.castTo(AssetAdministrationShell.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -1255,7 +1255,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -1270,9 +1270,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1305,7 +1305,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -1320,9 +1320,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1348,13 +1348,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IAdministrativeInformation> theAdministrationParsingResult = tryAdministrativeInformationFrom(currentNode.getValue());
-              if (theAdministrationParsingResult.isError()) {
-                theAdministrationParsingResult.getError()
+              final _ParsingResult<? extends IAdministrativeInformation> theAdministration_ParsingResult = tryAdministrativeInformationFrom(currentNode.getValue());
+              if (theAdministration_ParsingResult.isError()) {
+                theAdministration_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("administration"));
-                return theAdministrationParsingResult.castTo(AssetAdministrationShell.class);
+                return theAdministration_ParsingResult.castTo(AssetAdministrationShell.class);
               }
-              theAdministration = theAdministrationParsingResult.getResult();
+              theAdministration = theAdministration_ParsingResult.getResult();
               break;
             }
             case "embeddedDataSpecifications": {
@@ -1369,7 +1369,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -1384,9 +1384,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1412,13 +1412,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theDerivedFromParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theDerivedFromParsingResult.isError()) {
-                theDerivedFromParsingResult.getError()
+              final _ParsingResult<? extends IReference> theDerivedFrom_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theDerivedFrom_ParsingResult.isError()) {
+                theDerivedFrom_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("derivedFrom"));
-                return theDerivedFromParsingResult.castTo(AssetAdministrationShell.class);
+                return theDerivedFrom_ParsingResult.castTo(AssetAdministrationShell.class);
               }
-              theDerivedFrom = theDerivedFromParsingResult.getResult();
+              theDerivedFrom = theDerivedFrom_ParsingResult.getResult();
               break;
             }
             case "submodels": {
@@ -1433,7 +1433,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "submodels"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSubmodels = new ArrayList<>(
                 arraySubmodels.size());
@@ -1448,9 +1448,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "submodels"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1475,9 +1475,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -1491,14 +1491,14 @@ public class Jsonization {
                   "Expected the model type 'AssetAdministrationShell', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -1506,22 +1506,22 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theId == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"id\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theAssetInformation == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"assetInformation\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new AssetAdministrationShell(
+        return _ParsingResult.success(new AssetAdministrationShell(
           theId,
           theAssetInformation,
           theExtensions,
@@ -1541,11 +1541,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<AssetInformation> tryAssetInformationFrom(JsonNode node) {
+      private static _ParsingResult<AssetInformation> tryAssetInformationFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         AssetKind theAssetKind = null;
@@ -1563,13 +1563,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends AssetKind> theAssetKindParsingResult = tryAssetKindFrom(currentNode.getValue());
-              if (theAssetKindParsingResult.isError()) {
-                theAssetKindParsingResult.getError()
+              final _ParsingResult<? extends AssetKind> theAssetKind_ParsingResult = tryAssetKindFrom(currentNode.getValue());
+              if (theAssetKind_ParsingResult.isError()) {
+                theAssetKind_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("assetKind"));
-                return theAssetKindParsingResult.castTo(AssetInformation.class);
+                return theAssetKind_ParsingResult.castTo(AssetInformation.class);
               }
-              theAssetKind = theAssetKindParsingResult.getResult();
+              theAssetKind = theAssetKind_ParsingResult.getResult();
               break;
             }
             case "globalAssetId": {
@@ -1577,13 +1577,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theGlobalAssetIdParsingResult = tryStringFrom(currentNode.getValue());
-              if (theGlobalAssetIdParsingResult.isError()) {
-                theGlobalAssetIdParsingResult.getError()
+              final _ParsingResult<? extends String> theGlobalAssetId_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theGlobalAssetId_ParsingResult.isError()) {
+                theGlobalAssetId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("globalAssetId"));
-                return theGlobalAssetIdParsingResult.castTo(AssetInformation.class);
+                return theGlobalAssetId_ParsingResult.castTo(AssetInformation.class);
               }
-              theGlobalAssetId = theGlobalAssetIdParsingResult.getResult();
+              theGlobalAssetId = theGlobalAssetId_ParsingResult.getResult();
               break;
             }
             case "specificAssetIds": {
@@ -1598,7 +1598,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "specificAssetIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSpecificAssetIds = new ArrayList<>(
                 arraySpecificAssetIds.size());
@@ -1613,9 +1613,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "specificAssetIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISpecificAssetId> parsedItemResult =
+                final _ParsingResult<? extends ISpecificAssetId> parsedItemResult =
                   trySpecificAssetIdFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1641,13 +1641,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theAssetTypeParsingResult = tryStringFrom(currentNode.getValue());
-              if (theAssetTypeParsingResult.isError()) {
-                theAssetTypeParsingResult.getError()
+              final _ParsingResult<? extends String> theAssetType_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theAssetType_ParsingResult.isError()) {
+                theAssetType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("assetType"));
-                return theAssetTypeParsingResult.castTo(AssetInformation.class);
+                return theAssetType_ParsingResult.castTo(AssetInformation.class);
               }
-              theAssetType = theAssetTypeParsingResult.getResult();
+              theAssetType = theAssetType_ParsingResult.getResult();
               break;
             }
             case "defaultThumbnail": {
@@ -1655,19 +1655,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IResource> theDefaultThumbnailParsingResult = tryResourceFrom(currentNode.getValue());
-              if (theDefaultThumbnailParsingResult.isError()) {
-                theDefaultThumbnailParsingResult.getError()
+              final _ParsingResult<? extends IResource> theDefaultThumbnail_ParsingResult = tryResourceFrom(currentNode.getValue());
+              if (theDefaultThumbnail_ParsingResult.isError()) {
+                theDefaultThumbnail_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("defaultThumbnail"));
-                return theDefaultThumbnailParsingResult.castTo(AssetInformation.class);
+                return theDefaultThumbnail_ParsingResult.castTo(AssetInformation.class);
               }
-              theDefaultThumbnail = theDefaultThumbnailParsingResult.getResult();
+              theDefaultThumbnail = theDefaultThumbnail_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -1675,10 +1675,10 @@ public class Jsonization {
         if (theAssetKind == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"assetKind\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new AssetInformation(
+        return _ParsingResult.success(new AssetInformation(
           theAssetKind,
           theGlobalAssetId,
           theSpecificAssetIds,
@@ -1692,11 +1692,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Resource> tryResourceFrom(JsonNode node) {
+      private static _ParsingResult<Resource> tryResourceFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String thePath = null;
@@ -1711,13 +1711,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> thePathParsingResult = tryStringFrom(currentNode.getValue());
-              if (thePathParsingResult.isError()) {
-                thePathParsingResult.getError()
+              final _ParsingResult<? extends String> thePath_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (thePath_ParsingResult.isError()) {
+                thePath_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("path"));
-                return thePathParsingResult.castTo(Resource.class);
+                return thePath_ParsingResult.castTo(Resource.class);
               }
-              thePath = thePathParsingResult.getResult();
+              thePath = thePath_ParsingResult.getResult();
               break;
             }
             case "contentType": {
@@ -1725,19 +1725,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theContentTypeParsingResult = tryStringFrom(currentNode.getValue());
-              if (theContentTypeParsingResult.isError()) {
-                theContentTypeParsingResult.getError()
+              final _ParsingResult<? extends String> theContentType_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theContentType_ParsingResult.isError()) {
+                theContentType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("contentType"));
-                return theContentTypeParsingResult.castTo(Resource.class);
+                return theContentType_ParsingResult.castTo(Resource.class);
               }
-              theContentType = theContentTypeParsingResult.getResult();
+              theContentType = theContentType_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -1745,10 +1745,10 @@ public class Jsonization {
         if (thePath == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"path\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Resource(
+        return _ParsingResult.success(new Resource(
           thePath,
           theContentType));
       }
@@ -1758,17 +1758,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<AssetKind> tryAssetKindFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<AssetKind> tryAssetKindFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(AssetKind.class);
         }
         final Optional<AssetKind> assetKind = Stringification.assetKindFromString(textResult.getResult());
         if (!assetKind.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of AssetKind");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(assetKind.get());
+        return _ParsingResult.success(assetKind.get());
       }
 
       /**
@@ -1777,11 +1777,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<SpecificAssetId> trySpecificAssetIdFrom(JsonNode node) {
+      private static _ParsingResult<SpecificAssetId> trySpecificAssetIdFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theName = null;
@@ -1799,13 +1799,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theNameParsingResult = tryStringFrom(currentNode.getValue());
-              if (theNameParsingResult.isError()) {
-                theNameParsingResult.getError()
+              final _ParsingResult<? extends String> theName_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theName_ParsingResult.isError()) {
+                theName_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("name"));
-                return theNameParsingResult.castTo(SpecificAssetId.class);
+                return theName_ParsingResult.castTo(SpecificAssetId.class);
               }
-              theName = theNameParsingResult.getResult();
+              theName = theName_ParsingResult.getResult();
               break;
             }
             case "value": {
@@ -1813,13 +1813,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(SpecificAssetId.class);
+                return theValue_ParsingResult.castTo(SpecificAssetId.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "semanticId": {
@@ -1827,13 +1827,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(SpecificAssetId.class);
+                return theSemanticId_ParsingResult.castTo(SpecificAssetId.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -1848,7 +1848,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -1863,9 +1863,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -1891,19 +1891,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theExternalSubjectIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theExternalSubjectIdParsingResult.isError()) {
-                theExternalSubjectIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theExternalSubjectId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theExternalSubjectId_ParsingResult.isError()) {
+                theExternalSubjectId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("externalSubjectId"));
-                return theExternalSubjectIdParsingResult.castTo(SpecificAssetId.class);
+                return theExternalSubjectId_ParsingResult.castTo(SpecificAssetId.class);
               }
-              theExternalSubjectId = theExternalSubjectIdParsingResult.getResult();
+              theExternalSubjectId = theExternalSubjectId_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -1911,16 +1911,16 @@ public class Jsonization {
         if (theName == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"name\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theValue == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"value\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new SpecificAssetId(
+        return _ParsingResult.success(new SpecificAssetId(
           theName,
           theValue,
           theSemanticId,
@@ -1934,11 +1934,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Submodel> trySubmodelFrom(JsonNode node) {
+      private static _ParsingResult<Submodel> trySubmodelFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theId = null;
@@ -1966,13 +1966,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdParsingResult.isError()) {
-                theIdParsingResult.getError()
+              final _ParsingResult<? extends String> theId_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theId_ParsingResult.isError()) {
+                theId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("id"));
-                return theIdParsingResult.castTo(Submodel.class);
+                return theId_ParsingResult.castTo(Submodel.class);
               }
-              theId = theIdParsingResult.getResult();
+              theId = theId_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -1987,7 +1987,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -2002,9 +2002,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2030,13 +2030,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Submodel.class);
+                return theCategory_ParsingResult.castTo(Submodel.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -2044,13 +2044,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Submodel.class);
+                return theIdShort_ParsingResult.castTo(Submodel.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -2065,7 +2065,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -2080,9 +2080,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2115,7 +2115,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -2130,9 +2130,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2158,13 +2158,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IAdministrativeInformation> theAdministrationParsingResult = tryAdministrativeInformationFrom(currentNode.getValue());
-              if (theAdministrationParsingResult.isError()) {
-                theAdministrationParsingResult.getError()
+              final _ParsingResult<? extends IAdministrativeInformation> theAdministration_ParsingResult = tryAdministrativeInformationFrom(currentNode.getValue());
+              if (theAdministration_ParsingResult.isError()) {
+                theAdministration_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("administration"));
-                return theAdministrationParsingResult.castTo(Submodel.class);
+                return theAdministration_ParsingResult.castTo(Submodel.class);
               }
-              theAdministration = theAdministrationParsingResult.getResult();
+              theAdministration = theAdministration_ParsingResult.getResult();
               break;
             }
             case "kind": {
@@ -2172,13 +2172,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends ModellingKind> theKindParsingResult = tryModellingKindFrom(currentNode.getValue());
-              if (theKindParsingResult.isError()) {
-                theKindParsingResult.getError()
+              final _ParsingResult<? extends ModellingKind> theKind_ParsingResult = tryModellingKindFrom(currentNode.getValue());
+              if (theKind_ParsingResult.isError()) {
+                theKind_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("kind"));
-                return theKindParsingResult.castTo(Submodel.class);
+                return theKind_ParsingResult.castTo(Submodel.class);
               }
-              theKind = theKindParsingResult.getResult();
+              theKind = theKind_ParsingResult.getResult();
               break;
             }
             case "semanticId": {
@@ -2186,13 +2186,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Submodel.class);
+                return theSemanticId_ParsingResult.castTo(Submodel.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -2207,7 +2207,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -2222,9 +2222,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2257,7 +2257,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -2272,9 +2272,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2307,7 +2307,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -2322,9 +2322,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2357,7 +2357,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "submodelElements"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSubmodelElements = new ArrayList<>(
                 arraySubmodelElements.size());
@@ -2372,9 +2372,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "submodelElements"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISubmodelElement> parsedItemResult =
+                final _ParsingResult<? extends ISubmodelElement> parsedItemResult =
                   tryISubmodelElementFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2399,9 +2399,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -2415,14 +2415,14 @@ public class Jsonization {
                   "Expected the model type 'Submodel', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -2430,16 +2430,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theId == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"id\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Submodel(
+        return _ParsingResult.success(new Submodel(
           theId,
           theExtensions,
           theCategory,
@@ -2461,20 +2461,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends ISubmodelElement> tryISubmodelElementFrom(JsonNode node) {
+      public static _ParsingResult<? extends ISubmodelElement> tryISubmodelElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(ISubmodelElement.class);
         }
@@ -2512,7 +2512,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for ISubmodelElement: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -2523,20 +2523,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IRelationshipElement> tryIRelationshipElementFrom(JsonNode node) {
+      public static _ParsingResult<? extends IRelationshipElement> tryIRelationshipElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IRelationshipElement.class);
         }
@@ -2550,7 +2550,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IRelationshipElement: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -2561,11 +2561,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<RelationshipElement> tryRelationshipElementFrom(JsonNode node) {
+      private static _ParsingResult<RelationshipElement> tryRelationshipElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         IReference theFirst = null;
@@ -2591,13 +2591,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theFirstParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theFirstParsingResult.isError()) {
-                theFirstParsingResult.getError()
+              final _ParsingResult<? extends IReference> theFirst_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theFirst_ParsingResult.isError()) {
+                theFirst_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("first"));
-                return theFirstParsingResult.castTo(RelationshipElement.class);
+                return theFirst_ParsingResult.castTo(RelationshipElement.class);
               }
-              theFirst = theFirstParsingResult.getResult();
+              theFirst = theFirst_ParsingResult.getResult();
               break;
             }
             case "second": {
@@ -2605,13 +2605,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSecondParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSecondParsingResult.isError()) {
-                theSecondParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSecond_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSecond_ParsingResult.isError()) {
+                theSecond_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("second"));
-                return theSecondParsingResult.castTo(RelationshipElement.class);
+                return theSecond_ParsingResult.castTo(RelationshipElement.class);
               }
-              theSecond = theSecondParsingResult.getResult();
+              theSecond = theSecond_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -2626,7 +2626,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -2641,9 +2641,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2669,13 +2669,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(RelationshipElement.class);
+                return theCategory_ParsingResult.castTo(RelationshipElement.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -2683,13 +2683,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(RelationshipElement.class);
+                return theIdShort_ParsingResult.castTo(RelationshipElement.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -2704,7 +2704,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -2719,9 +2719,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2754,7 +2754,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -2769,9 +2769,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2797,13 +2797,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(RelationshipElement.class);
+                return theSemanticId_ParsingResult.castTo(RelationshipElement.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -2818,7 +2818,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -2833,9 +2833,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2868,7 +2868,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -2883,9 +2883,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2918,7 +2918,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -2933,9 +2933,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -2960,9 +2960,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -2976,14 +2976,14 @@ public class Jsonization {
                   "Expected the model type 'RelationshipElement', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -2991,22 +2991,22 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theFirst == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"first\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theSecond == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"second\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new RelationshipElement(
+        return _ParsingResult.success(new RelationshipElement(
           theFirst,
           theSecond,
           theExtensions,
@@ -3025,17 +3025,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<AasSubmodelElements> tryAasSubmodelElementsFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<AasSubmodelElements> tryAasSubmodelElementsFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(AasSubmodelElements.class);
         }
         final Optional<AasSubmodelElements> aasSubmodelElements = Stringification.aasSubmodelElementsFromString(textResult.getResult());
         if (!aasSubmodelElements.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of AasSubmodelElements");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(aasSubmodelElements.get());
+        return _ParsingResult.success(aasSubmodelElements.get());
       }
 
       /**
@@ -3044,11 +3044,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<SubmodelElementList> trySubmodelElementListFrom(JsonNode node) {
+      private static _ParsingResult<SubmodelElementList> trySubmodelElementListFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         AasSubmodelElements theTypeValueListElement = null;
@@ -3077,13 +3077,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends AasSubmodelElements> theTypeValueListElementParsingResult = tryAasSubmodelElementsFrom(currentNode.getValue());
-              if (theTypeValueListElementParsingResult.isError()) {
-                theTypeValueListElementParsingResult.getError()
+              final _ParsingResult<? extends AasSubmodelElements> theTypeValueListElement_ParsingResult = tryAasSubmodelElementsFrom(currentNode.getValue());
+              if (theTypeValueListElement_ParsingResult.isError()) {
+                theTypeValueListElement_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("typeValueListElement"));
-                return theTypeValueListElementParsingResult.castTo(SubmodelElementList.class);
+                return theTypeValueListElement_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theTypeValueListElement = theTypeValueListElementParsingResult.getResult();
+              theTypeValueListElement = theTypeValueListElement_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -3098,7 +3098,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -3113,9 +3113,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3141,13 +3141,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(SubmodelElementList.class);
+                return theCategory_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -3155,13 +3155,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(SubmodelElementList.class);
+                return theIdShort_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -3176,7 +3176,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -3191,9 +3191,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3226,7 +3226,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -3241,9 +3241,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3269,13 +3269,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(SubmodelElementList.class);
+                return theSemanticId_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -3290,7 +3290,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -3305,9 +3305,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3340,7 +3340,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -3355,9 +3355,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3390,7 +3390,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -3405,9 +3405,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3433,13 +3433,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends Boolean> theOrderRelevantParsingResult = tryBooleanFrom(currentNode.getValue());
-              if (theOrderRelevantParsingResult.isError()) {
-                theOrderRelevantParsingResult.getError()
+              final _ParsingResult<? extends Boolean> theOrderRelevant_ParsingResult = tryBooleanFrom(currentNode.getValue());
+              if (theOrderRelevant_ParsingResult.isError()) {
+                theOrderRelevant_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("orderRelevant"));
-                return theOrderRelevantParsingResult.castTo(SubmodelElementList.class);
+                return theOrderRelevant_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theOrderRelevant = theOrderRelevantParsingResult.getResult();
+              theOrderRelevant = theOrderRelevant_ParsingResult.getResult();
               break;
             }
             case "semanticIdListElement": {
@@ -3447,13 +3447,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdListElementParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdListElementParsingResult.isError()) {
-                theSemanticIdListElementParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticIdListElement_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticIdListElement_ParsingResult.isError()) {
+                theSemanticIdListElement_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticIdListElement"));
-                return theSemanticIdListElementParsingResult.castTo(SubmodelElementList.class);
+                return theSemanticIdListElement_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theSemanticIdListElement = theSemanticIdListElementParsingResult.getResult();
+              theSemanticIdListElement = theSemanticIdListElement_ParsingResult.getResult();
               break;
             }
             case "valueTypeListElement": {
@@ -3461,13 +3461,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends DataTypeDefXsd> theValueTypeListElementParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
-              if (theValueTypeListElementParsingResult.isError()) {
-                theValueTypeListElementParsingResult.getError()
+              final _ParsingResult<? extends DataTypeDefXsd> theValueTypeListElement_ParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
+              if (theValueTypeListElement_ParsingResult.isError()) {
+                theValueTypeListElement_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueTypeListElement"));
-                return theValueTypeListElementParsingResult.castTo(SubmodelElementList.class);
+                return theValueTypeListElement_ParsingResult.castTo(SubmodelElementList.class);
               }
-              theValueTypeListElement = theValueTypeListElementParsingResult.getResult();
+              theValueTypeListElement = theValueTypeListElement_ParsingResult.getResult();
               break;
             }
             case "value": {
@@ -3482,7 +3482,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "value"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theValue = new ArrayList<>(
                 arrayValue.size());
@@ -3497,9 +3497,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISubmodelElement> parsedItemResult =
+                final _ParsingResult<? extends ISubmodelElement> parsedItemResult =
                   tryISubmodelElementFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3524,9 +3524,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -3540,14 +3540,14 @@ public class Jsonization {
                   "Expected the model type 'SubmodelElementList', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -3555,16 +3555,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theTypeValueListElement == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"typeValueListElement\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new SubmodelElementList(
+        return _ParsingResult.success(new SubmodelElementList(
           theTypeValueListElement,
           theExtensions,
           theCategory,
@@ -3587,11 +3587,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<SubmodelElementCollection> trySubmodelElementCollectionFrom(JsonNode node) {
+      private static _ParsingResult<SubmodelElementCollection> trySubmodelElementCollectionFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IExtension> theExtensions = null;
@@ -3623,7 +3623,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -3638,9 +3638,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3666,13 +3666,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(SubmodelElementCollection.class);
+                return theCategory_ParsingResult.castTo(SubmodelElementCollection.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -3680,13 +3680,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(SubmodelElementCollection.class);
+                return theIdShort_ParsingResult.castTo(SubmodelElementCollection.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -3701,7 +3701,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -3716,9 +3716,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3751,7 +3751,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -3766,9 +3766,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3794,13 +3794,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(SubmodelElementCollection.class);
+                return theSemanticId_ParsingResult.castTo(SubmodelElementCollection.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -3815,7 +3815,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -3830,9 +3830,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3865,7 +3865,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -3880,9 +3880,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3915,7 +3915,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -3930,9 +3930,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -3965,7 +3965,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "value"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theValue = new ArrayList<>(
                 arrayValue.size());
@@ -3980,9 +3980,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISubmodelElement> parsedItemResult =
+                final _ParsingResult<? extends ISubmodelElement> parsedItemResult =
                   tryISubmodelElementFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4007,9 +4007,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -4023,14 +4023,14 @@ public class Jsonization {
                   "Expected the model type 'SubmodelElementCollection', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -4038,12 +4038,12 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
 
 
-        return ParsingResult.success(new SubmodelElementCollection(
+        return _ParsingResult.success(new SubmodelElementCollection(
           theExtensions,
           theCategory,
           theIdShort,
@@ -4062,20 +4062,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IDataElement> tryIDataElementFrom(JsonNode node) {
+      public static _ParsingResult<? extends IDataElement> tryIDataElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IDataElement.class);
         }
@@ -4097,7 +4097,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IDataElement: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -4108,11 +4108,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Property> tryPropertyFrom(JsonNode node) {
+      private static _ParsingResult<Property> tryPropertyFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         DataTypeDefXsd theValueType = null;
@@ -4139,13 +4139,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends DataTypeDefXsd> theValueTypeParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
-              if (theValueTypeParsingResult.isError()) {
-                theValueTypeParsingResult.getError()
+              final _ParsingResult<? extends DataTypeDefXsd> theValueType_ParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
+              if (theValueType_ParsingResult.isError()) {
+                theValueType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueType"));
-                return theValueTypeParsingResult.castTo(Property.class);
+                return theValueType_ParsingResult.castTo(Property.class);
               }
-              theValueType = theValueTypeParsingResult.getResult();
+              theValueType = theValueType_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -4160,7 +4160,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -4175,9 +4175,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4203,13 +4203,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Property.class);
+                return theCategory_ParsingResult.castTo(Property.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -4217,13 +4217,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Property.class);
+                return theIdShort_ParsingResult.castTo(Property.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -4238,7 +4238,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -4253,9 +4253,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4288,7 +4288,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -4303,9 +4303,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4331,13 +4331,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Property.class);
+                return theSemanticId_ParsingResult.castTo(Property.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -4352,7 +4352,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -4367,9 +4367,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4402,7 +4402,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -4417,9 +4417,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4452,7 +4452,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -4467,9 +4467,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4495,13 +4495,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(Property.class);
+                return theValue_ParsingResult.castTo(Property.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "valueId": {
@@ -4509,22 +4509,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theValueIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theValueIdParsingResult.isError()) {
-                theValueIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theValueId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theValueId_ParsingResult.isError()) {
+                theValueId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueId"));
-                return theValueIdParsingResult.castTo(Property.class);
+                return theValueId_ParsingResult.castTo(Property.class);
               }
-              theValueId = theValueIdParsingResult.getResult();
+              theValueId = theValueId_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -4538,14 +4538,14 @@ public class Jsonization {
                   "Expected the model type 'Property', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -4553,16 +4553,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theValueType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"valueType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Property(
+        return _ParsingResult.success(new Property(
           theValueType,
           theExtensions,
           theCategory,
@@ -4583,11 +4583,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<MultiLanguageProperty> tryMultiLanguagePropertyFrom(JsonNode node) {
+      private static _ParsingResult<MultiLanguageProperty> tryMultiLanguagePropertyFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IExtension> theExtensions = null;
@@ -4620,7 +4620,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -4635,9 +4635,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4663,13 +4663,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(MultiLanguageProperty.class);
+                return theCategory_ParsingResult.castTo(MultiLanguageProperty.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -4677,13 +4677,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(MultiLanguageProperty.class);
+                return theIdShort_ParsingResult.castTo(MultiLanguageProperty.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -4698,7 +4698,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -4713,9 +4713,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4748,7 +4748,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -4763,9 +4763,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4791,13 +4791,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(MultiLanguageProperty.class);
+                return theSemanticId_ParsingResult.castTo(MultiLanguageProperty.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -4812,7 +4812,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -4827,9 +4827,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4862,7 +4862,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -4877,9 +4877,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4912,7 +4912,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -4927,9 +4927,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -4962,7 +4962,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "value"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theValue = new ArrayList<>(
                 arrayValue.size());
@@ -4977,9 +4977,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5005,22 +5005,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theValueIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theValueIdParsingResult.isError()) {
-                theValueIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theValueId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theValueId_ParsingResult.isError()) {
+                theValueId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueId"));
-                return theValueIdParsingResult.castTo(MultiLanguageProperty.class);
+                return theValueId_ParsingResult.castTo(MultiLanguageProperty.class);
               }
-              theValueId = theValueIdParsingResult.getResult();
+              theValueId = theValueId_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -5034,14 +5034,14 @@ public class Jsonization {
                   "Expected the model type 'MultiLanguageProperty', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -5049,12 +5049,12 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
 
 
-        return ParsingResult.success(new MultiLanguageProperty(
+        return _ParsingResult.success(new MultiLanguageProperty(
           theExtensions,
           theCategory,
           theIdShort,
@@ -5074,11 +5074,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Range> tryRangeFrom(JsonNode node) {
+      private static _ParsingResult<Range> tryRangeFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         DataTypeDefXsd theValueType = null;
@@ -5105,13 +5105,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends DataTypeDefXsd> theValueTypeParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
-              if (theValueTypeParsingResult.isError()) {
-                theValueTypeParsingResult.getError()
+              final _ParsingResult<? extends DataTypeDefXsd> theValueType_ParsingResult = tryDataTypeDefXsdFrom(currentNode.getValue());
+              if (theValueType_ParsingResult.isError()) {
+                theValueType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueType"));
-                return theValueTypeParsingResult.castTo(Range.class);
+                return theValueType_ParsingResult.castTo(Range.class);
               }
-              theValueType = theValueTypeParsingResult.getResult();
+              theValueType = theValueType_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -5126,7 +5126,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -5141,9 +5141,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5169,13 +5169,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Range.class);
+                return theCategory_ParsingResult.castTo(Range.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -5183,13 +5183,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Range.class);
+                return theIdShort_ParsingResult.castTo(Range.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -5204,7 +5204,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -5219,9 +5219,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5254,7 +5254,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -5269,9 +5269,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5297,13 +5297,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Range.class);
+                return theSemanticId_ParsingResult.castTo(Range.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -5318,7 +5318,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -5333,9 +5333,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5368,7 +5368,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -5383,9 +5383,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5418,7 +5418,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -5433,9 +5433,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5461,13 +5461,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theMinParsingResult = tryStringFrom(currentNode.getValue());
-              if (theMinParsingResult.isError()) {
-                theMinParsingResult.getError()
+              final _ParsingResult<? extends String> theMin_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theMin_ParsingResult.isError()) {
+                theMin_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("min"));
-                return theMinParsingResult.castTo(Range.class);
+                return theMin_ParsingResult.castTo(Range.class);
               }
-              theMin = theMinParsingResult.getResult();
+              theMin = theMin_ParsingResult.getResult();
               break;
             }
             case "max": {
@@ -5475,22 +5475,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theMaxParsingResult = tryStringFrom(currentNode.getValue());
-              if (theMaxParsingResult.isError()) {
-                theMaxParsingResult.getError()
+              final _ParsingResult<? extends String> theMax_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theMax_ParsingResult.isError()) {
+                theMax_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("max"));
-                return theMaxParsingResult.castTo(Range.class);
+                return theMax_ParsingResult.castTo(Range.class);
               }
-              theMax = theMaxParsingResult.getResult();
+              theMax = theMax_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -5504,14 +5504,14 @@ public class Jsonization {
                   "Expected the model type 'Range', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -5519,16 +5519,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theValueType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"valueType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Range(
+        return _ParsingResult.success(new Range(
           theValueType,
           theExtensions,
           theCategory,
@@ -5549,11 +5549,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<ReferenceElement> tryReferenceElementFrom(JsonNode node) {
+      private static _ParsingResult<ReferenceElement> tryReferenceElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IExtension> theExtensions = null;
@@ -5585,7 +5585,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -5600,9 +5600,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5628,13 +5628,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(ReferenceElement.class);
+                return theCategory_ParsingResult.castTo(ReferenceElement.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -5642,13 +5642,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(ReferenceElement.class);
+                return theIdShort_ParsingResult.castTo(ReferenceElement.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -5663,7 +5663,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -5678,9 +5678,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5713,7 +5713,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -5728,9 +5728,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5756,13 +5756,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(ReferenceElement.class);
+                return theSemanticId_ParsingResult.castTo(ReferenceElement.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -5777,7 +5777,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -5792,9 +5792,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5827,7 +5827,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -5842,9 +5842,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5877,7 +5877,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -5892,9 +5892,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -5920,22 +5920,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theValueParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends IReference> theValue_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(ReferenceElement.class);
+                return theValue_ParsingResult.castTo(ReferenceElement.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -5949,14 +5949,14 @@ public class Jsonization {
                   "Expected the model type 'ReferenceElement', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -5964,12 +5964,12 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
 
 
-        return ParsingResult.success(new ReferenceElement(
+        return _ParsingResult.success(new ReferenceElement(
           theExtensions,
           theCategory,
           theIdShort,
@@ -5988,11 +5988,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Blob> tryBlobFrom(JsonNode node) {
+      private static _ParsingResult<Blob> tryBlobFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theContentType = null;
@@ -6018,13 +6018,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theContentTypeParsingResult = tryStringFrom(currentNode.getValue());
-              if (theContentTypeParsingResult.isError()) {
-                theContentTypeParsingResult.getError()
+              final _ParsingResult<? extends String> theContentType_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theContentType_ParsingResult.isError()) {
+                theContentType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("contentType"));
-                return theContentTypeParsingResult.castTo(Blob.class);
+                return theContentType_ParsingResult.castTo(Blob.class);
               }
-              theContentType = theContentTypeParsingResult.getResult();
+              theContentType = theContentType_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -6039,7 +6039,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -6054,9 +6054,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6082,13 +6082,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Blob.class);
+                return theCategory_ParsingResult.castTo(Blob.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -6096,13 +6096,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Blob.class);
+                return theIdShort_ParsingResult.castTo(Blob.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -6117,7 +6117,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -6132,9 +6132,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6167,7 +6167,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -6182,9 +6182,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6210,13 +6210,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Blob.class);
+                return theSemanticId_ParsingResult.castTo(Blob.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -6231,7 +6231,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -6246,9 +6246,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6281,7 +6281,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -6296,9 +6296,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6331,7 +6331,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -6346,9 +6346,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6374,22 +6374,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends byte[]> theValueParsingResult = tryBytesFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends byte[]> theValue_ParsingResult = tryBytesFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(Blob.class);
+                return theValue_ParsingResult.castTo(Blob.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -6403,14 +6403,14 @@ public class Jsonization {
                   "Expected the model type 'Blob', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -6418,16 +6418,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theContentType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"contentType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Blob(
+        return _ParsingResult.success(new Blob(
           theContentType,
           theExtensions,
           theCategory,
@@ -6447,11 +6447,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<File> tryFileFrom(JsonNode node) {
+      private static _ParsingResult<File> tryFileFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theContentType = null;
@@ -6477,13 +6477,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theContentTypeParsingResult = tryStringFrom(currentNode.getValue());
-              if (theContentTypeParsingResult.isError()) {
-                theContentTypeParsingResult.getError()
+              final _ParsingResult<? extends String> theContentType_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theContentType_ParsingResult.isError()) {
+                theContentType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("contentType"));
-                return theContentTypeParsingResult.castTo(File.class);
+                return theContentType_ParsingResult.castTo(File.class);
               }
-              theContentType = theContentTypeParsingResult.getResult();
+              theContentType = theContentType_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -6498,7 +6498,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -6513,9 +6513,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6541,13 +6541,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(File.class);
+                return theCategory_ParsingResult.castTo(File.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -6555,13 +6555,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(File.class);
+                return theIdShort_ParsingResult.castTo(File.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -6576,7 +6576,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -6591,9 +6591,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6626,7 +6626,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -6641,9 +6641,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6669,13 +6669,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(File.class);
+                return theSemanticId_ParsingResult.castTo(File.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -6690,7 +6690,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -6705,9 +6705,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6740,7 +6740,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -6755,9 +6755,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6790,7 +6790,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -6805,9 +6805,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -6833,22 +6833,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(File.class);
+                return theValue_ParsingResult.castTo(File.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -6862,14 +6862,14 @@ public class Jsonization {
                   "Expected the model type 'File', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -6877,16 +6877,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theContentType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"contentType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new File(
+        return _ParsingResult.success(new File(
           theContentType,
           theExtensions,
           theCategory,
@@ -6906,11 +6906,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<AnnotatedRelationshipElement> tryAnnotatedRelationshipElementFrom(JsonNode node) {
+      private static _ParsingResult<AnnotatedRelationshipElement> tryAnnotatedRelationshipElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         IReference theFirst = null;
@@ -6937,13 +6937,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theFirstParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theFirstParsingResult.isError()) {
-                theFirstParsingResult.getError()
+              final _ParsingResult<? extends IReference> theFirst_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theFirst_ParsingResult.isError()) {
+                theFirst_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("first"));
-                return theFirstParsingResult.castTo(AnnotatedRelationshipElement.class);
+                return theFirst_ParsingResult.castTo(AnnotatedRelationshipElement.class);
               }
-              theFirst = theFirstParsingResult.getResult();
+              theFirst = theFirst_ParsingResult.getResult();
               break;
             }
             case "second": {
@@ -6951,13 +6951,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSecondParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSecondParsingResult.isError()) {
-                theSecondParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSecond_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSecond_ParsingResult.isError()) {
+                theSecond_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("second"));
-                return theSecondParsingResult.castTo(AnnotatedRelationshipElement.class);
+                return theSecond_ParsingResult.castTo(AnnotatedRelationshipElement.class);
               }
-              theSecond = theSecondParsingResult.getResult();
+              theSecond = theSecond_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -6972,7 +6972,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -6987,9 +6987,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7015,13 +7015,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(AnnotatedRelationshipElement.class);
+                return theCategory_ParsingResult.castTo(AnnotatedRelationshipElement.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -7029,13 +7029,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(AnnotatedRelationshipElement.class);
+                return theIdShort_ParsingResult.castTo(AnnotatedRelationshipElement.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -7050,7 +7050,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -7065,9 +7065,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7100,7 +7100,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -7115,9 +7115,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7143,13 +7143,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(AnnotatedRelationshipElement.class);
+                return theSemanticId_ParsingResult.castTo(AnnotatedRelationshipElement.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -7164,7 +7164,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -7179,9 +7179,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7214,7 +7214,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -7229,9 +7229,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7264,7 +7264,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -7279,9 +7279,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7314,7 +7314,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "annotations"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theAnnotations = new ArrayList<>(
                 arrayAnnotations.size());
@@ -7329,9 +7329,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "annotations"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IDataElement> parsedItemResult =
+                final _ParsingResult<? extends IDataElement> parsedItemResult =
                   tryIDataElementFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7356,9 +7356,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -7372,14 +7372,14 @@ public class Jsonization {
                   "Expected the model type 'AnnotatedRelationshipElement', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -7387,22 +7387,22 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theFirst == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"first\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theSecond == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"second\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new AnnotatedRelationshipElement(
+        return _ParsingResult.success(new AnnotatedRelationshipElement(
           theFirst,
           theSecond,
           theExtensions,
@@ -7423,11 +7423,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Entity> tryEntityFrom(JsonNode node) {
+      private static _ParsingResult<Entity> tryEntityFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         EntityType theEntityType = null;
@@ -7455,13 +7455,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends EntityType> theEntityTypeParsingResult = tryEntityTypeFrom(currentNode.getValue());
-              if (theEntityTypeParsingResult.isError()) {
-                theEntityTypeParsingResult.getError()
+              final _ParsingResult<? extends EntityType> theEntityType_ParsingResult = tryEntityTypeFrom(currentNode.getValue());
+              if (theEntityType_ParsingResult.isError()) {
+                theEntityType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("entityType"));
-                return theEntityTypeParsingResult.castTo(Entity.class);
+                return theEntityType_ParsingResult.castTo(Entity.class);
               }
-              theEntityType = theEntityTypeParsingResult.getResult();
+              theEntityType = theEntityType_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -7476,7 +7476,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -7491,9 +7491,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7519,13 +7519,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Entity.class);
+                return theCategory_ParsingResult.castTo(Entity.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -7533,13 +7533,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Entity.class);
+                return theIdShort_ParsingResult.castTo(Entity.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -7554,7 +7554,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -7569,9 +7569,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7604,7 +7604,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -7619,9 +7619,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7647,13 +7647,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Entity.class);
+                return theSemanticId_ParsingResult.castTo(Entity.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -7668,7 +7668,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -7683,9 +7683,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7718,7 +7718,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -7733,9 +7733,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7768,7 +7768,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -7783,9 +7783,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7818,7 +7818,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "statements"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theStatements = new ArrayList<>(
                 arrayStatements.size());
@@ -7833,9 +7833,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "statements"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISubmodelElement> parsedItemResult =
+                final _ParsingResult<? extends ISubmodelElement> parsedItemResult =
                   tryISubmodelElementFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7861,13 +7861,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theGlobalAssetIdParsingResult = tryStringFrom(currentNode.getValue());
-              if (theGlobalAssetIdParsingResult.isError()) {
-                theGlobalAssetIdParsingResult.getError()
+              final _ParsingResult<? extends String> theGlobalAssetId_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theGlobalAssetId_ParsingResult.isError()) {
+                theGlobalAssetId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("globalAssetId"));
-                return theGlobalAssetIdParsingResult.castTo(Entity.class);
+                return theGlobalAssetId_ParsingResult.castTo(Entity.class);
               }
-              theGlobalAssetId = theGlobalAssetIdParsingResult.getResult();
+              theGlobalAssetId = theGlobalAssetId_ParsingResult.getResult();
               break;
             }
             case "specificAssetIds": {
@@ -7882,7 +7882,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "specificAssetIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSpecificAssetIds = new ArrayList<>(
                 arraySpecificAssetIds.size());
@@ -7897,9 +7897,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "specificAssetIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISpecificAssetId> parsedItemResult =
+                final _ParsingResult<? extends ISpecificAssetId> parsedItemResult =
                   trySpecificAssetIdFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -7924,9 +7924,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -7940,14 +7940,14 @@ public class Jsonization {
                   "Expected the model type 'Entity', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -7955,16 +7955,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theEntityType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"entityType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Entity(
+        return _ParsingResult.success(new Entity(
           theEntityType,
           theExtensions,
           theCategory,
@@ -7985,17 +7985,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<EntityType> tryEntityTypeFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<EntityType> tryEntityTypeFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(EntityType.class);
         }
         final Optional<EntityType> entityType = Stringification.entityTypeFromString(textResult.getResult());
         if (!entityType.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of EntityType");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(entityType.get());
+        return _ParsingResult.success(entityType.get());
       }
 
       /**
@@ -8003,17 +8003,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<Direction> tryDirectionFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<Direction> tryDirectionFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(Direction.class);
         }
         final Optional<Direction> direction = Stringification.directionFromString(textResult.getResult());
         if (!direction.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of Direction");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(direction.get());
+        return _ParsingResult.success(direction.get());
       }
 
       /**
@@ -8021,17 +8021,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<StateOfEvent> tryStateOfEventFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<StateOfEvent> tryStateOfEventFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(StateOfEvent.class);
         }
         final Optional<StateOfEvent> stateOfEvent = Stringification.stateOfEventFromString(textResult.getResult());
         if (!stateOfEvent.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of StateOfEvent");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(stateOfEvent.get());
+        return _ParsingResult.success(stateOfEvent.get());
       }
 
       /**
@@ -8040,11 +8040,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<EventPayload> tryEventPayloadFrom(JsonNode node) {
+      private static _ParsingResult<EventPayload> tryEventPayloadFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         IReference theSource = null;
@@ -8065,13 +8065,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSourceParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSourceParsingResult.isError()) {
-                theSourceParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSource_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSource_ParsingResult.isError()) {
+                theSource_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("source"));
-                return theSourceParsingResult.castTo(EventPayload.class);
+                return theSource_ParsingResult.castTo(EventPayload.class);
               }
-              theSource = theSourceParsingResult.getResult();
+              theSource = theSource_ParsingResult.getResult();
               break;
             }
             case "observableReference": {
@@ -8079,13 +8079,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theObservableReferenceParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theObservableReferenceParsingResult.isError()) {
-                theObservableReferenceParsingResult.getError()
+              final _ParsingResult<? extends IReference> theObservableReference_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theObservableReference_ParsingResult.isError()) {
+                theObservableReference_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("observableReference"));
-                return theObservableReferenceParsingResult.castTo(EventPayload.class);
+                return theObservableReference_ParsingResult.castTo(EventPayload.class);
               }
-              theObservableReference = theObservableReferenceParsingResult.getResult();
+              theObservableReference = theObservableReference_ParsingResult.getResult();
               break;
             }
             case "timeStamp": {
@@ -8093,13 +8093,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTimeStampParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTimeStampParsingResult.isError()) {
-                theTimeStampParsingResult.getError()
+              final _ParsingResult<? extends String> theTimeStamp_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theTimeStamp_ParsingResult.isError()) {
+                theTimeStamp_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("timeStamp"));
-                return theTimeStampParsingResult.castTo(EventPayload.class);
+                return theTimeStamp_ParsingResult.castTo(EventPayload.class);
               }
-              theTimeStamp = theTimeStampParsingResult.getResult();
+              theTimeStamp = theTimeStamp_ParsingResult.getResult();
               break;
             }
             case "sourceSemanticId": {
@@ -8107,13 +8107,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSourceSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSourceSemanticIdParsingResult.isError()) {
-                theSourceSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSourceSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSourceSemanticId_ParsingResult.isError()) {
+                theSourceSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("sourceSemanticId"));
-                return theSourceSemanticIdParsingResult.castTo(EventPayload.class);
+                return theSourceSemanticId_ParsingResult.castTo(EventPayload.class);
               }
-              theSourceSemanticId = theSourceSemanticIdParsingResult.getResult();
+              theSourceSemanticId = theSourceSemanticId_ParsingResult.getResult();
               break;
             }
             case "observableSemanticId": {
@@ -8121,13 +8121,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theObservableSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theObservableSemanticIdParsingResult.isError()) {
-                theObservableSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theObservableSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theObservableSemanticId_ParsingResult.isError()) {
+                theObservableSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("observableSemanticId"));
-                return theObservableSemanticIdParsingResult.castTo(EventPayload.class);
+                return theObservableSemanticId_ParsingResult.castTo(EventPayload.class);
               }
-              theObservableSemanticId = theObservableSemanticIdParsingResult.getResult();
+              theObservableSemanticId = theObservableSemanticId_ParsingResult.getResult();
               break;
             }
             case "topic": {
@@ -8135,13 +8135,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTopicParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTopicParsingResult.isError()) {
-                theTopicParsingResult.getError()
+              final _ParsingResult<? extends String> theTopic_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theTopic_ParsingResult.isError()) {
+                theTopic_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("topic"));
-                return theTopicParsingResult.castTo(EventPayload.class);
+                return theTopic_ParsingResult.castTo(EventPayload.class);
               }
-              theTopic = theTopicParsingResult.getResult();
+              theTopic = theTopic_ParsingResult.getResult();
               break;
             }
             case "subjectId": {
@@ -8149,13 +8149,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSubjectIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSubjectIdParsingResult.isError()) {
-                theSubjectIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSubjectId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSubjectId_ParsingResult.isError()) {
+                theSubjectId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("subjectId"));
-                return theSubjectIdParsingResult.castTo(EventPayload.class);
+                return theSubjectId_ParsingResult.castTo(EventPayload.class);
               }
-              theSubjectId = theSubjectIdParsingResult.getResult();
+              theSubjectId = theSubjectId_ParsingResult.getResult();
               break;
             }
             case "payload": {
@@ -8163,19 +8163,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends byte[]> thePayloadParsingResult = tryBytesFrom(currentNode.getValue());
-              if (thePayloadParsingResult.isError()) {
-                thePayloadParsingResult.getError()
+              final _ParsingResult<? extends byte[]> thePayload_ParsingResult = tryBytesFrom(currentNode.getValue());
+              if (thePayload_ParsingResult.isError()) {
+                thePayload_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("payload"));
-                return thePayloadParsingResult.castTo(EventPayload.class);
+                return thePayload_ParsingResult.castTo(EventPayload.class);
               }
-              thePayload = thePayloadParsingResult.getResult();
+              thePayload = thePayload_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -8183,22 +8183,22 @@ public class Jsonization {
         if (theSource == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"source\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theObservableReference == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"observableReference\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theTimeStamp == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"timeStamp\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new EventPayload(
+        return _ParsingResult.success(new EventPayload(
           theSource,
           theObservableReference,
           theTimeStamp,
@@ -8215,20 +8215,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IEventElement> tryIEventElementFrom(JsonNode node) {
+      public static _ParsingResult<? extends IEventElement> tryIEventElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IEventElement.class);
         }
@@ -8240,7 +8240,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IEventElement: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -8251,11 +8251,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<BasicEventElement> tryBasicEventElementFrom(JsonNode node) {
+      private static _ParsingResult<BasicEventElement> tryBasicEventElementFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         IReference theObserved = null;
@@ -8287,13 +8287,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theObservedParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theObservedParsingResult.isError()) {
-                theObservedParsingResult.getError()
+              final _ParsingResult<? extends IReference> theObserved_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theObserved_ParsingResult.isError()) {
+                theObserved_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("observed"));
-                return theObservedParsingResult.castTo(BasicEventElement.class);
+                return theObserved_ParsingResult.castTo(BasicEventElement.class);
               }
-              theObserved = theObservedParsingResult.getResult();
+              theObserved = theObserved_ParsingResult.getResult();
               break;
             }
             case "direction": {
@@ -8301,13 +8301,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends Direction> theDirectionParsingResult = tryDirectionFrom(currentNode.getValue());
-              if (theDirectionParsingResult.isError()) {
-                theDirectionParsingResult.getError()
+              final _ParsingResult<? extends Direction> theDirection_ParsingResult = tryDirectionFrom(currentNode.getValue());
+              if (theDirection_ParsingResult.isError()) {
+                theDirection_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("direction"));
-                return theDirectionParsingResult.castTo(BasicEventElement.class);
+                return theDirection_ParsingResult.castTo(BasicEventElement.class);
               }
-              theDirection = theDirectionParsingResult.getResult();
+              theDirection = theDirection_ParsingResult.getResult();
               break;
             }
             case "state": {
@@ -8315,13 +8315,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends StateOfEvent> theStateParsingResult = tryStateOfEventFrom(currentNode.getValue());
-              if (theStateParsingResult.isError()) {
-                theStateParsingResult.getError()
+              final _ParsingResult<? extends StateOfEvent> theState_ParsingResult = tryStateOfEventFrom(currentNode.getValue());
+              if (theState_ParsingResult.isError()) {
+                theState_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("state"));
-                return theStateParsingResult.castTo(BasicEventElement.class);
+                return theState_ParsingResult.castTo(BasicEventElement.class);
               }
-              theState = theStateParsingResult.getResult();
+              theState = theState_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -8336,7 +8336,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -8351,9 +8351,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8379,13 +8379,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(BasicEventElement.class);
+                return theCategory_ParsingResult.castTo(BasicEventElement.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -8393,13 +8393,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(BasicEventElement.class);
+                return theIdShort_ParsingResult.castTo(BasicEventElement.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -8414,7 +8414,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -8429,9 +8429,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8464,7 +8464,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -8479,9 +8479,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8507,13 +8507,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(BasicEventElement.class);
+                return theSemanticId_ParsingResult.castTo(BasicEventElement.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -8528,7 +8528,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -8543,9 +8543,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8578,7 +8578,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -8593,9 +8593,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8628,7 +8628,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -8643,9 +8643,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8671,13 +8671,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theMessageTopicParsingResult = tryStringFrom(currentNode.getValue());
-              if (theMessageTopicParsingResult.isError()) {
-                theMessageTopicParsingResult.getError()
+              final _ParsingResult<? extends String> theMessageTopic_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theMessageTopic_ParsingResult.isError()) {
+                theMessageTopic_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("messageTopic"));
-                return theMessageTopicParsingResult.castTo(BasicEventElement.class);
+                return theMessageTopic_ParsingResult.castTo(BasicEventElement.class);
               }
-              theMessageTopic = theMessageTopicParsingResult.getResult();
+              theMessageTopic = theMessageTopic_ParsingResult.getResult();
               break;
             }
             case "messageBroker": {
@@ -8685,13 +8685,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theMessageBrokerParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theMessageBrokerParsingResult.isError()) {
-                theMessageBrokerParsingResult.getError()
+              final _ParsingResult<? extends IReference> theMessageBroker_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theMessageBroker_ParsingResult.isError()) {
+                theMessageBroker_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("messageBroker"));
-                return theMessageBrokerParsingResult.castTo(BasicEventElement.class);
+                return theMessageBroker_ParsingResult.castTo(BasicEventElement.class);
               }
-              theMessageBroker = theMessageBrokerParsingResult.getResult();
+              theMessageBroker = theMessageBroker_ParsingResult.getResult();
               break;
             }
             case "lastUpdate": {
@@ -8699,13 +8699,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theLastUpdateParsingResult = tryStringFrom(currentNode.getValue());
-              if (theLastUpdateParsingResult.isError()) {
-                theLastUpdateParsingResult.getError()
+              final _ParsingResult<? extends String> theLastUpdate_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theLastUpdate_ParsingResult.isError()) {
+                theLastUpdate_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("lastUpdate"));
-                return theLastUpdateParsingResult.castTo(BasicEventElement.class);
+                return theLastUpdate_ParsingResult.castTo(BasicEventElement.class);
               }
-              theLastUpdate = theLastUpdateParsingResult.getResult();
+              theLastUpdate = theLastUpdate_ParsingResult.getResult();
               break;
             }
             case "minInterval": {
@@ -8713,13 +8713,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theMinIntervalParsingResult = tryStringFrom(currentNode.getValue());
-              if (theMinIntervalParsingResult.isError()) {
-                theMinIntervalParsingResult.getError()
+              final _ParsingResult<? extends String> theMinInterval_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theMinInterval_ParsingResult.isError()) {
+                theMinInterval_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("minInterval"));
-                return theMinIntervalParsingResult.castTo(BasicEventElement.class);
+                return theMinInterval_ParsingResult.castTo(BasicEventElement.class);
               }
-              theMinInterval = theMinIntervalParsingResult.getResult();
+              theMinInterval = theMinInterval_ParsingResult.getResult();
               break;
             }
             case "maxInterval": {
@@ -8727,22 +8727,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theMaxIntervalParsingResult = tryStringFrom(currentNode.getValue());
-              if (theMaxIntervalParsingResult.isError()) {
-                theMaxIntervalParsingResult.getError()
+              final _ParsingResult<? extends String> theMaxInterval_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theMaxInterval_ParsingResult.isError()) {
+                theMaxInterval_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("maxInterval"));
-                return theMaxIntervalParsingResult.castTo(BasicEventElement.class);
+                return theMaxInterval_ParsingResult.castTo(BasicEventElement.class);
               }
-              theMaxInterval = theMaxIntervalParsingResult.getResult();
+              theMaxInterval = theMaxInterval_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -8756,14 +8756,14 @@ public class Jsonization {
                   "Expected the model type 'BasicEventElement', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -8771,28 +8771,28 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theObserved == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"observed\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theDirection == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"direction\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theState == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"state\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new BasicEventElement(
+        return _ParsingResult.success(new BasicEventElement(
           theObserved,
           theDirection,
           theState,
@@ -8818,11 +8818,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Operation> tryOperationFrom(JsonNode node) {
+      private static _ParsingResult<Operation> tryOperationFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IExtension> theExtensions = null;
@@ -8856,7 +8856,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -8871,9 +8871,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8899,13 +8899,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Operation.class);
+                return theCategory_ParsingResult.castTo(Operation.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -8913,13 +8913,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Operation.class);
+                return theIdShort_ParsingResult.castTo(Operation.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -8934,7 +8934,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -8949,9 +8949,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -8984,7 +8984,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -8999,9 +8999,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9027,13 +9027,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Operation.class);
+                return theSemanticId_ParsingResult.castTo(Operation.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -9048,7 +9048,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -9063,9 +9063,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9098,7 +9098,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -9113,9 +9113,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9148,7 +9148,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -9163,9 +9163,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9198,7 +9198,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "inputVariables"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theInputVariables = new ArrayList<>(
                 arrayInputVariables.size());
@@ -9213,9 +9213,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "inputVariables"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IOperationVariable> parsedItemResult =
+                final _ParsingResult<? extends IOperationVariable> parsedItemResult =
                   tryOperationVariableFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9248,7 +9248,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "outputVariables"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theOutputVariables = new ArrayList<>(
                 arrayOutputVariables.size());
@@ -9263,9 +9263,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "outputVariables"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IOperationVariable> parsedItemResult =
+                final _ParsingResult<? extends IOperationVariable> parsedItemResult =
                   tryOperationVariableFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9298,7 +9298,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "inoutputVariables"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theInoutputVariables = new ArrayList<>(
                 arrayInoutputVariables.size());
@@ -9313,9 +9313,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "inoutputVariables"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IOperationVariable> parsedItemResult =
+                final _ParsingResult<? extends IOperationVariable> parsedItemResult =
                   tryOperationVariableFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9340,9 +9340,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -9356,14 +9356,14 @@ public class Jsonization {
                   "Expected the model type 'Operation', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -9371,12 +9371,12 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
 
 
-        return ParsingResult.success(new Operation(
+        return _ParsingResult.success(new Operation(
           theExtensions,
           theCategory,
           theIdShort,
@@ -9397,11 +9397,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<OperationVariable> tryOperationVariableFrom(JsonNode node) {
+      private static _ParsingResult<OperationVariable> tryOperationVariableFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         ISubmodelElement theValue = null;
@@ -9415,19 +9415,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends ISubmodelElement> theValueParsingResult = tryISubmodelElementFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends ISubmodelElement> theValue_ParsingResult = tryISubmodelElementFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(OperationVariable.class);
+                return theValue_ParsingResult.castTo(OperationVariable.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -9435,10 +9435,10 @@ public class Jsonization {
         if (theValue == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"value\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new OperationVariable(
+        return _ParsingResult.success(new OperationVariable(
           theValue));
       }
 
@@ -9448,11 +9448,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Capability> tryCapabilityFrom(JsonNode node) {
+      private static _ParsingResult<Capability> tryCapabilityFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IExtension> theExtensions = null;
@@ -9483,7 +9483,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -9498,9 +9498,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9526,13 +9526,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(Capability.class);
+                return theCategory_ParsingResult.castTo(Capability.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -9540,13 +9540,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(Capability.class);
+                return theIdShort_ParsingResult.castTo(Capability.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -9561,7 +9561,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -9576,9 +9576,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9611,7 +9611,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -9626,9 +9626,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9654,13 +9654,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theSemanticIdParsingResult.isError()) {
-                theSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theSemanticId_ParsingResult.isError()) {
+                theSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("semanticId"));
-                return theSemanticIdParsingResult.castTo(Capability.class);
+                return theSemanticId_ParsingResult.castTo(Capability.class);
               }
-              theSemanticId = theSemanticIdParsingResult.getResult();
+              theSemanticId = theSemanticId_ParsingResult.getResult();
               break;
             }
             case "supplementalSemanticIds": {
@@ -9675,7 +9675,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "supplementalSemanticIds"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSupplementalSemanticIds = new ArrayList<>(
                 arraySupplementalSemanticIds.size());
@@ -9690,9 +9690,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "supplementalSemanticIds"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9725,7 +9725,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "qualifiers"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theQualifiers = new ArrayList<>(
                 arrayQualifiers.size());
@@ -9740,9 +9740,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "qualifiers"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IQualifier> parsedItemResult =
+                final _ParsingResult<? extends IQualifier> parsedItemResult =
                   tryQualifierFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9775,7 +9775,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -9790,9 +9790,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9817,9 +9817,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -9833,14 +9833,14 @@ public class Jsonization {
                   "Expected the model type 'Capability', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -9848,12 +9848,12 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
 
 
-        return ParsingResult.success(new Capability(
+        return _ParsingResult.success(new Capability(
           theExtensions,
           theCategory,
           theIdShort,
@@ -9871,11 +9871,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<ConceptDescription> tryConceptDescriptionFrom(JsonNode node) {
+      private static _ParsingResult<ConceptDescription> tryConceptDescriptionFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theId = null;
@@ -9899,13 +9899,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdParsingResult.isError()) {
-                theIdParsingResult.getError()
+              final _ParsingResult<? extends String> theId_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theId_ParsingResult.isError()) {
+                theId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("id"));
-                return theIdParsingResult.castTo(ConceptDescription.class);
+                return theId_ParsingResult.castTo(ConceptDescription.class);
               }
-              theId = theIdParsingResult.getResult();
+              theId = theId_ParsingResult.getResult();
               break;
             }
             case "extensions": {
@@ -9920,7 +9920,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "extensions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theExtensions = new ArrayList<>(
                 arrayExtensions.size());
@@ -9935,9 +9935,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "extensions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IExtension> parsedItemResult =
+                final _ParsingResult<? extends IExtension> parsedItemResult =
                   tryExtensionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -9963,13 +9963,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theCategoryParsingResult = tryStringFrom(currentNode.getValue());
-              if (theCategoryParsingResult.isError()) {
-                theCategoryParsingResult.getError()
+              final _ParsingResult<? extends String> theCategory_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theCategory_ParsingResult.isError()) {
+                theCategory_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("category"));
-                return theCategoryParsingResult.castTo(ConceptDescription.class);
+                return theCategory_ParsingResult.castTo(ConceptDescription.class);
               }
-              theCategory = theCategoryParsingResult.getResult();
+              theCategory = theCategory_ParsingResult.getResult();
               break;
             }
             case "idShort": {
@@ -9977,13 +9977,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theIdShortParsingResult = tryStringFrom(currentNode.getValue());
-              if (theIdShortParsingResult.isError()) {
-                theIdShortParsingResult.getError()
+              final _ParsingResult<? extends String> theIdShort_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theIdShort_ParsingResult.isError()) {
+                theIdShort_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("idShort"));
-                return theIdShortParsingResult.castTo(ConceptDescription.class);
+                return theIdShort_ParsingResult.castTo(ConceptDescription.class);
               }
-              theIdShort = theIdShortParsingResult.getResult();
+              theIdShort = theIdShort_ParsingResult.getResult();
               break;
             }
             case "displayName": {
@@ -9998,7 +9998,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "displayName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDisplayName = new ArrayList<>(
                 arrayDisplayName.size());
@@ -10013,9 +10013,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "displayName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringNameType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringNameType> parsedItemResult =
                   tryLangStringNameTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10048,7 +10048,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "description"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDescription = new ArrayList<>(
                 arrayDescription.size());
@@ -10063,9 +10063,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "description"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringTextType> parsedItemResult =
+                final _ParsingResult<? extends ILangStringTextType> parsedItemResult =
                   tryLangStringTextTypeFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10091,13 +10091,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IAdministrativeInformation> theAdministrationParsingResult = tryAdministrativeInformationFrom(currentNode.getValue());
-              if (theAdministrationParsingResult.isError()) {
-                theAdministrationParsingResult.getError()
+              final _ParsingResult<? extends IAdministrativeInformation> theAdministration_ParsingResult = tryAdministrativeInformationFrom(currentNode.getValue());
+              if (theAdministration_ParsingResult.isError()) {
+                theAdministration_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("administration"));
-                return theAdministrationParsingResult.castTo(ConceptDescription.class);
+                return theAdministration_ParsingResult.castTo(ConceptDescription.class);
               }
-              theAdministration = theAdministrationParsingResult.getResult();
+              theAdministration = theAdministration_ParsingResult.getResult();
               break;
             }
             case "embeddedDataSpecifications": {
@@ -10112,7 +10112,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "embeddedDataSpecifications"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theEmbeddedDataSpecifications = new ArrayList<>(
                 arrayEmbeddedDataSpecifications.size());
@@ -10127,9 +10127,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "embeddedDataSpecifications"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
+                final _ParsingResult<? extends IEmbeddedDataSpecification> parsedItemResult =
                   tryEmbeddedDataSpecificationFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10162,7 +10162,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "isCaseOf"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theIsCaseOf = new ArrayList<>(
                 arrayIsCaseOf.size());
@@ -10177,9 +10177,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "isCaseOf"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IReference> parsedItemResult =
+                final _ParsingResult<? extends IReference> parsedItemResult =
                   tryReferenceFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10204,9 +10204,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -10220,14 +10220,14 @@ public class Jsonization {
                   "Expected the model type 'ConceptDescription', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -10235,16 +10235,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theId == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"id\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new ConceptDescription(
+        return _ParsingResult.success(new ConceptDescription(
           theId,
           theExtensions,
           theCategory,
@@ -10261,17 +10261,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<ReferenceTypes> tryReferenceTypesFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<ReferenceTypes> tryReferenceTypesFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(ReferenceTypes.class);
         }
         final Optional<ReferenceTypes> referenceTypes = Stringification.referenceTypesFromString(textResult.getResult());
         if (!referenceTypes.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of ReferenceTypes");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(referenceTypes.get());
+        return _ParsingResult.success(referenceTypes.get());
       }
 
       /**
@@ -10280,11 +10280,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Reference> tryReferenceFrom(JsonNode node) {
+      private static _ParsingResult<Reference> tryReferenceFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         ReferenceTypes theType = null;
@@ -10300,13 +10300,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends ReferenceTypes> theTypeParsingResult = tryReferenceTypesFrom(currentNode.getValue());
-              if (theTypeParsingResult.isError()) {
-                theTypeParsingResult.getError()
+              final _ParsingResult<? extends ReferenceTypes> theType_ParsingResult = tryReferenceTypesFrom(currentNode.getValue());
+              if (theType_ParsingResult.isError()) {
+                theType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("type"));
-                return theTypeParsingResult.castTo(Reference.class);
+                return theType_ParsingResult.castTo(Reference.class);
               }
-              theType = theTypeParsingResult.getResult();
+              theType = theType_ParsingResult.getResult();
               break;
             }
             case "keys": {
@@ -10321,7 +10321,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "keys"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theKeys = new ArrayList<>(
                 arrayKeys.size());
@@ -10336,9 +10336,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "keys"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IKey> parsedItemResult =
+                final _ParsingResult<? extends IKey> parsedItemResult =
                   tryKeyFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10364,19 +10364,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theReferredSemanticIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theReferredSemanticIdParsingResult.isError()) {
-                theReferredSemanticIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theReferredSemanticId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theReferredSemanticId_ParsingResult.isError()) {
+                theReferredSemanticId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("referredSemanticId"));
-                return theReferredSemanticIdParsingResult.castTo(Reference.class);
+                return theReferredSemanticId_ParsingResult.castTo(Reference.class);
               }
-              theReferredSemanticId = theReferredSemanticIdParsingResult.getResult();
+              theReferredSemanticId = theReferredSemanticId_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -10384,16 +10384,16 @@ public class Jsonization {
         if (theType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"type\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theKeys == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"keys\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Reference(
+        return _ParsingResult.success(new Reference(
           theType,
           theKeys,
           theReferredSemanticId));
@@ -10405,11 +10405,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Key> tryKeyFrom(JsonNode node) {
+      private static _ParsingResult<Key> tryKeyFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         KeyTypes theType = null;
@@ -10424,13 +10424,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends KeyTypes> theTypeParsingResult = tryKeyTypesFrom(currentNode.getValue());
-              if (theTypeParsingResult.isError()) {
-                theTypeParsingResult.getError()
+              final _ParsingResult<? extends KeyTypes> theType_ParsingResult = tryKeyTypesFrom(currentNode.getValue());
+              if (theType_ParsingResult.isError()) {
+                theType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("type"));
-                return theTypeParsingResult.castTo(Key.class);
+                return theType_ParsingResult.castTo(Key.class);
               }
-              theType = theTypeParsingResult.getResult();
+              theType = theType_ParsingResult.getResult();
               break;
             }
             case "value": {
@@ -10438,19 +10438,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(Key.class);
+                return theValue_ParsingResult.castTo(Key.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -10458,16 +10458,16 @@ public class Jsonization {
         if (theType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"type\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theValue == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"value\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new Key(
+        return _ParsingResult.success(new Key(
           theType,
           theValue));
       }
@@ -10477,17 +10477,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<KeyTypes> tryKeyTypesFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<KeyTypes> tryKeyTypesFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(KeyTypes.class);
         }
         final Optional<KeyTypes> keyTypes = Stringification.keyTypesFromString(textResult.getResult());
         if (!keyTypes.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of KeyTypes");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(keyTypes.get());
+        return _ParsingResult.success(keyTypes.get());
       }
 
       /**
@@ -10495,17 +10495,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<DataTypeDefXsd> tryDataTypeDefXsdFrom(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<DataTypeDefXsd> tryDataTypeDefXsdFrom(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(DataTypeDefXsd.class);
         }
         final Optional<DataTypeDefXsd> dataTypeDefXsd = Stringification.dataTypeDefXsdFromString(textResult.getResult());
         if (!dataTypeDefXsd.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of DataTypeDefXsd");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(dataTypeDefXsd.get());
+        return _ParsingResult.success(dataTypeDefXsd.get());
       }
 
       /**
@@ -10514,20 +10514,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IAbstractLangString> tryIAbstractLangStringFrom(JsonNode node) {
+      public static _ParsingResult<? extends IAbstractLangString> tryIAbstractLangStringFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IAbstractLangString.class);
         }
@@ -10547,7 +10547,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IAbstractLangString: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -10558,11 +10558,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<LangStringNameType> tryLangStringNameTypeFrom(JsonNode node) {
+      private static _ParsingResult<LangStringNameType> tryLangStringNameTypeFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theLanguage = null;
@@ -10577,13 +10577,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theLanguageParsingResult = tryStringFrom(currentNode.getValue());
-              if (theLanguageParsingResult.isError()) {
-                theLanguageParsingResult.getError()
+              final _ParsingResult<? extends String> theLanguage_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theLanguage_ParsingResult.isError()) {
+                theLanguage_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("language"));
-                return theLanguageParsingResult.castTo(LangStringNameType.class);
+                return theLanguage_ParsingResult.castTo(LangStringNameType.class);
               }
-              theLanguage = theLanguageParsingResult.getResult();
+              theLanguage = theLanguage_ParsingResult.getResult();
               break;
             }
             case "text": {
@@ -10591,19 +10591,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTextParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTextParsingResult.isError()) {
-                theTextParsingResult.getError()
+              final _ParsingResult<? extends String> theText_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theText_ParsingResult.isError()) {
+                theText_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("text"));
-                return theTextParsingResult.castTo(LangStringNameType.class);
+                return theText_ParsingResult.castTo(LangStringNameType.class);
               }
-              theText = theTextParsingResult.getResult();
+              theText = theText_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -10611,16 +10611,16 @@ public class Jsonization {
         if (theLanguage == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"language\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theText == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"text\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new LangStringNameType(
+        return _ParsingResult.success(new LangStringNameType(
           theLanguage,
           theText));
       }
@@ -10631,11 +10631,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<LangStringTextType> tryLangStringTextTypeFrom(JsonNode node) {
+      private static _ParsingResult<LangStringTextType> tryLangStringTextTypeFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theLanguage = null;
@@ -10650,13 +10650,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theLanguageParsingResult = tryStringFrom(currentNode.getValue());
-              if (theLanguageParsingResult.isError()) {
-                theLanguageParsingResult.getError()
+              final _ParsingResult<? extends String> theLanguage_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theLanguage_ParsingResult.isError()) {
+                theLanguage_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("language"));
-                return theLanguageParsingResult.castTo(LangStringTextType.class);
+                return theLanguage_ParsingResult.castTo(LangStringTextType.class);
               }
-              theLanguage = theLanguageParsingResult.getResult();
+              theLanguage = theLanguage_ParsingResult.getResult();
               break;
             }
             case "text": {
@@ -10664,19 +10664,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTextParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTextParsingResult.isError()) {
-                theTextParsingResult.getError()
+              final _ParsingResult<? extends String> theText_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theText_ParsingResult.isError()) {
+                theText_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("text"));
-                return theTextParsingResult.castTo(LangStringTextType.class);
+                return theText_ParsingResult.castTo(LangStringTextType.class);
               }
-              theText = theTextParsingResult.getResult();
+              theText = theText_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -10684,16 +10684,16 @@ public class Jsonization {
         if (theLanguage == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"language\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theText == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"text\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new LangStringTextType(
+        return _ParsingResult.success(new LangStringTextType(
           theLanguage,
           theText));
       }
@@ -10704,11 +10704,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<Environment> tryEnvironmentFrom(JsonNode node) {
+      private static _ParsingResult<Environment> tryEnvironmentFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IAssetAdministrationShell> theAssetAdministrationShells = null;
@@ -10731,7 +10731,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "assetAdministrationShells"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theAssetAdministrationShells = new ArrayList<>(
                 arrayAssetAdministrationShells.size());
@@ -10746,9 +10746,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "assetAdministrationShells"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IAssetAdministrationShell> parsedItemResult =
+                final _ParsingResult<? extends IAssetAdministrationShell> parsedItemResult =
                   tryAssetAdministrationShellFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10781,7 +10781,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "submodels"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theSubmodels = new ArrayList<>(
                 arraySubmodels.size());
@@ -10796,9 +10796,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "submodels"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ISubmodel> parsedItemResult =
+                final _ParsingResult<? extends ISubmodel> parsedItemResult =
                   trySubmodelFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10831,7 +10831,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "conceptDescriptions"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theConceptDescriptions = new ArrayList<>(
                 arrayConceptDescriptions.size());
@@ -10846,9 +10846,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "conceptDescriptions"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IConceptDescription> parsedItemResult =
+                final _ParsingResult<? extends IConceptDescription> parsedItemResult =
                   tryConceptDescriptionFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -10872,14 +10872,14 @@ public class Jsonization {
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
 
 
 
-        return ParsingResult.success(new Environment(
+        return _ParsingResult.success(new Environment(
           theAssetAdministrationShells,
           theSubmodels,
           theConceptDescriptions));
@@ -10891,20 +10891,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static ParsingResult<? extends IDataSpecificationContent> tryIDataSpecificationContentFrom(JsonNode node) {
+      public static _ParsingResult<? extends IDataSpecificationContent> tryIDataSpecificationContentFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        final ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final _ParsingResult<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IDataSpecificationContent.class);
         }
@@ -10916,7 +10916,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IDataSpecificationContent: " + modelTypeResult.getResult());
-            return ParsingResult.failure(error);
+            return _ParsingResult.failure(error);
           }
         }
       }
@@ -10927,11 +10927,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<EmbeddedDataSpecification> tryEmbeddedDataSpecificationFrom(JsonNode node) {
+      private static _ParsingResult<EmbeddedDataSpecification> tryEmbeddedDataSpecificationFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         IReference theDataSpecification = null;
@@ -10946,13 +10946,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theDataSpecificationParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theDataSpecificationParsingResult.isError()) {
-                theDataSpecificationParsingResult.getError()
+              final _ParsingResult<? extends IReference> theDataSpecification_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theDataSpecification_ParsingResult.isError()) {
+                theDataSpecification_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("dataSpecification"));
-                return theDataSpecificationParsingResult.castTo(EmbeddedDataSpecification.class);
+                return theDataSpecification_ParsingResult.castTo(EmbeddedDataSpecification.class);
               }
-              theDataSpecification = theDataSpecificationParsingResult.getResult();
+              theDataSpecification = theDataSpecification_ParsingResult.getResult();
               break;
             }
             case "dataSpecificationContent": {
@@ -10960,19 +10960,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IDataSpecificationContent> theDataSpecificationContentParsingResult = tryIDataSpecificationContentFrom(currentNode.getValue());
-              if (theDataSpecificationContentParsingResult.isError()) {
-                theDataSpecificationContentParsingResult.getError()
+              final _ParsingResult<? extends IDataSpecificationContent> theDataSpecificationContent_ParsingResult = tryIDataSpecificationContentFrom(currentNode.getValue());
+              if (theDataSpecificationContent_ParsingResult.isError()) {
+                theDataSpecificationContent_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("dataSpecificationContent"));
-                return theDataSpecificationContentParsingResult.castTo(EmbeddedDataSpecification.class);
+                return theDataSpecificationContent_ParsingResult.castTo(EmbeddedDataSpecification.class);
               }
-              theDataSpecificationContent = theDataSpecificationContentParsingResult.getResult();
+              theDataSpecificationContent = theDataSpecificationContent_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -10980,16 +10980,16 @@ public class Jsonization {
         if (theDataSpecification == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"dataSpecification\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theDataSpecificationContent == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"dataSpecificationContent\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new EmbeddedDataSpecification(
+        return _ParsingResult.success(new EmbeddedDataSpecification(
           theDataSpecification,
           theDataSpecificationContent));
       }
@@ -10999,17 +10999,17 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      private static ParsingResult<DataTypeIec61360> tryDataTypeIec61360From(JsonNode node) {
-        final ParsingResult<String> textResult = tryStringFrom(node);
+      private static _ParsingResult<DataTypeIec61360> tryDataTypeIec61360From(JsonNode node) {
+        final _ParsingResult<String> textResult = tryStringFrom(node);
         if (textResult.isError()) {
           return textResult.castTo(DataTypeIec61360.class);
         }
         final Optional<DataTypeIec61360> dataTypeIec61360 = Stringification.dataTypeIec61360FromString(textResult.getResult());
         if (!dataTypeIec61360.isPresent()) {
           final Reporting.Error error = new Reporting.Error("Not a valid JSON representation of DataTypeIec61360");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
-        return ParsingResult.success(dataTypeIec61360.get());
+        return _ParsingResult.success(dataTypeIec61360.get());
       }
 
       /**
@@ -11018,11 +11018,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<LevelType> tryLevelTypeFrom(JsonNode node) {
+      private static _ParsingResult<LevelType> tryLevelTypeFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         Boolean theMin = null;
@@ -11039,13 +11039,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends Boolean> theMinParsingResult = tryBooleanFrom(currentNode.getValue());
-              if (theMinParsingResult.isError()) {
-                theMinParsingResult.getError()
+              final _ParsingResult<? extends Boolean> theMin_ParsingResult = tryBooleanFrom(currentNode.getValue());
+              if (theMin_ParsingResult.isError()) {
+                theMin_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("min"));
-                return theMinParsingResult.castTo(LevelType.class);
+                return theMin_ParsingResult.castTo(LevelType.class);
               }
-              theMin = theMinParsingResult.getResult();
+              theMin = theMin_ParsingResult.getResult();
               break;
             }
             case "nom": {
@@ -11053,13 +11053,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends Boolean> theNomParsingResult = tryBooleanFrom(currentNode.getValue());
-              if (theNomParsingResult.isError()) {
-                theNomParsingResult.getError()
+              final _ParsingResult<? extends Boolean> theNom_ParsingResult = tryBooleanFrom(currentNode.getValue());
+              if (theNom_ParsingResult.isError()) {
+                theNom_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("nom"));
-                return theNomParsingResult.castTo(LevelType.class);
+                return theNom_ParsingResult.castTo(LevelType.class);
               }
-              theNom = theNomParsingResult.getResult();
+              theNom = theNom_ParsingResult.getResult();
               break;
             }
             case "typ": {
@@ -11067,13 +11067,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends Boolean> theTypParsingResult = tryBooleanFrom(currentNode.getValue());
-              if (theTypParsingResult.isError()) {
-                theTypParsingResult.getError()
+              final _ParsingResult<? extends Boolean> theTyp_ParsingResult = tryBooleanFrom(currentNode.getValue());
+              if (theTyp_ParsingResult.isError()) {
+                theTyp_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("typ"));
-                return theTypParsingResult.castTo(LevelType.class);
+                return theTyp_ParsingResult.castTo(LevelType.class);
               }
-              theTyp = theTypParsingResult.getResult();
+              theTyp = theTyp_ParsingResult.getResult();
               break;
             }
             case "max": {
@@ -11081,19 +11081,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends Boolean> theMaxParsingResult = tryBooleanFrom(currentNode.getValue());
-              if (theMaxParsingResult.isError()) {
-                theMaxParsingResult.getError()
+              final _ParsingResult<? extends Boolean> theMax_ParsingResult = tryBooleanFrom(currentNode.getValue());
+              if (theMax_ParsingResult.isError()) {
+                theMax_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("max"));
-                return theMaxParsingResult.castTo(LevelType.class);
+                return theMax_ParsingResult.castTo(LevelType.class);
               }
-              theMax = theMaxParsingResult.getResult();
+              theMax = theMax_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11101,28 +11101,28 @@ public class Jsonization {
         if (theMin == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"min\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theNom == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"nom\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theTyp == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"typ\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theMax == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"max\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new LevelType(
+        return _ParsingResult.success(new LevelType(
           theMin,
           theNom,
           theTyp,
@@ -11135,11 +11135,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<ValueReferencePair> tryValueReferencePairFrom(JsonNode node) {
+      private static _ParsingResult<ValueReferencePair> tryValueReferencePairFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theValue = null;
@@ -11154,13 +11154,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(ValueReferencePair.class);
+                return theValue_ParsingResult.castTo(ValueReferencePair.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "valueId": {
@@ -11168,19 +11168,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theValueIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theValueIdParsingResult.isError()) {
-                theValueIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theValueId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theValueId_ParsingResult.isError()) {
+                theValueId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueId"));
-                return theValueIdParsingResult.castTo(ValueReferencePair.class);
+                return theValueId_ParsingResult.castTo(ValueReferencePair.class);
               }
-              theValueId = theValueIdParsingResult.getResult();
+              theValueId = theValueId_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11188,16 +11188,16 @@ public class Jsonization {
         if (theValue == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"value\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theValueId == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"valueId\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new ValueReferencePair(
+        return _ParsingResult.success(new ValueReferencePair(
           theValue,
           theValueId));
       }
@@ -11208,11 +11208,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<ValueList> tryValueListFrom(JsonNode node) {
+      private static _ParsingResult<ValueList> tryValueListFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<IValueReferencePair> theValueReferencePairs = null;
@@ -11233,7 +11233,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "valueReferencePairs"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theValueReferencePairs = new ArrayList<>(
                 arrayValueReferencePairs.size());
@@ -11248,9 +11248,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "valueReferencePairs"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends IValueReferencePair> parsedItemResult =
+                final _ParsingResult<? extends IValueReferencePair> parsedItemResult =
                   tryValueReferencePairFrom(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -11274,7 +11274,7 @@ public class Jsonization {
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11282,10 +11282,10 @@ public class Jsonization {
         if (theValueReferencePairs == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"valueReferencePairs\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new ValueList(
+        return _ParsingResult.success(new ValueList(
           theValueReferencePairs));
       }
 
@@ -11295,11 +11295,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<LangStringPreferredNameTypeIec61360> tryLangStringPreferredNameTypeIec61360From(JsonNode node) {
+      private static _ParsingResult<LangStringPreferredNameTypeIec61360> tryLangStringPreferredNameTypeIec61360From(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theLanguage = null;
@@ -11314,13 +11314,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theLanguageParsingResult = tryStringFrom(currentNode.getValue());
-              if (theLanguageParsingResult.isError()) {
-                theLanguageParsingResult.getError()
+              final _ParsingResult<? extends String> theLanguage_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theLanguage_ParsingResult.isError()) {
+                theLanguage_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("language"));
-                return theLanguageParsingResult.castTo(LangStringPreferredNameTypeIec61360.class);
+                return theLanguage_ParsingResult.castTo(LangStringPreferredNameTypeIec61360.class);
               }
-              theLanguage = theLanguageParsingResult.getResult();
+              theLanguage = theLanguage_ParsingResult.getResult();
               break;
             }
             case "text": {
@@ -11328,19 +11328,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTextParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTextParsingResult.isError()) {
-                theTextParsingResult.getError()
+              final _ParsingResult<? extends String> theText_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theText_ParsingResult.isError()) {
+                theText_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("text"));
-                return theTextParsingResult.castTo(LangStringPreferredNameTypeIec61360.class);
+                return theText_ParsingResult.castTo(LangStringPreferredNameTypeIec61360.class);
               }
-              theText = theTextParsingResult.getResult();
+              theText = theText_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11348,16 +11348,16 @@ public class Jsonization {
         if (theLanguage == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"language\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theText == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"text\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new LangStringPreferredNameTypeIec61360(
+        return _ParsingResult.success(new LangStringPreferredNameTypeIec61360(
           theLanguage,
           theText));
       }
@@ -11368,11 +11368,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<LangStringShortNameTypeIec61360> tryLangStringShortNameTypeIec61360From(JsonNode node) {
+      private static _ParsingResult<LangStringShortNameTypeIec61360> tryLangStringShortNameTypeIec61360From(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theLanguage = null;
@@ -11387,13 +11387,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theLanguageParsingResult = tryStringFrom(currentNode.getValue());
-              if (theLanguageParsingResult.isError()) {
-                theLanguageParsingResult.getError()
+              final _ParsingResult<? extends String> theLanguage_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theLanguage_ParsingResult.isError()) {
+                theLanguage_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("language"));
-                return theLanguageParsingResult.castTo(LangStringShortNameTypeIec61360.class);
+                return theLanguage_ParsingResult.castTo(LangStringShortNameTypeIec61360.class);
               }
-              theLanguage = theLanguageParsingResult.getResult();
+              theLanguage = theLanguage_ParsingResult.getResult();
               break;
             }
             case "text": {
@@ -11401,19 +11401,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTextParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTextParsingResult.isError()) {
-                theTextParsingResult.getError()
+              final _ParsingResult<? extends String> theText_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theText_ParsingResult.isError()) {
+                theText_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("text"));
-                return theTextParsingResult.castTo(LangStringShortNameTypeIec61360.class);
+                return theText_ParsingResult.castTo(LangStringShortNameTypeIec61360.class);
               }
-              theText = theTextParsingResult.getResult();
+              theText = theText_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11421,16 +11421,16 @@ public class Jsonization {
         if (theLanguage == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"language\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theText == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"text\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new LangStringShortNameTypeIec61360(
+        return _ParsingResult.success(new LangStringShortNameTypeIec61360(
           theLanguage,
           theText));
       }
@@ -11441,11 +11441,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<LangStringDefinitionTypeIec61360> tryLangStringDefinitionTypeIec61360From(JsonNode node) {
+      private static _ParsingResult<LangStringDefinitionTypeIec61360> tryLangStringDefinitionTypeIec61360From(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         String theLanguage = null;
@@ -11460,13 +11460,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theLanguageParsingResult = tryStringFrom(currentNode.getValue());
-              if (theLanguageParsingResult.isError()) {
-                theLanguageParsingResult.getError()
+              final _ParsingResult<? extends String> theLanguage_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theLanguage_ParsingResult.isError()) {
+                theLanguage_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("language"));
-                return theLanguageParsingResult.castTo(LangStringDefinitionTypeIec61360.class);
+                return theLanguage_ParsingResult.castTo(LangStringDefinitionTypeIec61360.class);
               }
-              theLanguage = theLanguageParsingResult.getResult();
+              theLanguage = theLanguage_ParsingResult.getResult();
               break;
             }
             case "text": {
@@ -11474,19 +11474,19 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theTextParsingResult = tryStringFrom(currentNode.getValue());
-              if (theTextParsingResult.isError()) {
-                theTextParsingResult.getError()
+              final _ParsingResult<? extends String> theText_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theText_ParsingResult.isError()) {
+                theText_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("text"));
-                return theTextParsingResult.castTo(LangStringDefinitionTypeIec61360.class);
+                return theText_ParsingResult.castTo(LangStringDefinitionTypeIec61360.class);
               }
-              theText = theTextParsingResult.getResult();
+              theText = theText_ParsingResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11494,16 +11494,16 @@ public class Jsonization {
         if (theLanguage == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"language\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (theText == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"text\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new LangStringDefinitionTypeIec61360(
+        return _ParsingResult.success(new LangStringDefinitionTypeIec61360(
           theLanguage,
           theText));
       }
@@ -11514,11 +11514,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static ParsingResult<DataSpecificationIec61360> tryDataSpecificationIec61360From(JsonNode node) {
+      private static _ParsingResult<DataSpecificationIec61360> tryDataSpecificationIec61360From(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         List<ILangStringPreferredNameTypeIec61360> thePreferredName = null;
@@ -11552,7 +11552,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "preferredName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               thePreferredName = new ArrayList<>(
                 arrayPreferredName.size());
@@ -11567,9 +11567,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "preferredName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringPreferredNameTypeIec61360> parsedItemResult =
+                final _ParsingResult<? extends ILangStringPreferredNameTypeIec61360> parsedItemResult =
                   tryLangStringPreferredNameTypeIec61360From(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -11602,7 +11602,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "shortName"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theShortName = new ArrayList<>(
                 arrayShortName.size());
@@ -11617,9 +11617,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "shortName"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringShortNameTypeIec61360> parsedItemResult =
+                final _ParsingResult<? extends ILangStringShortNameTypeIec61360> parsedItemResult =
                   tryLangStringShortNameTypeIec61360From(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -11645,13 +11645,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theUnitParsingResult = tryStringFrom(currentNode.getValue());
-              if (theUnitParsingResult.isError()) {
-                theUnitParsingResult.getError()
+              final _ParsingResult<? extends String> theUnit_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theUnit_ParsingResult.isError()) {
+                theUnit_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("unit"));
-                return theUnitParsingResult.castTo(DataSpecificationIec61360.class);
+                return theUnit_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theUnit = theUnitParsingResult.getResult();
+              theUnit = theUnit_ParsingResult.getResult();
               break;
             }
             case "unitId": {
@@ -11659,13 +11659,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IReference> theUnitIdParsingResult = tryReferenceFrom(currentNode.getValue());
-              if (theUnitIdParsingResult.isError()) {
-                theUnitIdParsingResult.getError()
+              final _ParsingResult<? extends IReference> theUnitId_ParsingResult = tryReferenceFrom(currentNode.getValue());
+              if (theUnitId_ParsingResult.isError()) {
+                theUnitId_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("unitId"));
-                return theUnitIdParsingResult.castTo(DataSpecificationIec61360.class);
+                return theUnitId_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theUnitId = theUnitIdParsingResult.getResult();
+              theUnitId = theUnitId_ParsingResult.getResult();
               break;
             }
             case "sourceOfDefinition": {
@@ -11673,13 +11673,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theSourceOfDefinitionParsingResult = tryStringFrom(currentNode.getValue());
-              if (theSourceOfDefinitionParsingResult.isError()) {
-                theSourceOfDefinitionParsingResult.getError()
+              final _ParsingResult<? extends String> theSourceOfDefinition_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theSourceOfDefinition_ParsingResult.isError()) {
+                theSourceOfDefinition_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("sourceOfDefinition"));
-                return theSourceOfDefinitionParsingResult.castTo(DataSpecificationIec61360.class);
+                return theSourceOfDefinition_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theSourceOfDefinition = theSourceOfDefinitionParsingResult.getResult();
+              theSourceOfDefinition = theSourceOfDefinition_ParsingResult.getResult();
               break;
             }
             case "symbol": {
@@ -11687,13 +11687,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theSymbolParsingResult = tryStringFrom(currentNode.getValue());
-              if (theSymbolParsingResult.isError()) {
-                theSymbolParsingResult.getError()
+              final _ParsingResult<? extends String> theSymbol_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theSymbol_ParsingResult.isError()) {
+                theSymbol_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("symbol"));
-                return theSymbolParsingResult.castTo(DataSpecificationIec61360.class);
+                return theSymbol_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theSymbol = theSymbolParsingResult.getResult();
+              theSymbol = theSymbol_ParsingResult.getResult();
               break;
             }
             case "dataType": {
@@ -11701,13 +11701,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends DataTypeIec61360> theDataTypeParsingResult = tryDataTypeIec61360From(currentNode.getValue());
-              if (theDataTypeParsingResult.isError()) {
-                theDataTypeParsingResult.getError()
+              final _ParsingResult<? extends DataTypeIec61360> theDataType_ParsingResult = tryDataTypeIec61360From(currentNode.getValue());
+              if (theDataType_ParsingResult.isError()) {
+                theDataType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("dataType"));
-                return theDataTypeParsingResult.castTo(DataSpecificationIec61360.class);
+                return theDataType_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theDataType = theDataTypeParsingResult.getResult();
+              theDataType = theDataType_ParsingResult.getResult();
               break;
             }
             case "definition": {
@@ -11722,7 +11722,7 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "definition"));
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
               theDefinition = new ArrayList<>(
                 arrayDefinition.size());
@@ -11737,9 +11737,9 @@ public class Jsonization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "definition"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
                 }
-                final ParsingResult<? extends ILangStringDefinitionTypeIec61360> parsedItemResult =
+                final _ParsingResult<? extends ILangStringDefinitionTypeIec61360> parsedItemResult =
                   tryLangStringDefinitionTypeIec61360From(item);
                 if (parsedItemResult.isError()) {
                   parsedItemResult
@@ -11765,13 +11765,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueFormatParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueFormatParsingResult.isError()) {
-                theValueFormatParsingResult.getError()
+              final _ParsingResult<? extends String> theValueFormat_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValueFormat_ParsingResult.isError()) {
+                theValueFormat_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueFormat"));
-                return theValueFormatParsingResult.castTo(DataSpecificationIec61360.class);
+                return theValueFormat_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theValueFormat = theValueFormatParsingResult.getResult();
+              theValueFormat = theValueFormat_ParsingResult.getResult();
               break;
             }
             case "valueList": {
@@ -11779,13 +11779,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends IValueList> theValueListParsingResult = tryValueListFrom(currentNode.getValue());
-              if (theValueListParsingResult.isError()) {
-                theValueListParsingResult.getError()
+              final _ParsingResult<? extends IValueList> theValueList_ParsingResult = tryValueListFrom(currentNode.getValue());
+              if (theValueList_ParsingResult.isError()) {
+                theValueList_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("valueList"));
-                return theValueListParsingResult.castTo(DataSpecificationIec61360.class);
+                return theValueList_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theValueList = theValueListParsingResult.getResult();
+              theValueList = theValueList_ParsingResult.getResult();
               break;
             }
             case "value": {
@@ -11793,13 +11793,13 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends String> theValueParsingResult = tryStringFrom(currentNode.getValue());
-              if (theValueParsingResult.isError()) {
-                theValueParsingResult.getError()
+              final _ParsingResult<? extends String> theValue_ParsingResult = tryStringFrom(currentNode.getValue());
+              if (theValue_ParsingResult.isError()) {
+                theValue_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("value"));
-                return theValueParsingResult.castTo(DataSpecificationIec61360.class);
+                return theValue_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theValue = theValueParsingResult.getResult();
+              theValue = theValue_ParsingResult.getResult();
               break;
             }
             case "levelType": {
@@ -11807,22 +11807,22 @@ public class Jsonization {
                 continue;
               }
 
-              final ParsingResult<? extends ILevelType> theLevelTypeParsingResult = tryLevelTypeFrom(currentNode.getValue());
-              if (theLevelTypeParsingResult.isError()) {
-                theLevelTypeParsingResult.getError()
+              final _ParsingResult<? extends ILevelType> theLevelType_ParsingResult = tryLevelTypeFrom(currentNode.getValue());
+              if (theLevelType_ParsingResult.isError()) {
+                theLevelType_ParsingResult.getError()
                   .prependSegment(new Reporting.NameSegment("levelType"));
-                return theLevelTypeParsingResult.castTo(DataSpecificationIec61360.class);
+                return theLevelType_ParsingResult.castTo(DataSpecificationIec61360.class);
               }
-              theLevelType = theLevelTypeParsingResult.getResult();
+              theLevelType = theLevelType_ParsingResult.getResult();
               break;
             }
             case "modelType": {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return ParsingResult.failure(error);
+                return _ParsingResult.failure(error);
               }
-              final ParsingResult<? extends String> modelTypeResult =
+              final _ParsingResult<? extends String> modelTypeResult =
                 DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -11836,14 +11836,14 @@ public class Jsonization {
                   "Expected the model type 'DataSpecificationIec61360', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return ParsingResult.failure(error);
+                  return _ParsingResult.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return ParsingResult.failure(error);
+              return _ParsingResult.failure(error);
             }
           }
         }
@@ -11851,16 +11851,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
         if (thePreferredName == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"preferredName\" is missing");
-          return ParsingResult.failure(error);
+          return _ParsingResult.failure(error);
         }
 
-        return ParsingResult.success(new DataSpecificationIec61360(
+        return _ParsingResult.success(new DataSpecificationIec61360(
           thePreferredName,
           theShortName,
           theUnit,
@@ -11899,38 +11899,38 @@ public class Jsonization {
         }
       }
 
-    private static class ParsingResult<T> {
+    private static class _ParsingResult<T> {
       private final T result;
       private final Reporting.Error error;
       private final boolean success;
 
-      private ParsingResult(T result, Reporting.Error error, boolean success) {
+      private _ParsingResult(T result, Reporting.Error error, boolean success) {
         this.result = result;
         this.error = error;
         this.success = success;
       }
 
-      public static <T> ParsingResult<T> success(T result) {
-        if (result == null) throw new IllegalArgumentException("ParsingResult must not be null.");
-        return new ParsingResult<>(result, null, true);
+      public static <T> _ParsingResult<T> success(T result) {
+        if (result == null) throw new IllegalArgumentException("_ParsingResult must not be null.");
+        return new _ParsingResult<>(result, null, true);
       }
 
-      public static <T> ParsingResult<T> failure(Reporting.Error error) {
+      public static <T> _ParsingResult<T> failure(Reporting.Error error) {
         if (error == null) throw new IllegalArgumentException("Error must not be null.");
-        return new ParsingResult<>(null, error, false);
+        return new _ParsingResult<>(null, error, false);
       }
 
       @SuppressWarnings("unchecked")
-      public <I> ParsingResult<I> castTo(Class<I> type) {
-        if (isError() || type.isInstance(result)) return (ParsingResult<I>) this;
-        throw new IllegalStateException("ParsingResult of type "
+      public <I> _ParsingResult<I> castTo(Class<I> type) {
+        if (isError() || type.isInstance(result)) return (_ParsingResult<I>) this;
+        throw new IllegalStateException("_ParsingResult of type "
           + result.getClass().getName()
           + " is not an instance of "
           + type.getName());
       }
 
       public T getResult() {
-        if (!isSuccess()) throw new IllegalStateException("ParsingResult is not present.");
+        if (!isSuccess()) throw new IllegalStateException("_ParsingResult is not present.");
         return result;
       }
 
@@ -11943,7 +11943,7 @@ public class Jsonization {
       }
 
       public Reporting.Error getError() {
-        if (isSuccess()) throw new IllegalStateException("ParsingResult is present.");
+        if (isSuccess()) throw new IllegalStateException("_ParsingResult is present.");
         return error;
       }
 
@@ -11976,7 +11976,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IHasSemantics deserializeIHasSemantics(JsonNode node) {
-        final ParsingResult<? extends IHasSemantics> result =
+        final _ParsingResult<? extends IHasSemantics> result =
           DeserializeImplementation.tryIHasSemanticsFrom(
             node);
 
@@ -11993,7 +11993,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Extension deserializeExtension(JsonNode node) {
-        final ParsingResult<? extends Extension> result =
+        final _ParsingResult<? extends Extension> result =
           DeserializeImplementation.tryExtensionFrom(
             node);
 
@@ -12010,7 +12010,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IHasExtensions deserializeIHasExtensions(JsonNode node) {
-        final ParsingResult<? extends IHasExtensions> result =
+        final _ParsingResult<? extends IHasExtensions> result =
           DeserializeImplementation.tryIHasExtensionsFrom(
             node);
 
@@ -12027,7 +12027,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IReferable deserializeIReferable(JsonNode node) {
-        final ParsingResult<? extends IReferable> result =
+        final _ParsingResult<? extends IReferable> result =
           DeserializeImplementation.tryIReferableFrom(
             node);
 
@@ -12044,7 +12044,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IIdentifiable deserializeIIdentifiable(JsonNode node) {
-        final ParsingResult<? extends IIdentifiable> result =
+        final _ParsingResult<? extends IIdentifiable> result =
           DeserializeImplementation.tryIIdentifiableFrom(
             node);
 
@@ -12061,7 +12061,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ModellingKind deserializeModellingKind(JsonNode node) {
-        final ParsingResult<? extends ModellingKind> result =
+        final _ParsingResult<? extends ModellingKind> result =
           DeserializeImplementation.tryModellingKindFrom(
             node);
 
@@ -12078,7 +12078,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IHasKind deserializeIHasKind(JsonNode node) {
-        final ParsingResult<? extends IHasKind> result =
+        final _ParsingResult<? extends IHasKind> result =
           DeserializeImplementation.tryIHasKindFrom(
             node);
 
@@ -12095,7 +12095,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IHasDataSpecification deserializeIHasDataSpecification(JsonNode node) {
-        final ParsingResult<? extends IHasDataSpecification> result =
+        final _ParsingResult<? extends IHasDataSpecification> result =
           DeserializeImplementation.tryIHasDataSpecificationFrom(
             node);
 
@@ -12112,7 +12112,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AdministrativeInformation deserializeAdministrativeInformation(JsonNode node) {
-        final ParsingResult<? extends AdministrativeInformation> result =
+        final _ParsingResult<? extends AdministrativeInformation> result =
           DeserializeImplementation.tryAdministrativeInformationFrom(
             node);
 
@@ -12129,7 +12129,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IQualifiable deserializeIQualifiable(JsonNode node) {
-        final ParsingResult<? extends IQualifiable> result =
+        final _ParsingResult<? extends IQualifiable> result =
           DeserializeImplementation.tryIQualifiableFrom(
             node);
 
@@ -12146,7 +12146,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static QualifierKind deserializeQualifierKind(JsonNode node) {
-        final ParsingResult<? extends QualifierKind> result =
+        final _ParsingResult<? extends QualifierKind> result =
           DeserializeImplementation.tryQualifierKindFrom(
             node);
 
@@ -12163,7 +12163,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Qualifier deserializeQualifier(JsonNode node) {
-        final ParsingResult<? extends Qualifier> result =
+        final _ParsingResult<? extends Qualifier> result =
           DeserializeImplementation.tryQualifierFrom(
             node);
 
@@ -12180,7 +12180,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AssetAdministrationShell deserializeAssetAdministrationShell(JsonNode node) {
-        final ParsingResult<? extends AssetAdministrationShell> result =
+        final _ParsingResult<? extends AssetAdministrationShell> result =
           DeserializeImplementation.tryAssetAdministrationShellFrom(
             node);
 
@@ -12197,7 +12197,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AssetInformation deserializeAssetInformation(JsonNode node) {
-        final ParsingResult<? extends AssetInformation> result =
+        final _ParsingResult<? extends AssetInformation> result =
           DeserializeImplementation.tryAssetInformationFrom(
             node);
 
@@ -12214,7 +12214,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Resource deserializeResource(JsonNode node) {
-        final ParsingResult<? extends Resource> result =
+        final _ParsingResult<? extends Resource> result =
           DeserializeImplementation.tryResourceFrom(
             node);
 
@@ -12231,7 +12231,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AssetKind deserializeAssetKind(JsonNode node) {
-        final ParsingResult<? extends AssetKind> result =
+        final _ParsingResult<? extends AssetKind> result =
           DeserializeImplementation.tryAssetKindFrom(
             node);
 
@@ -12248,7 +12248,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static SpecificAssetId deserializeSpecificAssetId(JsonNode node) {
-        final ParsingResult<? extends SpecificAssetId> result =
+        final _ParsingResult<? extends SpecificAssetId> result =
           DeserializeImplementation.trySpecificAssetIdFrom(
             node);
 
@@ -12265,7 +12265,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Submodel deserializeSubmodel(JsonNode node) {
-        final ParsingResult<? extends Submodel> result =
+        final _ParsingResult<? extends Submodel> result =
           DeserializeImplementation.trySubmodelFrom(
             node);
 
@@ -12282,7 +12282,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ISubmodelElement deserializeISubmodelElement(JsonNode node) {
-        final ParsingResult<? extends ISubmodelElement> result =
+        final _ParsingResult<? extends ISubmodelElement> result =
           DeserializeImplementation.tryISubmodelElementFrom(
             node);
 
@@ -12299,7 +12299,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IRelationshipElement deserializeIRelationshipElement(JsonNode node) {
-        final ParsingResult<? extends IRelationshipElement> result =
+        final _ParsingResult<? extends IRelationshipElement> result =
           DeserializeImplementation.tryIRelationshipElementFrom(
             node);
 
@@ -12316,7 +12316,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static RelationshipElement deserializeRelationshipElement(JsonNode node) {
-        final ParsingResult<? extends RelationshipElement> result =
+        final _ParsingResult<? extends RelationshipElement> result =
           DeserializeImplementation.tryRelationshipElementFrom(
             node);
 
@@ -12333,7 +12333,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AasSubmodelElements deserializeAasSubmodelElements(JsonNode node) {
-        final ParsingResult<? extends AasSubmodelElements> result =
+        final _ParsingResult<? extends AasSubmodelElements> result =
           DeserializeImplementation.tryAasSubmodelElementsFrom(
             node);
 
@@ -12350,7 +12350,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static SubmodelElementList deserializeSubmodelElementList(JsonNode node) {
-        final ParsingResult<? extends SubmodelElementList> result =
+        final _ParsingResult<? extends SubmodelElementList> result =
           DeserializeImplementation.trySubmodelElementListFrom(
             node);
 
@@ -12367,7 +12367,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static SubmodelElementCollection deserializeSubmodelElementCollection(JsonNode node) {
-        final ParsingResult<? extends SubmodelElementCollection> result =
+        final _ParsingResult<? extends SubmodelElementCollection> result =
           DeserializeImplementation.trySubmodelElementCollectionFrom(
             node);
 
@@ -12384,7 +12384,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IDataElement deserializeIDataElement(JsonNode node) {
-        final ParsingResult<? extends IDataElement> result =
+        final _ParsingResult<? extends IDataElement> result =
           DeserializeImplementation.tryIDataElementFrom(
             node);
 
@@ -12401,7 +12401,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Property deserializeProperty(JsonNode node) {
-        final ParsingResult<? extends Property> result =
+        final _ParsingResult<? extends Property> result =
           DeserializeImplementation.tryPropertyFrom(
             node);
 
@@ -12418,7 +12418,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static MultiLanguageProperty deserializeMultiLanguageProperty(JsonNode node) {
-        final ParsingResult<? extends MultiLanguageProperty> result =
+        final _ParsingResult<? extends MultiLanguageProperty> result =
           DeserializeImplementation.tryMultiLanguagePropertyFrom(
             node);
 
@@ -12435,7 +12435,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Range deserializeRange(JsonNode node) {
-        final ParsingResult<? extends Range> result =
+        final _ParsingResult<? extends Range> result =
           DeserializeImplementation.tryRangeFrom(
             node);
 
@@ -12452,7 +12452,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ReferenceElement deserializeReferenceElement(JsonNode node) {
-        final ParsingResult<? extends ReferenceElement> result =
+        final _ParsingResult<? extends ReferenceElement> result =
           DeserializeImplementation.tryReferenceElementFrom(
             node);
 
@@ -12469,7 +12469,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Blob deserializeBlob(JsonNode node) {
-        final ParsingResult<? extends Blob> result =
+        final _ParsingResult<? extends Blob> result =
           DeserializeImplementation.tryBlobFrom(
             node);
 
@@ -12486,7 +12486,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static File deserializeFile(JsonNode node) {
-        final ParsingResult<? extends File> result =
+        final _ParsingResult<? extends File> result =
           DeserializeImplementation.tryFileFrom(
             node);
 
@@ -12503,7 +12503,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AnnotatedRelationshipElement deserializeAnnotatedRelationshipElement(JsonNode node) {
-        final ParsingResult<? extends AnnotatedRelationshipElement> result =
+        final _ParsingResult<? extends AnnotatedRelationshipElement> result =
           DeserializeImplementation.tryAnnotatedRelationshipElementFrom(
             node);
 
@@ -12520,7 +12520,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Entity deserializeEntity(JsonNode node) {
-        final ParsingResult<? extends Entity> result =
+        final _ParsingResult<? extends Entity> result =
           DeserializeImplementation.tryEntityFrom(
             node);
 
@@ -12537,7 +12537,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static EntityType deserializeEntityType(JsonNode node) {
-        final ParsingResult<? extends EntityType> result =
+        final _ParsingResult<? extends EntityType> result =
           DeserializeImplementation.tryEntityTypeFrom(
             node);
 
@@ -12554,7 +12554,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Direction deserializeDirection(JsonNode node) {
-        final ParsingResult<? extends Direction> result =
+        final _ParsingResult<? extends Direction> result =
           DeserializeImplementation.tryDirectionFrom(
             node);
 
@@ -12571,7 +12571,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static StateOfEvent deserializeStateOfEvent(JsonNode node) {
-        final ParsingResult<? extends StateOfEvent> result =
+        final _ParsingResult<? extends StateOfEvent> result =
           DeserializeImplementation.tryStateOfEventFrom(
             node);
 
@@ -12588,7 +12588,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static EventPayload deserializeEventPayload(JsonNode node) {
-        final ParsingResult<? extends EventPayload> result =
+        final _ParsingResult<? extends EventPayload> result =
           DeserializeImplementation.tryEventPayloadFrom(
             node);
 
@@ -12605,7 +12605,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IEventElement deserializeIEventElement(JsonNode node) {
-        final ParsingResult<? extends IEventElement> result =
+        final _ParsingResult<? extends IEventElement> result =
           DeserializeImplementation.tryIEventElementFrom(
             node);
 
@@ -12622,7 +12622,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static BasicEventElement deserializeBasicEventElement(JsonNode node) {
-        final ParsingResult<? extends BasicEventElement> result =
+        final _ParsingResult<? extends BasicEventElement> result =
           DeserializeImplementation.tryBasicEventElementFrom(
             node);
 
@@ -12639,7 +12639,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Operation deserializeOperation(JsonNode node) {
-        final ParsingResult<? extends Operation> result =
+        final _ParsingResult<? extends Operation> result =
           DeserializeImplementation.tryOperationFrom(
             node);
 
@@ -12656,7 +12656,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static OperationVariable deserializeOperationVariable(JsonNode node) {
-        final ParsingResult<? extends OperationVariable> result =
+        final _ParsingResult<? extends OperationVariable> result =
           DeserializeImplementation.tryOperationVariableFrom(
             node);
 
@@ -12673,7 +12673,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Capability deserializeCapability(JsonNode node) {
-        final ParsingResult<? extends Capability> result =
+        final _ParsingResult<? extends Capability> result =
           DeserializeImplementation.tryCapabilityFrom(
             node);
 
@@ -12690,7 +12690,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ConceptDescription deserializeConceptDescription(JsonNode node) {
-        final ParsingResult<? extends ConceptDescription> result =
+        final _ParsingResult<? extends ConceptDescription> result =
           DeserializeImplementation.tryConceptDescriptionFrom(
             node);
 
@@ -12707,7 +12707,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ReferenceTypes deserializeReferenceTypes(JsonNode node) {
-        final ParsingResult<? extends ReferenceTypes> result =
+        final _ParsingResult<? extends ReferenceTypes> result =
           DeserializeImplementation.tryReferenceTypesFrom(
             node);
 
@@ -12724,7 +12724,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Reference deserializeReference(JsonNode node) {
-        final ParsingResult<? extends Reference> result =
+        final _ParsingResult<? extends Reference> result =
           DeserializeImplementation.tryReferenceFrom(
             node);
 
@@ -12741,7 +12741,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Key deserializeKey(JsonNode node) {
-        final ParsingResult<? extends Key> result =
+        final _ParsingResult<? extends Key> result =
           DeserializeImplementation.tryKeyFrom(
             node);
 
@@ -12758,7 +12758,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static KeyTypes deserializeKeyTypes(JsonNode node) {
-        final ParsingResult<? extends KeyTypes> result =
+        final _ParsingResult<? extends KeyTypes> result =
           DeserializeImplementation.tryKeyTypesFrom(
             node);
 
@@ -12775,7 +12775,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static DataTypeDefXsd deserializeDataTypeDefXsd(JsonNode node) {
-        final ParsingResult<? extends DataTypeDefXsd> result =
+        final _ParsingResult<? extends DataTypeDefXsd> result =
           DeserializeImplementation.tryDataTypeDefXsdFrom(
             node);
 
@@ -12792,7 +12792,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IAbstractLangString deserializeIAbstractLangString(JsonNode node) {
-        final ParsingResult<? extends IAbstractLangString> result =
+        final _ParsingResult<? extends IAbstractLangString> result =
           DeserializeImplementation.tryIAbstractLangStringFrom(
             node);
 
@@ -12809,7 +12809,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static LangStringNameType deserializeLangStringNameType(JsonNode node) {
-        final ParsingResult<? extends LangStringNameType> result =
+        final _ParsingResult<? extends LangStringNameType> result =
           DeserializeImplementation.tryLangStringNameTypeFrom(
             node);
 
@@ -12826,7 +12826,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static LangStringTextType deserializeLangStringTextType(JsonNode node) {
-        final ParsingResult<? extends LangStringTextType> result =
+        final _ParsingResult<? extends LangStringTextType> result =
           DeserializeImplementation.tryLangStringTextTypeFrom(
             node);
 
@@ -12843,7 +12843,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Environment deserializeEnvironment(JsonNode node) {
-        final ParsingResult<? extends Environment> result =
+        final _ParsingResult<? extends Environment> result =
           DeserializeImplementation.tryEnvironmentFrom(
             node);
 
@@ -12860,7 +12860,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IDataSpecificationContent deserializeIDataSpecificationContent(JsonNode node) {
-        final ParsingResult<? extends IDataSpecificationContent> result =
+        final _ParsingResult<? extends IDataSpecificationContent> result =
           DeserializeImplementation.tryIDataSpecificationContentFrom(
             node);
 
@@ -12877,7 +12877,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static EmbeddedDataSpecification deserializeEmbeddedDataSpecification(JsonNode node) {
-        final ParsingResult<? extends EmbeddedDataSpecification> result =
+        final _ParsingResult<? extends EmbeddedDataSpecification> result =
           DeserializeImplementation.tryEmbeddedDataSpecificationFrom(
             node);
 
@@ -12894,7 +12894,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static DataTypeIec61360 deserializeDataTypeIec61360(JsonNode node) {
-        final ParsingResult<? extends DataTypeIec61360> result =
+        final _ParsingResult<? extends DataTypeIec61360> result =
           DeserializeImplementation.tryDataTypeIec61360From(
             node);
 
@@ -12911,7 +12911,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static LevelType deserializeLevelType(JsonNode node) {
-        final ParsingResult<? extends LevelType> result =
+        final _ParsingResult<? extends LevelType> result =
           DeserializeImplementation.tryLevelTypeFrom(
             node);
 
@@ -12928,7 +12928,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ValueReferencePair deserializeValueReferencePair(JsonNode node) {
-        final ParsingResult<? extends ValueReferencePair> result =
+        final _ParsingResult<? extends ValueReferencePair> result =
           DeserializeImplementation.tryValueReferencePairFrom(
             node);
 
@@ -12945,7 +12945,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static ValueList deserializeValueList(JsonNode node) {
-        final ParsingResult<? extends ValueList> result =
+        final _ParsingResult<? extends ValueList> result =
           DeserializeImplementation.tryValueListFrom(
             node);
 
@@ -12962,7 +12962,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static LangStringPreferredNameTypeIec61360 deserializeLangStringPreferredNameTypeIec61360(JsonNode node) {
-        final ParsingResult<? extends LangStringPreferredNameTypeIec61360> result =
+        final _ParsingResult<? extends LangStringPreferredNameTypeIec61360> result =
           DeserializeImplementation.tryLangStringPreferredNameTypeIec61360From(
             node);
 
@@ -12979,7 +12979,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static LangStringShortNameTypeIec61360 deserializeLangStringShortNameTypeIec61360(JsonNode node) {
-        final ParsingResult<? extends LangStringShortNameTypeIec61360> result =
+        final _ParsingResult<? extends LangStringShortNameTypeIec61360> result =
           DeserializeImplementation.tryLangStringShortNameTypeIec61360From(
             node);
 
@@ -12996,7 +12996,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static LangStringDefinitionTypeIec61360 deserializeLangStringDefinitionTypeIec61360(JsonNode node) {
-        final ParsingResult<? extends LangStringDefinitionTypeIec61360> result =
+        final _ParsingResult<? extends LangStringDefinitionTypeIec61360> result =
           DeserializeImplementation.tryLangStringDefinitionTypeIec61360From(
             node);
 
@@ -13013,7 +13013,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static DataSpecificationIec61360 deserializeDataSpecificationIec61360(JsonNode node) {
-        final ParsingResult<? extends DataSpecificationIec61360> result =
+        final _ParsingResult<? extends DataSpecificationIec61360> result =
           DeserializeImplementation.tryDataSpecificationIec61360From(
             node);
 
