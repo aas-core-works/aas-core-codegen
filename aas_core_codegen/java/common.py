@@ -67,7 +67,7 @@ def needs_escaping(text: str) -> bool:
 PRIMITIVE_TYPE_MAP = {
     intermediate.PrimitiveType.BOOL: Stripped("Boolean"),
     intermediate.PrimitiveType.INT: Stripped("Long"),
-    intermediate.PrimitiveType.FLOAT: Stripped("Float"),
+    intermediate.PrimitiveType.FLOAT: Stripped("Double"),
     intermediate.PrimitiveType.STR: Stripped("String"),
     intermediate.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }

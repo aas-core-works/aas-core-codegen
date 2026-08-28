@@ -34,14 +34,14 @@ public class TestDescendAndVisitorThrough {
     }
 
     private String trace(IClass instance) {
-      if (instance instanceof IIdentifiable) {
+    if (instance instanceof IIdentifiable) {
         return instance.getClass().getSimpleName() + " with ID " + (((IIdentifiable) instance).getId());
       } else if (instance instanceof IReferable) {
         return instance.getClass().getSimpleName() + " with ID-short " + (((IReferable) instance).getIdShort());
       } else {
         return instance.getClass().getSimpleName();
       }
-            }
+    }
 
     private void assertDescendAndVisitorThroughSame(IClass instance)
     {

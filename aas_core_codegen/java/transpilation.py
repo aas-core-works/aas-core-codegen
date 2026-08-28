@@ -41,7 +41,7 @@ from aas_core_codegen.parse import tree as parse_tree
 PRIMITIVE_TYPE_MAP = {
     intermediate_type_inference.PrimitiveType.BOOL: Stripped("Boolean"),
     intermediate_type_inference.PrimitiveType.INT: Stripped("Long"),
-    intermediate_type_inference.PrimitiveType.FLOAT: Stripped("Float"),
+    intermediate_type_inference.PrimitiveType.FLOAT: Stripped("Double"),
     intermediate_type_inference.PrimitiveType.STR: Stripped("String"),
     intermediate_type_inference.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }
@@ -556,6 +556,26 @@ class Transpiler(
                     and arg_type.our_type.constrainee == intermediate.PrimitiveType.STR
                 ):
                     return Stripped(f"{collection}.length()"), None
+
+                elif (
+                    isinstance(
+                        arg_type, intermediate_type_inference.PrimitiveTypeAnnotation
+                    )
+                    and arg_type.a_type
+                    == intermediate_type_inference.PrimitiveType.BYTEARRAY
+                ):
+                    # NOTE (mristin):
+                    # Unlike ``String``, a Java array does not expose its length
+                    # as a method (``.length()``), but as a field (``.length``).
+                    return Stripped(f"{collection}.length"), None
+
+                elif (
+                    isinstance(arg_type, intermediate_type_inference.OurTypeAnnotation)
+                    and isinstance(arg_type.our_type, intermediate.ConstrainedPrimitive)
+                    and arg_type.our_type.constrainee
+                    == intermediate.PrimitiveType.BYTEARRAY
+                ):
+                    return Stripped(f"{collection}.length"), None
 
                 elif isinstance(
                     arg_type, intermediate_type_inference.ListTypeAnnotation

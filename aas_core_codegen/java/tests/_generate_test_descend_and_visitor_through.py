@@ -3,7 +3,7 @@
 from typing import List
 
 from aas_core_codegen import intermediate, naming
-from aas_core_codegen.common import Stripped, indent_but_first_line
+from aas_core_codegen.common import Identifier, Stripped, indent_but_first_line
 from aas_core_codegen.java import common as java_common, naming as java_naming
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -21,6 +21,42 @@ def generate(
     """
     Generate code to test the ``Descend`` methods and ``VisitorThrough``.
     """
+    # NOTE (mristin):
+    # ``Identifiable`` and ``Referable`` are not universally defined in every
+    # meta-model (they stem from the Asset Administration Shell meta-model), so
+    # we only refer to their corresponding Java interfaces, ``IIdentifiable``
+    # and ``IReferable``, if they are actually defined. Otherwise, the import
+    # would not resolve and the generated code would not compile.
+    has_identifiable = symbol_table.find_our_type(Identifier("Identifiable")) is not None
+    has_referable = symbol_table.find_our_type(Identifier("Referable")) is not None
+
+    trace_branches = []  # type: List[str]
+    if has_identifiable:
+        trace_branches.append(
+            f"""\
+if (instance instanceof IIdentifiable) {{
+{I}return instance.getClass().getSimpleName() + " with ID " + (((IIdentifiable) instance).getId());
+}}"""
+        )
+    if has_referable:
+        trace_branches.append(
+            f"""\
+if (instance instanceof IReferable) {{
+{I}return instance.getClass().getSimpleName() + " with ID-short " + (((IReferable) instance).getIdShort());
+}}"""
+        )
+
+    if len(trace_branches) == 0:
+        trace_body = f"{I}return instance.getClass().getSimpleName();"
+    else:
+        trace_body = (
+            " else ".join(trace_branches)
+            + f""" else {{
+{I}return instance.getClass().getSimpleName();
+}}"""
+        )
+        trace_body = indent_but_first_line(trace_body, I)
+
     blocks = [
         Stripped(
             f"""\
@@ -37,14 +73,8 @@ private class TracingVisitorThrough extends VisitorThrough {{
         Stripped(
             f"""\
 private String trace(IClass instance) {{
-{I}if (instance instanceof IIdentifiable) {{
-{II}return instance.getClass().getSimpleName() + " with ID " + (((IIdentifiable) instance).getId());
-{I}}} else if (instance instanceof IReferable) {{
-{II}return instance.getClass().getSimpleName() + " with ID-short " + (((IReferable) instance).getIdShort());
-{I}}} else {{
-{II}return instance.getClass().getSimpleName();
-{I}}}
-        }}"""
+{trace_body}
+}}"""
         ),
         Stripped(
             f"""\
@@ -126,6 +156,15 @@ public void testDescendAgainstVisitorThroughFor{cls_name_java}() throws IOExcept
 
     blocks_joined = "\n\n".join(blocks)
 
+    optional_imports = []  # type: List[str]
+    if has_identifiable:
+        optional_imports.append(f"import {package}.types.model.IIdentifiable;")
+    if has_referable:
+        optional_imports.append(f"import {package}.types.model.IReferable;")
+    optional_imports_joined = (
+        "\n" + "\n".join(optional_imports) if len(optional_imports) > 0 else ""
+    )
+
     return [
         java_common.JavaFile(
             "TestDescendAndVisitorThrough.java",
@@ -137,9 +176,7 @@ package {package}.tests;
 import static org.junit.jupiter.api.Assertions.*;
 
 import {package}.types.impl.*;
-import {package}.types.model.IClass;
-import {package}.types.model.IIdentifiable;
-import {package}.types.model.IReferable;
+import {package}.types.model.IClass;{optional_imports_joined}
 import {package}.visitation.VisitorThrough;
 import java.io.FileNotFoundException;
 import java.io.IOException;

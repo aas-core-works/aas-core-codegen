@@ -1551,6 +1551,46 @@ package {package};\n\n"""
     return java_common.JavaFile(file_name, file_content)
 
 
+def _generate_no_enumerations_defined(
+    package: java_common.PackageIdentifier,
+) -> java_common.JavaFile:
+    """
+    Generate a placeholder file for the ``types.enums`` package.
+
+    The rest of the generated code always imports ``{package}.types.enums.*``
+    (see, *e.g.*, ``Stringification.java`` or ``Jsonization.java``), regardless
+    of whether the meta-model defines any enumeration. If we did not emit
+    anything into the ``types.enums`` package, that package would not exist,
+    and those imports would fail to compile with
+    "package ... does not exist". We generate this placeholder only if the
+    meta-model defines no enumeration at all (see the caller), so that the
+    package exists and the wildcard imports resolve.
+    """
+    structure_name = Stripped("NoEnumerationsDefined")
+    file_name = java_common.enum_package_path(structure_name)
+    file_content = f"""\
+{java_common.WARNING}
+
+package {package}.types.enums;
+
+/**
+ * Mark that this meta-model defines no enumerations.
+ *
+ * <p>This class only exists so that the wildcard import of this (otherwise
+ * empty) package elsewhere in the generated code compiles.
+ */
+final class NoEnumerationsDefined {{
+{I}private NoEnumerationsDefined() {{
+{II}// Intentionally empty.
+{I}}}
+}}
+
+{java_common.WARNING}
+"""
+
+    return java_common.JavaFile(file_name, file_content)
+
+
 def _generate_iclass(
     package: java_common.PackageIdentifier,
 ) -> java_common.JavaFile:
@@ -1775,6 +1815,9 @@ def generate(
     errors = []  # type: List[Error]
 
     files.append(_generate_iclass(package))
+
+    if len(symbol_table.enumerations) == 0:
+        files.append(_generate_no_enumerations_defined(package))
 
     for our_type in symbol_table.our_types:
         if not isinstance(

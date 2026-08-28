@@ -412,9 +412,10 @@ public class TestCopying {
         && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
         && that.getQualifiers().equals(casted.getQualifiers())
         && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && Arrays.equals(
-          that.getValue().get(),
-          casted.getValue().get())
+        && (that.getValue().isPresent()
+          ? casted.getValue().isPresent()
+          && Arrays.equals(that.getValue().get(), casted.getValue().get())
+          : ! casted.getValue().isPresent())
         && that.getContentType().equals(casted.getContentType()));
     }
 
@@ -529,9 +530,10 @@ public class TestCopying {
           && transform( that.getSubjectId().get(), casted.getSubjectId().get())
           : ! casted.getSubjectId().isPresent())
         && that.getTimeStamp().equals(casted.getTimeStamp())
-        && Arrays.equals(
-          that.getPayload().get(),
-          casted.getPayload().get()));
+        && (that.getPayload().isPresent()
+          ? casted.getPayload().isPresent()
+          && Arrays.equals(that.getPayload().get(), casted.getPayload().get())
+          : ! casted.getPayload().isPresent()));
     }
 
     @Override
