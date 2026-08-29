@@ -9,8 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import aas_core.aas3_0.types.impl.*;
 import aas_core.aas3_0.types.model.IClass;
-import aas_core.aas3_0.types.model.IIdentifiable;
-import aas_core.aas3_0.types.model.IReferable;
 import aas_core.aas3_0.visitation.VisitorThrough;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,27 +26,17 @@ public class TestDescendAndVisitorThrough {
 
       @Override
       public void visit(IClass that) {
-        log.add(trace(that));
+        log.add(Common.trace(that));
         super.visit(that);
       }
     }
-
-    private String trace(IClass instance) {
-      if (instance instanceof IIdentifiable) {
-        return instance.getClass().getSimpleName() + " with ID " + (((IIdentifiable) instance).getId());
-      } else if (instance instanceof IReferable) {
-        return instance.getClass().getSimpleName() + " with ID-short " + (((IReferable) instance).getIdShort());
-      } else {
-        return instance.getClass().getSimpleName();
-      }
-            }
 
     private void assertDescendAndVisitorThroughSame(IClass instance)
     {
       final List<String> logFromDescend = new ArrayList<>();
 
       for (IClass subInstance : instance.descend()) {
-        logFromDescend.add(trace(subInstance));
+        logFromDescend.add(Common.trace(subInstance));
       }
 
       final TracingVisitorThrough visitor = new TracingVisitorThrough();
@@ -57,7 +45,7 @@ public class TestDescendAndVisitorThrough {
 
       assertFalse(traceFromVisitor.isEmpty());
 
-      assertEquals(trace(instance), traceFromVisitor.get(0));
+      assertEquals(Common.trace(instance), traceFromVisitor.get(0));
 
       traceFromVisitor.remove(0);
 
