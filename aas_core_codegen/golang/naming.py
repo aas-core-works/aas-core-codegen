@@ -4,7 +4,7 @@ Generate Go identifiers based on the identifiers from the meta-model.
 The methods all generate public names (capitalized), unless their prefix indicates
 otherwise.
 """
-from typing import List, Iterator, Optional
+from typing import List, Iterator, Optional, Final, FrozenSet
 
 from icontract import require
 
@@ -98,6 +98,63 @@ def _lower_camel_case(identifier: Identifier) -> Identifier:
     return Identifier("".join(cased))
 
 
+_KEYWORD_SET: Final[FrozenSet[Identifier]] = frozenset(
+    [
+        Identifier("break"),
+        Identifier("case"),
+        Identifier("chan"),
+        Identifier("const"),
+        Identifier("continue"),
+        Identifier("default"),
+        Identifier("defer"),
+        Identifier("else"),
+        Identifier("fallthrough"),
+        Identifier("for"),
+        Identifier("func"),
+        Identifier("go"),
+        Identifier("goto"),
+        Identifier("if"),
+        Identifier("import"),
+        Identifier("interface"),
+        Identifier("map"),
+        Identifier("package"),
+        Identifier("range"),
+        Identifier("return"),
+        Identifier("select"),
+        Identifier("struct"),
+        Identifier("switch"),
+        Identifier("type"),
+        Identifier("var"),
+    ]
+)
+
+assert all(len(keyword) > 1 for keyword in _KEYWORD_SET), (
+    f"We expect all the keywords to be at least 2 characters, "
+    f"but we got at least one which is not: {_KEYWORD_SET=}."
+    f"We built the naming logic based on this assumption since we uppercase the last"
+    f"letter whenever the identifier conflicts with a keyword."
+)
+
+assert all(keyword.islower() for keyword in _KEYWORD_SET), (
+    "We expected all the keywords to be lowercase, since that was the assumption "
+    "when we renamed them to avoid conflicts, "
+    f"but that is not the case: {_KEYWORD_SET=}"
+)
+
+
+@require(lambda keyword: keyword in _KEYWORD_SET)
+def _transform_keyword_to_lowercase_with_upper_last_letter(
+    keyword: Identifier,
+) -> Identifier:
+    """
+    Transform the keyword identifier into a lowercase Go identifier.
+
+    >>> _transform_keyword_to_lowercase_with_upper_last_letter(Identifier("interface"))
+    'interfacE'
+    """
+    return Identifier(keyword[:-1] + keyword[-1].upper())
+
+
 def interface_name(identifier: Identifier) -> Identifier:
     """Generate a Go public interface name based on its meta-model ``identifier``."""
     return Identifier(f"I{capital_camel_case(identifier)}")
@@ -142,7 +199,19 @@ def private_struct_name(identifier: Identifier) -> Identifier:
 
     >>> private_struct_name(Identifier("something_to_URL"))
     'somethingToURL'
+
+    >>> private_struct_name(Identifier("interface"))
+    'interfacE'
+
+    >>> private_struct_name(Identifier("range"))
+    'rangE'
+
+    >>> private_struct_name(Identifier("type"))
+    'typE'
     """
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
+
     return _lower_camel_case(identifier)
 
 
@@ -212,11 +281,17 @@ def private_property_name(identifier: Identifier) -> Identifier:
     >>> private_property_name(Identifier("something_to_URL"))
     'somethingToURL'
 
+    >>> private_property_name(Identifier("interface"))
+    'interfacE'
+
+    >>> private_property_name(Identifier("range"))
+    'rangE'
+
     >>> private_property_name(Identifier("type"))
     'typE'
     """
-    if identifier == "type":
-        return Identifier("typE")
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
 
     return _lower_camel_case(identifier)
 
@@ -230,7 +305,19 @@ def private_method_name(identifier: Identifier) -> Identifier:
 
     >>> private_method_name(Identifier("something_to_URL"))
     'somethingToURL'
+
+    >>> private_method_name(Identifier("interface"))
+    'interfacE'
+
+    >>> private_method_name(Identifier("range"))
+    'rangE'
+
+    >>> private_method_name(Identifier("type"))
+    'typE'
     """
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
+
     return _lower_camel_case(identifier)
 
 
@@ -269,7 +356,19 @@ def private_function_name(identifier: Identifier) -> Identifier:
 
     >>> private_function_name(Identifier("do_something_to_URL"))
     'doSomethingToURL'
+
+    >>> private_function_name(Identifier("interface"))
+    'interfacE'
+
+    >>> private_function_name(Identifier("range"))
+    'rangE'
+
+    >>> private_function_name(Identifier("type"))
+    'typE'
     """
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
+
     return _lower_camel_case(identifier)
 
 
@@ -287,11 +386,17 @@ def argument_name(identifier: Identifier) -> Identifier:
     >>> argument_name(Identifier("something_to_URL"))
     'somethingToURL'
 
+    >>> argument_name(Identifier("interface"))
+    'interfacE'
+
+    >>> argument_name(Identifier("range"))
+    'rangE'
+
     >>> argument_name(Identifier("type"))
     'typE'
     """
-    if identifier == "type":
-        return Identifier("typE")
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
 
     return _lower_camel_case(identifier)
 
@@ -310,11 +415,17 @@ def variable_name(identifier: Identifier) -> Identifier:
     >>> variable_name(Identifier("something_to_URL"))
     'somethingToURL'
 
+    >>> variable_name(Identifier("interface"))
+    'interfacE'
+
+    >>> variable_name(Identifier("range"))
+    'rangE'
+
     >>> variable_name(Identifier("type"))
     'typE'
     """
-    if identifier == "type":
-        return Identifier("typE")
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
 
     return _lower_camel_case(identifier)
 
@@ -344,8 +455,32 @@ def private_constant_name(identifier: Identifier) -> Identifier:
 
     >>> private_constant_name(Identifier("something_to_URL"))
     'somethingToURL'
+
+    >>> private_constant_name(Identifier("interface"))
+    'interfacE'
+
+    >>> private_constant_name(Identifier("range"))
+    'rangE'
+
+    >>> private_constant_name(Identifier("type"))
+    'typE'
     """
-    return _lower_camel_case(identifier)
+    # NOTE (mristin):
+    # ``interface``, ``range`` and ``type'' are allowed in the specification, and
+    # predate aas-core-codegen, so we have to handle them separately.
+    if identifier == "interface":
+        # noinspection SpellCheckingInspection
+        return Identifier("interfacE")
+
+    elif identifier == "range":
+        # noinspection SpellCheckingInspection
+        return Identifier("rangE")
+
+    elif identifier == "type":
+        return Identifier("typE")
+
+    else:
+        return _lower_camel_case(identifier)
 
 
 def _over_potential_receivers(class_name: Identifier) -> Iterator[Identifier]:

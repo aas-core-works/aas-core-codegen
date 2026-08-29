@@ -124,6 +124,25 @@ def _verify_intra_structure_collisions(
                     f"the meta-model property {prop.name!r}"
                 )
 
+        observed_constructor_arg_names = {}  # type: Dict[Identifier, str]
+        for constructor_arg in our_type.constructor.arguments:
+            arg_name = typescript_naming.argument_name(constructor_arg.name)
+
+            if arg_name in observed_constructor_arg_names:
+                errors.append(
+                    Error(
+                        constructor_arg.parsed.node,
+                        f"TypeScript argument {arg_name!r} corresponding "
+                        f"to the meta-model constructor argument {constructor_arg.name!r} "
+                        f"collides with the {observed_constructor_arg_names[arg_name]}",
+                    )
+                )
+            else:
+                observed_constructor_arg_names[arg_name] = (
+                    f"TypeScript argument {arg_name!r} corresponding to "
+                    f"the meta-model constructor argument {constructor_arg.name!r}"
+                )
+
         for method in our_type.methods:
             method_name = typescript_naming.method_name(method.name)
 
@@ -142,17 +161,35 @@ def _verify_intra_structure_collisions(
                     f"the meta-model method {method.name!r}"
                 )
 
+            observed_method_arg_names = {}  # type: Dict[Identifier, str]
+            for arg in method.arguments:
+                arg_name = typescript_naming.argument_name(arg.name)
+
+                if arg_name in observed_method_arg_names:
+                    errors.append(
+                        Error(
+                            arg.parsed.node,
+                            f"TypeScript argument {arg_name!r} corresponding "
+                            f"to the meta-model method argument {arg.name!r} "
+                            f"of the method {method.name} "
+                            f"collides with the {observed_method_arg_names[arg_name]}",
+                        )
+                    )
+                else:
+                    observed_method_arg_names[arg_name] = (
+                        f"TypeScript argument {arg_name!r} corresponding to "
+                        f"the meta-model method argument {arg.name!r}"
+                    )
+
     else:
         # noinspection PyTypeChecker
         assert_never(our_type)
 
     if len(errors) > 0:
-        errors.append(
-            Error(
-                our_type.parsed.node,
-                f"Naming collision(s) in TypeScript code for our type {our_type.name!r}",
-                underlying=errors,
-            )
+        return Error(
+            our_type.parsed.node,
+            f"Naming collision(s) in TypeScript code for our type {our_type.name!r}",
+            underlying=errors,
         )
 
     return None

@@ -1,9 +1,125 @@
 """Generate C# identifiers based on the identifiers from the meta-model."""
-from typing import Union
+from typing import Union, Final, FrozenSet
+
+from icontract import require
 
 import aas_core_codegen.naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never
+
+_KEYWORD_SET: Final[FrozenSet[Identifier]] = frozenset(
+    {
+        Identifier("abstract"),
+        Identifier("as"),
+        Identifier("base"),
+        Identifier("bool"),
+        Identifier("break"),
+        Identifier("byte"),
+        Identifier("case"),
+        Identifier("catch"),
+        Identifier("char"),
+        Identifier("checked"),
+        Identifier("class"),
+        Identifier("const"),
+        Identifier("continue"),
+        Identifier("decimal"),
+        Identifier("default"),
+        Identifier("delegate"),
+        Identifier("do"),
+        Identifier("double"),
+        Identifier("else"),
+        Identifier("enum"),
+        Identifier("event"),
+        Identifier("explicit"),
+        Identifier("extern"),
+        Identifier("false"),
+        Identifier("finally"),
+        Identifier("fixed"),
+        Identifier("float"),
+        Identifier("for"),
+        Identifier("foreach"),
+        Identifier("goto"),
+        Identifier("if"),
+        Identifier("implicit"),
+        Identifier("in"),
+        Identifier("int"),
+        Identifier("interface"),
+        Identifier("internal"),
+        Identifier("is"),
+        Identifier("lock"),
+        Identifier("long"),
+        Identifier("namespace"),
+        Identifier("new"),
+        Identifier("null"),
+        Identifier("object"),
+        Identifier("operator"),
+        Identifier("out"),
+        Identifier("override"),
+        Identifier("params"),
+        Identifier("private"),
+        Identifier("protected"),
+        Identifier("public"),
+        Identifier("readonly"),
+        Identifier("ref"),
+        Identifier("return"),
+        Identifier("sbyte"),
+        Identifier("sealed"),
+        Identifier("short"),
+        Identifier("sizeof"),
+        Identifier("stackalloc"),
+        Identifier("static"),
+        Identifier("string"),
+        Identifier("struct"),
+        Identifier("switch"),
+        Identifier("this"),
+        Identifier("throw"),
+        Identifier("true"),
+        Identifier("try"),
+        Identifier("typeof"),
+        Identifier("uint"),
+        Identifier("ulong"),
+        Identifier("unchecked"),
+        Identifier("unsafe"),
+        Identifier("ushort"),
+        Identifier("using"),
+        Identifier("virtual"),
+        Identifier("void"),
+        Identifier("volatile"),
+        Identifier("while"),
+    }
+)
+
+assert all(len(keyword) > 1 for keyword in _KEYWORD_SET), (
+    f"We expect all the keywords to be at least 2 characters, "
+    f"but we got at least one which is not: {_KEYWORD_SET=}."
+    f"We built the naming logic based on this assumption since we uppercase the last"
+    f"letter whenever the identifier conflicts with a keyword."
+)
+
+assert all(keyword.islower() for keyword in _KEYWORD_SET), (
+    "We expected all the keywords to be lowercase, since that was the assumption "
+    "when we renamed them to avoid conflicts, "
+    f"but that is not the case: {_KEYWORD_SET=}"
+)
+
+assert all(not keyword.startswith("_") for keyword in _KEYWORD_SET), (
+    "We expected all the keywords to not start with ``_``, since that was "
+    "the assumption when we renamed them to avoid conflicts, "
+    f"but that is not the case: {_KEYWORD_SET=}"
+)
+
+
+@require(lambda keyword: keyword in _KEYWORD_SET)
+def _transform_keyword_to_lowercase_with_upper_last_letter(
+    keyword: Identifier,
+) -> Identifier:
+    """
+    Transform the keyword identifier into a lowercase Go identifier.
+
+    >>> _transform_keyword_to_lowercase_with_upper_last_letter(Identifier("interface"))
+    'interfacE'
+    """
+    return Identifier(keyword[:-1] + keyword[-1].upper())
 
 
 def interface_name(identifier: Identifier) -> Identifier:
@@ -76,8 +192,6 @@ def name_of(
     else:
         assert_never(something)
 
-    raise AssertionError("Should not have gotten here")
-
 
 def property_name(identifier: Identifier) -> Identifier:
     """
@@ -140,7 +254,13 @@ def argument_name(identifier: Identifier) -> Identifier:
 
     >>> argument_name(Identifier("something_to_URL"))
     'somethingToUrl'
+
+    >>> argument_name(Identifier("interface"))
+    'interfacE'
     """
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
+
     return aas_core_codegen.naming.lower_camel_case(identifier)
 
 
@@ -153,5 +273,11 @@ def variable_name(identifier: Identifier) -> Identifier:
 
     >>> variable_name(Identifier("something_to_URL"))
     'somethingToUrl'
+
+    >>> variable_name(Identifier("interface"))
+    'interfacE'
     """
+    if identifier in _KEYWORD_SET:
+        return _transform_keyword_to_lowercase_with_upper_last_letter(identifier)
+
     return aas_core_codegen.naming.lower_camel_case(identifier)
