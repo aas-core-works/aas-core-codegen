@@ -64,7 +64,8 @@ def _generate_constant_primitive(
         literal = Stripped("true") if constant.value else Stripped("false")
 
     elif constant.a_type is intermediate.PrimitiveType.INT:
-        literal = Stripped(str(constant.value))
+        assert isinstance(constant.value, int)
+        literal = Stripped(f"{constant.value}L")
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
         # NOTE (empwilli):
@@ -86,7 +87,7 @@ def _generate_constant_primitive(
         assert_never(constant.a_type)
 
     return (
-        Stripped(f"public static const {java_type} {constant_name} = {literal};"),
+        Stripped(f"public static final {java_type} {constant_name} = {literal};"),
         None,
     )
 
@@ -119,7 +120,7 @@ public static final Set<{java_type}> {constant_name} = Stream.of(
 
     elif constant.a_type is intermediate.PrimitiveType.INT:
         for i, literal in enumerate(constant.literals):
-            writer.write(textwrap.indent(str(literal.value), II))
+            writer.write(textwrap.indent(f"{literal.value}L", II))
 
             if i < len(constant.literals) - 1:
                 writer.write(",\n")
