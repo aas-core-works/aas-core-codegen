@@ -269,6 +269,7 @@ One script exists per supported language:
 * ``dev/live_tests/live_test_cpp.py`` -- C++
 * ``dev/live_tests/live_test_csharp.py`` -- C#
 * ``dev/live_tests/live_test_golang.py`` -- Go
+* ``dev/live_tests/live_test_java.py`` -- Java
 * ``dev/live_tests/live_test_python.py`` -- Python
 * ``dev/live_tests/live_test_typescript.py`` -- TypeScript
 
@@ -320,6 +321,10 @@ Each script requires the corresponding language toolchain to be installed and av
         go install golang.org/x/tools/cmd/goimports@latest
 
     The script looks for ``goimports`` on ``PATH`` and falls back to ``~/go/bin/goimports``.
+
+*Java*
+    ``mvn`` (Maven) and a JDK compatible with Java 17.
+    The script synthesizes a ``pom.xml`` and runs ``mvn test-compile`` and ``mvn test``.
 
 *Python*
     Python 3.9 or later (the same interpreter that runs the script).
