@@ -557,6 +557,23 @@ class Transpiler(
                 ):
                     return Stripped(f"{collection}.length()"), None
 
+                elif (
+                    isinstance(
+                        arg_type, intermediate_type_inference.PrimitiveTypeAnnotation
+                    )
+                    and arg_type.a_type
+                    == intermediate_type_inference.PrimitiveType.BYTEARRAY
+                ):
+                    return Stripped(f"{collection}.length"), None
+
+                elif (
+                    isinstance(arg_type, intermediate_type_inference.OurTypeAnnotation)
+                    and isinstance(arg_type.our_type, intermediate.ConstrainedPrimitive)
+                    and arg_type.our_type.constrainee
+                    == intermediate.PrimitiveType.BYTEARRAY
+                ):
+                    return Stripped(f"{collection}.length"), None
+
                 elif isinstance(
                     arg_type, intermediate_type_inference.ListTypeAnnotation
                 ):
