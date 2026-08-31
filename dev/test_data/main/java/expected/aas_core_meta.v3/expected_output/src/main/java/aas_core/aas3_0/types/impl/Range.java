@@ -348,14 +348,14 @@ public class Range implements IRange {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new RangeRecursiveIterable();
+    return new _RangeRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new RangeIterable();
+    return new _RangeIterable();
   }
 
   /**
@@ -396,7 +396,7 @@ public class Range implements IRange {
     return transformer.transformRange(this, context);
   }
 
-  private class RangeIterable implements Iterable<IClass> {
+  private class _RangeIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -460,7 +460,7 @@ public class Range implements IRange {
     }
   }
 
-  private class RangeRecursiveIterable implements Iterable<IClass> {
+  private class _RangeRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

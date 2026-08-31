@@ -168,14 +168,14 @@ public class SpecificAssetId implements ISpecificAssetId {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new SpecificAssetIdRecursiveIterable();
+    return new _SpecificAssetIdRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new SpecificAssetIdIterable();
+    return new _SpecificAssetIdIterable();
   }
 
   /**
@@ -216,7 +216,7 @@ public class SpecificAssetId implements ISpecificAssetId {
     return transformer.transformSpecificAssetId(this, context);
   }
 
-  private class SpecificAssetIdIterable implements Iterable<IClass> {
+  private class _SpecificAssetIdIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -260,7 +260,7 @@ public class SpecificAssetId implements ISpecificAssetId {
     }
   }
 
-  private class SpecificAssetIdRecursiveIterable implements Iterable<IClass> {
+  private class _SpecificAssetIdRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

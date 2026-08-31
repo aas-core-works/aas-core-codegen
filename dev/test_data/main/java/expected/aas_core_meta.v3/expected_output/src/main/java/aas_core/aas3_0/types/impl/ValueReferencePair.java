@@ -82,14 +82,14 @@ public class ValueReferencePair implements IValueReferencePair {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new ValueReferencePairRecursiveIterable();
+    return new _ValueReferencePairRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new ValueReferencePairIterable();
+    return new _ValueReferencePairIterable();
   }
 
   /**
@@ -130,7 +130,7 @@ public class ValueReferencePair implements IValueReferencePair {
     return transformer.transformValueReferencePair(this, context);
   }
 
-  private class ValueReferencePairIterable implements Iterable<IClass> {
+  private class _ValueReferencePairIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -164,7 +164,7 @@ public class ValueReferencePair implements IValueReferencePair {
     }
   }
 
-  private class ValueReferencePairRecursiveIterable implements Iterable<IClass> {
+  private class _ValueReferencePairRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

@@ -16,7 +16,7 @@ import aas_core.aas3_0.types.enums.KeyTypes;
 
 // Helper to generate read-only collections with less boilerplate.
 // See: https://stackoverflow.com/a/37406054
-class ImmutableCollector {
+class _ImmutableCollector {
     public static <T> Collector<T, Set<T>, Set<T>> toImmutableSet() {
         return Collector.of(HashSet::new, Set::add, (l, r) -> {
             l.addAll(r);
@@ -33,22 +33,22 @@ public class Constants {
             "CONSTANT",
             "PARAMETER",
             "VARIABLE"
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> genericFragmentKeys = Stream.of(
             KeyTypes.FRAGMENT_REFERENCE
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> genericGloballyIdentifiables = Stream.of(
             KeyTypes.GLOBAL_REFERENCE
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> aasIdentifiables = Stream.of(
             KeyTypes.ASSET_ADMINISTRATION_SHELL,
             KeyTypes.CONCEPT_DESCRIPTION,
             KeyTypes.IDENTIFIABLE,
             KeyTypes.SUBMODEL
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> aasSubmodelElementsAsKeys = Stream.of(
             KeyTypes.ANNOTATED_RELATIONSHIP_ELEMENT,
@@ -68,7 +68,7 @@ public class Constants {
             KeyTypes.SUBMODEL_ELEMENT,
             KeyTypes.SUBMODEL_ELEMENT_COLLECTION,
             KeyTypes.SUBMODEL_ELEMENT_LIST
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> aasReferableNonIdentifiables = Stream.of(
             KeyTypes.ANNOTATED_RELATIONSHIP_ELEMENT,
@@ -88,7 +88,7 @@ public class Constants {
             KeyTypes.SUBMODEL_ELEMENT,
             KeyTypes.SUBMODEL_ELEMENT_COLLECTION,
             KeyTypes.SUBMODEL_ELEMENT_LIST
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> aasReferables = Stream.of(
             KeyTypes.ASSET_ADMINISTRATION_SHELL,
@@ -113,7 +113,7 @@ public class Constants {
             KeyTypes.SUBMODEL_ELEMENT,
             KeyTypes.SUBMODEL_ELEMENT_COLLECTION,
             KeyTypes.SUBMODEL_ELEMENT_LIST
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> globallyIdentifiables = Stream.of(
             KeyTypes.GLOBAL_REFERENCE,
@@ -121,7 +121,7 @@ public class Constants {
             KeyTypes.CONCEPT_DESCRIPTION,
             KeyTypes.IDENTIFIABLE,
             KeyTypes.SUBMODEL
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<KeyTypes> fragmentKeys = Stream.of(
             KeyTypes.ANNOTATED_RELATIONSHIP_ELEMENT,
@@ -142,7 +142,7 @@ public class Constants {
             KeyTypes.SUBMODEL_ELEMENT,
             KeyTypes.SUBMODEL_ELEMENT_COLLECTION,
             KeyTypes.SUBMODEL_ELEMENT_LIST
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<DataTypeIec61360> dataTypeIec61360ForPropertyOrValue = Stream.of(
             DataTypeIec61360.DATE,
@@ -159,19 +159,19 @@ public class Constants {
             DataTypeIec61360.RATIONAL_MEASURE,
             DataTypeIec61360.TIME,
             DataTypeIec61360.TIMESTAMP
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<DataTypeIec61360> dataTypeIec61360ForReference = Stream.of(
             DataTypeIec61360.STRING,
             DataTypeIec61360.IRI,
             DataTypeIec61360.IRDI
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<DataTypeIec61360> dataTypeIec61360ForDocument = Stream.of(
             DataTypeIec61360.FILE,
             DataTypeIec61360.BLOB,
             DataTypeIec61360.HTML
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 
     public static final Set<DataTypeIec61360> iec61360DataTypesWithUnit = Stream.of(
             DataTypeIec61360.INTEGER_MEASURE,
@@ -179,7 +179,7 @@ public class Constants {
             DataTypeIec61360.RATIONAL_MEASURE,
             DataTypeIec61360.INTEGER_CURRENCY,
             DataTypeIec61360.REAL_CURRENCY
-    ).collect(ImmutableCollector.toImmutableSet());
+    ).collect(_ImmutableCollector.toImmutableSet());
 }
 
 /*

@@ -336,14 +336,14 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new MultiLanguagePropertyRecursiveIterable();
+    return new _MultiLanguagePropertyRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new MultiLanguagePropertyIterable();
+    return new _MultiLanguagePropertyIterable();
   }
 
   /**
@@ -384,7 +384,7 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
     return transformer.transformMultiLanguageProperty(this, context);
   }
 
-  private class MultiLanguagePropertyIterable implements Iterable<IClass> {
+  private class _MultiLanguagePropertyIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -458,7 +458,7 @@ public class MultiLanguageProperty implements IMultiLanguageProperty {
     }
   }
 
-  private class MultiLanguagePropertyRecursiveIterable implements Iterable<IClass> {
+  private class _MultiLanguagePropertyRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

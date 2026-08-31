@@ -277,14 +277,14 @@ public class Capability implements ICapability {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new CapabilityRecursiveIterable();
+    return new _CapabilityRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new CapabilityIterable();
+    return new _CapabilityIterable();
   }
 
   /**
@@ -325,7 +325,7 @@ public class Capability implements ICapability {
     return transformer.transformCapability(this, context);
   }
 
-  private class CapabilityIterable implements Iterable<IClass> {
+  private class _CapabilityIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -389,7 +389,7 @@ public class Capability implements ICapability {
     }
   }
 
-  private class CapabilityRecursiveIterable implements Iterable<IClass> {
+  private class _CapabilityRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

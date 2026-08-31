@@ -472,14 +472,14 @@ public class BasicEventElement implements IBasicEventElement {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new BasicEventElementRecursiveIterable();
+    return new _BasicEventElementRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new BasicEventElementIterable();
+    return new _BasicEventElementIterable();
   }
 
   /**
@@ -520,7 +520,7 @@ public class BasicEventElement implements IBasicEventElement {
     return transformer.transformBasicEventElement(this, context);
   }
 
-  private class BasicEventElementIterable implements Iterable<IClass> {
+  private class _BasicEventElementIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -594,7 +594,7 @@ public class BasicEventElement implements IBasicEventElement {
     }
   }
 
-  private class BasicEventElementRecursiveIterable implements Iterable<IClass> {
+  private class _BasicEventElementRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

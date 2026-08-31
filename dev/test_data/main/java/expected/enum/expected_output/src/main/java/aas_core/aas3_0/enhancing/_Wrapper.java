@@ -13,10 +13,10 @@ import java.util.stream.Stream;
 import aas_core.aas3_0.types.model.*;
 import aas_core.aas3_0.visitation.AbstractTransformer;
 
-class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
+class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
   private final Function<IClass, Optional<EnhancementT>> enhancementFactory;
 
-  Wrapper(
+  _Wrapper(
     Function<IClass, Optional<EnhancementT>> enhancementFactory
   ) {
     this.enhancementFactory = enhancementFactory;

@@ -180,14 +180,14 @@ public class Reference implements IReference {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new ReferenceRecursiveIterable();
+    return new _ReferenceRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new ReferenceIterable();
+    return new _ReferenceIterable();
   }
 
   /**
@@ -228,7 +228,7 @@ public class Reference implements IReference {
     return transformer.transformReference(this, context);
   }
 
-  private class ReferenceIterable implements Iterable<IClass> {
+  private class _ReferenceIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -267,7 +267,7 @@ public class Reference implements IReference {
     }
   }
 
-  private class ReferenceRecursiveIterable implements Iterable<IClass> {
+  private class _ReferenceRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

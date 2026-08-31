@@ -58,14 +58,14 @@ public class OperationVariable implements IOperationVariable {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new OperationVariableRecursiveIterable();
+    return new _OperationVariableRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new OperationVariableIterable();
+    return new _OperationVariableIterable();
   }
 
   /**
@@ -106,7 +106,7 @@ public class OperationVariable implements IOperationVariable {
     return transformer.transformOperationVariable(this, context);
   }
 
-  private class OperationVariableIterable implements Iterable<IClass> {
+  private class _OperationVariableIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -140,7 +140,7 @@ public class OperationVariable implements IOperationVariable {
     }
   }
 
-  private class OperationVariableRecursiveIterable implements Iterable<IClass> {
+  private class _OperationVariableRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

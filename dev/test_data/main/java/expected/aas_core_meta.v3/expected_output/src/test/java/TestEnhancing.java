@@ -20,19 +20,19 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 public class TestEnhancing {
-  public static class Enhancement {
+  public static class _Enhancement {
     public final long someCustomId;
 
-    public Enhancement(long someCustomId) {
+    public _Enhancement(long someCustomId) {
       this.someCustomId = someCustomId;
     }
   }
 
-  private Enhancer<Enhancement> createEnhancer() {
+  private Enhancer<_Enhancement> createEnhancer() {
     AtomicLong lastCustomId = new AtomicLong();
 
-    Function<IClass, Optional<Enhancement>> enhancementFactory =
-      iClass -> Optional.of(new Enhancement(lastCustomId.incrementAndGet()));
+    Function<IClass, Optional<_Enhancement>> enhancementFactory =
+      iClass -> Optional.of(new _Enhancement(lastCustomId.incrementAndGet()));
 
     return new Enhancer<>(enhancementFactory);
   }
@@ -41,7 +41,7 @@ public class TestEnhancing {
   public void testExtension() throws IOException {
     final Extension instance = CommonJsonization.loadMaximalExtension();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -72,7 +72,7 @@ public class TestEnhancing {
   public void testAdministrativeInformation() throws IOException {
     final AdministrativeInformation instance = CommonJsonization.loadMaximalAdministrativeInformation();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -103,7 +103,7 @@ public class TestEnhancing {
   public void testQualifier() throws IOException {
     final Qualifier instance = CommonJsonization.loadMaximalQualifier();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -134,7 +134,7 @@ public class TestEnhancing {
   public void testAssetAdministrationShell() throws IOException {
     final AssetAdministrationShell instance = CommonJsonization.loadMaximalAssetAdministrationShell();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -165,7 +165,7 @@ public class TestEnhancing {
   public void testAssetInformation() throws IOException {
     final AssetInformation instance = CommonJsonization.loadMaximalAssetInformation();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -196,7 +196,7 @@ public class TestEnhancing {
   public void testResource() throws IOException {
     final Resource instance = CommonJsonization.loadMaximalResource();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -227,7 +227,7 @@ public class TestEnhancing {
   public void testSpecificAssetId() throws IOException {
     final SpecificAssetId instance = CommonJsonization.loadMaximalSpecificAssetId();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -258,7 +258,7 @@ public class TestEnhancing {
   public void testSubmodel() throws IOException {
     final Submodel instance = CommonJsonization.loadMaximalSubmodel();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -289,7 +289,7 @@ public class TestEnhancing {
   public void testRelationshipElement() throws IOException {
     final RelationshipElement instance = CommonJsonization.loadMaximalRelationshipElement();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -320,7 +320,7 @@ public class TestEnhancing {
   public void testSubmodelElementList() throws IOException {
     final SubmodelElementList instance = CommonJsonization.loadMaximalSubmodelElementList();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -351,7 +351,7 @@ public class TestEnhancing {
   public void testSubmodelElementCollection() throws IOException {
     final SubmodelElementCollection instance = CommonJsonization.loadMaximalSubmodelElementCollection();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -382,7 +382,7 @@ public class TestEnhancing {
   public void testProperty() throws IOException {
     final Property instance = CommonJsonization.loadMaximalProperty();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -413,7 +413,7 @@ public class TestEnhancing {
   public void testMultiLanguageProperty() throws IOException {
     final MultiLanguageProperty instance = CommonJsonization.loadMaximalMultiLanguageProperty();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -444,7 +444,7 @@ public class TestEnhancing {
   public void testRange() throws IOException {
     final Range instance = CommonJsonization.loadMaximalRange();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -475,7 +475,7 @@ public class TestEnhancing {
   public void testReferenceElement() throws IOException {
     final ReferenceElement instance = CommonJsonization.loadMaximalReferenceElement();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -506,7 +506,7 @@ public class TestEnhancing {
   public void testBlob() throws IOException {
     final Blob instance = CommonJsonization.loadMaximalBlob();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -537,7 +537,7 @@ public class TestEnhancing {
   public void testFile() throws IOException {
     final File instance = CommonJsonization.loadMaximalFile();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -568,7 +568,7 @@ public class TestEnhancing {
   public void testAnnotatedRelationshipElement() throws IOException {
     final AnnotatedRelationshipElement instance = CommonJsonization.loadMaximalAnnotatedRelationshipElement();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -599,7 +599,7 @@ public class TestEnhancing {
   public void testEntity() throws IOException {
     final Entity instance = CommonJsonization.loadMaximalEntity();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -630,7 +630,7 @@ public class TestEnhancing {
   public void testEventPayload() throws IOException {
     final EventPayload instance = CommonJsonization.loadMaximalEventPayload();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -661,7 +661,7 @@ public class TestEnhancing {
   public void testBasicEventElement() throws IOException {
     final BasicEventElement instance = CommonJsonization.loadMaximalBasicEventElement();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -692,7 +692,7 @@ public class TestEnhancing {
   public void testOperation() throws IOException {
     final Operation instance = CommonJsonization.loadMaximalOperation();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -723,7 +723,7 @@ public class TestEnhancing {
   public void testOperationVariable() throws IOException {
     final OperationVariable instance = CommonJsonization.loadMaximalOperationVariable();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -754,7 +754,7 @@ public class TestEnhancing {
   public void testCapability() throws IOException {
     final Capability instance = CommonJsonization.loadMaximalCapability();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -785,7 +785,7 @@ public class TestEnhancing {
   public void testConceptDescription() throws IOException {
     final ConceptDescription instance = CommonJsonization.loadMaximalConceptDescription();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -816,7 +816,7 @@ public class TestEnhancing {
   public void testReference() throws IOException {
     final Reference instance = CommonJsonization.loadMaximalReference();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -847,7 +847,7 @@ public class TestEnhancing {
   public void testKey() throws IOException {
     final Key instance = CommonJsonization.loadMaximalKey();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -878,7 +878,7 @@ public class TestEnhancing {
   public void testLangStringNameType() throws IOException {
     final LangStringNameType instance = CommonJsonization.loadMaximalLangStringNameType();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -909,7 +909,7 @@ public class TestEnhancing {
   public void testLangStringTextType() throws IOException {
     final LangStringTextType instance = CommonJsonization.loadMaximalLangStringTextType();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -940,7 +940,7 @@ public class TestEnhancing {
   public void testEnvironment() throws IOException {
     final Environment instance = CommonJsonization.loadMaximalEnvironment();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -971,7 +971,7 @@ public class TestEnhancing {
   public void testEmbeddedDataSpecification() throws IOException {
     final EmbeddedDataSpecification instance = CommonJsonization.loadMaximalEmbeddedDataSpecification();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1002,7 +1002,7 @@ public class TestEnhancing {
   public void testLevelType() throws IOException {
     final LevelType instance = CommonJsonization.loadMaximalLevelType();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1033,7 +1033,7 @@ public class TestEnhancing {
   public void testValueReferencePair() throws IOException {
     final ValueReferencePair instance = CommonJsonization.loadMaximalValueReferencePair();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1064,7 +1064,7 @@ public class TestEnhancing {
   public void testValueList() throws IOException {
     final ValueList instance = CommonJsonization.loadMaximalValueList();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1095,7 +1095,7 @@ public class TestEnhancing {
   public void testLangStringPreferredNameTypeIec61360() throws IOException {
     final LangStringPreferredNameTypeIec61360 instance = CommonJsonization.loadMaximalLangStringPreferredNameTypeIec61360();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1126,7 +1126,7 @@ public class TestEnhancing {
   public void testLangStringShortNameTypeIec61360() throws IOException {
     final LangStringShortNameTypeIec61360 instance = CommonJsonization.loadMaximalLangStringShortNameTypeIec61360();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1157,7 +1157,7 @@ public class TestEnhancing {
   public void testLangStringDefinitionTypeIec61360() throws IOException {
     final LangStringDefinitionTypeIec61360 instance = CommonJsonization.loadMaximalLangStringDefinitionTypeIec61360();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 
@@ -1188,7 +1188,7 @@ public class TestEnhancing {
   public void testDataSpecificationIec61360() throws IOException {
     final DataSpecificationIec61360 instance = CommonJsonization.loadMaximalDataSpecificationIec61360();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 

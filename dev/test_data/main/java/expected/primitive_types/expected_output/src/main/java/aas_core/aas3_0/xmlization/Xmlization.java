@@ -78,30 +78,30 @@ public class Xmlization {
   public static final String AAS_NAME_SPACE =
     "https://dummy.com";
 
-  private static class Result<T> {
+  private static class _Result<T> {
     private final T result;
     private final Reporting.Error error;
     private final boolean success;
 
-    private Result(T result, Reporting.Error error, boolean success) {
+    private _Result(T result, Reporting.Error error, boolean success) {
       this.result = result;
       this.error = error;
       this.success = success;
     }
 
-    public static <T> Result<T> success(T result) {
+    public static <T> _Result<T> success(T result) {
       if(result == null) throw new IllegalArgumentException("Result must not be null.");
-      return new Result<>(result, null, true);
+      return new _Result<>(result, null, true);
     }
 
-    public static <T> Result<T> failure(Reporting.Error error) {
+    public static <T> _Result<T> failure(Reporting.Error error) {
       if(error == null) throw new IllegalArgumentException("Error must not be null.");
-      return new Result<>(null, error, false);
+      return new _Result<>(null, error, false);
     }
 
     @SuppressWarnings("unchecked")
-    public <I> Result<I> castTo(Class<I> type){
-      if(isError() || type.isInstance(result)) return (Result<I>) this;
+    public <I> _Result<I> castTo(Class<I> type){
+      if(isError() || type.isInstance(result)) return (_Result<I>) this;
       throw new IllegalStateException("Result of type "
         + result.getClass().getName()
         + " is not an instance of "
@@ -144,10 +144,10 @@ public class Xmlization {
    * <p>However, we do not want to force the client to deal with
    * the {@link Reporting.Error} class as this is not intuitive.
    * Therefore we distinguish the implementation, realized in
-   * {@link DeserializeImplementation}, and the facade given in
+   * {@link _DeserializeImplementation}, and the facade given in
    * {@link Deserialize} class.
    */
-  private static class DeserializeImplementation
+  private static class _DeserializeImplementation
   {
     private static XMLEvent currentEvent(XMLEventReader reader) {
       try {
@@ -201,22 +201,22 @@ public class Xmlization {
     }
 
     private static boolean isWrongClosingTag(
-      Result<String> tryElementName,
-      Result<String> tryEndElementName) {
+      _Result<String> tryElementName,
+      _Result<String> tryEndElementName) {
       return !tryElementName.getResult().equals(tryEndElementName.getResult());
     }
 
-    private static Result<XMLEvent> verifyClosingTagForClass(
+    private static _Result<XMLEvent> verifyClosingTagForClass(
       String className,
       XMLEventReader reader,
-      Result<String> tryElementName) {
+      _Result<String> tryElementName) {
       final XMLEvent currentEvent = currentEvent(reader);
       if (currentEvent.isEndDocument()) {
         final Reporting.Error error = new Reporting.Error(
             "Expected an XML end element to conclude a property of class " + className
                 + " with the element name " + tryElementName.getResult() + ", "
                 + "but got the end-of-file.");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       if (!currentEvent.isEndElement()) {
@@ -225,9 +225,9 @@ public class Xmlization {
                 + " with the element name " + tryElementName.getResult() + ", "
                 + "but got the node of type " + getEventTypeAsString(currentEvent)
                 + " with the value " + currentEvent);
-        return Result.failure(error);
+        return _Result.failure(error);
       }
-      final Result<String> tryEndElementName = tryElementName(reader);
+      final _Result<String> tryEndElementName = tryElementName(reader);
       if (tryEndElementName.isError()) {
         return tryEndElementName.castTo(XMLEvent.class);
       }
@@ -236,10 +236,10 @@ public class Xmlization {
             "Expected an XML end element to conclude a property of class " + className
                 + " with the element name " + tryElementName.getResult() + ", "
                 + "but got the end element with the name " + tryEndElementName.getResult());
-        return Result.failure(error);
+        return _Result.failure(error);
       }
       try {
-        return Result.success(reader.nextEvent());
+        return _Result.success(reader.nextEvent());
       } catch (XMLStreamException xmlStreamException) {
         throw new Xmlization.DeserializeException("",
           "Failed in method verifyClosingTagForClass because of: " +
@@ -280,7 +280,7 @@ public class Xmlization {
     /**
      * Check the namespace and extract the element's name.
      */
-    private static Result<String> tryElementName(XMLEventReader reader) {
+    private static _Result<String> tryElementName(XMLEventReader reader) {
       final XMLEvent currentEvent = currentEvent(reader);
       final boolean precondition = currentEvent.isStartElement() || currentEvent.isEndElement();
       if (!precondition) {
@@ -295,9 +295,9 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
             "Expected an element within a namespace " +
             AAS_NAME_SPACE + ", " + "but got: " + namespace);
-        return Result.failure(error);
+        return _Result.failure(error);
       }
-      return Result.success(currentEvent.isStartElement()
+      return _Result.success(currentEvent.isStartElement()
           ? currentEvent.asStartElement().getName().getLocalPart()
           : currentEvent.asEndElement().getName().getLocalPart());
     }
@@ -391,7 +391,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static Result<Something> trySomethingFromSequence(
+    private static _Result<Something> trySomethingFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       Boolean theSomeBool = null;
@@ -407,7 +407,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Something, " +
             "but reached the end-of-file");
-          return Result.failure(error);
+          return _Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -422,10 +422,10 @@ public class Xmlization {
               "a property of an instance of class Something, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return Result.failure(error);
+            return _Result.failure(error);
           }
 
-          final Result<String> tryElementName = tryElementName(reader);
+          final _Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Something.class);
           }
@@ -444,7 +444,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "someBool"));
-                return Result.failure(error);
+                return _Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -452,7 +452,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property someBool of an instance of class Something, " +
                     "but reached the end-of-file");
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
 
                 try {
@@ -464,7 +464,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "someBool"));
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
               }
               break;
@@ -479,7 +479,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "someInt"));
-                return Result.failure(error);
+                return _Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -487,7 +487,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property someInt of an instance of class Something, " +
                     "but reached the end-of-file");
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
 
                 try {
@@ -499,7 +499,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "someInt"));
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
               }
               break;
@@ -514,7 +514,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "someFloat"));
-                return Result.failure(error);
+                return _Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -522,7 +522,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property someFloat of an instance of class Something, " +
                     "but reached the end-of-file");
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
 
                 try {
@@ -534,7 +534,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "someFloat"));
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
               }
               break;
@@ -550,7 +550,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property someString of an instance of class Something, " +
                     "but reached the end-of-file");
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
 
                 try {
@@ -562,7 +562,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "someString"));
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
               }
               break;
@@ -577,7 +577,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "someBytes"));
-                return Result.failure(error);
+                return _Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -585,7 +585,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property someBytes of an instance of class Something, " +
                     "but reached the end-of-file");
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
 
                 try {
@@ -597,7 +597,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "someBytes"));
-                  return Result.failure(error);
+                  return _Result.failure(error);
                 }
               }
               break;
@@ -607,13 +607,13 @@ public class Xmlization {
                 "We expected properties of the class Something, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return Result.failure(error);
+              return _Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Something",
             reader,
             tryElementName);
@@ -626,38 +626,38 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property someBool has not been given " +
           "in the XML representation of an instance of class Something");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       if (theSomeInt == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property someInt has not been given " +
           "in the XML representation of an instance of class Something");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       if (theSomeFloat == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property someFloat has not been given " +
           "in the XML representation of an instance of class Something");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       if (theSomeString == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property someString has not been given " +
           "in the XML representation of an instance of class Something");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       if (theSomeBytes == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property someBytes has not been given " +
           "in the XML representation of an instance of class Something");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
-      return Result.success(new Something(
+      return _Result.success(new Something(
         theSomeBool,
         theSomeInt,
         theSomeFloat,
@@ -668,7 +668,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Something from an XML element.
      */
-    private static Result<Something> trySomethingFromElement(
+    private static _Result<Something> trySomethingFromElement(
       XMLEventReader reader) {
       skipWhitespaceAndComments(reader);
 
@@ -677,7 +677,7 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "Expected an XML element representing an instance of class Something, " +
           "but reached the end-of-file");
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
@@ -685,10 +685,10 @@ public class Xmlization {
           "Expected an XML element representing an instance of class Something, " +
           "but got a node of type " + getEventTypeAsString(currentEvent) +
           " with value " + currentEvent);
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
-      final Result<String> tryElementName = tryElementName(reader);
+      final _Result<String> tryElementName = tryElementName(reader);
       if (tryElementName.isError()) {
         return tryElementName.castTo(Something.class);
       }
@@ -698,18 +698,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "Expected an element representing an instance of class Something " +
           "with element name something, but got: " + elementName);
-        return Result.failure(error);
+        return _Result.failure(error);
       }
 
       final boolean isEmptyElement = isEmptyElement(reader);
 
-      Result<Something> result = trySomethingFromSequence(
+      _Result<Something> result = trySomethingFromSequence(
         reader,
         isEmptyElement);
       if (result.isError()) return result.castTo(Something.class);
 
 
-      final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
         "Something",
         reader,
         tryElementName);
@@ -752,11 +752,11 @@ public class Xmlization {
     public static Something deserializeSomething(
       XMLEventReader reader) {
 
-      DeserializeImplementation.skipStartDocument(reader);
-      DeserializeImplementation.skipWhitespaceAndComments(reader);
+      _DeserializeImplementation.skipStartDocument(reader);
+      _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      Result<? extends Something> result =
-        DeserializeImplementation.trySomethingFromElement(
+      _Result<? extends Something> result =
+        _DeserializeImplementation.trySomethingFromElement(
           reader);
 
       return result.onError(error -> {
@@ -771,7 +771,7 @@ public class Xmlization {
   /**
    * Serialize recursively the instances as XML elements.
    */
-  static class VisitorWithWriter
+  static class _VisitorWithWriter
     extends AbstractVisitorWithContext<XMLStreamWriter> {
 
     private boolean topLevel = true;
@@ -897,7 +897,7 @@ public class Xmlization {
     public static void to(
       IClass that,
       XMLStreamWriter writer) throws SerializeException {
-      VisitorWithWriter visitor = new VisitorWithWriter();
+      _VisitorWithWriter visitor = new _VisitorWithWriter();
       visitor.visit(
         that, writer);
     }

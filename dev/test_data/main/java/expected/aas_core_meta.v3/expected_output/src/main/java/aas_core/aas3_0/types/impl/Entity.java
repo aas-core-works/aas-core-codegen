@@ -383,14 +383,14 @@ public class Entity implements IEntity {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new EntityRecursiveIterable();
+    return new _EntityRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new EntityIterable();
+    return new _EntityIterable();
   }
 
   /**
@@ -431,7 +431,7 @@ public class Entity implements IEntity {
     return transformer.transformEntity(this, context);
   }
 
-  private class EntityIterable implements Iterable<IClass> {
+  private class _EntityIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -505,7 +505,7 @@ public class Entity implements IEntity {
     }
   }
 
-  private class EntityRecursiveIterable implements Iterable<IClass> {
+  private class _EntityRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

@@ -57,14 +57,14 @@ public class ValueList implements IValueList {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new ValueListRecursiveIterable();
+    return new _ValueListRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new ValueListIterable();
+    return new _ValueListIterable();
   }
 
   /**
@@ -105,7 +105,7 @@ public class ValueList implements IValueList {
     return transformer.transformValueList(this, context);
   }
 
-  private class ValueListIterable implements Iterable<IClass> {
+  private class _ValueListIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -139,7 +139,7 @@ public class ValueList implements IValueList {
     }
   }
 
-  private class ValueListRecursiveIterable implements Iterable<IClass> {
+  private class _ValueListRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

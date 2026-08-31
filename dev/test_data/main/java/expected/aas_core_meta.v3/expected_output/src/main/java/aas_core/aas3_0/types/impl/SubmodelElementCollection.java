@@ -302,14 +302,14 @@ public class SubmodelElementCollection implements ISubmodelElementCollection {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new SubmodelElementCollectionRecursiveIterable();
+    return new _SubmodelElementCollectionRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new SubmodelElementCollectionIterable();
+    return new _SubmodelElementCollectionIterable();
   }
 
   /**
@@ -350,7 +350,7 @@ public class SubmodelElementCollection implements ISubmodelElementCollection {
     return transformer.transformSubmodelElementCollection(this, context);
   }
 
-  private class SubmodelElementCollectionIterable implements Iterable<IClass> {
+  private class _SubmodelElementCollectionIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -419,7 +419,7 @@ public class SubmodelElementCollection implements ISubmodelElementCollection {
     }
   }
 
-  private class SubmodelElementCollectionRecursiveIterable implements Iterable<IClass> {
+  private class _SubmodelElementCollectionRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

@@ -450,9 +450,9 @@ def _generate_descend_iterable(
     iterable_name: Stripped
 
     if recursive:
-        iterable_name = Stripped(f"{cls_name}RecursiveIterable")
+        iterable_name = Stripped(f"_{cls_name}RecursiveIterable")
     else:
-        iterable_name = Stripped(f"{cls_name}Iterable")
+        iterable_name = Stripped(f"_{cls_name}Iterable")
 
     iterable_body = _generate_descend_body(cls, recursive)
 
@@ -496,7 +496,7 @@ def _generate_descend_method(
 
     cls_name = java_naming.class_name(cls.name)
 
-    iterable_name = Stripped(f"{cls_name}RecursiveIterable")
+    iterable_name = Stripped(f"_{cls_name}RecursiveIterable")
 
     descend_body: Stripped
 
@@ -523,7 +523,7 @@ def _generate_descend_once_method(
 
     cls_name = java_naming.class_name(cls.name)
 
-    iterable_name = Stripped(f"{cls_name}Iterable")
+    iterable_name = Stripped(f"_{cls_name}Iterable")
 
     descend_body: Stripped
     if descendable:

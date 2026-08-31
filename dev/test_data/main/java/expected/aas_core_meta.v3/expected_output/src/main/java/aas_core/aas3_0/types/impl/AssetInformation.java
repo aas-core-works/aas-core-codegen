@@ -190,14 +190,14 @@ public class AssetInformation implements IAssetInformation {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new AssetInformationRecursiveIterable();
+    return new _AssetInformationRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new AssetInformationIterable();
+    return new _AssetInformationIterable();
   }
 
   /**
@@ -238,7 +238,7 @@ public class AssetInformation implements IAssetInformation {
     return transformer.transformAssetInformation(this, context);
   }
 
-  private class AssetInformationIterable implements Iterable<IClass> {
+  private class _AssetInformationIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -277,7 +277,7 @@ public class AssetInformation implements IAssetInformation {
     }
   }
 
-  private class AssetInformationRecursiveIterable implements Iterable<IClass> {
+  private class _AssetInformationRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

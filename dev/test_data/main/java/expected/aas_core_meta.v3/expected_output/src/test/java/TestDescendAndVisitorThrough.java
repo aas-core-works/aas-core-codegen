@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public class TestDescendAndVisitorThrough {
-  private class TracingVisitorThrough extends VisitorThrough {
+  private class _TracingVisitorThrough extends VisitorThrough {
       public final List<String> log = new ArrayList<>();
 
       @Override
@@ -39,7 +39,7 @@ public class TestDescendAndVisitorThrough {
         logFromDescend.add(Common.trace(subInstance));
       }
 
-      final TracingVisitorThrough visitor = new TracingVisitorThrough();
+      final _TracingVisitorThrough visitor = new _TracingVisitorThrough();
       visitor.visit(instance);
       final List<String> traceFromVisitor = visitor.log;
 

@@ -16,7 +16,7 @@ import aas_core.aas3_0.types.model.*;
  * @param <EnhancementT> structure of the enhancement
  */
 public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {
-  private final Wrapper<EnhancementT> wrapper;
+  private final _Wrapper<EnhancementT> wrapper;
 
   /**
    * @param enhancementFactory how to enhance the instances.
@@ -27,7 +27,7 @@ public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {
   public Enhancer(
     Function<IClass, Optional<EnhancementT>> enhancementFactory
   ) {
-    this.wrapper = new Wrapper<>(enhancementFactory);
+    this.wrapper = new _Wrapper<>(enhancementFactory);
   }
 
   /**
