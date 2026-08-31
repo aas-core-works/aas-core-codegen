@@ -216,14 +216,14 @@ public class Qualifier implements IQualifier {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new QualifierRecursiveIterable();
+    return new _QualifierRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new QualifierIterable();
+    return new _QualifierIterable();
   }
 
   /**
@@ -264,7 +264,7 @@ public class Qualifier implements IQualifier {
     return transformer.transformQualifier(this, context);
   }
 
-  private class QualifierIterable implements Iterable<IClass> {
+  private class _QualifierIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -308,7 +308,7 @@ public class Qualifier implements IQualifier {
     }
   }
 
-  private class QualifierRecursiveIterable implements Iterable<IClass> {
+  private class _QualifierRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

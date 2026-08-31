@@ -37,63 +37,63 @@ public class Jsonization {
      * However, we do not want to force the client to deal with
      * the {@link Reporting.Error} class as this is not intuitive. Therefore
      * we distinguish the implementation, realized in
-     * {@link DeserializeImplementation}, and the facade given in
+     * {@link _DeserializeImplementation}, and the facade given in
      * {@link Deserialize} class.
      */
-    private static class DeserializeImplementation {
+    private static class _DeserializeImplementation {
       /** Convert {@code value} to a string.
        * @param node JSON node to be parsed
        */
-      private static Result<String> tryStringFrom(JsonNode value) {
+      private static _Result<String> tryStringFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return Result.failure(error);
+          return _Result.failure(error);
         }
-        return Result.success(value.asText());
+        return _Result.success(value.asText());
       }
 
       /** Convert {@code value} to a boolean.
        * @param node JSON node to be parsed
        */
-      private static Result<Boolean> tryBooleanFrom(JsonNode value) {
+      private static _Result<Boolean> tryBooleanFrom(JsonNode value) {
         if (!value.isBoolean()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Boolean, but got " + value.getNodeType());
-          return Result.failure(error);
+          return _Result.failure(error);
         }
-        return Result.success(value.asBoolean());
+        return _Result.success(value.asBoolean());
       }
 
       /** Convert {@code value} to a long 64-bit integer.
        * @param node JSON node to be parsed
        */
-      private static Result<Long> tryLongFrom(JsonNode value) {
+      private static _Result<Long> tryLongFrom(JsonNode value) {
         if (!value.isIntegralNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Long, but got " + value.getNodeType());
-          return Result.failure(error);
+          return _Result.failure(error);
         }
-        return Result.success(value.asLong());
+        return _Result.success(value.asLong());
       }
 
       /** Convert {@code value} to a double-precision 64-bit float.
        * @param node JSON node to be parsed
        */
-      private static Result<Double> tryDoubleFrom(JsonNode value) {
+      private static _Result<Double> tryDoubleFrom(JsonNode value) {
         if (!value.isFloatingPointNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Double, but got " + value.getNodeType());
-          return Result.failure(error);
+          return _Result.failure(error);
         }
-        return Result.success(value.asDouble());
+        return _Result.success(value.asDouble());
       }
 
-      private static Result<byte[]> tryBytesFrom(JsonNode value) {
+      private static _Result<byte[]> tryBytesFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return Result.failure(error);
+          return _Result.failure(error);
         }
         final byte[] decodedData;
         Base64.Decoder decoder = Base64.getDecoder();
@@ -104,10 +104,10 @@ public class Jsonization {
           final Reporting.Error error = new Reporting.Error(
             "Expected Base-64 encoded bytes, but the conversion failed " +
               "because: " + exception.getMessage());
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
-        return Result.success(decodedData);
+        return _Result.success(decodedData);
       }
 
       /**
@@ -116,11 +116,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static Result<Something> trySomethingFrom(JsonNode node) {
+      private static _Result<Something> trySomethingFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
         Boolean theSomeBool = null;
@@ -138,7 +138,7 @@ public class Jsonization {
                 continue;
               }
 
-              final Result<? extends Boolean> theSomeBoolResult = tryBooleanFrom(currentNode.getValue());
+              final _Result<? extends Boolean> theSomeBoolResult = tryBooleanFrom(currentNode.getValue());
               if (theSomeBoolResult.isError()) {
                 theSomeBoolResult.getError()
                   .prependSegment(new Reporting.NameSegment("someBool"));
@@ -152,7 +152,7 @@ public class Jsonization {
                 continue;
               }
 
-              final Result<? extends Long> theSomeIntResult = tryLongFrom(currentNode.getValue());
+              final _Result<? extends Long> theSomeIntResult = tryLongFrom(currentNode.getValue());
               if (theSomeIntResult.isError()) {
                 theSomeIntResult.getError()
                   .prependSegment(new Reporting.NameSegment("someInt"));
@@ -166,7 +166,7 @@ public class Jsonization {
                 continue;
               }
 
-              final Result<? extends Double> theSomeFloatResult = tryDoubleFrom(currentNode.getValue());
+              final _Result<? extends Double> theSomeFloatResult = tryDoubleFrom(currentNode.getValue());
               if (theSomeFloatResult.isError()) {
                 theSomeFloatResult.getError()
                   .prependSegment(new Reporting.NameSegment("someFloat"));
@@ -180,7 +180,7 @@ public class Jsonization {
                 continue;
               }
 
-              final Result<? extends String> theSomeStringResult = tryStringFrom(currentNode.getValue());
+              final _Result<? extends String> theSomeStringResult = tryStringFrom(currentNode.getValue());
               if (theSomeStringResult.isError()) {
                 theSomeStringResult.getError()
                   .prependSegment(new Reporting.NameSegment("someString"));
@@ -194,7 +194,7 @@ public class Jsonization {
                 continue;
               }
 
-              final Result<? extends byte[]> theSomeBytesResult = tryBytesFrom(currentNode.getValue());
+              final _Result<? extends byte[]> theSomeBytesResult = tryBytesFrom(currentNode.getValue());
               if (theSomeBytesResult.isError()) {
                 theSomeBytesResult.getError()
                   .prependSegment(new Reporting.NameSegment("someBytes"));
@@ -206,7 +206,7 @@ public class Jsonization {
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return Result.failure(error);
+              return _Result.failure(error);
             }
           }
         }
@@ -214,34 +214,34 @@ public class Jsonization {
         if (theSomeBool == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someBool\" is missing");
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
         if (theSomeInt == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someInt\" is missing");
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
         if (theSomeFloat == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someFloat\" is missing");
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
         if (theSomeString == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someString\" is missing");
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
         if (theSomeBytes == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someBytes\" is missing");
-          return Result.failure(error);
+          return _Result.failure(error);
         }
 
-        return Result.success(new Something(
+        return _Result.success(new Something(
           theSomeBool,
           theSomeInt,
           theSomeFloat,
@@ -273,30 +273,30 @@ public class Jsonization {
         }
       }
 
-    private static class Result<T> {
+    private static class _Result<T> {
       private final T result;
       private final Reporting.Error error;
       private final boolean success;
 
-      private Result(T result, Reporting.Error error, boolean success) {
+      private _Result(T result, Reporting.Error error, boolean success) {
         this.result = result;
         this.error = error;
         this.success = success;
       }
 
-      public static <T> Result<T> success(T result) {
+      public static <T> _Result<T> success(T result) {
         if (result == null) throw new IllegalArgumentException("Result must not be null.");
-        return new Result<>(result, null, true);
+        return new _Result<>(result, null, true);
       }
 
-      public static <T> Result<T> failure(Reporting.Error error) {
+      public static <T> _Result<T> failure(Reporting.Error error) {
         if (error == null) throw new IllegalArgumentException("Error must not be null.");
-        return new Result<>(null, error, false);
+        return new _Result<>(null, error, false);
       }
 
       @SuppressWarnings("unchecked")
-      public <I> Result<I> castTo(Class<I> type) {
-        if (isError() || type.isInstance(result)) return (Result<I>) this;
+      public <I> _Result<I> castTo(Class<I> type) {
+        if (isError() || type.isInstance(result)) return (_Result<I>) this;
         throw new IllegalStateException("Result of type "
           + result.getClass().getName()
           + " is not an instance of "
@@ -350,8 +350,8 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Something deserializeSomething(JsonNode node) {
-        final Result<? extends Something> result =
-          DeserializeImplementation.trySomethingFrom(
+        final _Result<? extends Something> result =
+          _DeserializeImplementation.trySomethingFrom(
             node);
 
         return result.onError(error -> {
@@ -362,7 +362,7 @@ public class Jsonization {
       }
     }
 
-    private static class Transformer extends AbstractTransformer<JsonNode> {
+    private static class _Transformer extends AbstractTransformer<JsonNode> {
       /**
        * Convert {@code that} 64-bit long integer to a JSON value.
        *
@@ -387,7 +387,7 @@ public class Jsonization {
         result.set("someBool", JsonNodeFactory.instance.booleanNode(
           that.getSomeBool()));
 
-        result.set("someInt", Transformer.toJsonNode(
+        result.set("someInt", _Transformer.toJsonNode(
           that.getSomeInt()));
 
         result.set("someFloat", JsonNodeFactory.instance.numberNode(
@@ -418,7 +418,7 @@ public class Jsonization {
      */
     public static class Serialize
     {
-      private static final Transformer transformer = new Transformer();
+      private static final _Transformer transformer = new _Transformer();
 
       /**
        * Serialize an instance of the meta-model into a JSON object.

@@ -17,9 +17,9 @@ import aas_core.aas3_0.types.model.*;
  */
 public class Copying
 {
-    private static final ShallowCopier shallowCopierInstance = new ShallowCopier();
+    private static final _ShallowCopier shallowCopierInstance = new _ShallowCopier();
 
-    private static final DeepCopier deepCopierInstance = new DeepCopier();
+    private static final _DeepCopier deepCopierInstance = new _DeepCopier();
 
     /**
      * Make a shallow copy of {@code that}.
@@ -48,7 +48,7 @@ public class Copying
     /**
      * Dispatch the making of shallow copies.
      */
-    private static class ShallowCopier extends AbstractTransformer<IClass> {
+    private static class _ShallowCopier extends AbstractTransformer<IClass> {
         @Override
         public IClass transformSomething(
             ISomething that
@@ -62,7 +62,7 @@ public class Copying
     }
 
     /** Dispatch the making of deep copies. */
-    private static class DeepCopier extends AbstractTransformer<IClass> {
+    private static class _DeepCopier extends AbstractTransformer<IClass> {
         @Override
         public IClass transformSomething (
             ISomething that

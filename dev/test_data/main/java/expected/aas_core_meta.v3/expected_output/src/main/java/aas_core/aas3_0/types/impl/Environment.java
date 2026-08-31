@@ -116,14 +116,14 @@ public class Environment implements IEnvironment {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new EnvironmentRecursiveIterable();
+    return new _EnvironmentRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new EnvironmentIterable();
+    return new _EnvironmentIterable();
   }
 
   /**
@@ -164,7 +164,7 @@ public class Environment implements IEnvironment {
     return transformer.transformEnvironment(this, context);
   }
 
-  private class EnvironmentIterable implements Iterable<IClass> {
+  private class _EnvironmentIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -208,7 +208,7 @@ public class Environment implements IEnvironment {
     }
   }
 
-  private class EnvironmentRecursiveIterable implements Iterable<IClass> {
+  private class _EnvironmentRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

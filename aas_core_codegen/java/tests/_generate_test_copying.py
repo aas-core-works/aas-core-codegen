@@ -222,7 +222,7 @@ def _generate_deep_equals_transformer(
     writer = io.StringIO()
     writer.write(
         """\
-private static class DeepEqualiser extends AbstractTransformerWithContext<IClass, Boolean> {
+private static class _DeepEqualiser extends AbstractTransformerWithContext<IClass, Boolean> {
 """
     )
 
@@ -232,7 +232,7 @@ private static class DeepEqualiser extends AbstractTransformerWithContext<IClass
 
         writer.write(textwrap.indent(block, I))
 
-    writer.write("\n} // class DeepEqualiser")
+    writer.write("\n} // class _DeepEqualiser")
 
     return Stripped(writer.getvalue())
 
@@ -273,7 +273,7 @@ def generate(
         _generate_deep_equals_transformer(symbol_table=symbol_table),
         Stripped(
             """\
-private static final DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();"""
+private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();"""
         ),
         Stripped(
             f"""\
@@ -286,11 +286,11 @@ private static Boolean byteSpansEqual(byte[] that, byte[] other) {{
         ),
         Stripped(
             f"""\
-private static class Pair<A, B> {{
+private static class _Pair<A, B> {{
 {I}private final A first;
 {I}private final B second;
 {I}
-{I}public Pair(A first, B second) {{
+{I}public _Pair(A first, B second) {{
 {II}this.first = first;
 {II}this.second = second;
 {I}}}
@@ -308,7 +308,7 @@ private static class Pair<A, B> {{
             f"""\
 // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
 // Adapted from: https://stackoverflow.com/a/23529010
-private static <A, B> Stream<Pair<A, B>> zip(
+private static <A, B> Stream<_Pair<A, B>> zip(
 {I}Stream<? extends A> a,
 {I}Stream<? extends B> b) {{
 {I}Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
@@ -323,19 +323,19 @@ private static <A, B> Stream<Pair<A, B>> zip(
 {I}
 {I}Iterator<A> aIter = Spliterators.iterator(aSplit);
 {I}Iterator<B> bIter = Spliterators.iterator(bSplit);
-{I}Iterator<Pair<A, B>> cIter = new Iterator<Pair<A, B>>() {{
+{I}Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {{
 {II}@Override
 {II}public boolean hasNext() {{
 {III}return aIter.hasNext() && bIter.hasNext();
 {II}}}
 {II}
 {II}@Override
-{II}public Pair<A, B> next() {{
-{III}return new Pair<>(aIter.next(), bIter.next());
+{II}public _Pair<A, B> next() {{
+{III}return new _Pair<>(aIter.next(), bIter.next());
 {II}}}
 {I}}};
 {I}
-{I}Spliterator<Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
+{I}Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
 {I}return StreamSupport.stream(split, false);
 }}"""
         ),

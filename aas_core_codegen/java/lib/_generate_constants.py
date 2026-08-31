@@ -166,7 +166,7 @@ public static final Set<{java_type}> {constant_name} = Stream.of(
     else:
         assert_never(constant.a_type)
 
-    writer.write(""").collect(ImmutableCollector.toImmutableSet());""")
+    writer.write(""").collect(_ImmutableCollector.toImmutableSet());""")
 
     return Stripped(writer.getvalue()), None
 
@@ -202,7 +202,7 @@ public static final Set<{enum_name}> {constant_name} = Stream.of(
         else:
             writer.write("\n")
 
-    writer.write(""").collect(ImmutableCollector.toImmutableSet());""")
+    writer.write(""").collect(_ImmutableCollector.toImmutableSet());""")
 
     return Stripped(writer.getvalue()), None
 
@@ -297,7 +297,7 @@ import java.util.stream.Stream;"""
             f"""\
 // Helper to generate read-only collections with less boilerplate.
 // See: https://stackoverflow.com/a/37406054
-class ImmutableCollector {{
+class _ImmutableCollector {{
     public static <T> Collector<T, Set<T>, Set<T>> toImmutableSet() {{
         return Collector.of(HashSet::new, Set::add, (l, r) -> {{
             l.addAll(r);

@@ -356,14 +356,14 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new AnnotatedRelationshipElementRecursiveIterable();
+    return new _AnnotatedRelationshipElementRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new AnnotatedRelationshipElementIterable();
+    return new _AnnotatedRelationshipElementIterable();
   }
 
   /**
@@ -404,7 +404,7 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
     return transformer.transformAnnotatedRelationshipElement(this, context);
   }
 
-  private class AnnotatedRelationshipElementIterable implements Iterable<IClass> {
+  private class _AnnotatedRelationshipElementIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -483,7 +483,7 @@ public class AnnotatedRelationshipElement implements IAnnotatedRelationshipEleme
     }
   }
 
-  private class AnnotatedRelationshipElementRecursiveIterable implements Iterable<IClass> {
+  private class _AnnotatedRelationshipElementRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

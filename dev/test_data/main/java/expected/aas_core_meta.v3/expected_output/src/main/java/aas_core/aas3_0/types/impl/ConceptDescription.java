@@ -328,14 +328,14 @@ public class ConceptDescription implements IConceptDescription {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new ConceptDescriptionRecursiveIterable();
+    return new _ConceptDescriptionRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new ConceptDescriptionIterable();
+    return new _ConceptDescriptionIterable();
   }
 
   /**
@@ -376,7 +376,7 @@ public class ConceptDescription implements IConceptDescription {
     return transformer.transformConceptDescription(this, context);
   }
 
-  private class ConceptDescriptionIterable implements Iterable<IClass> {
+  private class _ConceptDescriptionIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -435,7 +435,7 @@ public class ConceptDescription implements IConceptDescription {
     }
   }
 
-  private class ConceptDescriptionRecursiveIterable implements Iterable<IClass> {
+  private class _ConceptDescriptionRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

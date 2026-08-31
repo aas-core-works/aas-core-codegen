@@ -20,19 +20,19 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 public class TestEnhancing {
-  public static class Enhancement {
+  public static class _Enhancement {
     public final long someCustomId;
 
-    public Enhancement(long someCustomId) {
+    public _Enhancement(long someCustomId) {
       this.someCustomId = someCustomId;
     }
   }
 
-  private Enhancer<Enhancement> createEnhancer() {
+  private Enhancer<_Enhancement> createEnhancer() {
     AtomicLong lastCustomId = new AtomicLong();
 
-    Function<IClass, Optional<Enhancement>> enhancementFactory =
-      iClass -> Optional.of(new Enhancement(lastCustomId.incrementAndGet()));
+    Function<IClass, Optional<_Enhancement>> enhancementFactory =
+      iClass -> Optional.of(new _Enhancement(lastCustomId.incrementAndGet()));
 
     return new Enhancer<>(enhancementFactory);
   }
@@ -41,7 +41,7 @@ public class TestEnhancing {
   public void testSomething() throws IOException {
     final Something instance = CommonJsonization.loadMaximalSomething();
 
-    final Enhancer<Enhancement> enhancer = createEnhancer();
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
 
     assert !enhancer.unwrap(instance).isPresent();
 

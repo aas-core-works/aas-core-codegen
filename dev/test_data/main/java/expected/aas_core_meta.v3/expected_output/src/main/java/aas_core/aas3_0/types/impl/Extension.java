@@ -188,14 +188,14 @@ public class Extension implements IExtension {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new ExtensionRecursiveIterable();
+    return new _ExtensionRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new ExtensionIterable();
+    return new _ExtensionIterable();
   }
 
   /**
@@ -236,7 +236,7 @@ public class Extension implements IExtension {
     return transformer.transformExtension(this, context);
   }
 
-  private class ExtensionIterable implements Iterable<IClass> {
+  private class _ExtensionIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -280,7 +280,7 @@ public class Extension implements IExtension {
     }
   }
 
-  private class ExtensionRecursiveIterable implements Iterable<IClass> {
+  private class _ExtensionRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

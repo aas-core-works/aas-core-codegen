@@ -355,14 +355,14 @@ public class Property implements IProperty {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new PropertyRecursiveIterable();
+    return new _PropertyRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new PropertyIterable();
+    return new _PropertyIterable();
   }
 
   /**
@@ -403,7 +403,7 @@ public class Property implements IProperty {
     return transformer.transformProperty(this, context);
   }
 
-  private class PropertyIterable implements Iterable<IClass> {
+  private class _PropertyIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -472,7 +472,7 @@ public class Property implements IProperty {
     }
   }
 
-  private class PropertyRecursiveIterable implements Iterable<IClass> {
+  private class _PropertyRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

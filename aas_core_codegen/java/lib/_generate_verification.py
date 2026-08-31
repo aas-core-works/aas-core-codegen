@@ -607,7 +607,7 @@ static {{
 /**
  * Hash allowed enum values for efficient validation of enums.
  */
-private static class EnumValueSet {
+private static class _EnumValueSet {
 """
     )
     for i, block in enumerate(blocks):
@@ -1083,7 +1083,7 @@ def _generate_transformer(
     writer = io.StringIO()
     writer.write(
         """\
-private static class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {
+private static class _Transformer extends AbstractTransformer<Stream<Reporting.Error>> {
 """
     )
 
@@ -1108,7 +1108,7 @@ def _generate_verify_enumeration(enumeration: intermediate.Enumeration) -> Strip
  */
 public static Stream<Reporting.Error> verify{name}(
 {I}{name} that) {{
-{I}if (!EnumValueSet.for{name}.contains(that)) {{
+{I}if (!_EnumValueSet.for{name}.contains(that)) {{
 {II}return Stream.of(new Reporting.Error(
 {III}"Invalid {name}: " + that));
 {I}}} else {{
@@ -1297,7 +1297,7 @@ def generate(
     verification_blocks.append(
         Stripped(
             """\
-private static final Transformer transformer = new Transformer();"""
+private static final _Transformer transformer = new _Transformer();"""
         )
     )
 
@@ -1319,10 +1319,10 @@ public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {{
 {I}return transformer.transform(that);
 }}
 
-private static class ValidationErrorIterable implements Iterable<Reporting.Error> {{
+private static class _ValidationErrorIterable implements Iterable<Reporting.Error> {{
 {I}private final IClass element;
 
-{I}public ValidationErrorIterable(IClass element) {{
+{I}public _ValidationErrorIterable(IClass element) {{
 {II}this.element = element;
 }}
 
@@ -1358,7 +1358,7 @@ private static class ValidationErrorIterable implements Iterable<Reporting.Error
  * @param that The instance of the meta-model to be verified
  */
 public static Iterable<Reporting.Error> verify(IClass that) {{
-{I}return new ValidationErrorIterable(that);
+{I}return new _ValidationErrorIterable(that);
 }}"""
         )
     )
@@ -1398,11 +1398,11 @@ public static Iterable<Reporting.Error> verify(IClass that) {{
     verification_blocks.append(
         Stripped(
             f"""\
-private static class Pair<A, B> {{
+private static class _Pair<A, B> {{
 {I}private final A first;
 {I}private final B second;
 
-{I}public Pair(A first, B second) {{
+{I}public _Pair(A first, B second) {{
 {II}this.first = first;
 {II}this.second = second;
 {I}}}
@@ -1418,7 +1418,7 @@ private static class Pair<A, B> {{
 
 // Java 8 doesn't provide a split operation out of the box, so we have to ship our own.
 // Adapted from: https://stackoverflow.com/a/23529010
-private static <A, B> Stream<Pair<A, B>> zip(
+private static <A, B> Stream<_Pair<A, B>> zip(
 {I}Stream<? extends A> a,
 {I}Stream<? extends B> b) {{
 {I}Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
@@ -1433,19 +1433,19 @@ private static <A, B> Stream<Pair<A, B>> zip(
 
 {I}Iterator<A> aIter = Spliterators.iterator(aSplit);
 {I}Iterator<B> bIter = Spliterators.iterator(bSplit);
-{I}Iterator<Pair<A, B>> cIter = new Iterator<Pair<A, B>>() {{
+{I}Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {{
 {II}@Override
 {II}public boolean hasNext() {{
 {III}return aIter.hasNext() && bIter.hasNext();
 {II}}}
 
 {II}@Override
-{II}public Pair<A, B> next() {{
-{III}return new Pair<>(aIter.next(), bIter.next());
+{II}public _Pair<A, B> next() {{
+{III}return new _Pair<>(aIter.next(), bIter.next());
 {II}}}
 {I}}};
 
-{I}Spliterator<Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
+{I}Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
 {I}return StreamSupport.stream(split, false);
 }}"""
         )

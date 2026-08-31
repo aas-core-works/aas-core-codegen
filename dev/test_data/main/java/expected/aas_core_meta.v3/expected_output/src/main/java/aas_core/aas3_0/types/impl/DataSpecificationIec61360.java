@@ -324,14 +324,14 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new DataSpecificationIec61360RecursiveIterable();
+    return new _DataSpecificationIec61360RecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new DataSpecificationIec61360Iterable();
+    return new _DataSpecificationIec61360Iterable();
   }
 
   /**
@@ -372,7 +372,7 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
     return transformer.transformDataSpecificationIec61360(this, context);
   }
 
-  private class DataSpecificationIec61360Iterable implements Iterable<IClass> {
+  private class _DataSpecificationIec61360Iterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -431,7 +431,7 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
     }
   }
 
-  private class DataSpecificationIec61360RecursiveIterable implements Iterable<IClass> {
+  private class _DataSpecificationIec61360RecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

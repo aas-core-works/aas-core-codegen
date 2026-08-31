@@ -193,7 +193,7 @@ def _generate_enhancer_class(
  * @param <EnhancementT> structure of the enhancement
  */
 public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
-{I}private final Wrapper<EnhancementT> wrapper;
+{I}private final _Wrapper<EnhancementT> wrapper;
 
 {I}/**
 {I} * @param enhancementFactory how to enhance the instances.
@@ -204,7 +204,7 @@ public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
 {I}public Enhancer(
 {II}Function<IClass, Optional<EnhancementT>> enhancementFactory
 {I}) {{
-{II}this.wrapper = new Wrapper<>(enhancementFactory);
+{II}this.wrapper = new _Wrapper<>(enhancementFactory);
 {I}}}
 
 {I}/**
@@ -708,7 +708,7 @@ def _generate_wrapper(
         ),
         Stripped(
             f"""\
-Wrapper(
+_Wrapper(
 {I}Function<IClass, Optional<EnhancementT>> enhancementFactory
 ) {{
 {I}this.enhancementFactory = enhancementFactory;
@@ -741,7 +741,7 @@ Wrapper(
     writer = io.StringIO()
     writer.write(
         """\
-class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
+class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 """
     )
 
@@ -765,7 +765,7 @@ class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 
     return (
         java_common.JavaFile(
-            "Wrapper.java",
+            "_Wrapper.java",
             f"{code}\n",
         ),
         None,

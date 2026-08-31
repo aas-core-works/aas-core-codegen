@@ -361,14 +361,14 @@ public class Operation implements IOperation {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new OperationRecursiveIterable();
+    return new _OperationRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new OperationIterable();
+    return new _OperationIterable();
   }
 
   /**
@@ -409,7 +409,7 @@ public class Operation implements IOperation {
     return transformer.transformOperation(this, context);
   }
 
-  private class OperationIterable implements Iterable<IClass> {
+  private class _OperationIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -488,7 +488,7 @@ public class Operation implements IOperation {
     }
   }
 
-  private class OperationRecursiveIterable implements Iterable<IClass> {
+  private class _OperationRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

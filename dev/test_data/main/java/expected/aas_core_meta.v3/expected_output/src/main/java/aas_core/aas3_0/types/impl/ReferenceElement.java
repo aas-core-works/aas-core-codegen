@@ -304,14 +304,14 @@ public class ReferenceElement implements IReferenceElement {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new ReferenceElementRecursiveIterable();
+    return new _ReferenceElementRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new ReferenceElementIterable();
+    return new _ReferenceElementIterable();
   }
 
   /**
@@ -352,7 +352,7 @@ public class ReferenceElement implements IReferenceElement {
     return transformer.transformReferenceElement(this, context);
   }
 
-  private class ReferenceElementIterable implements Iterable<IClass> {
+  private class _ReferenceElementIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -421,7 +421,7 @@ public class ReferenceElement implements IReferenceElement {
     }
   }
 
-  private class ReferenceElementRecursiveIterable implements Iterable<IClass> {
+  private class _ReferenceElementRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

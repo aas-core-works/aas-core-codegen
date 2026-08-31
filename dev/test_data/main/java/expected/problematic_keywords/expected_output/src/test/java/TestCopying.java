@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 
 public class TestCopying {
-  private static class DeepEqualiser extends AbstractTransformerWithContext<IClass, Boolean> {
+  private static class _DeepEqualiser extends AbstractTransformerWithContext<IClass, Boolean> {
     @Override
     public Boolean transformSomething(ISomething that, IClass other) {
       if (!(other instanceof Something)) {
@@ -34,9 +34,9 @@ public class TestCopying {
         && that.getRange().equals(casted.getRange())
         && that.getVoid().equals(casted.getVoid()));
     }
-  } // class DeepEqualiser
+  } // class _DeepEqualiser
 
-  private static final DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+  private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();
 
   /**
    * Compare two byte spans for equal content.
@@ -45,11 +45,11 @@ public class TestCopying {
     return that.equals(other);
   }
 
-  private static class Pair<A, B> {
+  private static class _Pair<A, B> {
     private final A first;
     private final B second;
     
-    public Pair(A first, B second) {
+    public _Pair(A first, B second) {
       this.first = first;
       this.second = second;
     }
@@ -65,7 +65,7 @@ public class TestCopying {
 
   // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
   // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<Pair<A, B>> zip(
+  private static <A, B> Stream<_Pair<A, B>> zip(
     Stream<? extends A> a,
     Stream<? extends B> b) {
     Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
@@ -80,19 +80,19 @@ public class TestCopying {
     
     Iterator<A> aIter = Spliterators.iterator(aSplit);
     Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<Pair<A, B>> cIter = new Iterator<Pair<A, B>>() {
+    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
       @Override
       public boolean hasNext() {
         return aIter.hasNext() && bIter.hasNext();
       }
       
       @Override
-      public Pair<A, B> next() {
-        return new Pair<>(aIter.next(), bIter.next());
+      public _Pair<A, B> next() {
+        return new _Pair<>(aIter.next(), bIter.next());
       }
     };
     
-    Spliterator<Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
+    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
     return StreamSupport.stream(split, false);
   }
 

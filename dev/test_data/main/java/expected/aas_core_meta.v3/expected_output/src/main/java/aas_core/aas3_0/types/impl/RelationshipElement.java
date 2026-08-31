@@ -330,14 +330,14 @@ public class RelationshipElement implements IRelationshipElement {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new RelationshipElementRecursiveIterable();
+    return new _RelationshipElementRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new RelationshipElementIterable();
+    return new _RelationshipElementIterable();
   }
 
   /**
@@ -378,7 +378,7 @@ public class RelationshipElement implements IRelationshipElement {
     return transformer.transformRelationshipElement(this, context);
   }
 
-  private class RelationshipElementIterable implements Iterable<IClass> {
+  private class _RelationshipElementIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -452,7 +452,7 @@ public class RelationshipElement implements IRelationshipElement {
     }
   }
 
-  private class RelationshipElementRecursiveIterable implements Iterable<IClass> {
+  private class _RelationshipElementRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

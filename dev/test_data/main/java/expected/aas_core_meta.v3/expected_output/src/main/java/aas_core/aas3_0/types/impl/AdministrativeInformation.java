@@ -149,14 +149,14 @@ public class AdministrativeInformation implements IAdministrativeInformation {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new AdministrativeInformationRecursiveIterable();
+    return new _AdministrativeInformationRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new AdministrativeInformationIterable();
+    return new _AdministrativeInformationIterable();
   }
 
   /**
@@ -197,7 +197,7 @@ public class AdministrativeInformation implements IAdministrativeInformation {
     return transformer.transformAdministrativeInformation(this, context);
   }
 
-  private class AdministrativeInformationIterable implements Iterable<IClass> {
+  private class _AdministrativeInformationIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -236,7 +236,7 @@ public class AdministrativeInformation implements IAdministrativeInformation {
     }
   }
 
-  private class AdministrativeInformationRecursiveIterable implements Iterable<IClass> {
+  private class _AdministrativeInformationRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

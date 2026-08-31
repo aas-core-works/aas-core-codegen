@@ -333,14 +333,14 @@ public class File implements IFile {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new FileRecursiveIterable();
+    return new _FileRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new FileIterable();
+    return new _FileIterable();
   }
 
   /**
@@ -381,7 +381,7 @@ public class File implements IFile {
     return transformer.transformFile(this, context);
   }
 
-  private class FileIterable implements Iterable<IClass> {
+  private class _FileIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -445,7 +445,7 @@ public class File implements IFile {
     }
   }
 
-  private class FileRecursiveIterable implements Iterable<IClass> {
+  private class _FileRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

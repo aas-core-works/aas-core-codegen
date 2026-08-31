@@ -79,14 +79,14 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new EmbeddedDataSpecificationRecursiveIterable();
+    return new _EmbeddedDataSpecificationRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new EmbeddedDataSpecificationIterable();
+    return new _EmbeddedDataSpecificationIterable();
   }
 
   /**
@@ -127,7 +127,7 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     return transformer.transformEmbeddedDataSpecification(this, context);
   }
 
-  private class EmbeddedDataSpecificationIterable implements Iterable<IClass> {
+  private class _EmbeddedDataSpecificationIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -166,7 +166,7 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     }
   }
 
-  private class EmbeddedDataSpecificationRecursiveIterable implements Iterable<IClass> {
+  private class _EmbeddedDataSpecificationRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

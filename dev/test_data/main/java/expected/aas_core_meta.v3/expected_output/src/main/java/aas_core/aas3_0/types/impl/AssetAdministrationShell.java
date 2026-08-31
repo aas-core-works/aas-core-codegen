@@ -316,14 +316,14 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new AssetAdministrationShellRecursiveIterable();
+    return new _AssetAdministrationShellRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new AssetAdministrationShellIterable();
+    return new _AssetAdministrationShellIterable();
   }
 
   /**
@@ -364,7 +364,7 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
     return transformer.transformAssetAdministrationShell(this, context);
   }
 
-  private class AssetAdministrationShellIterable implements Iterable<IClass> {
+  private class _AssetAdministrationShellIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -433,7 +433,7 @@ public class AssetAdministrationShell implements IAssetAdministrationShell {
     }
   }
 
-  private class AssetAdministrationShellRecursiveIterable implements Iterable<IClass> {
+  private class _AssetAdministrationShellRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

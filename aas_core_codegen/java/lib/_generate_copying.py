@@ -122,7 +122,7 @@ def _generate_shallow_copier(
 /**
  * Dispatch the making of shallow copies.
  */
-private static class ShallowCopier extends AbstractTransformer<IClass> {
+private static class _ShallowCopier extends AbstractTransformer<IClass> {
 """
     )
 
@@ -350,7 +350,7 @@ def _generate_deep_copier(
     writer.write(
         """\
 /** Dispatch the making of deep copies. */
-private static class DeepCopier extends AbstractTransformer<IClass> {
+private static class _DeepCopier extends AbstractTransformer<IClass> {
 """
     )
 
@@ -395,10 +395,10 @@ def generate(
 
     copy_blocks = [
         Stripped(
-            """private static final ShallowCopier shallowCopierInstance = new ShallowCopier();"""
+            """private static final _ShallowCopier shallowCopierInstance = new _ShallowCopier();"""
         ),
         Stripped(
-            """private static final DeepCopier deepCopierInstance = new DeepCopier();"""
+            """private static final _DeepCopier deepCopierInstance = new _DeepCopier();"""
         ),
         Stripped(
             f"""\

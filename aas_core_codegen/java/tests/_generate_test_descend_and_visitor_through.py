@@ -24,7 +24,7 @@ def generate(
     blocks = [
         Stripped(
             f"""\
-private class TracingVisitorThrough extends VisitorThrough {{
+private class _TracingVisitorThrough extends VisitorThrough {{
 {I}public final List<String> log = new ArrayList<>();
 
 {I}@Override
@@ -44,7 +44,7 @@ private void assertDescendAndVisitorThroughSame(IClass instance)
 {II}logFromDescend.add(Common.trace(subInstance));
 {I}}}
 
-{I}final TracingVisitorThrough visitor = new TracingVisitorThrough();
+{I}final _TracingVisitorThrough visitor = new _TracingVisitorThrough();
 {I}visitor.visit(instance);
 {I}final List<String> traceFromVisitor = visitor.log;
 

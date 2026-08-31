@@ -216,14 +216,14 @@ public class EventPayload implements IEventPayload {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new EventPayloadRecursiveIterable();
+    return new _EventPayloadRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new EventPayloadIterable();
+    return new _EventPayloadIterable();
   }
 
   /**
@@ -264,7 +264,7 @@ public class EventPayload implements IEventPayload {
     return transformer.transformEventPayload(this, context);
   }
 
-  private class EventPayloadIterable implements Iterable<IClass> {
+  private class _EventPayloadIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -318,7 +318,7 @@ public class EventPayload implements IEventPayload {
     }
   }
 
-  private class EventPayloadRecursiveIterable implements Iterable<IClass> {
+  private class _EventPayloadRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();

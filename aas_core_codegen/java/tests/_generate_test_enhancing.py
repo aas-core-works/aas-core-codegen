@@ -22,21 +22,21 @@ def generate(
     blocks = [
         Stripped(
             f"""\
-public static class Enhancement {{
+public static class _Enhancement {{
 {I}public final long someCustomId;
 
-{I}public Enhancement(long someCustomId) {{
+{I}public _Enhancement(long someCustomId) {{
 {II}this.someCustomId = someCustomId;
 {I}}}
 }}"""
         ),
         Stripped(
             f"""\
-private Enhancer<Enhancement> createEnhancer() {{
+private Enhancer<_Enhancement> createEnhancer() {{
 {I}AtomicLong lastCustomId = new AtomicLong();
 
-{I}Function<IClass, Optional<Enhancement>> enhancementFactory =
-{II}iClass -> Optional.of(new Enhancement(lastCustomId.incrementAndGet()));
+{I}Function<IClass, Optional<_Enhancement>> enhancementFactory =
+{II}iClass -> Optional.of(new _Enhancement(lastCustomId.incrementAndGet()));
 
 {I}return new Enhancer<>(enhancementFactory);
 }}"""
@@ -53,7 +53,7 @@ private Enhancer<Enhancement> createEnhancer() {{
 public void test{cls_name}() throws IOException {{
 {I}final {cls_name} instance = CommonJsonization.loadMaximal{cls_name}();
 
-{I}final Enhancer<Enhancement> enhancer = createEnhancer();
+{I}final Enhancer<_Enhancement> enhancer = createEnhancer();
 
 {I}assert !enhancer.unwrap(instance).isPresent();
 

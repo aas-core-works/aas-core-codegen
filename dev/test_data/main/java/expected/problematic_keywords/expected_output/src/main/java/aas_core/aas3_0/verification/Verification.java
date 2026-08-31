@@ -41,13 +41,13 @@ public class Verification {
   /**
    * Hash allowed enum values for efficient validation of enums.
    */
-  private static class EnumValueSet {
+  private static class _EnumValueSet {
 
   }
 
-  private static final Transformer transformer = new Transformer();
+  private static final _Transformer transformer = new _Transformer();
 
-  private static class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {
+  private static class _Transformer extends AbstractTransformer<Stream<Reporting.Error>> {
     @Override
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
@@ -63,10 +63,10 @@ public class Verification {
     return transformer.transform(that);
   }
 
-  private static class ValidationErrorIterable implements Iterable<Reporting.Error> {
+  private static class _ValidationErrorIterable implements Iterable<Reporting.Error> {
     private final IClass element;
 
-    public ValidationErrorIterable(IClass element) {
+    public _ValidationErrorIterable(IClass element) {
       this.element = element;
   }
 
@@ -102,14 +102,14 @@ public class Verification {
    * @param that The instance of the meta-model to be verified
    */
   public static Iterable<Reporting.Error> verify(IClass that) {
-    return new ValidationErrorIterable(that);
+    return new _ValidationErrorIterable(that);
   }
 
-  private static class Pair<A, B> {
+  private static class _Pair<A, B> {
     private final A first;
     private final B second;
 
-    public Pair(A first, B second) {
+    public _Pair(A first, B second) {
       this.first = first;
       this.second = second;
     }
@@ -125,7 +125,7 @@ public class Verification {
 
   // Java 8 doesn't provide a split operation out of the box, so we have to ship our own.
   // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<Pair<A, B>> zip(
+  private static <A, B> Stream<_Pair<A, B>> zip(
     Stream<? extends A> a,
     Stream<? extends B> b) {
     Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
@@ -140,19 +140,19 @@ public class Verification {
 
     Iterator<A> aIter = Spliterators.iterator(aSplit);
     Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<Pair<A, B>> cIter = new Iterator<Pair<A, B>>() {
+    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
       @Override
       public boolean hasNext() {
         return aIter.hasNext() && bIter.hasNext();
       }
 
       @Override
-      public Pair<A, B> next() {
-        return new Pair<>(aIter.next(), bIter.next());
+      public _Pair<A, B> next() {
+        return new _Pair<>(aIter.next(), bIter.next());
       }
     };
 
-    Spliterator<Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
+    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
     return StreamSupport.stream(split, false);
   }
 }

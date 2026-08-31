@@ -338,14 +338,14 @@ public class Blob implements IBlob {
    * Iterate recursively over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descend() {
-    return new BlobRecursiveIterable();
+    return new _BlobRecursiveIterable();
   }
 
   /**
    * Iterate over all the class instances referenced from this instance.
    */
   public Iterable<IClass> descendOnce() {
-    return new BlobIterable();
+    return new _BlobIterable();
   }
 
   /**
@@ -386,7 +386,7 @@ public class Blob implements IBlob {
     return transformer.transformBlob(this, context);
   }
 
-  private class BlobIterable implements Iterable<IClass> {
+  private class _BlobIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
@@ -450,7 +450,7 @@ public class Blob implements IBlob {
     }
   }
 
-  private class BlobRecursiveIterable implements Iterable<IClass> {
+  private class _BlobRecursiveIterable implements Iterable<IClass> {
     @Override
     public Iterator<IClass> iterator() {
       Stream<IClass> stream = stream();
