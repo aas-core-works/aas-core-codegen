@@ -385,6 +385,250 @@ public class Xmlization {
     }
 
     /**
+     * Consume a {@code <v>} element from the reader and return whether
+     * it was a self-closing (empty) element.
+     */
+    private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {
+      if (currentEvent(reader).isEndDocument()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a <v> element, but got an end-of-file.");
+        return _Result.failure(error);
+      }
+
+      if (!currentEvent(reader).isStartElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a <v> start element, but got the node of type "
+            + getEventTypeAsString(currentEvent(reader)));
+        return _Result.failure(error);
+      }
+
+      final _Result<String> tryElementName = tryElementName(reader);
+      if (tryElementName.isError()) {
+        return tryElementName.castTo(Boolean.class);
+      }
+
+      if (!"v".equals(tryElementName.getResult())) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a <v> element, but got an element " + tryElementName.getResult());
+        return _Result.failure(error);
+      }
+
+      final boolean isEmpty = isEmptyElement(reader);
+      return _Result.success(isEmpty);
+    }
+
+    /**
+     * Consume a {@code </v>} element from the reader.
+     */
+    private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {
+      skipWhitespaceAndComments(reader);
+
+      if (currentEvent(reader).isEndDocument()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a </v> element, but got an end-of-file.");
+        return _Result.failure(error);
+      }
+
+      if (!currentEvent(reader).isEndElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a </v> end element, but got the node of type "
+            + getEventTypeAsString(currentEvent(reader)));
+        return _Result.failure(error);
+      }
+
+      final _Result<String> tryElementName = tryElementName(reader);
+      if (tryElementName.isError()) {
+        return tryElementName.castTo(XMLEvent.class);
+      }
+
+      if (!"v".equals(tryElementName.getResult())) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a </v> element, but got an end element " + tryElementName.getResult());
+        return _Result.failure(error);
+      }
+
+      try {
+        return _Result.success(reader.nextEvent());
+      } catch (XMLStreamException xmlStreamException) {
+        throw new Xmlization.DeserializeException("",
+          "Failed in method tryVEndElement because of: " +
+            xmlStreamException.getMessage());
+      }
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as Boolean.
+     */
+    private static _Result<Boolean> tryVElementAsBoolean(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(Boolean.class);
+      }
+
+      if (tryVStart.getResult()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected an XML content representing Boolean, " +
+          "but got a self-closing <v /> element");
+        return _Result.failure(error);
+      }
+
+      final Boolean result;
+      try {
+        result = readContentAsBool(reader);
+      } catch (Exception exception) {
+        final Reporting.Error error = new Reporting.Error(
+          "The content of a <v> element could not be de-serialized " +
+          "as Boolean: " + exception.getMessage());
+        return _Result.failure(error);
+      }
+
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(Boolean.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as Long.
+     */
+    private static _Result<Long> tryVElementAsLong(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(Long.class);
+      }
+
+      if (tryVStart.getResult()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected an XML content representing Long, " +
+          "but got a self-closing <v /> element");
+        return _Result.failure(error);
+      }
+
+      final Long result;
+      try {
+        result = readContentAsLong(reader);
+      } catch (Exception exception) {
+        final Reporting.Error error = new Reporting.Error(
+          "The content of a <v> element could not be de-serialized " +
+          "as Long: " + exception.getMessage());
+        return _Result.failure(error);
+      }
+
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(Long.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as Double.
+     */
+    private static _Result<Double> tryVElementAsDouble(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(Double.class);
+      }
+
+      if (tryVStart.getResult()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected an XML content representing Double, " +
+          "but got a self-closing <v /> element");
+        return _Result.failure(error);
+      }
+
+      final Double result;
+      try {
+        result = readContentAsDouble(reader);
+      } catch (Exception exception) {
+        final Reporting.Error error = new Reporting.Error(
+          "The content of a <v> element could not be de-serialized " +
+          "as Double: " + exception.getMessage());
+        return _Result.failure(error);
+      }
+
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(Double.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as a string.
+     */
+    private static _Result<String> tryVElementAsString(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(String.class);
+      }
+
+      final String result;
+      if (tryVStart.getResult()) {
+        result = "";
+      } else {
+        try {
+          result = readContentAsString(reader);
+        } catch (Exception exception) {
+          final Reporting.Error error = new Reporting.Error(
+            "The content of a <v> element could not be de-serialized " +
+            "as String: " + exception.getMessage());
+          return _Result.failure(error);
+        }
+      }
+
+      // NOTE (mristin):
+      // A self-closing <v /> is represented as a pair of start and end events
+      // in StAX, so we need to consume the end element even if the <v /> was
+      // empty.
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(String.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read a {@code <v>} element as base64-encoded bytes.
+     */
+    private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(byte[].class);
+      }
+
+      final byte[] result;
+      if (tryVStart.getResult()) {
+        result = new byte[0];
+      } else {
+        try {
+          result = readContentAsBase64(reader);
+        } catch (Exception exception) {
+          final Reporting.Error error = new Reporting.Error(
+            "The content of a <v> element could not be de-serialized " +
+            "as base64-encoded bytes: " + exception.getMessage());
+          return _Result.failure(error);
+        }
+      }
+
+      // NOTE (mristin):
+      // A self-closing <v /> is represented as a pair of start and end events
+      // in StAX, so we need to consume the end element even if the <v /> was
+      // empty.
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(byte[].class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
      * Deserialize an instance of INode from an XML element.
      */
     private static _Result<? extends INode> tryINodeFromElement(

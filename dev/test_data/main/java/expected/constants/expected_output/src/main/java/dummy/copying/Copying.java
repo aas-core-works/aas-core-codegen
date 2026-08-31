@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import dummy.types.model.IClass;
 import dummy.visitation.AbstractTransformer;
+import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
 

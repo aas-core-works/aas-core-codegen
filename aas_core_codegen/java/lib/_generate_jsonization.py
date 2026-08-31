@@ -237,8 +237,11 @@ if ({target_var}Result.isError()) {{
             type_anno.items,
             (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
         ), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate_._verify_only_simple_type_patterns"
+            f"We only support lists of atomic values (primitives, constrained "
+            f"primitives, enumeration literals) or classes when de-serializing "
+            f"from JSON, but the argument {arg.name!r} has the unsupported "
+            f"nested type {arg.type_annotation}. Please contact the developers "
+            f"if you need this feature."
         )
 
         item_type = java_common.generate_type(type_anno.items)
@@ -995,8 +998,11 @@ def _generate_transform_property(
             type_anno.items,
             (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
         ), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate._verify_only_simple_type_patterns."
+            f"We only support lists of atomic values (primitives, constrained "
+            f"primitives, enumeration literals) or classes when serializing "
+            f"to JSON, but the property {prop.name!r} has the unsupported "
+            f"nested type {prop.type_annotation}. Please contact the "
+            f"developers if you need this feature."
         )
 
         item_type = java_common.generate_type(type_anno.items)

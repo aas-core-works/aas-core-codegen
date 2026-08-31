@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import aas_core.aas3_0.types.model.IClass;
 import aas_core.aas3_0.visitation.AbstractTransformer;
+import aas_core.aas3_0.types.enums.*;
 import aas_core.aas3_0.types.impl.*;
 import aas_core.aas3_0.types.model.*;
 
