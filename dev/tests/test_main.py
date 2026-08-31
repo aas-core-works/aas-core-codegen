@@ -431,6 +431,11 @@ class Test_java(_TestCase):
             target=aas_core_codegen.main.Target.JAVA, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_constants(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="constants"
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA,
