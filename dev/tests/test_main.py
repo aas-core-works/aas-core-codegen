@@ -431,9 +431,25 @@ class Test_java(_TestCase):
             target=aas_core_codegen.main.Target.JAVA, case_name="aas_core_meta.v3"
         )
 
+    def test_expected_constrained_primitives(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="constrained_primitives",
+        )
+
+    def test_expected_deep_class_hierarchy(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="deep_class_hierarchy"
+        )
+
     def test_expected_enum(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="enum"
+        )
+
+    def test_expected_list_of_classes(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="list_of_classes"
         )
 
     def test_expected_primitive_types(self) -> None:
