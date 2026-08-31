@@ -103,12 +103,20 @@ def _generate_transform_as_deep_equals(cls: intermediate.ConcreteClass) -> Strip
 that.{getter_name}().equals(casted.{getter_name}())"""
                 )
             elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                expr = Stripped(
-                    f"""\
+                if optional:
+                    expr = Stripped(
+                        f"""\
 Arrays.equals(
 {I}that.{getter_name}().get(),
 {I}casted.{getter_name}().get())"""
-                )
+                    )
+                else:
+                    expr = Stripped(
+                        f"""\
+Arrays.equals(
+{I}that.{getter_name}(),
+{I}casted.{getter_name}())"""
+                    )
             else:
                 assert_never(primitive_type)
 
