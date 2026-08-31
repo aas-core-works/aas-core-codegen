@@ -263,9 +263,9 @@ def _generate_deserialize_primitive_property(
     if a_type is intermediate.PrimitiveType.BOOL:
         deserialization_expr = "readContentAsBool(reader)"
     elif a_type is intermediate.PrimitiveType.INT:
-        deserialization_expr = "readContentAsInt(reader)"
+        deserialization_expr = "readContentAsLong(reader)"
     elif a_type is intermediate.PrimitiveType.FLOAT:
-        deserialization_expr = "readContentAsFloat(reader)"
+        deserialization_expr = "readContentAsDouble(reader)"
     elif a_type is intermediate.PrimitiveType.STR:
         deserialization_expr = "readContentAsString(reader)"
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
@@ -1526,9 +1526,16 @@ if (that.{getter_name}().isPresent()) {{
             )
             write_value_block = Stripped(
                 f"""\
+writer.writeStartElement(
+{I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
 String {base64_prop_name} = Base64.getEncoder().encodeToString(
 {I}that.{getter_name}());
-writer.writeCharacters({base64_prop_name});"""
+writer.writeCharacters({base64_prop_name});
+writer.writeEndElement();"""
             )
     else:
         assert_never(a_type)

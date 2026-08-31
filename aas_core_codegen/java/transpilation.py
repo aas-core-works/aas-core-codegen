@@ -41,7 +41,7 @@ from aas_core_codegen.parse import tree as parse_tree
 PRIMITIVE_TYPE_MAP = {
     intermediate_type_inference.PrimitiveType.BOOL: Stripped("Boolean"),
     intermediate_type_inference.PrimitiveType.INT: Stripped("Long"),
-    intermediate_type_inference.PrimitiveType.FLOAT: Stripped("Float"),
+    intermediate_type_inference.PrimitiveType.FLOAT: Stripped("Double"),
     intermediate_type_inference.PrimitiveType.STR: Stripped("String"),
     intermediate_type_inference.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }

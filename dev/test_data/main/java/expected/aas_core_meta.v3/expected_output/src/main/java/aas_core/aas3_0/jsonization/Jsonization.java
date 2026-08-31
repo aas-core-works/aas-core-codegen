@@ -69,7 +69,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       private static Result<Long> tryLongFrom(JsonNode value) {
-        if (!value.isLong()) {
+        if (!value.isIntegralNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Long, but got " + value.getNodeType());
           return Result.failure(error);
@@ -81,7 +81,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       private static Result<Double> tryDoubleFrom(JsonNode value) {
-        if (!value.isDouble()) {
+        if (!value.isFloatingPointNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Double, but got " + value.getNodeType());
           return Result.failure(error);

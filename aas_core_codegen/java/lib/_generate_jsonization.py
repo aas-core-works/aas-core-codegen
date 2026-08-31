@@ -614,7 +614,7 @@ private static Result<Boolean> tryBooleanFrom(JsonNode value) {{
  * @param node JSON node to be parsed
  */
 private static Result<Long> tryLongFrom(JsonNode value) {{
-{I}if (!value.isLong()) {{
+{I}if (!value.isIntegralNumber()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of Long, but got " + value.getNodeType());
 {II}return Result.failure(error);
@@ -628,7 +628,7 @@ private static Result<Long> tryLongFrom(JsonNode value) {{
  * @param node JSON node to be parsed
  */
 private static Result<Double> tryDoubleFrom(JsonNode value) {{
-{I}if (!value.isDouble()) {{
+{I}if (!value.isFloatingPointNumber()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of Double, but got " + value.getNodeType());
 {II}return Result.failure(error);
@@ -894,7 +894,7 @@ JsonNodeFactory.instance.textNode(
         # We can not use textwrap due to indent_but_first_line.
         return Stripped(
             f"""\
-Transformer.toJsonValue(
+Transformer.toJsonNode(
 {I}{indent_but_first_line(source_expr, I)})"""
         )
     elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:

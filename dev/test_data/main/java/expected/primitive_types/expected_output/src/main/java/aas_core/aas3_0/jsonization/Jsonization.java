@@ -123,69 +123,84 @@ public class Jsonization {
           return Result.failure(error);
         }
 
-        String theInterface = null;
-        String theType = null;
-        String theRange = null;
-        String theVoid = null;
+        Boolean theSomeBool = null;
+        Long theSomeInt = null;
+        Double theSomeFloat = null;
+        String theSomeString = null;
+        byte[] theSomeBytes = null;
 
         for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
           Map.Entry<String, JsonNode> currentNode = iterator.next();
 
           switch (currentNode.getKey()) {
-            case "interface": {
+            case "someBool": {
               if (currentNode.getValue() == null) {
                 continue;
               }
 
-              final Result<? extends String> theInterfaceResult = tryStringFrom(currentNode.getValue());
-              if (theInterfaceResult.isError()) {
-                theInterfaceResult.getError()
-                  .prependSegment(new Reporting.NameSegment("interface"));
-                return theInterfaceResult.castTo(Something.class);
+              final Result<? extends Boolean> theSomeBoolResult = tryBooleanFrom(currentNode.getValue());
+              if (theSomeBoolResult.isError()) {
+                theSomeBoolResult.getError()
+                  .prependSegment(new Reporting.NameSegment("someBool"));
+                return theSomeBoolResult.castTo(Something.class);
               }
-              theInterface = theInterfaceResult.getResult();
+              theSomeBool = theSomeBoolResult.getResult();
               break;
             }
-            case "type": {
+            case "someInt": {
               if (currentNode.getValue() == null) {
                 continue;
               }
 
-              final Result<? extends String> theTypeResult = tryStringFrom(currentNode.getValue());
-              if (theTypeResult.isError()) {
-                theTypeResult.getError()
-                  .prependSegment(new Reporting.NameSegment("type"));
-                return theTypeResult.castTo(Something.class);
+              final Result<? extends Long> theSomeIntResult = tryLongFrom(currentNode.getValue());
+              if (theSomeIntResult.isError()) {
+                theSomeIntResult.getError()
+                  .prependSegment(new Reporting.NameSegment("someInt"));
+                return theSomeIntResult.castTo(Something.class);
               }
-              theType = theTypeResult.getResult();
+              theSomeInt = theSomeIntResult.getResult();
               break;
             }
-            case "range": {
+            case "someFloat": {
               if (currentNode.getValue() == null) {
                 continue;
               }
 
-              final Result<? extends String> theRangeResult = tryStringFrom(currentNode.getValue());
-              if (theRangeResult.isError()) {
-                theRangeResult.getError()
-                  .prependSegment(new Reporting.NameSegment("range"));
-                return theRangeResult.castTo(Something.class);
+              final Result<? extends Double> theSomeFloatResult = tryDoubleFrom(currentNode.getValue());
+              if (theSomeFloatResult.isError()) {
+                theSomeFloatResult.getError()
+                  .prependSegment(new Reporting.NameSegment("someFloat"));
+                return theSomeFloatResult.castTo(Something.class);
               }
-              theRange = theRangeResult.getResult();
+              theSomeFloat = theSomeFloatResult.getResult();
               break;
             }
-            case "void": {
+            case "someString": {
               if (currentNode.getValue() == null) {
                 continue;
               }
 
-              final Result<? extends String> theVoidResult = tryStringFrom(currentNode.getValue());
-              if (theVoidResult.isError()) {
-                theVoidResult.getError()
-                  .prependSegment(new Reporting.NameSegment("void"));
-                return theVoidResult.castTo(Something.class);
+              final Result<? extends String> theSomeStringResult = tryStringFrom(currentNode.getValue());
+              if (theSomeStringResult.isError()) {
+                theSomeStringResult.getError()
+                  .prependSegment(new Reporting.NameSegment("someString"));
+                return theSomeStringResult.castTo(Something.class);
               }
-              theVoid = theVoidResult.getResult();
+              theSomeString = theSomeStringResult.getResult();
+              break;
+            }
+            case "someBytes": {
+              if (currentNode.getValue() == null) {
+                continue;
+              }
+
+              final Result<? extends byte[]> theSomeBytesResult = tryBytesFrom(currentNode.getValue());
+              if (theSomeBytesResult.isError()) {
+                theSomeBytesResult.getError()
+                  .prependSegment(new Reporting.NameSegment("someBytes"));
+                return theSomeBytesResult.castTo(Something.class);
+              }
+              theSomeBytes = theSomeBytesResult.getResult();
               break;
             }
             default: {
@@ -196,35 +211,42 @@ public class Jsonization {
           }
         }
 
-        if (theInterface == null) {
+        if (theSomeBool == null) {
           final Reporting.Error error = new Reporting.Error(
-            "Required property \"interface\" is missing");
+            "Required property \"someBool\" is missing");
           return Result.failure(error);
         }
 
-        if (theType == null) {
+        if (theSomeInt == null) {
           final Reporting.Error error = new Reporting.Error(
-            "Required property \"type\" is missing");
+            "Required property \"someInt\" is missing");
           return Result.failure(error);
         }
 
-        if (theRange == null) {
+        if (theSomeFloat == null) {
           final Reporting.Error error = new Reporting.Error(
-            "Required property \"range\" is missing");
+            "Required property \"someFloat\" is missing");
           return Result.failure(error);
         }
 
-        if (theVoid == null) {
+        if (theSomeString == null) {
           final Reporting.Error error = new Reporting.Error(
-            "Required property \"void\" is missing");
+            "Required property \"someString\" is missing");
+          return Result.failure(error);
+        }
+
+        if (theSomeBytes == null) {
+          final Reporting.Error error = new Reporting.Error(
+            "Required property \"someBytes\" is missing");
           return Result.failure(error);
         }
 
         return Result.success(new Something(
-          theInterface,
-          theType,
-          theRange,
-          theVoid));
+          theSomeBool,
+          theSomeInt,
+          theSomeFloat,
+          theSomeString,
+          theSomeBytes));
       }
     }
 
@@ -362,17 +384,21 @@ public class Jsonization {
       ) {
         final ObjectNode result = JsonNodeFactory.instance.objectNode();
 
-        result.put("interface", JsonNodeFactory.instance.textNode(
-          that.getInterface()));
+        result.set("someBool", JsonNodeFactory.instance.booleanNode(
+          that.getSomeBool()));
 
-        result.put("type", JsonNodeFactory.instance.textNode(
-          that.getType()));
+        result.set("someInt", Transformer.toJsonNode(
+          that.getSomeInt()));
 
-        result.put("range", JsonNodeFactory.instance.textNode(
-          that.getRange()));
+        result.set("someFloat", JsonNodeFactory.instance.numberNode(
+          that.getSomeFloat()));
 
-        result.put("void", JsonNodeFactory.instance.textNode(
-          that.getVoid()));
+        result.put("someString", JsonNodeFactory.instance.textNode(
+          that.getSomeString()));
+
+        result.set("someBytes", JsonNodeFactory.instance.textNode(
+            Base64.getEncoder()
+              .encodeToString(that.getSomeBytes())));
 
         return result;
       }
