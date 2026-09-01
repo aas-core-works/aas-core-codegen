@@ -13,7 +13,7 @@ import sys
 import tempfile
 from typing import Optional, Pattern
 
-if sys.version_info <= (3, 11):
+if sys.version_info < (3, 12):
     import more_itertools as itertools
 else:
     import itertools
