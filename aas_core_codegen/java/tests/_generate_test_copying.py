@@ -148,20 +148,41 @@ transform(
 {I}casted.{getter_name}())"""
                     )
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(type_anno.items.our_type, intermediate.Class), (
-                f"(empwilli): We handle only lists of classes in the deep "
-                f"equality checks at the moment. The meta-model does not contain "
-                f"any other lists, so we wanted to keep the code as simple as "
-                f"possible, and avoid unrolling. Please contact the developers "
-                f"if you need this feature. The class in question was {cls.name!r} and "
-                f"the property {prop.name!r}."
+            assert not isinstance(
+                type_anno.items,
+                (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+            ), (
+                f"(mristin): We handle only lists of atomic values (primitives, "
+                f"constrained primitives, enumeration literals) or lists of "
+                f"classes in the deep equality checks at the moment. Lists of "
+                f"lists or lists of optionals are not supported. Please contact "
+                f"the developers if you need this feature. The class in "
+                f"question was {cls.name!r} and the property {prop.name!r}."
             )
-            expr = Stripped(
-                f"""\
+
+            item_primitive_type = intermediate.try_primitive_type(type_anno.items)
+
+            if item_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                # NOTE (mristin):
+                # ``byte[]`` does not override ``equals`` to compare content, so
+                # ``List.equals`` would compare the arrays by reference. We zip
+                # the two lists and compare each pair of byte arrays with
+                # ``Arrays.equals`` instead.
+                expr = Stripped(
+                    f"""\
+(that.{getter_name}().size() == casted.{getter_name}().size()
+{I}&& zip(that.{getter_name}().stream(), casted.{getter_name}().stream())
+{II}.allMatch(pair -> Arrays.equals(pair.getFirst(), pair.getSecond())))"""
+                )
+            else:
+                # NOTE (mristin):
+                # For lists of other primitives, constrained primitives or
+                # enumeration literals, the items are compared by value with
+                # their own ``equals`` method, so ``List.equals`` is sufficient.
+                expr = Stripped(
+                    f"""\
 that.{getter_name}().equals(casted.{getter_name}())"""
-            )
+                )
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)

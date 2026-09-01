@@ -385,6 +385,503 @@ public class Xmlization {
     }
 
     /**
+     * Consume a {@code <v>} element from the reader and return whether
+     * it was a self-closing (empty) element.
+     */
+    private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {
+      if (currentEvent(reader).isEndDocument()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a <v> element, but got an end-of-file.");
+        return _Result.failure(error);
+      }
+
+      if (!currentEvent(reader).isStartElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a <v> start element, but got the node of type "
+            + getEventTypeAsString(currentEvent(reader)));
+        return _Result.failure(error);
+      }
+
+      final _Result<String> tryElementName = tryElementName(reader);
+      if (tryElementName.isError()) {
+        return tryElementName.castTo(Boolean.class);
+      }
+
+      if (!"v".equals(tryElementName.getResult())) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a <v> element, but got an element " + tryElementName.getResult());
+        return _Result.failure(error);
+      }
+
+      final boolean isEmpty = isEmptyElement(reader);
+      return _Result.success(isEmpty);
+    }
+
+    /**
+     * Consume a {@code </v>} element from the reader.
+     */
+    private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {
+      skipWhitespaceAndComments(reader);
+
+      if (currentEvent(reader).isEndDocument()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a </v> element, but got an end-of-file.");
+        return _Result.failure(error);
+      }
+
+      if (!currentEvent(reader).isEndElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a </v> end element, but got the node of type "
+            + getEventTypeAsString(currentEvent(reader)));
+        return _Result.failure(error);
+      }
+
+      final _Result<String> tryElementName = tryElementName(reader);
+      if (tryElementName.isError()) {
+        return tryElementName.castTo(XMLEvent.class);
+      }
+
+      if (!"v".equals(tryElementName.getResult())) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a </v> element, but got an end element " + tryElementName.getResult());
+        return _Result.failure(error);
+      }
+
+      try {
+        return _Result.success(reader.nextEvent());
+      } catch (XMLStreamException xmlStreamException) {
+        throw new Xmlization.DeserializeException("",
+          "Failed in method tryVEndElement because of: " +
+            xmlStreamException.getMessage());
+      }
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as Boolean.
+     */
+    private static _Result<Boolean> tryVElementAsBoolean(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(Boolean.class);
+      }
+
+      if (tryVStart.getResult()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected an XML content representing Boolean, " +
+          "but got a self-closing <v /> element");
+        return _Result.failure(error);
+      }
+
+      final Boolean result;
+      try {
+        result = readContentAsBool(reader);
+      } catch (Exception exception) {
+        final Reporting.Error error = new Reporting.Error(
+          "The content of a <v> element could not be de-serialized " +
+          "as Boolean: " + exception.getMessage());
+        return _Result.failure(error);
+      }
+
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(Boolean.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as Long.
+     */
+    private static _Result<Long> tryVElementAsLong(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(Long.class);
+      }
+
+      if (tryVStart.getResult()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected an XML content representing Long, " +
+          "but got a self-closing <v /> element");
+        return _Result.failure(error);
+      }
+
+      final Long result;
+      try {
+        result = readContentAsLong(reader);
+      } catch (Exception exception) {
+        final Reporting.Error error = new Reporting.Error(
+          "The content of a <v> element could not be de-serialized " +
+          "as Long: " + exception.getMessage());
+        return _Result.failure(error);
+      }
+
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(Long.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as Double.
+     */
+    private static _Result<Double> tryVElementAsDouble(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(Double.class);
+      }
+
+      if (tryVStart.getResult()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected an XML content representing Double, " +
+          "but got a self-closing <v /> element");
+        return _Result.failure(error);
+      }
+
+      final Double result;
+      try {
+        result = readContentAsDouble(reader);
+      } catch (Exception exception) {
+        final Reporting.Error error = new Reporting.Error(
+          "The content of a <v> element could not be de-serialized " +
+          "as Double: " + exception.getMessage());
+        return _Result.failure(error);
+      }
+
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(Double.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read the content of a {@code <v>} element and parse it as a string.
+     */
+    private static _Result<String> tryVElementAsString(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(String.class);
+      }
+
+      final String result;
+      if (tryVStart.getResult()) {
+        result = "";
+      } else {
+        try {
+          result = readContentAsString(reader);
+        } catch (Exception exception) {
+          final Reporting.Error error = new Reporting.Error(
+            "The content of a <v> element could not be de-serialized " +
+            "as String: " + exception.getMessage());
+          return _Result.failure(error);
+        }
+      }
+
+      // NOTE (mristin):
+      // A self-closing <v /> is represented as a pair of start and end events
+      // in StAX, so we need to consume the end element even if the <v /> was
+      // empty.
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(String.class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read a {@code <v>} element as base64-encoded bytes.
+     */
+    private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {
+      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+      if (tryVStart.isError()) {
+        return tryVStart.castTo(byte[].class);
+      }
+
+      final byte[] result;
+      if (tryVStart.getResult()) {
+        result = new byte[0];
+      } else {
+        try {
+          result = readContentAsBase64(reader);
+        } catch (Exception exception) {
+          final Reporting.Error error = new Reporting.Error(
+            "The content of a <v> element could not be de-serialized " +
+            "as base64-encoded bytes: " + exception.getMessage());
+          return _Result.failure(error);
+        }
+      }
+
+      // NOTE (mristin):
+      // A self-closing <v /> is represented as a pair of start and end events
+      // in StAX, so we need to consume the end element even if the <v /> was
+      // empty.
+      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      if (tryVEnd.isError()) {
+        return tryVEnd.castTo(byte[].class);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link ModellingKind}.
+     */
+    private static _Result<ModellingKind> tryVElementAsModellingKind(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(ModellingKind.class);
+      }
+
+      final Optional<ModellingKind> result = Stringification.modellingKindFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of ModellingKind: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link QualifierKind}.
+     */
+    private static _Result<QualifierKind> tryVElementAsQualifierKind(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(QualifierKind.class);
+      }
+
+      final Optional<QualifierKind> result = Stringification.qualifierKindFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of QualifierKind: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link AssetKind}.
+     */
+    private static _Result<AssetKind> tryVElementAsAssetKind(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(AssetKind.class);
+      }
+
+      final Optional<AssetKind> result = Stringification.assetKindFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of AssetKind: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link AasSubmodelElements}.
+     */
+    private static _Result<AasSubmodelElements> tryVElementAsAasSubmodelElements(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(AasSubmodelElements.class);
+      }
+
+      final Optional<AasSubmodelElements> result = Stringification.aasSubmodelElementsFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of AasSubmodelElements: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link EntityType}.
+     */
+    private static _Result<EntityType> tryVElementAsEntityType(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(EntityType.class);
+      }
+
+      final Optional<EntityType> result = Stringification.entityTypeFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of EntityType: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link Direction}.
+     */
+    private static _Result<Direction> tryVElementAsDirection(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(Direction.class);
+      }
+
+      final Optional<Direction> result = Stringification.directionFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of Direction: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link StateOfEvent}.
+     */
+    private static _Result<StateOfEvent> tryVElementAsStateOfEvent(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(StateOfEvent.class);
+      }
+
+      final Optional<StateOfEvent> result = Stringification.stateOfEventFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of StateOfEvent: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link ReferenceTypes}.
+     */
+    private static _Result<ReferenceTypes> tryVElementAsReferenceTypes(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(ReferenceTypes.class);
+      }
+
+      final Optional<ReferenceTypes> result = Stringification.referenceTypesFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of ReferenceTypes: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link KeyTypes}.
+     */
+    private static _Result<KeyTypes> tryVElementAsKeyTypes(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(KeyTypes.class);
+      }
+
+      final Optional<KeyTypes> result = Stringification.keyTypesFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of KeyTypes: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link DataTypeDefXsd}.
+     */
+    private static _Result<DataTypeDefXsd> tryVElementAsDataTypeDefXsd(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(DataTypeDefXsd.class);
+      }
+
+      final Optional<DataTypeDefXsd> result = Stringification.dataTypeDefXsdFromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of DataTypeDefXsd: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
+     * Read a {@code <v>} element and parse its content as a literal
+     * of {@link DataTypeIec61360}.
+     */
+    private static _Result<DataTypeIec61360> tryVElementAsDataTypeIec61360(XMLEventReader reader) {
+      final _Result<String> tryText = tryVElementAsString(reader);
+      if (tryText.isError()) {
+        return tryText.castTo(DataTypeIec61360.class);
+      }
+
+      final Optional<DataTypeIec61360> result = Stringification.dataTypeIec61360FromString(
+        tryText.getResult());
+
+      if (!result.isPresent()) {
+        final Reporting.Error error = new Reporting.Error(
+          "The text could not be parsed as a literal of DataTypeIec61360: " +
+          tryText.getResult());
+        return _Result.failure(error);
+      }
+
+      return _Result.success(result.get());
+    }
+
+    /**
      * Deserialize an instance of IHasSemantics from an XML element.
      */
     private static _Result<? extends IHasSemantics> tryIHasSemanticsFromElement(
@@ -16369,11 +16866,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16446,11 +16941,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getRefersTo().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getRefersTo().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16489,11 +16982,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16624,11 +17115,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16768,11 +17257,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16823,11 +17310,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16842,11 +17327,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16894,11 +17377,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -16949,11 +17430,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSubmodels().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSubmodels().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17034,11 +17513,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSpecificAssetIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISpecificAssetId item : that.getSpecificAssetIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17189,11 +17666,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17279,11 +17754,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17334,11 +17807,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17353,11 +17824,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17450,11 +17919,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17469,11 +17936,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17488,11 +17953,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17507,11 +17970,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSubmodelElements().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISubmodelElement item : that.getSubmodelElements().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17550,11 +18011,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17605,11 +18064,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17624,11 +18081,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17662,11 +18117,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17681,11 +18134,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17700,11 +18151,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17777,11 +18226,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17832,11 +18279,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17851,11 +18296,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17889,11 +18332,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17908,11 +18349,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -17927,11 +18366,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18033,11 +18470,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getValue().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISubmodelElement item : that.getValue().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18076,11 +18511,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18131,11 +18564,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18150,11 +18581,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18188,11 +18617,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18207,11 +18634,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18226,11 +18651,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18245,11 +18668,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getValue().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISubmodelElement item : that.getValue().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18288,11 +18709,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18343,11 +18762,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18362,11 +18779,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18400,11 +18815,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18419,11 +18832,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18438,11 +18849,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18542,11 +18951,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18597,11 +19004,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18616,11 +19021,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18654,11 +19057,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18673,11 +19074,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18692,11 +19091,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18711,11 +19108,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getValue().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getValue().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18773,11 +19168,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18828,11 +19221,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18847,11 +19238,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18885,11 +19274,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18904,11 +19291,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -18923,11 +19308,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19026,11 +19409,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19081,11 +19462,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19100,11 +19479,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19138,11 +19515,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19157,11 +19532,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19176,11 +19549,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19238,11 +19609,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19293,11 +19662,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19312,11 +19679,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19350,11 +19715,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19369,11 +19732,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19388,11 +19749,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19461,11 +19820,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19516,11 +19873,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19535,11 +19890,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19573,11 +19926,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19592,11 +19943,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19611,11 +19960,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19686,11 +20033,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19741,11 +20086,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19760,11 +20103,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19798,11 +20139,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19817,11 +20156,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19836,11 +20173,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19889,11 +20224,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getAnnotations().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IDataElement item : that.getAnnotations().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19932,11 +20265,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -19987,11 +20318,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20006,11 +20335,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20044,11 +20371,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20063,11 +20388,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20082,11 +20405,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20101,11 +20422,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getStatements().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISubmodelElement item : that.getStatements().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20162,11 +20481,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSpecificAssetIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISpecificAssetId item : that.getSpecificAssetIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20368,11 +20685,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20423,11 +20738,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20442,11 +20755,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20480,11 +20791,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20499,11 +20808,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20518,11 +20825,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20717,11 +21022,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20772,11 +21075,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20791,11 +21092,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20829,11 +21128,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20848,11 +21145,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20867,11 +21162,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20886,11 +21179,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getInputVariables().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IOperationVariable item : that.getInputVariables().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20905,11 +21196,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getOutputVariables().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IOperationVariable item : that.getOutputVariables().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -20924,11 +21213,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getInoutputVariables().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IOperationVariable item : that.getInoutputVariables().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21008,11 +21295,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21063,11 +21348,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21082,11 +21365,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21120,11 +21401,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSupplementalSemanticIds().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getSupplementalSemanticIds().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21139,11 +21418,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getQualifiers().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IQualifier item : that.getQualifiers().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21158,11 +21435,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21201,11 +21476,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getExtensions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IExtension item : that.getExtensions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21256,11 +21529,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDisplayName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringNameType item : that.getDisplayName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21275,11 +21546,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDescription().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringTextType item : that.getDescription().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21327,11 +21596,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21346,11 +21613,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getIsCaseOf().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IReference item : that.getIsCaseOf().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21432,10 +21697,8 @@ public class Xmlization {
           topLevel = false;
         }
 
-        for (IClass item : that.getKeys()) {
-          this.visit(
-            item,
-            writer);
+        for (IKey item : that.getKeys()) {
+          this.visit(item, writer);
         }
 
         writer.writeEndElement();
@@ -21641,11 +21904,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getAssetAdministrationShells().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IAssetAdministrationShell item : that.getAssetAdministrationShells().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21660,11 +21921,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getSubmodels().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ISubmodel item : that.getSubmodels().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21679,11 +21938,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getConceptDescriptions().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (IConceptDescription item : that.getConceptDescriptions().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -21915,10 +22172,8 @@ public class Xmlization {
           topLevel = false;
         }
 
-        for (IClass item : that.getValueReferencePairs()) {
-          this.visit(
-            item,
-            writer);
+        for (IValueReferencePair item : that.getValueReferencePairs()) {
+          this.visit(item, writer);
         }
 
         writer.writeEndElement();
@@ -22114,10 +22369,8 @@ public class Xmlization {
           topLevel = false;
         }
 
-        for (IClass item : that.getPreferredName()) {
-          this.visit(
-            item,
-            writer);
+        for (ILangStringPreferredNameTypeIec61360 item : that.getPreferredName()) {
+          this.visit(item, writer);
         }
 
         writer.writeEndElement();
@@ -22133,11 +22386,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getShortName().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringShortNameTypeIec61360 item : that.getShortName().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {
@@ -22251,11 +22502,9 @@ public class Xmlization {
             writer.writeNamespace("xmlns", AAS_NAME_SPACE);
             topLevel = false;
           }
-          for (IClass item : that.getDefinition().get()) {
-            this.visit(
-              item,
-              writer);
-            }
+          for (ILangStringDefinitionTypeIec61360 item : that.getDefinition().get()) {
+            this.visit(item, writer);
+          }
           writer.writeEndElement();
         }
       } catch (XMLStreamException exception) {

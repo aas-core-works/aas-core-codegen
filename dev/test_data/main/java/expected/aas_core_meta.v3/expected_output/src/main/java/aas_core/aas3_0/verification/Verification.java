@@ -2131,7 +2131,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2183,7 +2183,7 @@ public class Verification {
             that.getRefersTo().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2234,7 +2234,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2348,7 +2348,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2528,7 +2528,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2571,7 +2571,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2592,7 +2592,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2633,7 +2633,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2674,7 +2674,7 @@ public class Verification {
             that.getSubmodels().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2769,7 +2769,7 @@ public class Verification {
             that.getSpecificAssetIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISpecificAssetId elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -2889,7 +2889,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3131,7 +3131,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3174,7 +3174,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3195,7 +3195,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3258,7 +3258,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3279,7 +3279,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3300,7 +3300,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3321,7 +3321,7 @@ public class Verification {
             that.getSubmodelElements().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISubmodelElement elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3456,7 +3456,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3499,7 +3499,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3520,7 +3520,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3552,7 +3552,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3573,7 +3573,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3594,7 +3594,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3837,7 +3837,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3880,7 +3880,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3901,7 +3901,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3933,7 +3933,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3954,7 +3954,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -3975,7 +3975,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4027,7 +4027,7 @@ public class Verification {
             that.getValue().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISubmodelElement elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4195,7 +4195,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4238,7 +4238,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4259,7 +4259,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4291,7 +4291,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4312,7 +4312,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4333,7 +4333,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4354,7 +4354,7 @@ public class Verification {
             that.getValue().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISubmodelElement elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4509,7 +4509,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4552,7 +4552,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4573,7 +4573,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4605,7 +4605,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4626,7 +4626,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4647,7 +4647,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4842,7 +4842,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4885,7 +4885,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4906,7 +4906,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4938,7 +4938,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4959,7 +4959,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -4980,7 +4980,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5001,7 +5001,7 @@ public class Verification {
             that.getValue().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5176,7 +5176,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5219,7 +5219,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5240,7 +5240,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5272,7 +5272,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5293,7 +5293,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5314,7 +5314,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5491,7 +5491,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5534,7 +5534,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5555,7 +5555,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5587,7 +5587,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5608,7 +5608,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5629,7 +5629,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5786,7 +5786,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5829,7 +5829,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5850,7 +5850,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5882,7 +5882,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5903,7 +5903,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -5924,7 +5924,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6090,7 +6090,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6133,7 +6133,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6154,7 +6154,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6186,7 +6186,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6207,7 +6207,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6228,7 +6228,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6408,7 +6408,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6451,7 +6451,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6472,7 +6472,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6504,7 +6504,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6525,7 +6525,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6546,7 +6546,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6585,7 +6585,7 @@ public class Verification {
             that.getAnnotations().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IDataElement elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6782,7 +6782,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6825,7 +6825,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6846,7 +6846,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6878,7 +6878,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6899,7 +6899,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6920,7 +6920,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6941,7 +6941,7 @@ public class Verification {
             that.getStatements().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISubmodelElement elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -6982,7 +6982,7 @@ public class Verification {
             that.getSpecificAssetIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISpecificAssetId elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7250,7 +7250,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7293,7 +7293,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7314,7 +7314,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7346,7 +7346,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7367,7 +7367,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7388,7 +7388,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7647,7 +7647,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7690,7 +7690,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7711,7 +7711,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7743,7 +7743,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7764,7 +7764,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7785,7 +7785,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7806,7 +7806,7 @@ public class Verification {
             that.getInputVariables().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IOperationVariable elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7827,7 +7827,7 @@ public class Verification {
             that.getOutputVariables().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IOperationVariable elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -7848,7 +7848,7 @@ public class Verification {
             that.getInoutputVariables().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IOperationVariable elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8010,7 +8010,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8053,7 +8053,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8074,7 +8074,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8106,7 +8106,7 @@ public class Verification {
             that.getSupplementalSemanticIds().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8127,7 +8127,7 @@ public class Verification {
             that.getQualifiers().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IQualifier elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8148,7 +8148,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8338,7 +8338,7 @@ public class Verification {
             that.getExtensions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IExtension elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8381,7 +8381,7 @@ public class Verification {
             that.getDisplayName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringNameType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8402,7 +8402,7 @@ public class Verification {
             that.getDescription().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringTextType elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8443,7 +8443,7 @@ public class Verification {
             that.getEmbeddedDataSpecifications().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IEmbeddedDataSpecification elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8464,7 +8464,7 @@ public class Verification {
             that.getIsCaseOf().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IReference elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8657,7 +8657,7 @@ public class Verification {
           that.getKeys().stream())
             .flatMap(elemTuple -> {
               final int index = elemTuple.getFirst();
-              final IClass elem = elemTuple.getSecond();
+              final IKey elem = elemTuple.getSecond();
               return Verification.verifyToErrorStream(elem)
                 .map(error -> {
                   error.prependSegment(new Reporting.IndexSegment(index));
@@ -8806,7 +8806,7 @@ public class Verification {
             that.getAssetAdministrationShells().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IAssetAdministrationShell elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8827,7 +8827,7 @@ public class Verification {
             that.getSubmodels().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ISubmodel elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8848,7 +8848,7 @@ public class Verification {
             that.getConceptDescriptions().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final IConceptDescription elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -8945,7 +8945,7 @@ public class Verification {
           that.getValueReferencePairs().stream())
             .flatMap(elemTuple -> {
               final int index = elemTuple.getFirst();
-              final IClass elem = elemTuple.getSecond();
+              final IValueReferencePair elem = elemTuple.getSecond();
               return Verification.verifyToErrorStream(elem)
                 .map(error -> {
                   error.prependSegment(new Reporting.IndexSegment(index));
@@ -9159,7 +9159,7 @@ public class Verification {
           that.getPreferredName().stream())
             .flatMap(elemTuple -> {
               final int index = elemTuple.getFirst();
-              final IClass elem = elemTuple.getSecond();
+              final ILangStringPreferredNameTypeIec61360 elem = elemTuple.getSecond();
               return Verification.verifyToErrorStream(elem)
                 .map(error -> {
                   error.prependSegment(new Reporting.IndexSegment(index));
@@ -9179,7 +9179,7 @@ public class Verification {
             that.getShortName().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringShortNameTypeIec61360 elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));
@@ -9255,7 +9255,7 @@ public class Verification {
             that.getDefinition().get().stream())
               .flatMap(elemTuple -> {
                 final int index = elemTuple.getFirst();
-                final IClass elem = elemTuple.getSecond();
+                final ILangStringDefinitionTypeIec61360 elem = elemTuple.getSecond();
                 return Verification.verifyToErrorStream(elem)
                   .map(error -> {
                     error.prependSegment(new Reporting.IndexSegment(index));

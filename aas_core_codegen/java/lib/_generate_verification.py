@@ -889,6 +889,7 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
             return Stripped(""), None
 
         verify_method = _generate_verify_method(type_anno.items.our_type)
+        item_type = java_common.generate_type(type_anno.items)
 
         stmts.append(
             Stripped(
@@ -899,8 +900,8 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
 {II}{source_expr}.stream())
 {III}.flatMap(elemTuple -> {{
 {IIII}final int index = elemTuple.getFirst();
-{IIII}final IClass elem = elemTuple.getSecond();
-{IIII}return Verification.verifyToErrorStream(elem)
+{IIII}final {item_type} elem = elemTuple.getSecond();
+{IIII}return Verification.{verify_method}(elem)
 {IIIII}.map(error -> {{
 {IIIIII}error.prependSegment(new Reporting.IndexSegment(index));
 {IIIIII}return error;

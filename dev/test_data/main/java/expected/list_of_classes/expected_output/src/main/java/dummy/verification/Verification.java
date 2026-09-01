@@ -79,7 +79,7 @@ public class Verification {
           that.getSomeItems().stream())
             .flatMap(elemTuple -> {
               final int index = elemTuple.getFirst();
-              final IClass elem = elemTuple.getSecond();
+              final IAbstractItem elem = elemTuple.getSecond();
               return Verification.verifyToErrorStream(elem)
                 .map(error -> {
                   error.prependSegment(new Reporting.IndexSegment(index));
@@ -98,7 +98,7 @@ public class Verification {
           that.getSomeSimples().stream())
             .flatMap(elemTuple -> {
               final int index = elemTuple.getFirst();
-              final IClass elem = elemTuple.getSecond();
+              final ISimple elem = elemTuple.getSecond();
               return Verification.verifyToErrorStream(elem)
                 .map(error -> {
                   error.prependSegment(new Reporting.IndexSegment(index));

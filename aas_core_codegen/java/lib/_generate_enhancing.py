@@ -589,19 +589,28 @@ if (that.{getter_name}().isPresent()) {{
                 assert_never(type_anno.our_type)
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             # fmt: off
-            assert (
+            assert not isinstance(
+                type_anno.items,
+                (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation)
+            ), (
+                "We handle only lists of atomic values (primitives, constrained "
+                "primitives, enumeration literals) or lists of classes in the "
+                "enhancing at the moment. Lists of lists or lists of optionals "
+                "are not supported. Please contact the developers if you need "
+                "this feature."
+            )
+            # fmt: on
+
+            if not (
                 isinstance(type_anno.items, intermediate.OurTypeAnnotation)
                 and isinstance(
                     type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass)
-               )
-            ), (
-                "We handle only lists of classes in the enhancing at the moment. "
-                "The meta-model does not contain any other lists, so we wanted to "
-                "keep the code as simple as possible, and avoid unrolling. Please "
-                "contact the developers if you need this feature."
-            )
-            # fmt: on
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                )
+            ):
+                # We can not enhance lists of primitives, constrained
+                # primitives or enumeration literals; nothing to do here.
+                continue
 
             item_interface_name = java_naming.interface_name(
                 type_anno.items.our_type.name

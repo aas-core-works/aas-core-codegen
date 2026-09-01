@@ -171,14 +171,15 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
             if not isinstance(type_anno, intermediate.ListTypeAnnotation):
                 continue
 
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(type_anno.items.our_type, intermediate.Class), (
-                "We handle only lists of classes in the deep copies at the "
-                "moment. The meta-model does not contain any other lists, so "
-                "we wanted to keep the code as simple as possible, and avoid "
-                "unrolling. Please contact the developers if you need this "
-                "feature."
+            assert not isinstance(
+                type_anno.items,
+                (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+            ), (
+                "We handle only lists of atomic values (primitives, "
+                "constrained primitives, enumeration literals) or lists of "
+                "classes in the deep copies at the moment. Lists of lists "
+                "or lists of optionals are not supported. Please contact "
+                "the developers if you need this feature."
             )
 
             # We need to prefix to avoid any possible naming conflicts.
@@ -186,27 +187,30 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
 
             variable_type = java_common.generate_type(type_anno)
 
-            inner_type = java_naming.interface_name(type_anno.items.our_type.name)
+            if isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(type_anno.items.our_type, intermediate.Class):
+                inner_type = java_naming.interface_name(type_anno.items.our_type.name)
 
-            if not optional:
-                body_blocks.append(
-                    Stripped(
-                        f"""\
+                if not optional:
+                    body_blocks.append(
+                        Stripped(
+                            f"""\
 {variable_type} {variable_name} = new ArrayList<>(
 {I}that.{getter_name}().size());
 for ({inner_type} item : that.{getter_name}()) {{
 {I}{variable_name}.add(deep(item));
 }}"""
+                        )
                     )
-                )
-            else:
-                other_property_name = java_naming.variable_name(
-                    Identifier(f"that_{arg.name}")
-                )
+                else:
+                    other_property_name = java_naming.variable_name(
+                        Identifier(f"that_{arg.name}")
+                    )
 
-                body_blocks.append(
-                    Stripped(
-                        f"""\
+                    body_blocks.append(
+                        Stripped(
+                            f"""\
 {variable_type} {other_property_name} =
 {I}that.{getter_name}().orElse(null);
 {variable_type} {variable_name} = null;
@@ -218,8 +222,32 @@ if ({other_property_name} != null) {{
 {II}{variable_name}.add(deep(item));
 {I}}}
 }}"""
+                        )
                     )
-                )
+            else:
+                # NOTE (mristin):
+                # The items are atomic values (primitives, constrained
+                # primitives or enumeration literals). They are immutable in
+                # Java (or, in the case of byte arrays, treated as such
+                # elsewhere in this generator), so a shallow copy of the list
+                # container itself already gives us a deep copy.
+                if not optional:
+                    body_blocks.append(
+                        Stripped(
+                            f"""\
+{variable_type} {variable_name} = new ArrayList<>(
+{I}that.{getter_name}());"""
+                        )
+                    )
+                else:
+                    body_blocks.append(
+                        Stripped(
+                            f"""\
+{variable_type} {variable_name} = that.{getter_name}().isPresent()
+{I}? new ArrayList<>(that.{getter_name}().get())
+{I}: null;"""
+                        )
+                    )
 
         constructor_arg_exprs = []  # type: List[str]
         for arg in cls.constructor.arguments:
@@ -383,6 +411,7 @@ def generate(
         Stripped("import java.util.ArrayList;"),
         Stripped(f"import {package}.types.{java_common.INTERFACE_PKG}.IClass;"),
         Stripped(f"import {package}.visitation.AbstractTransformer;"),
+        Stripped(f"import {package}.types.enums.*;"),
         Stripped(f"import {package}.types.impl.*;"),
         Stripped(f"import {package}.types.model.*;"),
     ]  # type: List[Stripped]
