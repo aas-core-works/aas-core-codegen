@@ -3,13 +3,13 @@
  * Do NOT edit or append.
  */
 
-package aas_core.aas3_0.tests;
+package dummy.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import aas_core.aas3_0.reporting.Reporting;
-import aas_core.aas3_0.types.model.IClass;
+import dummy.reporting.Reporting;
+import dummy.types.model.IClass;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +29,7 @@ public class Common {
   public static String TEST_DATA_DIR = Paths.get("test_data").toAbsolutePath().toString();
 
   public static final String RECORD_MODE_ENVIRONMENT_VARIABLE_NAME =
-    "AAS_CORE_AAS3_0_TESTS_RECORD_MODE";
+    "DUMMY_TESTS_RECORD_MODE";
 
   // NOTE (empwilli):
   // It is tedious to record manually all the expected error messages.
@@ -37,7 +37,7 @@ public class Common {
   // We intentionally inter-twine the recording code with the test code
   // to keep them close to each other so that they are easier to maintain.
   public static final boolean RECORD_MODE =
-    System.getenv("AAS_CORE_AAS3_0_TESTS_RECORD_MODE") != null && (
+    System.getenv("DUMMY_TESTS_RECORD_MODE") != null && (
       System.getenv(RECORD_MODE_ENVIRONMENT_VARIABLE_NAME).equalsIgnoreCase("true") ||
       System.getenv(RECORD_MODE_ENVIRONMENT_VARIABLE_NAME).equalsIgnoreCase("on") ||
       System.getenv(RECORD_MODE_ENVIRONMENT_VARIABLE_NAME).equalsIgnoreCase("1") ||
