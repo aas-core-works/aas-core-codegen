@@ -224,6 +224,516 @@ class TestIsSubclassOf(unittest.TestCase):
         self.assertFalse(concrete.is_subclass_of(cls=another_concrete))
 
 
+class TestIsStructuralSubtypeOf(unittest.TestCase):
+    def test_self(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: int
+
+                def __init__(self, x: int) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+
+        self.assertTrue(concrete.is_structural_subtype_of(cls=concrete))
+
+    def test_unrelated_classes_with_same_shape(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: int
+                y: str
+
+                def __init__(self, x: int, y: str) -> None:
+                    self.x = x
+                    self.y = y
+
+
+            class Structurally_same:
+                x: int
+                y: str
+
+                def __init__(self, x: int, y: str) -> None:
+                    self.x = x
+                    self.y = y
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        structurally_same = symbol_table.must_find_concrete_class(
+            Identifier("Structurally_same")
+        )
+
+        self.assertTrue(structurally_same.is_structural_subtype_of(cls=concrete))
+        self.assertTrue(concrete.is_structural_subtype_of(cls=structurally_same))
+
+    def test_mismatch_in_property_type(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: int
+
+                def __init__(self, x: int) -> None:
+                    self.x = x
+
+
+            class Different_type:
+                x: str
+
+                def __init__(self, x: str) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        different_type = symbol_table.must_find_concrete_class(
+            Identifier("Different_type")
+        )
+
+        self.assertFalse(different_type.is_structural_subtype_of(cls=concrete))
+        self.assertFalse(concrete.is_structural_subtype_of(cls=different_type))
+
+    def test_missing_property(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: int
+                y: str
+
+                def __init__(self, x: int, y: str) -> None:
+                    self.x = x
+                    self.y = y
+
+
+            class Missing_property:
+                x: int
+
+                def __init__(self, x: int) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        missing_property = symbol_table.must_find_concrete_class(
+            Identifier("Missing_property")
+        )
+
+        # ``Missing_property`` lacks ``y``, so it can not stand in for ``Concrete``.
+        self.assertFalse(missing_property.is_structural_subtype_of(cls=concrete))
+
+        # ``Concrete`` has all the properties of ``Missing_property`` (and more).
+        self.assertTrue(concrete.is_structural_subtype_of(cls=missing_property))
+
+    def test_nominal_subclass_is_not_automatically_a_structural_subtype(
+        self,
+    ) -> None:
+        source = textwrap.dedent(
+            """\
+            class Parent:
+                x: int
+
+                def __init__(self, x: int) -> None:
+                    self.x = x
+
+
+            class Concrete(Parent):
+                y: str
+
+                def __init__(self, x: int, y: str) -> None:
+                    Parent.__init__(self, x)
+                    self.y = y
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        parent = symbol_table.must_find_concrete_class(Identifier("Parent"))
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+
+        self.assertTrue(concrete.is_subclass_of(cls=parent))
+        self.assertTrue(concrete.is_structural_subtype_of(cls=parent))
+        self.assertFalse(parent.is_structural_subtype_of(cls=concrete))
+
+    def test_matching_primitive_type_but_different_constrained_primitive(
+        self,
+    ) -> None:
+        source = textwrap.dedent(
+            """\
+            @invariant(lambda self: len(self) > 0, "Non-empty")
+            class Constrained_str_a(str):
+                pass
+
+
+            @invariant(lambda self: len(self) < 100, "Not too long")
+            class Constrained_str_b(str):
+                pass
+
+
+            class Concrete:
+                x: Constrained_str_a
+
+                def __init__(self, x: Constrained_str_a) -> None:
+                    self.x = x
+
+
+            class Different_constrained_primitive:
+                x: Constrained_str_b
+
+                def __init__(self, x: Constrained_str_b) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        different_constrained_primitive = symbol_table.must_find_concrete_class(
+            Identifier("Different_constrained_primitive")
+        )
+
+        # Even though both properties are ``str`` at the primitive level, the
+        # constrained primitives ``Constrained_str_a`` and ``Constrained_str_b``
+        # are distinct our-types, so the classes are not structural subtypes of
+        # one another.
+        self.assertFalse(
+            different_constrained_primitive.is_structural_subtype_of(cls=concrete)
+        )
+        self.assertFalse(
+            concrete.is_structural_subtype_of(cls=different_constrained_primitive)
+        )
+
+    def test_constrained_primitive_is_not_substitutable_for_plain_primitive(
+        self,
+    ) -> None:
+        source = textwrap.dedent(
+            """\
+            @invariant(lambda self: len(self) > 0, "Non-empty")
+            class Constrained_str(str):
+                pass
+
+
+            class Concrete:
+                x: str
+
+                def __init__(self, x: str) -> None:
+                    self.x = x
+
+
+            class With_constrained_primitive:
+                x: Constrained_str
+
+                def __init__(self, x: Constrained_str) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        with_constrained_primitive = symbol_table.must_find_concrete_class(
+            Identifier("With_constrained_primitive")
+        )
+
+        # NOTE (mristin):
+        # We enforce invariance, not contra-variance.
+        self.assertFalse(
+            with_constrained_primitive.is_structural_subtype_of(cls=concrete)
+        )
+        self.assertFalse(
+            concrete.is_structural_subtype_of(cls=with_constrained_primitive)
+        )
+
+    def test_different_list_items(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: List[int]
+
+                def __init__(self, x: List[int]) -> None:
+                    self.x = x
+
+
+            class Different_list_items:
+                x: List[str]
+
+                def __init__(self, x: List[str]) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        different_list_items = symbol_table.must_find_concrete_class(
+            Identifier("Different_list_items")
+        )
+
+        # NOTE (mristin):
+        # We enforce invariance, not contra-variance.
+        self.assertFalse(different_list_items.is_structural_subtype_of(cls=concrete))
+        self.assertFalse(concrete.is_structural_subtype_of(cls=different_list_items))
+
+    def test_matching_list_items(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: List[int]
+
+                def __init__(self, x: List[int]) -> None:
+                    self.x = x
+
+
+            class Structurally_same:
+                x: List[int]
+
+                def __init__(self, x: List[int]) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        structurally_same = symbol_table.must_find_concrete_class(
+            Identifier("Structurally_same")
+        )
+
+        self.assertTrue(structurally_same.is_structural_subtype_of(cls=concrete))
+        self.assertTrue(concrete.is_structural_subtype_of(cls=structurally_same))
+
+    def test_optional_property_is_invariant(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Required:
+                x: int
+
+                def __init__(self, x: int) -> None:
+                    self.x = x
+
+
+            class Optional_property:
+                x: Optional[int]
+
+                def __init__(self, x: Optional[int] = None) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        required = symbol_table.must_find_concrete_class(Identifier("Required"))
+        optional_property = symbol_table.must_find_concrete_class(
+            Identifier("Optional_property")
+        )
+
+        # Optionality is invariant: a required property is not structurally the
+        # same as an optional one, in either direction.
+        self.assertFalse(required.is_structural_subtype_of(cls=optional_property))
+        self.assertFalse(optional_property.is_structural_subtype_of(cls=required))
+
+    def test_required_property_is_not_substitutable_for_optional(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Required:
+                x: int
+
+                def __init__(self, x: int) -> None:
+                    self.x = x
+
+
+            class Optional_property:
+                x: Optional[int]
+
+                def __init__(self, x: Optional[int] = None) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        required = symbol_table.must_find_concrete_class(Identifier("Required"))
+        optional_property = symbol_table.must_find_concrete_class(
+            Identifier("Optional_property")
+        )
+
+        # Even though a value is always present for ``Required.x``, structural
+        # subtyping is invariant, so a required property does *not* satisfy
+        # an optional one -- ``Optional[int]`` and ``int`` are distinct type
+        # annotations.
+        self.assertFalse(required.is_structural_subtype_of(cls=optional_property))
+
+    def test_matching_optional_property(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: Optional[int]
+
+                def __init__(self, x: Optional[int] = None) -> None:
+                    self.x = x
+
+
+            class Structurally_same:
+                x: Optional[int]
+
+                def __init__(self, x: Optional[int] = None) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        structurally_same = symbol_table.must_find_concrete_class(
+            Identifier("Structurally_same")
+        )
+
+        self.assertTrue(structurally_same.is_structural_subtype_of(cls=concrete))
+        self.assertTrue(concrete.is_structural_subtype_of(cls=structurally_same))
+
+    def test_optional_list_with_different_items_is_not_a_subtype(self) -> None:
+        source = textwrap.dedent(
+            """\
+            class Concrete:
+                x: Optional[List[int]]
+
+                def __init__(self, x: Optional[List[int]] = None) -> None:
+                    self.x = x
+
+
+            class Different_list_items:
+                x: Optional[List[str]]
+
+                def __init__(self, x: Optional[List[str]] = None) -> None:
+                    self.x = x
+
+
+            __version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
+        different_list_items = symbol_table.must_find_concrete_class(
+            Identifier("Different_list_items")
+        )
+
+        self.assertFalse(different_list_items.is_structural_subtype_of(cls=concrete))
+        self.assertFalse(concrete.is_structural_subtype_of(cls=different_list_items))
+
+
 class TestMustFindConstant(unittest.TestCase):
     def test_empty(self) -> None:
         source = """\
