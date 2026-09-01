@@ -63,18 +63,35 @@ test("XML wrong root closing element fails", () => {
     TestCommon.TEST_DATA_DIR, "Xml", "Expected", "branch", "minimal.xml"
   );
   const text = fs.readFileSync(pth, "utf-8");
-  const expectedClosing = "</branch>";
-  const insertionIndex = text.lastIndexOf(expectedClosing);
-  if (insertionIndex < 0) {
-    throw new Error(`Failed to find root closing tag: ${expectedClosing}`);
+
+  // NOTE (mristin):
+  // The root element might be self-closing (*e.g.*, `<branch .../>`)
+  // if it has no content, in which case there is no separate closing tag to
+  // corrupt. We handle the two cases distinctly.
+  const selfClosingRegex = new RegExp("<branch(?=[^>]*/>)");
+  const selfClosingMatch = text.match(selfClosingRegex);
+
+  let brokenText: string;
+  if (selfClosingMatch !== null && selfClosingMatch.index !== undefined) {
+    brokenText =
+      text.slice(0, selfClosingMatch.index) +
+      "<branch_BROKEN" +
+      text.slice(selfClosingMatch.index + selfClosingMatch[0].length);
+  } else {
+    const expectedClosing = "</branch>";
+    const insertionIndex = text.lastIndexOf(expectedClosing);
+    if (insertionIndex < 0) {
+      throw new Error(`Failed to find root closing tag: ${expectedClosing}`);
+    }
+
+    const brokenClosing = "</branch_BROKEN>";
+    brokenText =
+      text.slice(0, insertionIndex) +
+      brokenClosing +
+      text.slice(insertionIndex + expectedClosing.length);
   }
 
-  const brokenClosing = "</branch_BROKEN>";
-  const brokenText =
-    text.slice(0, insertionIndex) +
-    brokenClosing +
-    text.slice(insertionIndex + expectedClosing.length);
-
+  expect(brokenText).not.toStrictEqual(text);
   expectDeserializationError(brokenText);
 });
 

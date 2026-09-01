@@ -839,12 +839,18 @@ def _generate_reader_and_setter(cls: intermediate.ConcreteClass) -> Stripped:
             init_writer.write("\n")
         init_writer.write(f"self.{prop_name}: {prop_type} = None")
 
+    init_body = (
+        Stripped(init_writer.getvalue())
+        if len(cls.properties) > 0
+        else Stripped("pass")
+    )
+
     methods.append(
         Stripped(
             f"""\
 def __init__(self) -> None:
 {I}\"\"\"Initialize with all the properties unset.\"\"\"
-{I}{indent_but_first_line(init_writer.getvalue(), I)}"""
+{I}{indent_but_first_line(init_body, I)}"""
         )
     )
 
@@ -1142,8 +1148,8 @@ if next_event_element is None:
 {II}f"but got the end-of-input"
 {I})
 
-{I}next_event, next_element = next_event_element
-{I}if next_event != 'end' or next_element.tag == element.tag:
+next_event, next_element = next_event_element
+if next_event != 'end' or next_element.tag != element.tag:
 {I}raise DeserializationException(
 {II}f"Expected the end element corresponding to {{element.tag}}, "
 {II}f"but got event {{next_event!r}} and element {{next_element.tag!r}}"

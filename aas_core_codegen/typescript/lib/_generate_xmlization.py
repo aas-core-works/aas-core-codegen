@@ -310,7 +310,7 @@ if (casted === null) {{
             parse_function = _parse_function_for_atomic_type(type_anno)
             parse_body = Stripped(
                 f"""\
-const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
 if (textOrError.error !== null) {{
 {I}propertyError = textOrError.error;
 {I}break;
@@ -399,7 +399,7 @@ while (true) {{
 
 {I}cursor.advance();
 
-{I}const itemTextOrError = readTextContentAndConsumeEndTag(cursor, itemStartTag);
+{I}const itemTextOrError = parseTextContentAndConsumeEndTag(cursor, itemStartTag);
 {I}if (itemTextOrError.error !== null) {{
 {II}propertyError = itemTextOrError.error;
 {II}propertyError.path.prepend(new IndexSegment(itemIndex));
@@ -1440,7 +1440,7 @@ function readRequiredRootOpenTag(
 {I});
 }}
 
-function readTextContentAndConsumeEndTag(
+function parseTextContentAndConsumeEndTag(
 {I}cursor: XmlCursor,
 {I}startTag: OpenTagToken
 ): AasCommon.Either<string, DeserializationError> {{

@@ -242,6 +242,35 @@ test("XML nested class dispatch mismatch fails", () => {{
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
     """Generate code for targeted negative XML de-serialization tests."""
+    atomic_list_candidate = _first_atomic_list_property_candidate(symbol_table)
+    nested_dispatch_candidate = _first_nested_class_dispatch_candidate(symbol_table)
+
+    has_required_property = any(
+        not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+        for concrete_cls in symbol_table.concrete_classes
+        for prop in concrete_cls.properties
+    )
+
+    # NOTE (mristin):
+    # ``XMLSerializer`` is only used by the duplicate-property, invalid-item-delimiter
+    # and nested-class-dispatch-mismatch tests below, which are only generated if
+    # a suitable candidate class/property exists in the meta-model. We have to
+    # determine that upfront so that we do not import ``XMLSerializer`` in vain and
+    # trigger an unused-import lint error on meta-models which do not provide such
+    # a candidate (*e.g.*, a meta-model with only optional, atomic properties, or
+    # even a class with no properties at all).
+    xml_serializer_needed = (
+        has_required_property
+        or atomic_list_candidate is not None
+        or nested_dispatch_candidate is not None
+    )
+
+    xmldom_import = (
+        "import { DOMParser, XMLSerializer } from " '"@xmldom/xmldom";'
+        if xml_serializer_needed
+        else 'import { DOMParser } from "@xmldom/xmldom";'
+    )
+
     blocks = [
         Stripped(
             """\
@@ -265,7 +294,7 @@ import * as path from "path";
 // In the end, we decided to use an external library as development dependency since
 // all the other approaches (gymnastics with jest, tsconfig and tsconfig.test) turned
 // out to be much more complicated.
-import {{ DOMParser, XMLSerializer }} from "@xmldom/xmldom";
+{xmldom_import}
 import type {{ Document }} from "@xmldom/xmldom";
 
 import * as AasXmlization from "../src/xmlization";
@@ -331,18 +360,35 @@ test("XML wrong root closing element fails", () => {{
 {II}TestCommon.TEST_DATA_DIR, "Xml", "Expected", {first_cls_xml_name_literal}, "minimal.xml"
 {I});
 {I}const text = fs.readFileSync(pth, "utf-8");
-{I}const expectedClosing = "</{first_cls_xml_name}>";
-{I}const insertionIndex = text.lastIndexOf(expectedClosing);
-{I}if (insertionIndex < 0) {{
-{II}throw new Error(`Failed to find root closing tag: ${{expectedClosing}}`);
+
+{I}// NOTE (mristin):
+{I}// The root element might be self-closing (*e.g.*, `<{first_cls_xml_name} .../>`)
+{I}// if it has no content, in which case there is no separate closing tag to
+{I}// corrupt. We handle the two cases distinctly.
+{I}const selfClosingRegex = new RegExp("<{first_cls_xml_name}(?=[^>]*/>)");
+{I}const selfClosingMatch = text.match(selfClosingRegex);
+
+{I}let brokenText: string;
+{I}if (selfClosingMatch !== null && selfClosingMatch.index !== undefined) {{
+{II}brokenText =
+{III}text.slice(0, selfClosingMatch.index) +
+{III}"<{first_cls_xml_name}_BROKEN" +
+{III}text.slice(selfClosingMatch.index + selfClosingMatch[0].length);
+{I}}} else {{
+{II}const expectedClosing = "</{first_cls_xml_name}>";
+{II}const insertionIndex = text.lastIndexOf(expectedClosing);
+{II}if (insertionIndex < 0) {{
+{III}throw new Error(`Failed to find root closing tag: ${{expectedClosing}}`);
+{II}}}
+
+{II}const brokenClosing = "</{first_cls_xml_name}_BROKEN>";
+{II}brokenText =
+{III}text.slice(0, insertionIndex) +
+{III}brokenClosing +
+{III}text.slice(insertionIndex + expectedClosing.length);
 {I}}}
 
-{I}const brokenClosing = "</{first_cls_xml_name}_BROKEN>";
-{I}const brokenText =
-{II}text.slice(0, insertionIndex) +
-{II}brokenClosing +
-{II}text.slice(insertionIndex + expectedClosing.length);
-
+{I}expect(brokenText).not.toStrictEqual(text);
 {I}expectDeserializationError(brokenText);
 }});"""
             )
@@ -378,13 +424,11 @@ test("XML wrong root closing element fails", () => {{
 
     # endregion Check duplicate properties
 
-    atomic_list_candidate = _first_atomic_list_property_candidate(symbol_table)
     if atomic_list_candidate is not None:
         list_cls, list_prop = atomic_list_candidate
 
         blocks.append(_generate_invalid_item_delimiter(cls=list_cls, prop=list_prop))
 
-    nested_dispatch_candidate = _first_nested_class_dispatch_candidate(symbol_table)
     if nested_dispatch_candidate is not None:
         nested_cls, nested_prop = nested_dispatch_candidate
 

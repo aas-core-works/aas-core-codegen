@@ -871,14 +871,29 @@ def _generate_concrete_class_from_map_without_dispatch(
 
     # endregion
 
-    blocks.append(
-        Stripped(
-            f"""\
+    # NOTE (mristin):
+    # ``v`` is only referenced in the case branches of the switch statement, which
+    # only exist for the actual properties and, if applicable, the model type
+    # discriminator. If neither is present, ``v`` would be declared, but never used,
+    # which Go rejects at compile time.
+    if len(cls.properties) > 0 or cls.serialization.with_model_type:
+        blocks.append(
+            Stripped(
+                f"""\
 for k, v := range m {{
 {I}{indent_but_first_line(switch_statement, I)}
 }}"""
+            )
         )
-    )
+    else:
+        blocks.append(
+            Stripped(
+                f"""\
+for k := range m {{
+{I}{indent_but_first_line(switch_statement, I)}
+}}"""
+            )
+        )
 
     # region Check required properties
 

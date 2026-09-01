@@ -468,12 +468,18 @@ def _generate_setter(cls: intermediate.ConcreteClass) -> Stripped:
             init_writer.write("\n")
         init_writer.write(f"self.{prop_name}: {prop_type} = None")
 
+    init_body = (
+        Stripped(init_writer.getvalue())
+        if len(cls.properties) > 0
+        else Stripped("pass")
+    )
+
     methods.append(
         Stripped(
             f"""\
 def __init__(self) -> None:
 {I}\"\"\"Initialize with all the properties unset.\"\"\"
-{I}{indent_but_first_line(init_writer.getvalue(), I)}"""
+{I}{indent_but_first_line(init_body, I)}"""
         )
     )
 

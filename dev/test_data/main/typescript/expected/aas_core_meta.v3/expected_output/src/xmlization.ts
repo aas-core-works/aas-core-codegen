@@ -310,7 +310,7 @@ function readRequiredRootOpenTag(
   );
 }
 
-function readTextContentAndConsumeEndTag(
+function parseTextContentAndConsumeEndTag(
   cursor: XmlCursor,
   startTag: OpenTagToken
 ): AasCommon.Either<string, DeserializationError> {
@@ -910,7 +910,7 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -936,7 +936,7 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -962,7 +962,7 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1273,7 +1273,7 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1299,7 +1299,7 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1355,7 +1355,7 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1602,7 +1602,7 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1628,7 +1628,7 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1654,7 +1654,7 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1680,7 +1680,7 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1943,7 +1943,7 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -1969,7 +1969,7 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -2207,7 +2207,7 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -2589,7 +2589,7 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -2615,7 +2615,7 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -2732,7 +2732,7 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -2887,7 +2887,7 @@ function parseResourceFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -2913,7 +2913,7 @@ function parseResourceFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -3159,7 +3159,7 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -3185,7 +3185,7 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -3448,7 +3448,7 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -3474,7 +3474,7 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -3712,7 +3712,7 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -3738,7 +3738,7 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -4365,7 +4365,7 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -4391,7 +4391,7 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -5176,7 +5176,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -5202,7 +5202,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -5713,7 +5713,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -5769,7 +5769,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -5795,7 +5795,7 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -6119,7 +6119,7 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -6145,7 +6145,7 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -6948,7 +6948,7 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -6974,7 +6974,7 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -7485,7 +7485,7 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -7511,7 +7511,7 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -7773,7 +7773,7 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -7799,7 +7799,7 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -8633,7 +8633,7 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -8659,7 +8659,7 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -9170,7 +9170,7 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -9196,7 +9196,7 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -9222,7 +9222,7 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -9453,7 +9453,7 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -9479,7 +9479,7 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -10220,7 +10220,7 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -10246,7 +10246,7 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -10757,7 +10757,7 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -10783,7 +10783,7 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -11014,7 +11014,7 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -11040,7 +11040,7 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -11551,7 +11551,7 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -11577,7 +11577,7 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -11809,7 +11809,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -11835,7 +11835,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -12711,7 +12711,7 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -12737,7 +12737,7 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -13339,7 +13339,7 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -13365,7 +13365,7 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -13715,7 +13715,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -13771,7 +13771,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -13797,7 +13797,7 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14043,7 +14043,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14069,7 +14069,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14610,7 +14610,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14636,7 +14636,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14662,7 +14662,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14718,7 +14718,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14744,7 +14744,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -14770,7 +14770,7 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -15020,7 +15020,7 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -15046,7 +15046,7 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -16154,7 +16154,7 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -16180,7 +16180,7 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -16888,7 +16888,7 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -16914,7 +16914,7 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -17152,7 +17152,7 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -17464,7 +17464,7 @@ function parseReferenceFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -17714,7 +17714,7 @@ function parseKeyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -17740,7 +17740,7 @@ function parseKeyFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -17868,7 +17868,7 @@ function parseLangStringNameTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -17894,7 +17894,7 @@ function parseLangStringNameTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18022,7 +18022,7 @@ function parseLangStringTextTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18048,7 +18048,7 @@ function parseLangStringTextTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18707,7 +18707,7 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18733,7 +18733,7 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18759,7 +18759,7 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18785,7 +18785,7 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -18927,7 +18927,7 @@ function parseValueReferencePairFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19270,7 +19270,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19296,7 +19296,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19424,7 +19424,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19450,7 +19450,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19578,7 +19578,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19604,7 +19604,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19924,7 +19924,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -19980,7 +19980,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -20006,7 +20006,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -20032,7 +20032,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -20149,7 +20149,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -20205,7 +20205,7 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;

@@ -35,11 +35,15 @@ def _generate_shallow_equals(cls: intermediate.ConcreteClass) -> Stripped:
         prop_name = java_naming.method_name(Identifier(f"get_{prop.name}"))
         exprs.append(f"that.{prop_name}().equals(other.{prop_name}())")
 
+    if len(exprs) == 0:
+        # NOTE (mristin):
+        # There are no properties to compare, so the instances are trivially
+        # shallowly equal.
+        statement = Stripped("return true;")
     # NOTE (empwilli):
     # This is a poor man's line re-flowing.
-    exprs_joined = " && ".join(exprs)
-    if len(exprs_joined) < 70:
-        statement = Stripped(f"return {exprs_joined};")
+    elif len(" && ".join(exprs)) < 70:
+        statement = Stripped(f"return {' && '.join(exprs)};")
     else:
         exprs_joined = "\n&& ".join(exprs)
         statement = Stripped(
@@ -190,15 +194,22 @@ that.{getter_name}().equals(casted.{getter_name}())"""
         exprs.append(expr)
 
     body_writer = io.StringIO()
-    body_writer.write("return (")
-    for i, expr in enumerate(exprs):
-        body_writer.write("\n")
-        if i > 0:
-            body_writer.write(f"{I}&& {indent_but_first_line(expr, I)}")
-        else:
-            body_writer.write(f"{I}{indent_but_first_line(expr, I)}")
+    if len(exprs) == 0:
+        # NOTE (mristin):
+        # There are no properties to compare, so the instances are trivially
+        # deeply equal as soon as we know ``other`` is of the expected concrete
+        # type (which we already checked above).
+        body_writer.write("return true;")
+    else:
+        body_writer.write("return (")
+        for i, expr in enumerate(exprs):
+            body_writer.write("\n")
+            if i > 0:
+                body_writer.write(f"{I}&& {indent_but_first_line(expr, I)}")
+            else:
+                body_writer.write(f"{I}{indent_but_first_line(expr, I)}")
 
-    body_writer.write(");")
+        body_writer.write(");")
 
     interface_name = java_naming.interface_name(cls.name)
     transform_name = java_naming.method_name(Identifier(f"transform_{cls.name}"))

@@ -310,7 +310,7 @@ function readRequiredRootOpenTag(
   );
 }
 
-function readTextContentAndConsumeEndTag(
+function parseTextContentAndConsumeEndTag(
   cursor: XmlCursor,
   startTag: OpenTagToken
 ): AasCommon.Either<string, DeserializationError> {
@@ -596,7 +596,7 @@ function parseSomethingFromOpenTag(
 
           cursor.advance();
 
-          const itemTextOrError = readTextContentAndConsumeEndTag(cursor, itemStartTag);
+          const itemTextOrError = parseTextContentAndConsumeEndTag(cursor, itemStartTag);
           if (itemTextOrError.error !== null) {
             propertyError = itemTextOrError.error;
             propertyError.path.prepend(new IndexSegment(itemIndex));
