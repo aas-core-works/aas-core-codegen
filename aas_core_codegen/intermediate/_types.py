@@ -1808,6 +1808,42 @@ class Class(DBC):
 
         return id(cls) in self._ancestor_id_set
 
+    def is_structural_subtype_of(self, cls: "ClassUnion") -> bool:
+        """
+        Check whether this class is a structural subtype of ``cls``.
+
+        In contrast to :py:meth:`is_subclass_of`, which follows the nominal
+        inheritance hierarchy of the meta-model, structural subtyping only cares
+        about the shape of the class: this class is a structural subtype of
+        ``cls`` if, for every property of ``cls``, this class defines a property
+        of the same name and the exact same type (see
+        :py:func:`type_annotations_equal`). Structural subtyping is invariant:
+        an optional property is not the same as a required one, in either
+        direction.
+
+        Properties are re-specified per class (see
+        :py:attr:`Property.specified_for`) instead of being inherited as the same
+        object, so, unlike, *e.g.*, :py:attr:`property_id_set`, we can not compare
+        the properties by their IDs here — we have to compare them by name and
+        type instead.
+
+        Every class is a structural subtype of itself.
+        """
+        if id(cls) == id(self):
+            return True
+
+        for prop_name, cls_prop in cls.properties_by_name.items():
+            self_prop = self.properties_by_name.get(prop_name, None)
+            if self_prop is None:
+                return False
+
+            if not type_annotations_equal(
+                self_prop.type_annotation, cls_prop.type_annotation
+            ):
+                return False
+
+        return True
+
     @property
     def descendant_id_set(self) -> FrozenSet[int]:
         """List the IDs (as in Python's ``id`` built-in) of the descendants."""
