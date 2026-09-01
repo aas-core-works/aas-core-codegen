@@ -16,7 +16,6 @@ from icontract import ensure, require
 
 from aas_core_codegen import (
     intermediate,
-    naming,
     specific_implementations,
 )
 from aas_core_codegen.common import (
@@ -847,7 +846,7 @@ def _generate_transform_property(
     stmts = []  # type: List[Stripped]
 
     getter_name = java_naming.getter_name(prop.name)
-    prop_literal = java_common.string_literal(naming.json_property(prop.name))
+    prop_literal = java_common.string_literal(prop.json_name)
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         source_expr = Stripped(f"that.{getter_name}().get()")

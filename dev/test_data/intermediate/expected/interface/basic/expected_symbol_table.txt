@@ -20,6 +20,8 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass SomethingAbstract',
+            json_name='someProperty',
+            xml_name='someProperty',
             parsed=...)],
         signatures=[
           Signature(
@@ -49,6 +51,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass SomethingAbstract',
+          json_name='someProperty',
+          xml_name='someProperty',
           parsed=...)],
       methods=[
         UnderstoodMethod(

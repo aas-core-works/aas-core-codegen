@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="queryCondition">
+    <xs:sequence>
+      <xs:element name="eq" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="not-eq" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="queryCondition_t">
+    <xs:sequence>
+      <xs:group ref="queryCondition"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="queryCondition" type="queryCondition_t"/>
+</xs:schema>

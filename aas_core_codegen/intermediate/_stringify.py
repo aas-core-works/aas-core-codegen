@@ -241,6 +241,8 @@ def _stringify_property(
                 f"Reference to {that.specified_for.__class__.__name__} "
                 f"{that.specified_for.name}",
             ),
+            stringify_mod.Property("json_name", that.json_name),
+            stringify_mod.Property("xml_name", that.xml_name),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )

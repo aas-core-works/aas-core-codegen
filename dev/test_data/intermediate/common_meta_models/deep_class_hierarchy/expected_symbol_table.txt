@@ -23,6 +23,8 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass Node',
+            json_name='identifier',
+            xml_name='identifier',
             parsed=...)],
         signatures=[],
         description=None,
@@ -47,6 +49,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Node',
+          json_name='identifier',
+          xml_name='identifier',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -116,6 +120,8 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to ConcreteClass Branch',
+            json_name='description',
+            xml_name='description',
             parsed=...)],
         signatures=[],
         description=None,
@@ -138,6 +144,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Node',
+          json_name='identifier',
+          xml_name='identifier',
           parsed=...),
         Property(
           name='description',
@@ -146,6 +154,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Branch',
+          json_name='description',
+          xml_name='description',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -230,6 +240,8 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to ConcreteClass Leaf',
+            json_name='value',
+            xml_name='value',
             parsed=...)],
         signatures=[],
         description=None,
@@ -250,6 +262,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Node',
+          json_name='identifier',
+          xml_name='identifier',
           parsed=...),
         Property(
           name='description',
@@ -258,6 +272,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Branch',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='value',
@@ -266,6 +282,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Leaf',
+          json_name='value',
+          xml_name='value',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -360,6 +378,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Node',
+          json_name='identifier',
+          xml_name='identifier',
           parsed=...),
         Property(
           name='description',
@@ -368,6 +388,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Branch',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='value',
@@ -376,6 +398,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Leaf',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='details',
@@ -384,6 +408,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Blossom',
+          json_name='details',
+          xml_name='details',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -486,6 +512,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someChoice',
+          xml_name='someChoice',
           parsed=...),
         Property(
           name='something_without_choice',
@@ -494,6 +522,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='somethingWithoutChoice',
+          xml_name='somethingWithoutChoice',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -574,6 +604,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Container',
+          json_name='node',
+          xml_name='node',
           parsed=...),
         Property(
           name='something',
@@ -582,6 +614,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Container',
+          json_name='something',
+          xml_name='something',
           parsed=...)],
       methods=[],
       constructor=Constructor(

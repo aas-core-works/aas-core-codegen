@@ -22,6 +22,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someBools',
+          xml_name='someBools',
           parsed=...),
         Property(
           name='some_ints',
@@ -32,6 +34,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someInts',
+          xml_name='someInts',
           parsed=...),
         Property(
           name='some_floats',
@@ -42,6 +46,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someFloats',
+          xml_name='someFloats',
           parsed=...),
         Property(
           name='some_strings',
@@ -52,6 +58,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someStrings',
+          xml_name='someStrings',
           parsed=...),
         Property(
           name='some_bytes',
@@ -62,6 +70,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someBytes',
+          xml_name='someBytes',
           parsed=...)],
       methods=[],
       constructor=Constructor(

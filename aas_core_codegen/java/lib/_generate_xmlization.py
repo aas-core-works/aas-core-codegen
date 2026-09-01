@@ -530,7 +530,7 @@ def _generate_deserialize_primitive_property(
 
     prop_name = java_naming.property_name(prop.name)
     cls_name = java_naming.class_name(cls.name)
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     if a_type is intermediate.PrimitiveType.STR:
         empty_handling_body = Stripped(f'{target_var} = "";')
@@ -723,7 +723,7 @@ def _generate_deserialize_enumeration_property(
     from_str_name = java_naming.private_property_name(
         Identifier(f"{our_type.name}_from_string")
     )
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
@@ -800,7 +800,7 @@ def _generate_deserialize_interface_property(
 
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
     try_target_var = java_naming.variable_name(Identifier(f"try_{prop.name}"))
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
@@ -873,7 +873,7 @@ def _generate_deserialize_cls_property(
 
     try_target_var = java_naming.variable_name(Identifier(f"try_{prop.name}"))
 
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     cls_name = java_naming.class_name(cls.name)
 
@@ -960,7 +960,7 @@ def _generate_deserialize_list_property(
 
     cls_name = java_naming.class_name(cls.name)
 
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
@@ -1127,7 +1127,7 @@ if (currentEvent(reader).isEndDocument()) {{
 
         assert case_body is not None
 
-        xml_prop_name = naming.xml_property(prop.name)
+        xml_prop_name = prop.xml_name
         xml_prop_name_literal = java_common.string_literal(xml_prop_name)
         case_blocks.append(
             Stripped(
@@ -1751,7 +1751,7 @@ def _generate_serialize_primitive_property_as_content(
 
     prop_name = java_naming.property_name(prop.name)
     getter_name = java_naming.getter_name(prop.name)
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     write_value_block: Stripped
 
@@ -1862,7 +1862,7 @@ def _generate_serialize_enumeration_property_as_content(
     enumeration = type_anno.our_type
 
     getter_name = java_naming.getter_name(prop.name)
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     enum_name = java_naming.enum_name(enumeration.name)
 
@@ -1959,7 +1959,7 @@ def _generate_serialize_interface_property_as_content(
     # fmt: on
 
     getter_name = java_naming.getter_name(prop.name)
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     result: Stripped
 
@@ -2023,7 +2023,7 @@ def _generate_serialize_concrete_class_property_as_sequence(
     )
 
     getter_name = java_naming.getter_name(prop.name)
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     result: Stripped
 
@@ -2150,7 +2150,7 @@ this.visit(item, writer);"""
     item_type = java_common.generate_type(type_anno.items)
 
     getter_name = java_naming.getter_name(prop.name)
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     result: Stripped
 

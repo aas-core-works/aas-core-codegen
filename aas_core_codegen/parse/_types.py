@@ -11,7 +11,9 @@ from icontract import require, DBC, ensure, invariant
 from aas_core_codegen.common import (
     Identifier,
     assert_union_of_descendants_exhaustive,
+    NonEmptyString,
     Stripped,
+    XMLTagName,
 )
 from aas_core_codegen.parse import tree
 
@@ -236,12 +238,16 @@ class Property:
         type_annotation: TypeAnnotation,
         description: Optional[Description],
         node: ast.AnnAssign,
+        json_name: Optional[NonEmptyString] = None,
+        xml_name: Optional[XMLTagName] = None,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
         self.type_annotation = type_annotation
         self.description = description
         self.node = node
+        self.json_name = json_name
+        self.xml_name = xml_name
 
 
 class Default:

@@ -20,6 +20,8 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass VeryAbstract',
+            json_name='someProperty',
+            xml_name='someProperty',
             parsed=...)],
         signatures=[
           Signature(
@@ -50,6 +52,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass VeryAbstract',
+          json_name='someProperty',
+          xml_name='someProperty',
           parsed=...)],
       methods=[
         UnderstoodMethod(
@@ -145,6 +149,8 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass SomethingAbstract',
+            json_name='anotherProperty',
+            xml_name='anotherProperty',
             parsed=...)],
         signatures=[
           Signature(
@@ -174,6 +180,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass VeryAbstract',
+          json_name='someProperty',
+          xml_name='someProperty',
           parsed=...),
         Property(
           name='another_property',
@@ -182,6 +190,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass SomethingAbstract',
+          json_name='anotherProperty',
+          xml_name='anotherProperty',
           parsed=...)],
       methods=[
         UnderstoodMethod(

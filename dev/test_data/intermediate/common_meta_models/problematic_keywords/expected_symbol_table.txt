@@ -20,6 +20,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='interface',
+          xml_name='interface',
           parsed=...),
         Property(
           name='type',
@@ -28,6 +30,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='type',
+          xml_name='type',
           parsed=...),
         Property(
           name='range',
@@ -36,6 +40,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='range',
+          xml_name='range',
           parsed=...),
         Property(
           name='void',
@@ -44,6 +50,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='void',
+          xml_name='void',
           parsed=...)],
       methods=[],
       constructor=Constructor(

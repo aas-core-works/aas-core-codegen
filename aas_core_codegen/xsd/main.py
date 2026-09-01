@@ -623,7 +623,7 @@ def _define_properties(
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        xs_element = ET.Element("xs:element", {"name": naming.xml_property(prop.name)})
+        xs_element = ET.Element("xs:element", {"name": prop.xml_name})
 
         # fmt: off
         (

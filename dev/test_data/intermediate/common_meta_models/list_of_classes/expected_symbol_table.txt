@@ -76,6 +76,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Some_item',
+          json_name='name',
+          xml_name='name',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -141,6 +143,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Another_item',
+          json_name='serialNumber',
+          xml_name='serialNumber',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -204,6 +208,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Simple',
+          json_name='name',
+          xml_name='name',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -269,6 +275,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someItems',
+          xml_name='someItems',
           parsed=...),
         Property(
           name='some_simples',
@@ -279,6 +287,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someSimples',
+          xml_name='someSimples',
           parsed=...)],
       methods=[],
       constructor=Constructor(

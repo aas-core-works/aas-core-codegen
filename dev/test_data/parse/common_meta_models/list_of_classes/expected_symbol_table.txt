@@ -25,6 +25,8 @@ UnverifiedSymbolTable(
             identifier='str',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -71,6 +73,8 @@ UnverifiedSymbolTable(
             identifier='int',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -116,6 +120,8 @@ UnverifiedSymbolTable(
             identifier='str',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -165,6 +171,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_simples',
@@ -176,6 +184,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(

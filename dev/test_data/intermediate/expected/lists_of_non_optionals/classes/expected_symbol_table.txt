@@ -76,6 +76,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass SomeItem',
+          json_name='name',
+          xml_name='name',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -141,6 +143,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass AnotherItem',
+          json_name='serialNumber',
+          xml_name='serialNumber',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -206,6 +210,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someItems',
+          xml_name='someItems',
           parsed=...)],
       methods=[],
       constructor=Constructor(

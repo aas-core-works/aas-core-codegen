@@ -13,6 +13,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='another_property',
@@ -20,6 +22,8 @@ UnverifiedSymbolTable(
             identifier='str',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='yet_another_property',
@@ -29,6 +33,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[],
       invariants=[],

@@ -143,6 +143,8 @@ def _stringify_property(that: Property) -> stringify.Entity:
             stringify.Property("name", that.name),
             stringify.Property("type_annotation", _stringify(that.type_annotation)),
             stringify.Property("description", _stringify(that.description)),
+            stringify.Property("json_name", that.json_name),
+            stringify.Property("xml_name", that.xml_name),
             stringify.PropertyEllipsis("node", that.node),
         ],
     )

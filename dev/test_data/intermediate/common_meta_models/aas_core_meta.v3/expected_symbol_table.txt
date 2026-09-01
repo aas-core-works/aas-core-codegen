@@ -1147,6 +1147,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_semantics',
+            json_name='semanticId',
+            xml_name='semanticId',
             parsed=...),
           Property(
             name='supplemental_semantic_IDs',
@@ -1166,6 +1168,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_semantics',
+            json_name='supplementalSemanticIds',
+            xml_name='supplementalSemanticIds',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -1243,6 +1247,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -1262,6 +1268,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1428,6 +1436,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -1447,6 +1457,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='name',
@@ -1464,6 +1476,8 @@ SymbolTable(
                   to be unique.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          json_name='name',
+          xml_name='name',
           parsed=...),
         Property(
           name='value_type',
@@ -1479,6 +1493,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          json_name='valueType',
+          xml_name='valueType',
           parsed=...),
         Property(
           name='value',
@@ -1493,6 +1509,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='refers_to',
@@ -1509,6 +1527,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          json_name='refersTo',
+          xml_name='refersTo',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -1837,6 +1857,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_extensions',
+            json_name='extensions',
+            xml_name='extensions',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -1907,6 +1929,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2072,6 +2096,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            json_name='category',
+            xml_name='category',
             parsed=...),
           Property(
             name='ID_short',
@@ -2093,6 +2119,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            json_name='idShort',
+            xml_name='idShort',
             parsed=...),
           Property(
             name='display_name',
@@ -2109,6 +2137,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            json_name='displayName',
+            xml_name='displayName',
             parsed=...),
           Property(
             name='description',
@@ -2134,6 +2164,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            json_name='description',
+            xml_name='description',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -2210,6 +2242,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -2233,6 +2267,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -2254,6 +2290,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -2270,6 +2308,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -2295,6 +2335,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2646,6 +2688,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Identifiable',
+            json_name='administration',
+            xml_name='administration',
             parsed=...),
           Property(
             name='ID',
@@ -2658,6 +2702,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Identifiable',
+            json_name='id',
+            xml_name='id',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -2694,6 +2740,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -2717,6 +2765,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -2738,6 +2788,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -2754,6 +2806,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -2779,6 +2833,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='administration',
@@ -2796,6 +2852,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='administration',
+          xml_name='administration',
           parsed=...),
         Property(
           name='ID',
@@ -2808,6 +2866,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='id',
+          xml_name='id',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3194,6 +3254,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_kind',
+            json_name='kind',
+            xml_name='kind',
             parsed=...)],
         signatures=[
           Signature(
@@ -3241,6 +3303,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          json_name='kind',
+          xml_name='kind',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -3356,6 +3420,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
+            json_name='embeddedDataSpecifications',
+            xml_name='embeddedDataSpecifications',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -3429,6 +3495,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3547,6 +3615,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='version',
@@ -3561,6 +3631,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Administrative_information',
+          json_name='version',
+          xml_name='version',
           parsed=...),
         Property(
           name='revision',
@@ -3575,6 +3647,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Administrative_information',
+          json_name='revision',
+          xml_name='revision',
           parsed=...),
         Property(
           name='creator',
@@ -3589,6 +3663,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Administrative_information',
+          json_name='creator',
+          xml_name='creator',
           parsed=...),
         Property(
           name='template_ID',
@@ -3612,6 +3688,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Administrative_information',
+          json_name='templateId',
+          xml_name='templateId',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3857,6 +3935,8 @@ SymbolTable(
                     <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
               parsed=...),
             specified_for='Reference to AbstractClass Qualifiable',
+            json_name='qualifiers',
+            xml_name='qualifiers',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -3934,6 +4014,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4131,6 +4213,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -4150,6 +4234,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='kind',
@@ -4167,6 +4253,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          json_name='kind',
+          xml_name='kind',
           parsed=...),
         Property(
           name='type',
@@ -4181,6 +4269,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          json_name='type',
+          xml_name='type',
           parsed=...),
         Property(
           name='value_type',
@@ -4193,6 +4283,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          json_name='valueType',
+          xml_name='valueType',
           parsed=...),
         Property(
           name='value',
@@ -4207,6 +4299,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='value_ID',
@@ -4222,6 +4316,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          json_name='valueId',
+          xml_name='valueId',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -4534,6 +4630,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -4557,6 +4655,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -4578,6 +4678,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -4594,6 +4696,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -4619,6 +4723,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='administration',
@@ -4636,6 +4742,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='administration',
+          xml_name='administration',
           parsed=...),
         Property(
           name='ID',
@@ -4648,6 +4756,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='id',
+          xml_name='id',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -4664,6 +4774,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='derived_from',
@@ -4678,6 +4790,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
+          json_name='derivedFrom',
+          xml_name='derivedFrom',
           parsed=...),
         Property(
           name='asset_information',
@@ -4690,6 +4804,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
+          json_name='assetInformation',
+          xml_name='assetInformation',
           parsed=...),
         Property(
           name='submodels',
@@ -4709,6 +4825,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
+          json_name='submodels',
+          xml_name='submodels',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5266,6 +5384,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          json_name='assetKind',
+          xml_name='assetKind',
           parsed=...),
         Property(
           name='global_asset_ID',
@@ -5286,6 +5406,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          json_name='globalAssetId',
+          xml_name='globalAssetId',
           parsed=...),
         Property(
           name='specific_asset_IDs',
@@ -5304,6 +5426,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          json_name='specificAssetIds',
+          xml_name='specificAssetIds',
           parsed=...),
         Property(
           name='asset_type',
@@ -5325,6 +5449,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          json_name='assetType',
+          xml_name='assetType',
           parsed=...),
         Property(
           name='default_thumbnail',
@@ -5340,6 +5466,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          json_name='defaultThumbnail',
+          xml_name='defaultThumbnail',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5689,6 +5817,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Resource',
+          json_name='path',
+          xml_name='path',
           parsed=...),
         Property(
           name='content_type',
@@ -5704,6 +5834,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Resource',
+          json_name='contentType',
+          xml_name='contentType',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5842,6 +5974,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -5861,6 +5995,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='name',
@@ -5873,6 +6009,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Specific_asset_ID',
+          json_name='name',
+          xml_name='name',
           parsed=...),
         Property(
           name='value',
@@ -5885,6 +6023,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Specific_asset_ID',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='external_subject_ID',
@@ -5900,6 +6040,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Specific_asset_ID',
+          json_name='externalSubjectId',
+          xml_name='externalSubjectId',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -6157,6 +6299,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -6180,6 +6324,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -6201,6 +6347,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -6217,6 +6365,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -6242,6 +6392,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='administration',
@@ -6259,6 +6411,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='administration',
+          xml_name='administration',
           parsed=...),
         Property(
           name='ID',
@@ -6271,6 +6425,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='id',
+          xml_name='id',
           parsed=...),
         Property(
           name='kind',
@@ -6286,6 +6442,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          json_name='kind',
+          xml_name='kind',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -6303,6 +6461,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -6322,6 +6482,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -6343,6 +6505,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -6359,6 +6523,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='submodel_elements',
@@ -6375,6 +6541,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel',
+          json_name='submodelElements',
+          xml_name='submodelElements',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -7329,6 +7497,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -7352,6 +7522,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -7373,6 +7545,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -7389,6 +7563,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -7414,6 +7590,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -7431,6 +7609,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -7450,6 +7630,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -7471,6 +7653,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -7487,6 +7671,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8039,6 +8225,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to ConcreteClass Relationship_element',
+            json_name='first',
+            xml_name='first',
             parsed=...),
           Property(
             name='second',
@@ -8051,6 +8239,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to ConcreteClass Relationship_element',
+            json_name='second',
+            xml_name='second',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -8085,6 +8275,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -8108,6 +8300,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -8129,6 +8323,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -8145,6 +8341,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -8170,6 +8368,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -8187,6 +8387,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -8206,6 +8408,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -8227,6 +8431,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -8243,6 +8449,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='first',
@@ -8255,6 +8463,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          json_name='first',
+          xml_name='first',
           parsed=...),
         Property(
           name='second',
@@ -8267,6 +8477,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          json_name='second',
+          xml_name='second',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -8934,6 +9146,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -8957,6 +9171,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -8978,6 +9194,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -8994,6 +9212,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -9019,6 +9239,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -9036,6 +9258,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -9055,6 +9279,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -9076,6 +9302,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -9092,6 +9320,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='order_relevant',
@@ -9109,6 +9339,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          json_name='orderRelevant',
+          xml_name='orderRelevant',
           parsed=...),
         Property(
           name='semantic_ID_list_element',
@@ -9124,6 +9356,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          json_name='semanticIdListElement',
+          xml_name='semanticIdListElement',
           parsed=...),
         Property(
           name='type_value_list_element',
@@ -9136,6 +9370,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          json_name='typeValueListElement',
+          xml_name='typeValueListElement',
           parsed=...),
         Property(
           name='value_type_list_element',
@@ -9150,6 +9386,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          json_name='valueTypeListElement',
+          xml_name='valueTypeListElement',
           parsed=...),
         Property(
           name='value',
@@ -9167,6 +9405,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          json_name='value',
+          xml_name='value',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -10131,6 +10371,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -10154,6 +10396,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -10175,6 +10419,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -10191,6 +10437,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -10216,6 +10464,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -10233,6 +10483,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -10252,6 +10504,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -10273,6 +10527,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -10289,6 +10545,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value',
@@ -10305,6 +10563,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_collection',
+          json_name='value',
+          xml_name='value',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -11025,6 +11285,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -11048,6 +11310,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -11069,6 +11333,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -11085,6 +11351,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -11110,6 +11378,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -11127,6 +11397,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -11146,6 +11418,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -11167,6 +11441,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -11183,6 +11459,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -11782,6 +12060,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -11805,6 +12085,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -11826,6 +12108,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -11842,6 +12126,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -11867,6 +12153,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -11884,6 +12172,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -11903,6 +12193,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -11924,6 +12216,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -11940,6 +12234,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value_type',
@@ -11952,6 +12248,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
+          json_name='valueType',
+          xml_name='valueType',
           parsed=...),
         Property(
           name='value',
@@ -11966,6 +12264,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='value_ID',
@@ -11981,6 +12281,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
+          json_name='valueId',
+          xml_name='valueId',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -12666,6 +12968,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -12689,6 +12993,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -12710,6 +13016,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -12726,6 +13034,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -12751,6 +13061,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -12768,6 +13080,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -12787,6 +13101,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -12808,6 +13124,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -12824,6 +13142,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value',
@@ -12840,6 +13160,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Multi_language_property',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='value_ID',
@@ -12855,6 +13177,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Multi_language_property',
+          json_name='valueId',
+          xml_name='valueId',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -13550,6 +13874,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -13573,6 +13899,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -13594,6 +13922,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -13610,6 +13940,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -13635,6 +13967,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -13652,6 +13986,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -13671,6 +14007,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -13692,6 +14030,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -13708,6 +14048,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value_type',
@@ -13720,6 +14062,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
+          json_name='valueType',
+          xml_name='valueType',
           parsed=...),
         Property(
           name='min',
@@ -13735,6 +14079,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
+          json_name='min',
+          xml_name='min',
           parsed=...),
         Property(
           name='max',
@@ -13750,6 +14096,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
+          json_name='max',
+          xml_name='max',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -14460,6 +14808,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -14483,6 +14833,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -14504,6 +14856,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -14520,6 +14874,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -14545,6 +14901,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -14562,6 +14920,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -14581,6 +14941,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -14602,6 +14964,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -14618,6 +14982,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value',
@@ -14635,6 +15001,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference_element',
+          json_name='value',
+          xml_name='value',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -15248,6 +15616,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -15271,6 +15641,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -15292,6 +15664,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -15308,6 +15682,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -15333,6 +15709,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -15350,6 +15728,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -15369,6 +15749,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -15390,6 +15772,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -15406,6 +15790,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value',
@@ -15423,6 +15809,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Blob',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='content_type',
@@ -15440,6 +15828,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Blob',
+          json_name='contentType',
+          xml_name='contentType',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -16069,6 +16459,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -16092,6 +16484,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -16113,6 +16507,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -16129,6 +16525,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -16154,6 +16552,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -16171,6 +16571,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -16190,6 +16592,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -16211,6 +16615,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -16227,6 +16633,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='value',
@@ -16242,6 +16650,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass File',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='content_type',
@@ -16255,6 +16665,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass File',
+          json_name='contentType',
+          xml_name='contentType',
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -16883,6 +17295,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -16906,6 +17320,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -16927,6 +17343,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -16943,6 +17361,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -16968,6 +17388,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -16985,6 +17407,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -17004,6 +17428,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -17025,6 +17451,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -17041,6 +17469,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='first',
@@ -17053,6 +17483,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          json_name='first',
+          xml_name='first',
           parsed=...),
         Property(
           name='second',
@@ -17065,6 +17497,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          json_name='second',
+          xml_name='second',
           parsed=...),
         Property(
           name='annotations',
@@ -17083,6 +17517,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Annotated_relationship_element',
+          json_name='annotations',
+          xml_name='annotations',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -17732,6 +18168,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -17755,6 +18193,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -17776,6 +18216,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -17792,6 +18234,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -17817,6 +18261,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -17834,6 +18280,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -17853,6 +18301,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -17874,6 +18324,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -17890,6 +18342,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='statements',
@@ -17908,6 +18362,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          json_name='statements',
+          xml_name='statements',
           parsed=...),
         Property(
           name='entity_type',
@@ -17920,6 +18376,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          json_name='entityType',
+          xml_name='entityType',
           parsed=...),
         Property(
           name='global_asset_ID',
@@ -17935,6 +18393,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          json_name='globalAssetId',
+          xml_name='globalAssetId',
           parsed=...),
         Property(
           name='specific_asset_IDs',
@@ -17953,6 +18413,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          json_name='specificAssetIds',
+          xml_name='specificAssetIds',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -18883,6 +19345,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='source',
+          xml_name='source',
           parsed=...),
         Property(
           name='source_semantic_ID',
@@ -18898,6 +19362,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='sourceSemanticId',
+          xml_name='sourceSemanticId',
           parsed=...),
         Property(
           name='observable_reference',
@@ -18913,6 +19379,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='observableReference',
+          xml_name='observableReference',
           parsed=...),
         Property(
           name='observable_semantic_ID',
@@ -18930,6 +19398,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='observableSemanticId',
+          xml_name='observableSemanticId',
           parsed=...),
         Property(
           name='topic',
@@ -18946,6 +19416,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='topic',
+          xml_name='topic',
           parsed=...),
         Property(
           name='subject_ID',
@@ -18961,6 +19433,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='subjectId',
+          xml_name='subjectId',
           parsed=...),
         Property(
           name='time_stamp',
@@ -18973,6 +19447,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='timeStamp',
+          xml_name='timeStamp',
           parsed=...),
         Property(
           name='payload',
@@ -18987,6 +19463,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          json_name='payload',
+          xml_name='payload',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -19287,6 +19765,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -19310,6 +19790,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -19331,6 +19813,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -19347,6 +19831,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -19372,6 +19858,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -19389,6 +19877,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -19408,6 +19898,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -19429,6 +19921,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -19445,6 +19939,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -19982,6 +20478,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -20005,6 +20503,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -20026,6 +20526,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -20042,6 +20544,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -20067,6 +20571,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -20084,6 +20590,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -20103,6 +20611,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -20124,6 +20634,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -20140,6 +20652,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='observed',
@@ -20158,6 +20672,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='observed',
+          xml_name='observed',
           parsed=...),
         Property(
           name='direction',
@@ -20171,6 +20687,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='direction',
+          xml_name='direction',
           parsed=...),
         Property(
           name='state',
@@ -20184,6 +20702,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='state',
+          xml_name='state',
           parsed=...),
         Property(
           name='message_topic',
@@ -20200,6 +20720,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='messageTopic',
+          xml_name='messageTopic',
           parsed=...),
         Property(
           name='message_broker',
@@ -20222,6 +20744,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='messageBroker',
+          xml_name='messageBroker',
           parsed=...),
         Property(
           name='last_update',
@@ -20238,6 +20762,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='lastUpdate',
+          xml_name='lastUpdate',
           parsed=...),
         Property(
           name='min_interval',
@@ -20258,6 +20784,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='minInterval',
+          xml_name='minInterval',
           parsed=...),
         Property(
           name='max_interval',
@@ -20277,6 +20805,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          json_name='maxInterval',
+          xml_name='maxInterval',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -21039,6 +21569,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -21062,6 +21594,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -21083,6 +21617,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -21099,6 +21635,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -21124,6 +21662,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -21141,6 +21681,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -21160,6 +21702,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -21181,6 +21725,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -21197,6 +21743,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='input_variables',
@@ -21213,6 +21761,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
+          json_name='inputVariables',
+          xml_name='inputVariables',
           parsed=...),
         Property(
           name='output_variables',
@@ -21229,6 +21779,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
+          json_name='outputVariables',
+          xml_name='outputVariables',
           parsed=...),
         Property(
           name='inoutput_variables',
@@ -21245,6 +21797,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
+          json_name='inoutputVariables',
+          xml_name='inoutputVariables',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -21963,6 +22517,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation_variable',
+          json_name='value',
+          xml_name='value',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -22063,6 +22619,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -22086,6 +22644,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -22107,6 +22667,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -22123,6 +22685,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -22148,6 +22712,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='semantic_ID',
@@ -22165,6 +22731,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='semanticId',
+          xml_name='semanticId',
           parsed=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -22184,6 +22752,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          json_name='supplementalSemanticIds',
+          xml_name='supplementalSemanticIds',
           parsed=...),
         Property(
           name='qualifiers',
@@ -22205,6 +22775,8 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          json_name='qualifiers',
+          xml_name='qualifiers',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -22221,6 +22793,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -22758,6 +23332,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          json_name='extensions',
+          xml_name='extensions',
           parsed=...),
         Property(
           name='category',
@@ -22781,6 +23357,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='category',
+          xml_name='category',
           parsed=...),
         Property(
           name='ID_short',
@@ -22802,6 +23380,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='idShort',
+          xml_name='idShort',
           parsed=...),
         Property(
           name='display_name',
@@ -22818,6 +23398,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='displayName',
+          xml_name='displayName',
           parsed=...),
         Property(
           name='description',
@@ -22843,6 +23425,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          json_name='description',
+          xml_name='description',
           parsed=...),
         Property(
           name='administration',
@@ -22860,6 +23444,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='administration',
+          xml_name='administration',
           parsed=...),
         Property(
           name='ID',
@@ -22872,6 +23458,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          json_name='id',
+          xml_name='id',
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -22888,6 +23476,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          json_name='embeddedDataSpecifications',
+          xml_name='embeddedDataSpecifications',
           parsed=...),
         Property(
           name='is_case_of',
@@ -22908,6 +23498,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Concept_description',
+          json_name='isCaseOf',
+          xml_name='isCaseOf',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -23682,6 +24274,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference',
+          json_name='type',
+          xml_name='type',
           parsed=...),
         Property(
           name='referred_semantic_ID',
@@ -23700,6 +24294,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference',
+          json_name='referredSemanticId',
+          xml_name='referredSemanticId',
           parsed=...),
         Property(
           name='keys',
@@ -23714,6 +24310,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference',
+          json_name='keys',
+          xml_name='keys',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -24566,6 +25164,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Key',
+          json_name='type',
+          xml_name='type',
           parsed=...),
         Property(
           name='value',
@@ -24578,6 +25178,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Key',
+          json_name='value',
+          xml_name='value',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -25012,6 +25614,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Abstract_lang_string',
+            json_name='language',
+            xml_name='language',
             parsed=...),
           Property(
             name='text',
@@ -25024,6 +25628,8 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Abstract_lang_string',
+            json_name='text',
+            xml_name='text',
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -25060,6 +25666,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='language',
+          xml_name='language',
           parsed=...),
         Property(
           name='text',
@@ -25072,6 +25680,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='text',
+          xml_name='text',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -25162,6 +25772,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='language',
+          xml_name='language',
           parsed=...),
         Property(
           name='text',
@@ -25174,6 +25786,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='text',
+          xml_name='text',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -25278,6 +25892,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='language',
+          xml_name='language',
           parsed=...),
         Property(
           name='text',
@@ -25290,6 +25906,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='text',
+          xml_name='text',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -25396,6 +26014,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Environment',
+          json_name='assetAdministrationShells',
+          xml_name='assetAdministrationShells',
           parsed=...),
         Property(
           name='submodels',
@@ -25412,6 +26032,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Environment',
+          json_name='submodels',
+          xml_name='submodels',
           parsed=...),
         Property(
           name='concept_descriptions',
@@ -25428,6 +26050,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Environment',
+          json_name='conceptDescriptions',
+          xml_name='conceptDescriptions',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -25731,6 +26355,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Embedded_data_specification',
+          json_name='dataSpecification',
+          xml_name='dataSpecification',
           parsed=...),
         Property(
           name='data_specification_content',
@@ -25743,6 +26369,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Embedded_data_specification',
+          json_name='dataSpecificationContent',
+          xml_name='dataSpecificationContent',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26039,6 +26667,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Level_type',
+          json_name='min',
+          xml_name='min',
           parsed=...),
         Property(
           name='nom',
@@ -26051,6 +26681,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Level_type',
+          json_name='nom',
+          xml_name='nom',
           parsed=...),
         Property(
           name='typ',
@@ -26063,6 +26695,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Level_type',
+          json_name='typ',
+          xml_name='typ',
           parsed=...),
         Property(
           name='max',
@@ -26075,6 +26709,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Level_type',
+          json_name='max',
+          xml_name='max',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26221,6 +26857,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Value_reference_pair',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='value_ID',
@@ -26234,6 +26872,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Value_reference_pair',
+          json_name='valueId',
+          xml_name='valueId',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26326,6 +26966,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Value_list',
+          json_name='valueReferencePairs',
+          xml_name='valueReferencePairs',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26422,6 +27064,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='language',
+          xml_name='language',
           parsed=...),
         Property(
           name='text',
@@ -26434,6 +27078,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='text',
+          xml_name='text',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26539,6 +27185,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='language',
+          xml_name='language',
           parsed=...),
         Property(
           name='text',
@@ -26551,6 +27199,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='text',
+          xml_name='text',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26655,6 +27305,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='language',
+          xml_name='language',
           parsed=...),
         Property(
           name='text',
@@ -26667,6 +27319,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Abstract_lang_string',
+          json_name='text',
+          xml_name='text',
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26777,6 +27431,8 @@ SymbolTable(
                 '<field_body><paragraph><ReferenceToAttribute refuri="preferred_name">preferred_name</ReferenceToAttribute> shall be provided at least in English.</paragraph></field_body>']],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='preferredName',
+          xml_name='preferredName',
           parsed=...),
         Property(
           name='short_name',
@@ -26793,6 +27449,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='shortName',
+          xml_name='shortName',
           parsed=...),
         Property(
           name='unit',
@@ -26807,6 +27465,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='unit',
+          xml_name='unit',
           parsed=...),
         Property(
           name='unit_ID',
@@ -26825,6 +27485,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='unitId',
+          xml_name='unitId',
           parsed=...),
         Property(
           name='source_of_definition',
@@ -26839,6 +27501,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='sourceOfDefinition',
+          xml_name='sourceOfDefinition',
           parsed=...),
         Property(
           name='symbol',
@@ -26853,6 +27517,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='symbol',
+          xml_name='symbol',
           parsed=...),
         Property(
           name='data_type',
@@ -26867,6 +27533,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='dataType',
+          xml_name='dataType',
           parsed=...),
         Property(
           name='definition',
@@ -26883,6 +27551,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='definition',
+          xml_name='definition',
           parsed=...),
         Property(
           name='value_format',
@@ -26898,6 +27568,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='valueFormat',
+          xml_name='valueFormat',
           parsed=...),
         Property(
           name='value_list',
@@ -26912,6 +27584,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='valueList',
+          xml_name='valueList',
           parsed=...),
         Property(
           name='value',
@@ -26926,6 +27600,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='value',
+          xml_name='value',
           parsed=...),
         Property(
           name='level_type',
@@ -26940,6 +27616,8 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          json_name='levelType',
+          xml_name='levelType',
           parsed=...)],
       methods=[],
       constructor=Constructor(

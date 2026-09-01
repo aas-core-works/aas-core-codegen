@@ -50,6 +50,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='somePositives',
+          xml_name='somePositives',
           parsed=...)],
       methods=[],
       constructor=Constructor(

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<queryCondition xmlns="https://dummy.com">
+    <eq><nested>invalid</nested></eq>
+</queryCondition>

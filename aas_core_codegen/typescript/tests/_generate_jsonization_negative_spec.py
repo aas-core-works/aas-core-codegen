@@ -216,7 +216,7 @@ test("{typescript_naming.class_name(first_cls.name)} deserialization fails on no
             Identifier(f"{required_cls.name}_from_jsonable")
         )
         required_property_name_literal = typescript_common.string_literal(
-            naming.json_property(required_prop.name)
+            required_prop.json_name
         )
 
         blocks.append(
@@ -249,7 +249,7 @@ test("{typescript_naming.class_name(required_cls.name)} deserialization fails wi
             Identifier(f"{mismatch_cls.name}_from_jsonable")
         )
         mismatch_property_name_literal = typescript_common.string_literal(
-            naming.json_property(mismatch_prop.name)
+            mismatch_prop.json_name
         )
 
         blocks.append(
@@ -282,7 +282,7 @@ test("{typescript_naming.class_name(mismatch_cls.name)} deserialization fails wi
             Identifier(f"{nested_cls.name}_from_jsonable")
         )
         nested_property_name_literal = typescript_common.string_literal(
-            naming.json_property(nested_prop.name)
+            nested_prop.json_name
         )
         model_type_property_name_literal = typescript_common.string_literal(
             naming.json_property(Identifier("model_type"))

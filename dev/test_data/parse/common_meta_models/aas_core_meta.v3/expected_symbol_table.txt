@@ -539,6 +539,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='supplemental_semantic_IDs',
@@ -556,6 +558,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -679,6 +683,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_type',
@@ -692,6 +698,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -705,6 +713,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='refers_to',
@@ -722,6 +732,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -930,6 +942,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1047,6 +1061,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='ID_short',
@@ -1060,6 +1076,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='display_name',
@@ -1077,6 +1095,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='description',
@@ -1094,6 +1114,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1322,6 +1344,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='ID',
@@ -1331,6 +1355,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1490,6 +1516,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -1572,6 +1600,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1665,6 +1695,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='revision',
@@ -1678,6 +1710,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='creator',
@@ -1691,6 +1725,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='template_ID',
@@ -1704,6 +1740,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1840,6 +1878,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1987,6 +2027,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='type',
@@ -1996,6 +2038,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_type',
@@ -2005,6 +2049,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -2018,6 +2064,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_ID',
@@ -2031,6 +2079,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -2207,6 +2257,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='asset_information',
@@ -2216,6 +2268,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='submodels',
@@ -2233,6 +2287,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -2517,6 +2573,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='global_asset_ID',
@@ -2530,6 +2588,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='specific_asset_IDs',
@@ -2547,6 +2607,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='asset_type',
@@ -2560,6 +2622,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='default_thumbnail',
@@ -2573,6 +2637,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -2836,6 +2902,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='content_type',
@@ -2849,6 +2917,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -2940,6 +3010,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -2949,6 +3021,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='external_subject_ID',
@@ -2962,6 +3036,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -3103,6 +3179,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -3736,6 +3814,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='second',
@@ -3745,6 +3825,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -4031,6 +4113,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='semantic_ID_list_element',
@@ -4044,6 +4128,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='type_value_list_element',
@@ -4053,6 +4139,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_type_list_element',
@@ -4066,6 +4154,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -4083,6 +4173,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -4615,6 +4707,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -5112,6 +5206,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -5125,6 +5221,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_ID',
@@ -5138,6 +5236,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -5382,6 +5482,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_ID',
@@ -5395,6 +5497,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -5652,6 +5756,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='min',
@@ -5665,6 +5771,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='max',
@@ -5678,6 +5786,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -5948,6 +6058,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -6139,6 +6251,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='content_type',
@@ -6148,6 +6262,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -6346,6 +6462,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='content_type',
@@ -6355,6 +6473,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -6557,6 +6677,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -6835,6 +6957,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='entity_type',
@@ -6844,6 +6968,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='global_asset_ID',
@@ -6857,6 +6983,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='specific_asset_IDs',
@@ -6874,6 +7002,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -7376,6 +7506,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='source_semantic_ID',
@@ -7389,6 +7521,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='observable_reference',
@@ -7398,6 +7532,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='observable_semantic_ID',
@@ -7411,6 +7547,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='topic',
@@ -7424,6 +7562,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='subject_ID',
@@ -7437,6 +7577,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='time_stamp',
@@ -7446,6 +7588,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='payload',
@@ -7459,6 +7603,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -7802,6 +7948,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='direction',
@@ -7811,6 +7959,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='state',
@@ -7820,6 +7970,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='message_topic',
@@ -7833,6 +7985,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='message_broker',
@@ -7846,6 +8000,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='last_update',
@@ -7859,6 +8015,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='min_interval',
@@ -7872,6 +8030,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='max_interval',
@@ -7885,6 +8045,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -8216,6 +8378,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='output_variables',
@@ -8233,6 +8397,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='inoutput_variables',
@@ -8250,6 +8416,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -8588,6 +8756,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -8828,6 +8998,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -9285,6 +9457,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='referred_semantic_ID',
@@ -9298,6 +9472,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='keys',
@@ -9311,6 +9487,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -10033,6 +10211,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -10042,6 +10222,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -10406,6 +10588,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='text',
@@ -10415,6 +10599,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -10615,6 +10801,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='submodels',
@@ -10632,6 +10820,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='concept_descriptions',
@@ -10649,6 +10839,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -10844,6 +11036,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='data_specification_content',
@@ -10853,6 +11047,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -11048,6 +11244,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='nom',
@@ -11057,6 +11255,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='typ',
@@ -11066,6 +11266,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='max',
@@ -11075,6 +11277,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -11145,6 +11349,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_ID',
@@ -11154,6 +11360,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -11214,6 +11422,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -11496,6 +11706,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='short_name',
@@ -11513,6 +11725,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='unit',
@@ -11526,6 +11740,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='unit_ID',
@@ -11539,6 +11755,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='source_of_definition',
@@ -11552,6 +11770,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='symbol',
@@ -11565,6 +11785,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='data_type',
@@ -11578,6 +11800,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='definition',
@@ -11595,6 +11819,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_format',
@@ -11608,6 +11834,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value_list',
@@ -11621,6 +11849,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='value',
@@ -11634,6 +11864,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='level_type',
@@ -11647,6 +11879,8 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(

@@ -618,14 +618,14 @@ def _generate_setter_map(cls: intermediate.ConcreteClass) -> Stripped:
     )
     # fmt: on
 
-    identifiers_expressions = []  # type: List[Tuple[Identifier, Stripped]]
+    identifiers_expressions = []  # type: List[Tuple[str, Stripped]]
 
     setter_cls_name = python_naming.private_class_name(
         Identifier(f"Setter_for_{cls.name}")
     )
 
     for prop in cls.properties:
-        json_identifier = naming.json_property(prop.name)
+        json_identifier = prop.json_name
         method_name = python_naming.method_name(
             Identifier(f"set_{prop.name}_from_jsonable")
         )
@@ -779,7 +779,7 @@ for key, jsonable_value in jsonable.items():
         prop_name = python_naming.property_name(prop.name)
 
         cause_literal = python_common.string_literal(
-            f"The required property {naming.json_property(prop.name)!r} is missing"
+            f"The required property {prop.json_name!r} is missing"
         )
         required_checks.append(
             Stripped(
@@ -968,7 +968,7 @@ def _generate_transform(cls: intermediate.ConcreteClass) -> Stripped:
     ]  # type: List[Stripped]
 
     for prop in cls.properties:
-        key_literal = python_common.string_literal(naming.json_property(prop.name))
+        key_literal = python_common.string_literal(prop.json_name)
         prop_name = python_naming.property_name(prop.name)
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)

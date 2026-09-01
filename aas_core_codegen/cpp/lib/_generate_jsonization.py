@@ -1102,7 +1102,7 @@ def _generate_deserialize_primitive_property(
 
     deserialize_primitive = _PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]
 
-    json_prop_name = naming.json_property(prop.name)
+    json_prop_name = prop.json_name
 
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
@@ -1156,7 +1156,7 @@ def _generate_deserialize_enumeration_property(
         Identifier(f"deserialize_{enum.name}")
     )
 
-    json_prop_name = naming.json_property(prop.name)
+    json_prop_name = prop.json_name
 
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
@@ -1235,7 +1235,7 @@ def _generate_deserialize_instance_property(
     deserialize_function = _determine_deserialize_function_for_class(cls=cls)
 
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
-    json_prop_name = naming.json_property(prop.name)
+    json_prop_name = prop.json_name
 
     return Stripped(
         f"""\
@@ -1331,7 +1331,7 @@ def _generate_deserialize_list_property(
             )
 
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
-    json_prop_name = naming.json_property(prop.name)
+    json_prop_name = prop.json_name
 
     items_type = cpp_common.generate_type(
         type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
@@ -1406,7 +1406,7 @@ def _generate_deserialize_property(
         assert_never(type_anno)
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        json_prop_literal = cpp_common.string_literal(naming.json_property(prop.name))
+        json_prop_literal = cpp_common.string_literal(prop.json_name)
 
         code = Stripped(
             f"""\
@@ -1528,19 +1528,20 @@ return std::make_pair(
             )
         )
     else:
-        names_of_required_properties = [
-            prop.name
+        json_names_of_required_properties = [
+            prop.json_name
             for prop in cls.properties
             if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        ]
+        ]  # type: List[str]
 
         if cls.serialization.with_model_type:
-            names_of_required_properties.append(Identifier("model_type"))
+            json_names_of_required_properties.append(
+                naming.json_property(Identifier("model_type"))
+            )
 
-        if len(names_of_required_properties) > 0:
+        if len(json_names_of_required_properties) > 0:
             blocks.append(Stripped("// region Check required properties"))
-            for prop_name in names_of_required_properties:
-                json_prop_name = naming.json_property(prop_name)
+            for json_prop_name in json_names_of_required_properties:
                 json_prop_name_literal = cpp_common.string_literal(json_prop_name)
                 blocks.append(
                     Stripped(
@@ -1601,7 +1602,7 @@ common::optional<
 
         # region Deserialize properties
         for prop in cls.properties:
-            json_prop_name = naming.json_property(prop.name)
+            json_prop_name = prop.json_name
             blocks.append(Stripped(f"// region De-serialize {json_prop_name}"))
 
             blocks.append(_generate_deserialize_property(prop=prop, ok_type=ok_type))
@@ -1772,8 +1773,7 @@ std::pair<
         )
 
     expected_properties_literals = [
-        f"{cpp_common.string_literal(naming.json_property(prop.name))}"
-        for prop in cls.properties
+        f"{cpp_common.string_literal(prop.json_name)}" for prop in cls.properties
     ]
 
     if cls.serialization.with_model_type:
@@ -2252,6 +2252,7 @@ def _generate_serialize_primitive_property(
     getter_expr: Stripped,
     primitive_type: intermediate.PrimitiveType,
     property_name: Identifier,
+    json_name: str,
 ) -> Stripped:
     """
     Generate the snippet to serialize the given primitive property.
@@ -2259,11 +2260,10 @@ def _generate_serialize_primitive_property(
     The ``getter_expr`` refers to the C++ expression specifying the value
     to be serialized.
 
-    The ``property_name`` refers to the intermediate property name.
+    The ``property_name`` refers to the intermediate property name, and
+    the ``json_name`` to its name in the JSON serialization.
     """
-    json_prop_name_literal = cpp_common.string_literal(
-        naming.json_property(property_name)
-    )
+    json_prop_name_literal = cpp_common.string_literal(json_name)
 
     if primitive_type is intermediate.PrimitiveType.BOOL:
         return Stripped(f"result[{json_prop_name_literal}] = {getter_expr};")
@@ -2329,6 +2329,7 @@ def _generate_serialize_list_property(
     getter_expr: Stripped,
     type_anno: intermediate.ListTypeAnnotation,
     property_name: Identifier,
+    json_name: str,
 ) -> Stripped:
     """
     Generate the snippet to serialize the given property as a list.
@@ -2336,7 +2337,8 @@ def _generate_serialize_list_property(
     The ``getter_expr`` refers to the C++ expression specifying the list
     to be serialized.
 
-    The ``property_name`` refers to the intermediate property name.
+    The ``property_name`` refers to the intermediate property name, and
+    the ``json_name`` to its name in the JSON serialization.
     """
     serialize_list: Union[
         Literal["SerializeListWithFallible"], Literal["SerializeListWithInfallible"]
@@ -2422,9 +2424,7 @@ def _generate_serialize_list_property(
                 f"Please contact the developers if you need this feature."
             )
 
-    json_prop_name_literal = cpp_common.string_literal(
-        naming.json_property(property_name)
-    )
+    json_prop_name_literal = cpp_common.string_literal(json_name)
 
     if serialize_list == "SerializeListWithInfallible":
         return Stripped(
@@ -2488,13 +2488,14 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
     else:
         getter_expr = Stripped(f"that.{getter}()")
 
-    json_prop_name = naming.json_property(prop.name)
+    json_prop_name = prop.json_name
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         code = _generate_serialize_primitive_property(
             getter_expr=getter_expr,
             primitive_type=type_anno.a_type,
             property_name=prop.name,
+            json_name=json_prop_name,
         )
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
@@ -2510,6 +2511,7 @@ result[{cpp_common.string_literal(json_prop_name)}] = stringification::to_string
                 getter_expr=getter_expr,
                 primitive_type=type_anno.our_type.constrainee,
                 property_name=prop.name,
+                json_name=json_prop_name,
             )
         elif isinstance(
             type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
@@ -2551,7 +2553,10 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         code = _generate_serialize_list_property(
-            getter_expr=getter_expr, type_anno=type_anno, property_name=prop.name
+            getter_expr=getter_expr,
+            type_anno=type_anno,
+            property_name=prop.name,
+            json_name=json_prop_name,
         )
 
     else:

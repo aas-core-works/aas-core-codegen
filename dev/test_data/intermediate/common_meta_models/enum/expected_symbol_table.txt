@@ -39,6 +39,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='someResult',
+          xml_name='someResult',
           parsed=...)],
       methods=[],
       constructor=Constructor(

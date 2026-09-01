@@ -229,6 +229,7 @@ def _parse_method_for_atomic_value(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_deserialize_constructor_argument(
     arg: intermediate.Argument,
+    json_name: str,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the code snippet for de-serializing the constructor argument ``arg``."""
     type_anno = intermediate.beneath_optional(arg.type_annotation)
@@ -236,7 +237,6 @@ def _generate_deserialize_constructor_argument(
     # Prefix the variables to avoid naming conflicts
     target_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
-    json_name = naming.json_property(arg.name)
     assert not csharp_common.needs_escaping(json_name)
 
     json_literal = csharp_common.string_literal(json_name)
@@ -428,12 +428,15 @@ if (obj == null)
 
     cases = []  # type: List[Stripped]
     for arg in cls.constructor.arguments:
-        case_body, error = _generate_deserialize_constructor_argument(arg=arg)
+        json_name = cls.properties_by_name[arg.name].json_name
+
+        case_body, error = _generate_deserialize_constructor_argument(
+            arg=arg, json_name=json_name
+        )
         if error is not None:
             errors.append(error)
         else:
             assert case_body is not None
-            json_name = naming.json_property(arg.name)
 
             cases.append(
                 Stripped(
@@ -526,7 +529,7 @@ foreach (var keyValue in obj)
             continue
 
         arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
-        json_name = naming.json_property(arg.name)
+        json_name = cls.properties_by_name[arg.name].json_name
         assert not csharp_common.needs_escaping(json_name)
 
         if i > 0:
@@ -1150,7 +1153,7 @@ def _generate_transform_property(
     stmts = []  # type: List[Stripped]
 
     name = csharp_naming.property_name(prop.name)
-    prop_literal = csharp_common.string_literal(naming.json_property(prop.name))
+    prop_literal = csharp_common.string_literal(prop.json_name)
 
     # NOTE (mristin, 2022-03-12):
     # For some unexplainable reason, C# compiler can not infer that properties which

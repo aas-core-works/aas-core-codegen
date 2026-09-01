@@ -75,6 +75,32 @@ class Identifier(DBC, Stripped):
         return cast(Identifier, value)
 
 
+# noinspection RegExpSimplifiable
+#: Match a valid local (*i.e.*, unprefixed) XML tag name, a simplified,
+#: ASCII-only subset of the ``NCName`` production, see:
+#: https://www.w3.org/TR/xml-names/#NT-NCName
+#:
+#: The colon (``:``) is deliberately excluded as it is reserved for
+#: namespace prefixes, and this codegen only ever emits unprefixed tag names.
+XML_TAG_NAME_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9.\-]*")
+
+
+class XMLTagName(DBC, Stripped):
+    """Represent a valid local (unprefixed) XML tag name."""
+
+    @require(lambda value: XML_TAG_NAME_RE.fullmatch(value))
+    def __new__(cls, value: str) -> "XMLTagName":
+        return cast(XMLTagName, value)
+
+
+class NonEmptyString(DBC, str):
+    """Represent a string with at least one character."""
+
+    @require(lambda value: len(value) > 0)
+    def __new__(cls, value: str) -> "NonEmptyString":
+        return cast(NonEmptyString, value)
+
+
 class Error:
     """
     Represent an unexpected input.

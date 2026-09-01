@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from icontract import ensure
 
-from aas_core_codegen import intermediate, naming
+from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped, Identifier
 from aas_core_codegen.typescript import (
     common as typescript_common,
@@ -76,9 +76,7 @@ import * as TestCommonXmlization from "./commonXmlization";"""
         as_function = typescript_naming.function_name(
             Identifier(f"as_{carrier_cls.name}")
         )
-        prop_xml_name_literal = typescript_common.string_literal(
-            naming.xml_property(carrier_prop.name)
-        )
+        prop_xml_name_literal = typescript_common.string_literal(carrier_prop.xml_name)
 
         blocks.append(
             Stripped(

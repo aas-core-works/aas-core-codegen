@@ -662,12 +662,12 @@ def _generate_setter_map(cls: intermediate.ConcreteClass) -> Stripped:
     )
     # fmt: on
 
-    identifiers_expressions = []  # type: List[Tuple[Identifier, Stripped]]
+    identifiers_expressions = []  # type: List[Tuple[str, Stripped]]
 
     setter_cls_name = typescript_naming.class_name(Identifier(f"Setter_for_{cls.name}"))
 
     for prop in cls.properties:
-        json_identifier = naming.json_property(prop.name)
+        json_identifier: str = prop.json_name
         method_name = typescript_naming.method_name(
             Identifier(f"set_{prop.name}_from_jsonable")
         )
@@ -838,7 +838,7 @@ for (const key in jsonable) {{
         prop_name = typescript_naming.property_name(prop.name)
 
         message_literal = typescript_common.string_literal(
-            f"The required property {naming.json_property(prop.name)!r} is missing"
+            f"The required property {prop.json_name!r} is missing"
         )
         required_checks.append(
             Stripped(
@@ -1077,7 +1077,7 @@ def _generate_transform(cls: intermediate.ConcreteClass) -> Stripped:
     blocks = [Stripped("const jsonable: JsonObject = {};")]  # type: List[Stripped]
 
     for prop in cls.properties:
-        key_literal = typescript_common.string_literal(naming.json_property(prop.name))
+        key_literal = typescript_common.string_literal(prop.json_name)
         prop_name = typescript_naming.property_name(prop.name)
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
