@@ -1,0 +1,4 @@
+{
+  "$eq": "some value",
+  "$ne": "another value"
+}

@@ -13,7 +13,7 @@ from typing import (
 
 from icontract import ensure, require
 
-from aas_core_codegen import intermediate, specific_implementations, naming
+from aas_core_codegen import intermediate, specific_implementations
 from aas_core_codegen.common import (
     Error,
     Stripped,
@@ -781,7 +781,7 @@ def _generate_transform_property(
     stmts = []  # type: List[Stripped]
 
     prop_name = csharp_naming.property_name(prop.name)
-    prop_literal = csharp_common.string_literal(naming.json_property(prop.name))
+    prop_literal = csharp_common.string_literal(prop.json_name)
 
     # NOTE (mristin, 2022-03-12):
     # For some unexplainable reason, C# compiler can not infer that properties which

@@ -1,0 +1,1 @@
+Expected ``Annotated`` to wrap the type annotation together with at least one metadata item such as ``json_name(...)`` or ``xml_name(...)``, but got: int

@@ -22,6 +22,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass SomeContainerClass',
+          json_name='x',
+          xml_name='x',
           parsed=...)],
       methods=[],
       constructor=Constructor(

@@ -143,6 +143,8 @@ UnverifiedSymbolTable(
             identifier='ConstrainedBool',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_int',
@@ -150,6 +152,8 @@ UnverifiedSymbolTable(
             identifier='PositiveInt',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_float',
@@ -157,6 +161,8 @@ UnverifiedSymbolTable(
             identifier='PositiveFloat',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_string',
@@ -164,6 +170,8 @@ UnverifiedSymbolTable(
             identifier='NonEmptyString',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_bytes',
@@ -171,6 +179,8 @@ UnverifiedSymbolTable(
             identifier='NonEmptyBytes',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(

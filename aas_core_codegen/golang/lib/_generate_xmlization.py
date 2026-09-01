@@ -878,7 +878,7 @@ def _generate_snippet_to_switch_on_property_deserialization(
 
         prop_var = golang_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-        xml_prop_literal = golang_common.string_literal(naming.xml_property(prop.name))
+        xml_prop_literal = golang_common.string_literal(prop.xml_name)
 
         case_body_blocks = []  # type: List[Stripped]
 
@@ -1171,7 +1171,7 @@ def _generate_read_as_sequence(cls: intermediate.ConcreteClass) -> Stripped:
         found_var = golang_naming.variable_name(Identifier(f"found_{prop.name}"))
 
         message_literal = golang_common.string_literal(
-            f"The required property {naming.json_property(prop.name)!r} is missing"
+            f"The required property {prop.xml_name!r} is missing"
         )
 
         construct_blocks.append(
@@ -2145,7 +2145,7 @@ assert all(
 def _generate_snippet_to_serialize_property(prop: intermediate.Property) -> Stripped:
     blocks = []  # type: List[Stripped]
 
-    local_literal = golang_common.string_literal(naming.xml_property(prop.name))
+    local_literal = golang_common.string_literal(prop.xml_name)
 
     segment_name_literal = golang_common.string_literal(
         f"{golang_naming.getter_name(prop.name)}()"

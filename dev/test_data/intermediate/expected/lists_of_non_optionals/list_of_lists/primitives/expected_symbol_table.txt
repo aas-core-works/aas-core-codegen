@@ -24,6 +24,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='listOfListsOfInts',
+          xml_name='listOfListsOfInts',
           parsed=...)],
       methods=[],
       constructor=Constructor(

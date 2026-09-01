@@ -15,6 +15,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_ints',
@@ -26,6 +28,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_floats',
@@ -37,6 +41,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_strings',
@@ -48,6 +54,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...),
         Property(
           name='some_bytes',
@@ -59,6 +67,8 @@ UnverifiedSymbolTable(
                 node=...)],
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[
         ConstructorToBeUnderstood(

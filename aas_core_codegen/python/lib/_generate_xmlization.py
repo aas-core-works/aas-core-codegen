@@ -1230,7 +1230,7 @@ while True:
             prop_name = python_naming.property_name(prop.name)
 
             cause_literal = python_common.string_literal(
-                f"The required property {naming.xml_property(prop.name)!r} is missing"
+                f"The required property {prop.xml_name!r} is missing"
             )
             blocks.append(
                 Stripped(
@@ -1443,14 +1443,14 @@ def _generate_reader_and_setter_map(cls: intermediate.ConcreteClass) -> Stripped
     )
     # fmt: on
 
-    identifiers_expressions = []  # type: List[Tuple[Identifier, Stripped]]
+    identifiers_expressions = []  # type: List[Tuple[str, Stripped]]
 
     reader_and_setter_cls_name = python_naming.private_class_name(
         Identifier(f"Reader_and_setter_for_{cls.name}")
     )
 
     for prop in cls.properties:
-        xml_identifier = naming.xml_property(prop.name)
+        xml_identifier = prop.xml_name
         method_name = python_naming.method_name(Identifier(f"read_and_set_{prop.name}"))
 
         identifiers_expressions.append(
@@ -1536,7 +1536,7 @@ def _generate_snippet_for_writing_concrete_cls_prop(
     our_type = type_anno.our_type
     assert isinstance(our_type, intermediate.ConcreteClass)
 
-    xml_prop_literal = python_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_literal = python_common.string_literal(prop.xml_name)
 
     write_cls_as_sequence = python_naming.private_method_name(
         Identifier(f"write_{our_type.name}_as_sequence")
@@ -1638,9 +1638,7 @@ return"""
     else:
         for prop in cls.properties:
             prop_name = python_naming.property_name(prop.name)
-            xml_prop_literal = python_common.string_literal(
-                naming.xml_property(prop.name)
-            )
+            xml_prop_literal = python_common.string_literal(prop.xml_name)
 
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 

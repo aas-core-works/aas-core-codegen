@@ -52,6 +52,8 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Something',
+          json_name='listOfListsOfPositives',
+          xml_name='listOfListsOfPositives',
           parsed=...)],
       methods=[],
       constructor=Constructor(

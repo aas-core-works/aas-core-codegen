@@ -257,6 +257,12 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="constrained_primitives"
         )
 
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="custom_serialization_names",
+        )
+
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="deep_class_hierarchy"
@@ -322,6 +328,12 @@ class Test_csharp(_TestCase):
             case_name="constrained_primitives",
         )
 
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="custom_serialization_names",
+        )
+
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="deep_class_hierarchy"
@@ -385,6 +397,12 @@ class Test_golang(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG,
             case_name="constrained_primitives",
+        )
+
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="custom_serialization_names",
         )
 
     def test_expected_deep_class_hierarchy(self) -> None:
@@ -457,6 +475,12 @@ class Test_java(_TestCase):
             case_name="constrained_primitives",
         )
 
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="custom_serialization_names",
+        )
+
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="deep_class_hierarchy"
@@ -520,6 +544,12 @@ class Test_jsonschema(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
             case_name="constrained_primitives",
+        )
+
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="custom_serialization_names",
         )
 
     def test_expected_deep_class_hierarchy(self) -> None:
@@ -624,6 +654,12 @@ class Test_python(_TestCase):
             case_name="constrained_primitives",
         )
 
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="custom_serialization_names",
+        )
+
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="deep_class_hierarchy"
@@ -695,6 +731,12 @@ class Test_typescript(_TestCase):
             case_name="constrained_primitives",
         )
 
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="custom_serialization_names",
+        )
+
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
@@ -763,6 +805,12 @@ class Test_xsd(_TestCase):
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="constrained_primitives"
+        )
+
+    def test_expected_custom_serialization_names(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="custom_serialization_names",
         )
 
     def test_expected_deep_class_hierarchy(self) -> None:

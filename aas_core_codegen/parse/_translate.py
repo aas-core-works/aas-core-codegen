@@ -32,9 +32,12 @@ from aas_core_codegen.common import (
     Identifier,
     IDENTIFIER_RE,
     LinenoColumner,
+    NonEmptyString,
     assert_never,
     is_stripped,
     Stripped,
+    XMLTagName,
+    XML_TAG_NAME_RE,
 )
 from aas_core_codegen.parse import tree, _rules
 from aas_core_codegen.parse._types import (
@@ -100,6 +103,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         [
             ("match", "re"),
             ("Enum", "enum"),
+            ("Annotated", "typing"),
             ("List", "typing"),
             ("Optional", "typing"),
             ("Set", "typing"),
@@ -110,9 +114,11 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("abstract", "aas_core_meta.marker"),
             ("constant_set", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
+            ("json_name", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
             ("verification", "aas_core_meta.marker"),
             ("non_mutating", "aas_core_meta.marker"),
+            ("xml_name", "aas_core_meta.marker"),
         ]
     )
 
@@ -182,6 +188,62 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
 
 # noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _subscript_index_node(
+    node: ast.Subscript, atok: asttokens.ASTTokens
+) -> Tuple[Optional[ast.AST], Optional[Error]]:
+    """
+    Extract the index node of a subscript, *e.g.*, ``int`` out of ``List[int]``.
+
+    This bridges the breaking changes between Python 3.8 and 3.9 in the ``ast``
+    module, relevant to this particular piece of parsing logic, where
+    ``ast.Index`` and ``ast.ExtSlice`` got deprecated in favor of the wrapped
+    value and ``ast.Tuple``, respectively.
+
+    See the deprecation notes just at the end of:
+    https://docs.python.org/3/library/ast.html#ast.AST
+    """
+    if isinstance(node.slice, ast.Slice):
+        return (
+            None,
+            Error(
+                node.slice,
+                f"Expected an index to define a subscripted type annotation, "
+                f"but got a slice: {atok.get_text(node.slice)}",
+            ),
+        )
+
+    # noinspection PyUnresolvedReferences
+    if (sys.version_info < (3, 9) and isinstance(node.slice, ast.ExtSlice)) or (
+        sys.version_info >= (3, 9)
+        and isinstance(node.slice, ast.Tuple)
+        and any(isinstance(elt, ast.Slice) for elt in node.slice.elts)
+    ):
+        return (
+            None,
+            Error(
+                node.slice,
+                f"Expected an index to define a subscripted type annotation, "
+                f"but got an extended slice: {atok.get_text(node.slice)}",
+            ),
+        )
+
+    if sys.version_info < (3, 9):
+        # noinspection PyUnresolvedReferences
+        if isinstance(node.slice, ast.Index):
+            return node.slice.value, None
+        else:
+            return (
+                None,
+                Error(
+                    node.slice,
+                    f"Expected an index to define a subscripted type annotation, "
+                    f"but got: {atok.get_text(node.slice)}",
+                ),
+            )
+    else:
+        return node.slice, None
+
+
 def _type_annotation(
     node: ast.AST, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[TypeAnnotation], Optional[Error]]:
@@ -216,61 +278,11 @@ def _type_annotation(
                 ),
             )
 
-        # NOTE (mristin, 2022-01-22):
-        # There were breaking changes between Python 3.8 and 3.9 in ``ast`` module.
-        # Relevant to this particular piece of parsing logic is the deprecation of
-        # ``ast.Index`` and ``ast.ExtSlice`` which is replaced with their actual value
-        # and ``ast.Tuple``, respectively.
-        #
-        # Hence, we need to switch on Python version and get the underlying slice value
-        # explicitly.
-        #
-        # See deprecation notes just at the end of:
-        # https://docs.python.org/3/library/ast.html#ast.AST
+        index_node, error = _subscript_index_node(node=node, atok=atok)
+        if error is not None:
+            return None, error
 
-        if isinstance(node.slice, ast.Slice):
-            return (
-                None,
-                Error(
-                    node.slice,
-                    f"Expected an index to define a subscripted type annotation, "
-                    f"but got a slice: {atok.get_text(node.slice)}",
-                ),
-            )
-
-        # noinspection PyUnresolvedReferences
-        if (sys.version_info < (3, 9) and isinstance(node.slice, ast.ExtSlice)) or (
-            sys.version_info >= (3, 9)
-            and isinstance(node.slice, ast.Tuple)
-            and any(isinstance(elt, ast.Slice) for elt in node.slice.elts)
-        ):
-            return (
-                None,
-                Error(
-                    node.slice,
-                    f"Expected an index to define a subscripted type annotation, "
-                    f"but got an extended slice: {atok.get_text(node.slice)}",
-                ),
-            )
-
-        # NOTE (mristin, 2022-01-22):
-        # Please see the note about the deprecation of ``ast.Index`` above.
-        index_node: ast.AST
-        if sys.version_info < (3, 9):
-            # noinspection PyUnresolvedReferences
-            if isinstance(node.slice, ast.Index):
-                index_node = node.slice.value
-            else:
-                return (
-                    None,
-                    Error(
-                        node.slice,
-                        f"Expected an index to define a subscripted type annotation, "
-                        f"but got: {atok.get_text(node.slice)}",
-                    ),
-                )
-        else:
-            index_node = node.slice
+        assert index_node is not None
 
         subscripts = []  # type: List[TypeAnnotation]
 
@@ -323,6 +335,13 @@ def _type_annotation(
                 f"but got: {atok.get_text(node)} (as {type(node)})",
             ),
         )
+
+
+#: Markers accepted as the metadata items of ``Annotated[...]`` on a property's
+#: type annotation, to specify an explicit name of the property in
+#: a serialization, *e.g.*,
+#: ``Annotated[Optional[str], json_name("someFoo"), xml_name("someFoo")]``.
+_SERIALIZATION_NAME_MARKERS = ("json_name", "xml_name")
 
 
 _PRIMITIVE_TYPE_NAMES_TO_CONSTANT_FUNCTION_NAMES: Dict[Identifier, Identifier] = {
@@ -831,11 +850,156 @@ def _ann_assign_to_property(
             Error(node.target, "Expected property to be annotated with a type"),
         )
 
-    type_annotation, error = _type_annotation(node=node.annotation, atok=atok)
-    if error is not None:
-        return None, error
+    json_name = None  # type: Optional[NonEmptyString]
+    xml_name = None  # type: Optional[XMLTagName]
 
-    assert type_annotation is not None
+    if (
+        isinstance(node.annotation, ast.Subscript)
+        and isinstance(node.annotation.value, ast.Name)
+        and node.annotation.value.id == "Annotated"
+    ):
+        # NOTE (2026-09-01):
+        # We unwrap ``Annotated[...]`` here, at the property level, and nowhere
+        # else, since the ``json_name``/``xml_name`` markers only make sense as
+        # metadata on a property's type annotation.
+        index_node, error = _subscript_index_node(node=node.annotation, atok=atok)
+        if error is not None:
+            return None, error
+
+        assert index_node is not None
+
+        if not isinstance(index_node, ast.Tuple) or len(index_node.elts) < 2:
+            return (
+                None,
+                Error(
+                    index_node,
+                    f"Expected ``Annotated`` to wrap the type annotation "
+                    f"together with at least one metadata item "
+                    f"such as ``json_name(...)`` or ``xml_name(...)``, "
+                    f"but got: {atok.get_text(index_node)}",
+                ),
+            )
+
+        type_annotation, error = _type_annotation(node=index_node.elts[0], atok=atok)
+        if error is not None:
+            return None, error
+
+        assert type_annotation is not None
+
+        for metadata_node in index_node.elts[1:]:
+            if (
+                not isinstance(metadata_node, ast.Call)
+                or not isinstance(metadata_node.func, ast.Name)
+                or metadata_node.func.id not in _SERIALIZATION_NAME_MARKERS
+            ):
+                joined_markers = " or ".join(
+                    f"``{marker}(...)``" for marker in _SERIALIZATION_NAME_MARKERS
+                )
+                return (
+                    None,
+                    Error(
+                        metadata_node,
+                        f"Expected a call to {joined_markers} "
+                        f"as the metadata of ``Annotated``, "
+                        f"but got: {atok.get_text(metadata_node)}",
+                    ),
+                )
+
+            marker_name = metadata_node.func.id
+
+            if len(metadata_node.args) + len(metadata_node.keywords) != 1:
+                return (
+                    None,
+                    Error(
+                        metadata_node,
+                        f"Expected exactly one argument ``name`` "
+                        f"to the marker {marker_name!r}, "
+                        f"but got: {atok.get_text(metadata_node)}",
+                    ),
+                )
+
+            name_arg_node: ast.expr
+            if len(metadata_node.args) == 1:
+                name_arg_node = metadata_node.args[0]
+            else:
+                kwarg = metadata_node.keywords[0]
+                if kwarg.arg != "name":
+                    return (
+                        None,
+                        Error(
+                            metadata_node,
+                            f"Unexpected keyword argument {kwarg.arg!r} "
+                            f"to the marker {marker_name!r}: "
+                            f"{atok.get_text(metadata_node)}",
+                        ),
+                    )
+                name_arg_node = kwarg.value
+
+            if not isinstance(name_arg_node, ast.Constant) or not isinstance(
+                name_arg_node.value, str
+            ):
+                return (
+                    None,
+                    Error(
+                        name_arg_node,
+                        f"Expected a string literal as the argument "
+                        f"to the marker {marker_name!r}, "
+                        f"but got: {atok.get_text(name_arg_node)}",
+                    ),
+                )
+
+            if marker_name == "json_name":
+                if json_name is not None:
+                    return (
+                        None,
+                        Error(
+                            metadata_node,
+                            "Unexpected multiple ``json_name`` markers "
+                            "in ``Annotated``",
+                        ),
+                    )
+
+                if len(name_arg_node.value) == 0:
+                    return (
+                        None,
+                        Error(
+                            name_arg_node,
+                            "Expected a non-empty string as the argument "
+                            "to the marker 'json_name'",
+                        ),
+                    )
+
+                json_name = NonEmptyString(name_arg_node.value)
+            else:
+                if xml_name is not None:
+                    return (
+                        None,
+                        Error(
+                            metadata_node,
+                            "Unexpected multiple ``xml_name`` markers "
+                            "in ``Annotated``",
+                        ),
+                    )
+
+                if not XML_TAG_NAME_RE.fullmatch(name_arg_node.value):
+                    return (
+                        None,
+                        Error(
+                            name_arg_node,
+                            f"Expected a valid local XML tag name "
+                            f"(matching {XML_TAG_NAME_RE.pattern!r}) as the argument "
+                            f"to the marker 'xml_name', "
+                            f"but got: {name_arg_node.value!r}",
+                        ),
+                    )
+
+                xml_name = XMLTagName(name_arg_node.value)
+    else:
+        type_annotation, error = _type_annotation(node=node.annotation, atok=atok)
+        if error is not None:
+            return None, error
+
+        assert type_annotation is not None
 
     if node.value is not None:
         return (
@@ -849,6 +1013,8 @@ def _ann_assign_to_property(
             type_annotation=type_annotation,
             description=description,
             node=node,
+            json_name=json_name,
+            xml_name=xml_name,
         ),
         None,
     )

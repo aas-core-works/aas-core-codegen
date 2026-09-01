@@ -28,7 +28,9 @@ from aas_core_codegen.common import (
     assert_never,
     assert_union_of_descendants_exhaustive,
     assert_union_without_excluded,
+    NonEmptyString,
     Stripped,
+    XMLTagName,
 )
 from aas_core_codegen.intermediate import construction
 from aas_core_codegen.parse import tree as parse_tree
@@ -469,6 +471,20 @@ class Property:
     #: a class.
     specified_for: Final["Class"]
 
+    #: Name of the property in a JSON serialization.
+    #:
+    #: This is either the explicit name given by the ``json_name`` marker in
+    #: the meta-model, or, if none was given, the name inferred from :py:attr:`name`
+    #: by the usual naming convention (see :py:mod:`aas_core_codegen.naming`).
+    json_name: Final[NonEmptyString]
+
+    #: Name of the property in an XML serialization.
+    #:
+    #: This is either the explicit name given by the ``xml_name`` marker in
+    #: the meta-model, or, if none was given, the name inferred from :py:attr:`name`
+    #: by the usual naming convention (see :py:mod:`aas_core_codegen.naming`).
+    xml_name: Final[XMLTagName]
+
     #: Relation to the property from the parse stage
     parsed: Final[parse.Property]
 
@@ -478,6 +494,8 @@ class Property:
         type_annotation: TypeAnnotationUnion,
         description: Optional[DescriptionOfProperty],
         specified_for: "Class",
+        json_name: NonEmptyString,
+        xml_name: XMLTagName,
         parsed: parse.Property,
     ) -> None:
         """Initialize with the given values."""
@@ -485,6 +503,8 @@ class Property:
         self.type_annotation = type_annotation
         self.description = description
         self.specified_for = specified_for
+        self.json_name = json_name
+        self.xml_name = xml_name
         self.parsed = parsed
 
     def __repr__(self) -> str:

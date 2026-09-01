@@ -1,0 +1,1 @@
+Expected a call to ``json_name(...)`` or ``xml_name(...)`` as the metadata of ``Annotated``, but got: something_else()

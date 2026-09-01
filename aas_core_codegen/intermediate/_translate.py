@@ -28,12 +28,14 @@ import docutils.parsers.rst
 import docutils.utils
 from icontract import require, ensure, snapshot
 
-from aas_core_codegen import parse
+from aas_core_codegen import naming, parse
 from aas_core_codegen.common import (
     Error,
     Identifier,
     assert_never,
     IDENTIFIER_RE,
+    NonEmptyString,
+    XMLTagName,
 )
 from aas_core_codegen.intermediate import (
     _hierarchy,
@@ -1074,6 +1076,17 @@ def _to_property(
         if description_errors is not None:
             return None, description_errors
 
+    json_name = (
+        parsed.json_name
+        if parsed.json_name is not None
+        else NonEmptyString(naming.json_property(parsed.name))
+    )
+    xml_name = (
+        parsed.xml_name
+        if parsed.xml_name is not None
+        else XMLTagName(naming.xml_property(parsed.name))
+    )
+
     # noinspection PyTypeChecker
     return (
         Property(
@@ -1085,6 +1098,8 @@ def _to_property(
             # created. Therefore, we assign here a placeholder and fix it later
             # in a second pass.
             specified_for=_PlaceholderOurType(parsed_cls.name),  # type: ignore
+            json_name=json_name,
+            xml_name=xml_name,
             parsed=parsed,
         ),
         None,

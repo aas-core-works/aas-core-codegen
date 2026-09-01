@@ -1,0 +1,1 @@
+<queryCondition xmlns="https://dummy.com"><eq>some value</eq><not-eq>another value</not-eq></queryCondition>

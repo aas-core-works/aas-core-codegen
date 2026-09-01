@@ -78,7 +78,7 @@ def _generate_duplicate_property_test(
     cls_xml_name = naming.xml_class_name(cls.name)
     cls_xml_name_literal = typescript_common.string_literal(cls_xml_name)
 
-    prop_xml_name = naming.xml_property(prop.name)
+    prop_xml_name = prop.xml_name
     prop_xml_literal = typescript_common.string_literal(prop_xml_name)
 
     return Stripped(
@@ -127,7 +127,7 @@ def _generate_invalid_item_delimiter(
     cls_xml_name = naming.xml_class_name(cls.name)
     cls_xml_name_literal = typescript_common.string_literal(cls_xml_name)
 
-    prop_xml_name = naming.xml_property(prop.name)
+    prop_xml_name = prop.xml_name
     prop_xml_name_literal = typescript_common.string_literal(prop_xml_name)
 
     return Stripped(
@@ -178,7 +178,7 @@ def _generate_nested_class_dispatch_mismatch(
     cls_xml_name = naming.xml_class_name(cls.name)
     cls_xml_name_literal = typescript_common.string_literal(cls_xml_name)
 
-    prop_xml_name = naming.xml_property(prop.name)
+    prop_xml_name = prop.xml_name
     prop_xml_name_literal = typescript_common.string_literal(prop_xml_name)
 
     return Stripped(

@@ -226,7 +226,7 @@ def _generate_parse_case_for_property(
 
     The generated code stores the parsed property value into ``var_name``.
     """
-    xml_name_literal = typescript_common.string_literal(naming.xml_property(prop.name))
+    xml_name_literal = typescript_common.string_literal(prop.xml_name)
 
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -565,7 +565,7 @@ def _generate_parse_concrete_class(cls: intermediate.ConcreteClass) -> Stripped:
 
         if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             message_literal = typescript_common.string_literal(
-                f"The required property {naming.xml_property(prop.name)!r} is missing"
+                f"The required property {prop.xml_name!r} is missing"
             )
             required_checks.append(
                 Stripped(
@@ -851,7 +851,7 @@ def _generate_serialize_block_for_property(
     prop: intermediate.Property,
 ) -> Stripped:
     """Generate serialization statements for a property."""
-    xml_name_literal = typescript_common.string_literal(naming.xml_property(prop.name))
+    xml_name_literal = typescript_common.string_literal(prop.xml_name)
     prop_name = typescript_naming.property_name(prop.name)
     access_expr = Stripped(f"that.{prop_name}")
 

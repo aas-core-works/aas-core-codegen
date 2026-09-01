@@ -28,7 +28,13 @@ from aas_core_codegen import (
     infer_for_schema,
 )
 from aas_core_codegen.parse import retree as parse_retree
-from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
+from aas_core_codegen.common import (
+    Stripped,
+    Error,
+    assert_never,
+    Identifier,
+    NonEmptyString,
+)
 
 assert aas_core_codegen.jsonschema.__doc__ == __doc__
 
@@ -371,7 +377,7 @@ def _define_properties(
     constraints_by_value = constraints_by_class[cls]
 
     for prop in cls.properties:
-        prop_name = naming.json_property(prop.name)
+        prop_name = prop.json_name
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -448,14 +454,14 @@ def _define_properties(
     return properties, None
 
 
-def _list_required_properties(cls: intermediate.ClassUnion) -> List[Identifier]:
+def _list_required_properties(cls: intermediate.ClassUnion) -> List[NonEmptyString]:
     """
     List all the properties which are required.
 
     Only the meta-model properties are listed, so this list might not be exhaustive.
     For example, the JSON property ``modelType`` is not listed here.
     """
-    required = []  # type: List[Identifier]
+    required = []  # type: List[NonEmptyString]
     for prop in cls.properties:
         # NOTE (mristin, 2023-02-06):
         # We stack the inheritance as ``allOf``. This will impose the stacking
@@ -466,8 +472,7 @@ def _list_required_properties(cls: intermediate.ClassUnion) -> List[Identifier]:
             continue
 
         if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            prop_name = naming.json_property(prop.name)
-            required.append(prop_name)
+            required.append(prop.json_name)
 
     return required
 
@@ -553,7 +558,7 @@ def _generate_inheritable_definition(
         assert "modelType" not in properties
         properties["modelType"] = {"$ref": "#/definitions/ModelType"}
 
-        required.append(Identifier("modelType"))
+        required.append(NonEmptyString("modelType"))
 
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     if len(cls.inheritances) == 0:

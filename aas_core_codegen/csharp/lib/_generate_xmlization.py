@@ -458,7 +458,7 @@ DeserializeImplementation.ReadWholeContentAsBase64(
 
     prop_name = csharp_naming.property_name(prop.name)
     cls_name = csharp_naming.class_name(cls.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     if a_type is intermediate.PrimitiveType.STR:
         empty_handling_body = Stripped(f'{target_var} = "";')
@@ -533,7 +533,7 @@ def _generate_deserialize_enumeration_property(
     prop_name = csharp_naming.property_name(prop.name)
     cls_name = csharp_naming.class_name(cls.name)
     enum_name = csharp_naming.enum_name(our_type.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
@@ -612,7 +612,7 @@ def _generate_deserialize_interface_property(
     interface_name = csharp_naming.interface_name(our_type.interface.name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
@@ -680,7 +680,7 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
     target_cls_name = csharp_naming.class_name(our_type.name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
@@ -754,7 +754,7 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
             f"Please contact the developers if you need this feature."
         )
 
-    xml_prop_name = naming.xml_property(prop.name)
+    xml_prop_name = prop.xml_name
     xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
@@ -937,7 +937,7 @@ if (reader.EOF)
 
         assert case_body is not None
 
-        xml_prop_name = naming.xml_property(prop.name)
+        xml_prop_name = prop.xml_name
         xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
         case_blocks.append(
             Stripped(
@@ -1687,7 +1687,7 @@ def _generate_serialize_primitive_property_as_content(
     ), f"Unexpected non-primitive type of the property {prop.name!r}: {type_anno}"
 
     prop_name = csharp_naming.property_name(prop.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     write_value_block: Stripped
 
@@ -1770,7 +1770,7 @@ def _generate_serialize_enumeration_property_as_content(
     enumeration = type_anno.our_type
 
     prop_name = csharp_naming.property_name(prop.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     enum_name = csharp_naming.enum_name(enumeration.name)
 
@@ -1824,7 +1824,7 @@ def _generate_serialize_interface_property_as_content(
     # fmt: on
 
     prop_name = csharp_naming.property_name(prop.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     result = Stripped(
         f"""\
@@ -1864,7 +1864,7 @@ def _generate_serialize_concrete_class_property_as_sequence(
     )
 
     prop_name = csharp_naming.property_name(prop.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     result = Stripped(
         f"""\
@@ -1965,7 +1965,7 @@ this.Visit(item, writer);"""
         )
 
     prop_name = csharp_naming.property_name(prop.name)
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     result = Stripped(
         f"""\

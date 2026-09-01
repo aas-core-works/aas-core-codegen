@@ -11,6 +11,8 @@ UnverifiedSymbolTable(
             identifier='Something',
             node=...),
           description=None,
+          json_name=None,
+          xml_name=None,
           node=...)],
       methods=[],
       invariants=[],

@@ -552,9 +552,7 @@ def _generate_deserialization_switch_statement(
 
         prop_var = golang_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-        json_prop_literal = golang_common.string_literal(
-            naming.json_property(prop.name)
-        )
+        json_prop_literal = golang_common.string_literal(prop.json_name)
 
         case_body: Stripped
 
@@ -904,7 +902,7 @@ for k := range m {{
         found_var = golang_naming.variable_name(Identifier(f"found_{prop.name}"))
 
         message_literal = golang_common.string_literal(
-            f"The required property {naming.json_property(prop.name)!r} is missing"
+            f"The required property {prop.json_name!r} is missing"
         )
 
         blocks.append(
@@ -1295,9 +1293,7 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
             f"{golang_naming.property_name(prop.name)}()"
         )
 
-        json_prop_literal = golang_common.string_literal(
-            naming.json_property(prop.name)
-        )
+        json_prop_literal = golang_common.string_literal(prop.json_name)
 
         prop_jsonable_var = golang_naming.variable_name(
             Identifier(f"jsonable_{prop.name}")

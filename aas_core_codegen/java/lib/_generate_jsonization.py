@@ -205,7 +205,7 @@ def _generate_deserialize_constructor_argument(
     # Prefix the variables to avoid naming conflicts
     target_var = java_naming.variable_name(Identifier(f"the_{arg.name}"))
 
-    json_name = naming.json_property(arg.name)
+    json_name = cls.properties_by_name[arg.name].json_name
     assert not java_common.needs_escaping(json_name)
 
     json_literal = java_common.string_literal(json_name)
@@ -353,7 +353,7 @@ if (node == null || !node.isObject()) {{
             errors.append(error)
         else:
             assert case_body is not None
-            json_name = naming.json_property(arg.name)
+            json_name = cls.properties_by_name[arg.name].json_name
 
             # NOTE (empwilli):
             # We put ``if (currentNode.getValue() == null)`` here instead of the outer loop
@@ -461,7 +461,7 @@ if (modelType == null) {{
             continue
 
         arg_var = java_naming.variable_name(Identifier(f"the_{arg.name}"))
-        json_name = naming.json_property(arg.name)
+        json_name = cls.properties_by_name[arg.name].json_name
         assert not java_common.needs_escaping(json_name)
 
         if i > 0:
@@ -962,7 +962,7 @@ def _generate_transform_property(
     stmts = []  # type: List[Stripped]
 
     getter_name = java_naming.getter_name(prop.name)
-    prop_literal = java_common.string_literal(naming.json_property(prop.name))
+    prop_literal = java_common.string_literal(prop.json_name)
 
     source_expr: Stripped
 

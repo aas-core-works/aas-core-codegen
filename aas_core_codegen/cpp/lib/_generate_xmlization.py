@@ -3120,7 +3120,7 @@ enum class {enum_name} : std::uint32_t {{
         items = []  # type: List[Stripped]
         for prop in cls.properties:
             literal_name = cpp_naming.enum_literal_name(prop.name)
-            xml_prop = naming.xml_property(prop.name)
+            xml_prop = prop.xml_name
 
             items.append(
                 Stripped(
@@ -3658,7 +3658,7 @@ return std::make_pair(
 
             for prop in required_properties:
                 var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
-                xml_prop_name = naming.xml_property(prop.name)
+                xml_prop_name = prop.xml_name
 
                 blocks.append(
                     Stripped(
@@ -4888,7 +4888,7 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
     else:
         getter_expr = Stripped(f"that.{getter_name}()")
 
-    xml_name_literal = cpp_common.string_literal(naming.xml_property(prop.name))
+    xml_name_literal = cpp_common.string_literal(prop.xml_name)
 
     blocks.append(
         Stripped(
