@@ -101,7 +101,12 @@ func assertNoSerializationError(
         ),
         Stripped(
             """\
-var emptyTagRe = regexp.MustCompile(`<(\\w+)></\\w+>`)"""
+// NOTE (mristin):
+// The opening tag, tag name plus an optional attribute list (*e.g.*,
+// ``xmlns="..."`` on a root element), is captured in the first (and only)
+// submatch group so that we do not lose any attributes when we force
+// the tag to be self-closing below.
+var emptyTagRe = regexp.MustCompile(`<(\\w+(?:\\s[^>]*)?)></\\w+>`)"""
         ),
         Stripped(
             f"""\

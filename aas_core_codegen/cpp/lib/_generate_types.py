@@ -779,7 +779,12 @@ def _generate_class_definition(cls: intermediate.ConcreteClass) -> Stripped:
     cls_name = cpp_naming.class_name(cls.name)
 
     if len(cls.constructor.arguments) == 0:
-        public_members.append(Stripped(f"{cls_name}() {{}}"))
+        # NOTE (mristin):
+        # We only declare the constructor here, and provide the definition
+        # out-of-line in the implementation file, just as for the case with one or
+        # more constructor arguments below. Defining it here as well would cause
+        # a re-definition error at compile time.
+        public_members.append(Stripped(f"{cls_name}();"))
     else:
         constructor_argument_specs = []  # type: List[str]
         for arg in cls.constructor.arguments:

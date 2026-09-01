@@ -121,6 +121,34 @@ def _first_nested_class_dispatch_candidate(
 # fmt: on
 def generate(symbol_table: intermediate.SymbolTable) -> str:
     """Generate code for targeted negative JSONization tests."""
+    required_property_candidate = _first_required_property_candidate(symbol_table)
+    type_mismatch_candidate = _first_property_for_type_mismatch_candidate(symbol_table)
+    nested_dispatch_candidate = _first_nested_class_dispatch_candidate(symbol_table)
+
+    # NOTE (mristin):
+    # ``readExpectedJson`` and ``mustBeJsonObject`` are only used by the tests below,
+    # which are only generated if a suitable candidate class/property exists in
+    # the meta-model. We have to determine that upfront so that we do not define
+    # them in vain and trigger an unused-variable lint error on meta-models which do
+    # not provide such a candidate (*e.g.*, a class with no properties at all).
+    helpers_needed = (
+        required_property_candidate is not None
+        or type_mismatch_candidate is not None
+        or nested_dispatch_candidate is not None
+    )
+
+    imports = (
+        """\
+import * as path from "path";
+
+import * as AasJsonization from "../src/jsonization";
+
+import * as TestCommon from "./common";"""
+        if helpers_needed
+        else """\
+import * as AasJsonization from "../src/jsonization";"""
+    )
+
     blocks = [
         Stripped(
             """\
@@ -129,14 +157,13 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
  */"""
         ),
         typescript_common.WARNING,
-        Stripped(
-            """\
-import * as path from "path";
+        Stripped(imports),
+    ]  # type: List[Stripped]
 
-import * as AasJsonization from "../src/jsonization";
-
-import * as TestCommon from "./common";
-
+    if helpers_needed:
+        blocks.append(
+            Stripped(
+                """\
 function readExpectedJson(
     classJsonName: string,
     fileName: "minimal.json" | "maximal.json"
@@ -156,8 +183,8 @@ function mustBeJsonObject(jsonable: AasJsonization.JsonValue): AasJsonization.Js
 
   return <AasJsonization.JsonObject>jsonable;
 }"""
-        ),
-    ]  # type: List[Stripped]
+            )
+        )
 
     first_cls = _first_concrete_class(symbol_table)
     if first_cls is not None:
@@ -180,7 +207,6 @@ test("{typescript_naming.class_name(first_cls.name)} deserialization fails on no
             )
         )
 
-    required_property_candidate = _first_required_property_candidate(symbol_table)
     if required_property_candidate is not None:
         required_cls, required_prop = required_property_candidate
         required_cls_name_json_literal = typescript_common.string_literal(
@@ -214,7 +240,6 @@ test("{typescript_naming.class_name(required_cls.name)} deserialization fails wi
             )
         )
 
-    type_mismatch_candidate = _first_property_for_type_mismatch_candidate(symbol_table)
     if type_mismatch_candidate is not None:
         mismatch_cls, mismatch_prop, mismatch_file_name = type_mismatch_candidate
         mismatch_cls_name_json_literal = typescript_common.string_literal(
@@ -248,7 +273,6 @@ test("{typescript_naming.class_name(mismatch_cls.name)} deserialization fails wi
             )
         )
 
-    nested_dispatch_candidate = _first_nested_class_dispatch_candidate(symbol_table)
     if nested_dispatch_candidate is not None:
         nested_cls, nested_prop = nested_dispatch_candidate
         nested_cls_name_json_literal = typescript_common.string_literal(

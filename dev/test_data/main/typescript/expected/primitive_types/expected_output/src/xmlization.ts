@@ -310,7 +310,7 @@ function readRequiredRootOpenTag(
   );
 }
 
-function readTextContentAndConsumeEndTag(
+function parseTextContentAndConsumeEndTag(
   cursor: XmlCursor,
   startTag: OpenTagToken
 ): AasCommon.Either<string, DeserializationError> {
@@ -546,7 +546,7 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -572,7 +572,7 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -598,7 +598,7 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -624,7 +624,7 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;
@@ -650,7 +650,7 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const textOrError = readTextContentAndConsumeEndTag(cursor, propertyStartTag);
+        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
         if (textOrError.error !== null) {
           propertyError = textOrError.error;
           break;

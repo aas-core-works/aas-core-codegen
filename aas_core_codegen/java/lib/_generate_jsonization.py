@@ -497,7 +497,7 @@ if ({arg_var} == null) {{
     # fmt: on
 
     if len(cls.constructor.arguments) == 0:
-        blocks.append(Stripped(f"return _Result.success(new{name}());"))
+        blocks.append(Stripped(f"return _Result.success(new {name}());"))
     else:
         init_writer = io.StringIO()
         init_writer.write(f"return _Result.success(new {name}(\n")

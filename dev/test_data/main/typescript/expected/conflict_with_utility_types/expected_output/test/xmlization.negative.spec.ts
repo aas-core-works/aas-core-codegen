@@ -63,18 +63,35 @@ test("XML wrong root closing element fails", () => {
     TestCommon.TEST_DATA_DIR, "Xml", "Expected", "readonly", "minimal.xml"
   );
   const text = fs.readFileSync(pth, "utf-8");
-  const expectedClosing = "</readonly>";
-  const insertionIndex = text.lastIndexOf(expectedClosing);
-  if (insertionIndex < 0) {
-    throw new Error(`Failed to find root closing tag: ${expectedClosing}`);
+
+  // NOTE (mristin):
+  // The root element might be self-closing (*e.g.*, `<readonly .../>`)
+  // if it has no content, in which case there is no separate closing tag to
+  // corrupt. We handle the two cases distinctly.
+  const selfClosingRegex = new RegExp("<readonly(?=[^>]*/>)");
+  const selfClosingMatch = text.match(selfClosingRegex);
+
+  let brokenText: string;
+  if (selfClosingMatch !== null && selfClosingMatch.index !== undefined) {
+    brokenText =
+      text.slice(0, selfClosingMatch.index) +
+      "<readonly_BROKEN" +
+      text.slice(selfClosingMatch.index + selfClosingMatch[0].length);
+  } else {
+    const expectedClosing = "</readonly>";
+    const insertionIndex = text.lastIndexOf(expectedClosing);
+    if (insertionIndex < 0) {
+      throw new Error(`Failed to find root closing tag: ${expectedClosing}`);
+    }
+
+    const brokenClosing = "</readonly_BROKEN>";
+    brokenText =
+      text.slice(0, insertionIndex) +
+      brokenClosing +
+      text.slice(insertionIndex + expectedClosing.length);
   }
 
-  const brokenClosing = "</readonly_BROKEN>";
-  const brokenText =
-    text.slice(0, insertionIndex) +
-    brokenClosing +
-    text.slice(insertionIndex + expectedClosing.length);
-
+  expect(brokenText).not.toStrictEqual(text);
   expectDeserializationError(brokenText);
 });
 
