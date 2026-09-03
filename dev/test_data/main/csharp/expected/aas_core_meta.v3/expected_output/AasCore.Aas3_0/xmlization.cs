@@ -102,24 +102,25 @@ namespace AasCore.Aas3_0
             }
 
             /// <summary>
-            /// Consume a <c>&lt;v&gt;</c> element from the reader and return whether
-            /// it was a self-closing (empty) element.
+            /// Consume a start element named <paramref name="expectedName" /> from
+            /// the reader and return whether it was a self-closing (empty) element.
             /// </summary>
             private static bool ReadVElement(
                 Xml.XmlReader reader,
+                string expectedName,
                 out Reporting.Error? error
                 )
             {
                 if (reader.EOF) {
                     error = new Reporting.Error(
-                        "Expected a <v> element, but got an end-of-file.");
+                        $"Expected a <{expectedName}> element, but got an end-of-file.");
                     return false;
                 }
 
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        "Expected a <v> start element, " +
+                        $"Expected a <{expectedName}> start element, " +
                         $"but got the node of type {reader.NodeType} " +
                         $"with the value {reader.Value}");
                     return false;
@@ -131,10 +132,10 @@ namespace AasCore.Aas3_0
                 {
                     return false;
                 }
-                if (elementName != "v")
+                if (elementName != expectedName)
                 {
                     error = new Reporting.Error(
-                        "Expected a <v> element, " +
+                        $"Expected a <{expectedName}> element, " +
                         $"but got an element {elementName}");
                     return false;
                 }
@@ -147,23 +148,25 @@ namespace AasCore.Aas3_0
             }
 
             /// <summary>
-            /// Consume a <c>&lt;/v&gt;</c> element from the reader.
+            /// Consume an end element named <paramref name="expectedName" /> from
+            /// the reader.
             /// </summary>
             private static void ReadVEndElement(
                 Xml.XmlReader reader,
+                string expectedName,
                 out Reporting.Error? error
                 )
             {
                 if (reader.EOF) {
                     error = new Reporting.Error(
-                        "Expected a </v> element, but got an end-of-file.");
+                        $"Expected a </{expectedName}> element, but got an end-of-file.");
                     return;
                 }
 
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        "Expected a </v> end element, " +
+                        $"Expected a </{expectedName}> end element, " +
                         $"but got the node of type {reader.NodeType} " +
                         $"with the value {reader.Value}");
                     return;
@@ -175,10 +178,10 @@ namespace AasCore.Aas3_0
                 {
                     return;
                 }
-                if (elementName != "v")
+                if (elementName != expectedName)
                 {
                     error = new Reporting.Error(
-                        "Expected a </v> element, " +
+                        $"Expected a </{expectedName}> element, " +
                         $"but got an end element {elementName}");
                     return;
                 }
@@ -193,10 +196,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static bool? ReadVElementAsBoolean(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                bool isEmptyVElement = ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -217,14 +221,16 @@ namespace AasCore.Aas3_0
                     {
                         result = reader.ReadContentAsBoolean();
                     }
-                    catch (System.FormatException exception)
+                    catch (System.Exception exception)
+                            when (exception is System.FormatException
+                                || exception is System.Xml.XmlException)
                     {
                         error = new Reporting.Error(
                             $"The content could not be de-serialized as bool: {exception}");
                         return null;
                     }
 
-                    ReadVEndElement(reader, out error);
+                    ReadVEndElement(reader, elementName, out error);
                     if (error != null)
                     {
                         return null;
@@ -245,10 +251,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static long? ReadVElementAsLong(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                bool isEmptyVElement = ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -269,14 +276,16 @@ namespace AasCore.Aas3_0
                     {
                         result = reader.ReadContentAsLong();
                     }
-                    catch (System.FormatException exception)
+                    catch (System.Exception exception)
+                            when (exception is System.FormatException
+                                || exception is System.Xml.XmlException)
                     {
                         error = new Reporting.Error(
                             $"The content could not be de-serialized as long: {exception}");
                         return null;
                     }
 
-                    ReadVEndElement(reader, out error);
+                    ReadVEndElement(reader, elementName, out error);
                     if (error != null)
                     {
                         return null;
@@ -297,10 +306,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static double? ReadVElementAsDouble(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                bool isEmptyVElement = ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -321,14 +331,16 @@ namespace AasCore.Aas3_0
                     {
                         result = reader.ReadContentAsDouble();
                     }
-                    catch (System.FormatException exception)
+                    catch (System.Exception exception)
+                            when (exception is System.FormatException
+                                || exception is System.Xml.XmlException)
                     {
                         error = new Reporting.Error(
                             $"The content could not be de-serialized as double: {exception}");
                         return null;
                     }
 
-                    ReadVEndElement(reader, out error);
+                    ReadVEndElement(reader, elementName, out error);
                     if (error != null)
                     {
                         return null;
@@ -349,10 +361,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static string? ReadVElementAsString(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                bool isEmptyVElement = ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -380,7 +393,7 @@ namespace AasCore.Aas3_0
                         return null;
                     }
 
-                    ReadVEndElement(reader, out error);
+                    ReadVEndElement(reader, elementName, out error);
                     if (error != null)
                     {
                         return null;
@@ -399,10 +412,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static byte[]? ReadVElementAsBytes(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                bool isEmptyVElement = ReadVElement(reader, out error);
+                bool isEmptyVElement = ReadVElement(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -435,7 +449,7 @@ namespace AasCore.Aas3_0
                         return null;
                     }
 
-                    ReadVEndElement(reader, out error);
+                    ReadVEndElement(reader, elementName, out error);
                     if (error != null)
                     {
                         return null;
@@ -446,15 +460,233 @@ namespace AasCore.Aas3_0
             }
 
             /// <summary>
+            /// Read a single list item, positioned at its start element.
+            /// </summary>
+            /// <typeparam name="T">Type of the parsed item</typeparam>
+            private delegate T? ClassItemDeserializer<T>(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                ) where T : class;
+
+            /// <summary>
+            /// Parse a sequence of list items with <paramref name="deserializeItem" />,
+            /// stopping (without consuming) at the first non-element node.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed properties whose items are
+            /// de-serialized into a reference type (<em>e.g.</em>, a string, a byte
+            /// array or a class instance).
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static List<T> ParseListOfClass<T>(
+                Xml.XmlReader reader,
+                ClassItemDeserializer<T> deserializeItem,
+                out Reporting.Error? error
+                ) where T : class
+            {
+                error = null;
+                List<T> result = new List<T>();
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                int index = 0;
+                while (reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    T? item = deserializeItem(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(
+                        item
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected item null when error null"));
+
+                    index++;
+                    SkipNoneWhitespaceAndComments(reader);
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a single list item, positioned at its start element.
+            /// </summary>
+            /// <typeparam name="T">Type of the parsed item</typeparam>
+            private delegate T? StructItemDeserializer<T>(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                ) where T : struct;
+
+            /// <summary>
+            /// Parse a sequence of list items with <paramref name="deserializeItem" />,
+            /// stopping (without consuming) at the first non-element node.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed properties whose items are
+            /// de-serialized into a value type (<em>e.g.</em>, a bool, a number or
+            /// an enumeration literal).
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static List<T> ParseListOfStruct<T>(
+                Xml.XmlReader reader,
+                StructItemDeserializer<T> deserializeItem,
+                out Reporting.Error? error
+                ) where T : struct
+            {
+                error = null;
+                List<T> result = new List<T>();
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                int index = 0;
+                while (reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    T? item = deserializeItem(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(
+                        item
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected item null when error null"));
+
+                    index++;
+                    SkipNoneWhitespaceAndComments(reader);
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read the opening tag of an XML element representing an instance of
+            /// <paramref name="className" />, without consuming its content.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by the de-serialization of every concrete class from
+            /// an XML element.
+            /// </remarks>
+            private static string ReadStartElementOfClass(
+                Xml.XmlReader reader,
+                string className,
+                out bool isEmptyElement,
+                out Reporting.Error? error
+                )
+            {
+                error = null;
+                isEmptyElement = false;
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (reader.EOF)
+                {
+                    error = new Reporting.Error(
+                        $"Expected an XML element representing an instance of class {className}, " +
+                        "but reached the end-of-file");
+                    return "";
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.Element)
+                {
+                    error = new Reporting.Error(
+                        $"Expected an XML element representing an instance of class {className}, " +
+                        $"but got a node of type {reader.NodeType} " +
+                        $"with value {reader.Value}");
+                    return "";
+                }
+
+                string elementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return "";
+                }
+
+                isEmptyElement = reader.IsEmptyElement;
+                return elementName;
+            }
+
+            /// <summary>
+            /// Consume the closing tag matching <paramref name="expectedElementName" />,
+            /// unless <paramref name="isEmptyElement" /> indicates that the element was
+            /// self-closing and thus has no separate closing tag to consume.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by the de-serialization of every concrete class from
+            /// an XML element.
+            /// </remarks>
+            private static void ConsumeCloseTag(
+                Xml.XmlReader reader,
+                string expectedElementName,
+                bool isEmptyElement,
+                out Reporting.Error? error
+                )
+            {
+                error = null;
+
+                if (isEmptyElement)
+                {
+                    return;
+                }
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (reader.EOF)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a closing element </{expectedElementName}>, " +
+                        "but reached the end-of-file");
+                    return;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a closing element </{expectedElementName}>, " +
+                        $"but got a node of type {reader.NodeType} " +
+                        $"with value {reader.Value}");
+                    return;
+                }
+
+                string endElementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return;
+                }
+
+                if (endElementName != expectedElementName)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a closing element </{expectedElementName}>, " +
+                        $"but got a closing element </{endElementName}>");
+                    return;
+                }
+
+                // Skip the end element
+                reader.Read();
+            }
+
+            /// <summary>
             /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
             /// <see cref="Aas.ModellingKind"/>.
             /// </summary>
             private static Aas.ModellingKind? ReadVElementAsModellingKind(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -486,10 +718,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.QualifierKind? ReadVElementAsQualifierKind(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -521,10 +754,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.AssetKind? ReadVElementAsAssetKind(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -556,10 +790,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.AasSubmodelElements? ReadVElementAsAasSubmodelElements(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -591,10 +826,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.EntityType? ReadVElementAsEntityType(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -626,10 +862,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.Direction? ReadVElementAsDirection(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -661,10 +898,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.StateOfEvent? ReadVElementAsStateOfEvent(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -696,10 +934,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.ReferenceTypes? ReadVElementAsReferenceTypes(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -731,10 +970,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.KeyTypes? ReadVElementAsKeyTypes(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -766,10 +1006,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.DataTypeDefXsd? ReadVElementAsDataTypeDefXsd(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -801,10 +1042,11 @@ namespace AasCore.Aas3_0
             /// </summary>
             private static Aas.DataTypeIec61360? ReadVElementAsDataTypeIec61360(
                 Xml.XmlReader reader,
+                string elementName,
                 out Reporting.Error? error
                 )
             {
-                string? text = ReadVElementAsString(reader, out error);
+                string? text = ReadVElementAsString(reader, elementName, out error);
                 if (error != null)
                 {
                     return null;
@@ -1014,32 +1256,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1066,20 +1293,16 @@ namespace AasCore.Aas3_0
                                         theName = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Name of an instance of class Extension " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "name"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Name of an instance of class Extension " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "name"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1161,20 +1384,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class Extension " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class Extension " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1185,32 +1404,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theRefersTo = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexRefersTo = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexRefersTo));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "refersTo"));
-                                            return null;
-                                        }
-
-                                        theRefersTo.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexRefersTo++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "refersTo"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1296,27 +1500,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Extension, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Extension, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Extension", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -1330,8 +1515,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -1343,44 +1526,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Extension, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Extension, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -1845,32 +1998,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1897,20 +2035,16 @@ namespace AasCore.Aas3_0
                                         theVersion = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Version of an instance of class AdministrativeInformation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "version"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Version of an instance of class AdministrativeInformation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "version"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1937,20 +2071,16 @@ namespace AasCore.Aas3_0
                                         theRevision = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Revision of an instance of class AdministrativeInformation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "revision"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Revision of an instance of class AdministrativeInformation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "revision"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -1991,20 +2121,16 @@ namespace AasCore.Aas3_0
                                         theTemplateId = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property TemplateId of an instance of class AdministrativeInformation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "templateId"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property TemplateId of an instance of class AdministrativeInformation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "templateId"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2079,27 +2205,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AdministrativeInformation, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AdministrativeInformation, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "AdministrativeInformation", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -2113,8 +2220,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -2126,44 +2231,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AdministrativeInformation, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AdministrativeInformation, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -2345,32 +2420,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2452,20 +2512,16 @@ namespace AasCore.Aas3_0
                                         theType = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Type of an instance of class Qualifier " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "type"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Type of an instance of class Qualifier " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "type"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2547,20 +2603,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class Qualifier " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class Qualifier " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2671,27 +2723,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Qualifier, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Qualifier, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Qualifier", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -2705,8 +2738,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -2718,44 +2749,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Qualifier, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Qualifier, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -2838,32 +2839,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2890,20 +2876,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class AssetAdministrationShell " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2930,20 +2912,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class AssetAdministrationShell " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2954,32 +2932,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -2990,32 +2953,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3056,20 +3004,16 @@ namespace AasCore.Aas3_0
                                         theId = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Id of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "id"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Id of an instance of class AssetAdministrationShell " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "id"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3080,32 +3024,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3144,32 +3073,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSubmodels = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSubmodels = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSubmodels));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "submodels"));
-                                            return null;
-                                        }
-
-                                        theSubmodels.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSubmodels++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "submodels"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3270,27 +3184,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AssetAdministrationShell, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AssetAdministrationShell, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "AssetAdministrationShell", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -3304,8 +3199,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -3317,44 +3210,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AssetAdministrationShell, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AssetAdministrationShell, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -3502,20 +3365,16 @@ namespace AasCore.Aas3_0
                                         theGlobalAssetId = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property GlobalAssetId of an instance of class AssetInformation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "globalAssetId"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property GlobalAssetId of an instance of class AssetInformation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "globalAssetId"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3526,32 +3385,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSpecificAssetIds = ParseListOfClass<ISpecificAssetId>(
+                                        reader,
+                                        SpecificAssetIdFromElement,
+                                        out error);
 
-                                    int indexSpecificAssetIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISpecificAssetId? item = SpecificAssetIdFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSpecificAssetIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "specificAssetIds"));
-                                            return null;
-                                        }
-
-                                        theSpecificAssetIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSpecificAssetIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "specificAssetIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3578,20 +3422,16 @@ namespace AasCore.Aas3_0
                                         theAssetType = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property AssetType of an instance of class AssetInformation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "assetType"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property AssetType of an instance of class AssetInformation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "assetType"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3690,27 +3530,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AssetInformation, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AssetInformation, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "AssetInformation", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -3724,8 +3545,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -3737,44 +3556,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AssetInformation, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AssetInformation, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -3864,20 +3653,16 @@ namespace AasCore.Aas3_0
                                         thePath = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Path of an instance of class Resource " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "path"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Path of an instance of class Resource " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "path"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3904,20 +3689,16 @@ namespace AasCore.Aas3_0
                                         theContentType = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property ContentType of an instance of class Resource " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "contentType"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property ContentType of an instance of class Resource " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "contentType"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -3999,27 +3780,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Resource, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Resource, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Resource", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -4033,8 +3795,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -4046,44 +3806,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Resource, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Resource, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -4174,32 +3904,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4226,20 +3941,16 @@ namespace AasCore.Aas3_0
                                         theName = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Name of an instance of class SpecificAssetId " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "name"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Name of an instance of class SpecificAssetId " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "name"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4266,20 +3977,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class SpecificAssetId " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class SpecificAssetId " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4388,27 +4095,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SpecificAssetId, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SpecificAssetId, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "SpecificAssetId", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -4422,8 +4110,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -4435,44 +4121,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SpecificAssetId, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SpecificAssetId, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -4557,32 +4213,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4609,20 +4250,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Submodel " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4649,20 +4286,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Submodel " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4673,32 +4306,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4709,32 +4327,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4775,20 +4378,16 @@ namespace AasCore.Aas3_0
                                         theId = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Id of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "id"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Id of an instance of class Submodel " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "id"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4868,32 +4467,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4904,32 +4488,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4940,32 +4509,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -4976,32 +4530,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSubmodelElements = ParseListOfClass<ISubmodelElement>(
+                                        reader,
+                                        ISubmodelElementFromElement,
+                                        out error);
 
-                                    int indexSubmodelElements = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSubmodelElements));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "submodelElements"));
-                                            return null;
-                                        }
-
-                                        theSubmodelElements.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSubmodelElements++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "submodelElements"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5094,27 +4633,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Submodel, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Submodel, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Submodel", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -5128,8 +4648,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -5141,44 +4659,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Submodel, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Submodel, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -5347,32 +4835,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5399,20 +4872,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class RelationshipElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class RelationshipElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5439,20 +4908,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class RelationshipElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class RelationshipElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5463,32 +4928,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5499,32 +4949,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5549,32 +4984,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5585,32 +5005,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5621,32 +5026,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -5825,27 +5215,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class RelationshipElement, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class RelationshipElement, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "RelationshipElement", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -5859,8 +5230,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -5872,44 +5241,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class RelationshipElement, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class RelationshipElement, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -5995,32 +5334,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6047,20 +5371,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class SubmodelElementList " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6087,20 +5407,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class SubmodelElementList " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6111,32 +5427,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6147,32 +5448,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6197,32 +5483,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6233,32 +5504,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6269,32 +5525,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6328,20 +5569,16 @@ namespace AasCore.Aas3_0
                                         theOrderRelevant = reader.ReadContentAsBoolean();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property OrderRelevant of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "orderRelevant"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property OrderRelevant of an instance of class SubmodelElementList " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "orderRelevant"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6476,32 +5713,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theValue = ParseListOfClass<ISubmodelElement>(
+                                        reader,
+                                        ISubmodelElementFromElement,
+                                        out error);
 
-                                    int indexValue = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexValue));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "value"));
-                                            return null;
-                                        }
-
-                                        theValue.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexValue++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6595,27 +5817,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SubmodelElementList, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SubmodelElementList, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "SubmodelElementList", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -6629,8 +5832,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -6642,44 +5843,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SubmodelElementList, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SubmodelElementList, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -6761,32 +5932,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6813,20 +5969,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class SubmodelElementCollection " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class SubmodelElementCollection " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6853,20 +6005,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class SubmodelElementCollection " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class SubmodelElementCollection " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6877,32 +6025,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6913,32 +6046,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6963,32 +6081,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -6999,32 +6102,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7035,32 +6123,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7071,32 +6144,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theValue = ParseListOfClass<ISubmodelElement>(
+                                        reader,
+                                        ISubmodelElementFromElement,
+                                        out error);
 
-                                    int indexValue = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexValue));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "value"));
-                                            return null;
-                                        }
-
-                                        theValue.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexValue++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7176,27 +6234,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SubmodelElementCollection, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SubmodelElementCollection, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "SubmodelElementCollection", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -7210,8 +6249,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -7223,44 +6260,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SubmodelElementCollection, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SubmodelElementCollection, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -7406,32 +6413,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7458,20 +6450,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Property " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Property " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7498,20 +6486,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Property " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Property " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7522,32 +6506,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7558,32 +6527,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7608,32 +6562,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7644,32 +6583,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7680,32 +6604,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7787,20 +6696,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class Property " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class Property " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -7906,27 +6811,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Property, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Property, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Property", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -7940,8 +6826,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -7953,44 +6837,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Property, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Property, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -8073,32 +6927,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8125,20 +6964,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class MultiLanguageProperty " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class MultiLanguageProperty " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8165,20 +7000,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class MultiLanguageProperty " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class MultiLanguageProperty " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8189,32 +7020,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8225,32 +7041,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8275,32 +7076,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8311,32 +7097,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8347,32 +7118,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8383,32 +7139,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theValue = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexValue = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexValue));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "value"));
-                                            return null;
-                                        }
-
-                                        theValue.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexValue++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8503,27 +7244,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class MultiLanguageProperty, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class MultiLanguageProperty, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "MultiLanguageProperty", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -8537,8 +7259,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -8550,44 +7270,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class MultiLanguageProperty, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class MultiLanguageProperty, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -8671,32 +7361,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8723,20 +7398,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Range " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Range " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8763,20 +7434,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Range " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Range " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8787,32 +7454,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8823,32 +7475,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8873,32 +7510,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8909,32 +7531,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -8945,32 +7552,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9052,20 +7644,16 @@ namespace AasCore.Aas3_0
                                         theMin = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Min of an instance of class Range " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "min"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Min of an instance of class Range " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "min"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9092,20 +7680,16 @@ namespace AasCore.Aas3_0
                                         theMax = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Max of an instance of class Range " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "max"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Max of an instance of class Range " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "max"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9197,27 +7781,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Range, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Range, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Range", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -9231,8 +7796,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -9244,44 +7807,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Range, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Range, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -9363,32 +7896,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9415,20 +7933,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class ReferenceElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class ReferenceElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9455,20 +7969,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class ReferenceElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class ReferenceElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9479,32 +7989,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9515,32 +8010,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9565,32 +8045,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9601,32 +8066,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9637,32 +8087,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9756,27 +8191,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ReferenceElement, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ReferenceElement, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "ReferenceElement", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -9790,8 +8206,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -9803,44 +8217,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ReferenceElement, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ReferenceElement, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -9923,32 +8307,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -9975,20 +8344,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Blob " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10015,20 +8380,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Blob " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10039,32 +8400,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10075,32 +8421,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10125,32 +8456,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10161,32 +8477,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10197,32 +8498,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10257,20 +8543,16 @@ namespace AasCore.Aas3_0
                                         reader);
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class Blob " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10297,20 +8579,16 @@ namespace AasCore.Aas3_0
                                         theContentType = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property ContentType of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "contentType"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property ContentType of an instance of class Blob " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "contentType"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10401,27 +8679,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Blob, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Blob, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Blob", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -10435,8 +8694,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -10448,44 +8705,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Blob, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Blob, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -10568,32 +8795,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10620,20 +8832,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class File " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class File " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10660,20 +8868,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class File " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class File " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10684,32 +8888,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10720,32 +8909,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10770,32 +8944,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10806,32 +8965,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10842,32 +8986,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10894,20 +9023,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class File " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class File " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -10934,20 +9059,16 @@ namespace AasCore.Aas3_0
                                         theContentType = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property ContentType of an instance of class File " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "contentType"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property ContentType of an instance of class File " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "contentType"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11038,27 +9159,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class File, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class File, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "File", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -11072,8 +9174,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -11085,44 +9185,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class File, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class File, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -11206,32 +9276,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11258,20 +9313,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class AnnotatedRelationshipElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class AnnotatedRelationshipElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11298,20 +9349,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class AnnotatedRelationshipElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class AnnotatedRelationshipElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11322,32 +9369,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11358,32 +9390,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11408,32 +9425,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11444,32 +9446,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11480,32 +9467,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11544,32 +9516,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theAnnotations = ParseListOfClass<IDataElement>(
+                                        reader,
+                                        IDataElementFromElement,
+                                        out error);
 
-                                    int indexAnnotations = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IDataElement? item = IDataElementFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexAnnotations));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "annotations"));
-                                            return null;
-                                        }
-
-                                        theAnnotations.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexAnnotations++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "annotations"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11671,27 +9628,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AnnotatedRelationshipElement, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AnnotatedRelationshipElement, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "AnnotatedRelationshipElement", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -11705,8 +9643,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -11718,44 +9654,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AnnotatedRelationshipElement, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AnnotatedRelationshipElement, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -11840,32 +9746,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11892,20 +9783,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Entity " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Entity " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11932,20 +9819,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Entity " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Entity " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11956,32 +9839,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -11992,32 +9860,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12042,32 +9895,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12078,32 +9916,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12114,32 +9937,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12150,32 +9958,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theStatements = ParseListOfClass<ISubmodelElement>(
+                                        reader,
+                                        ISubmodelElementFromElement,
+                                        out error);
 
-                                    int indexStatements = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexStatements));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "statements"));
-                                            return null;
-                                        }
-
-                                        theStatements.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexStatements++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "statements"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12257,20 +10050,16 @@ namespace AasCore.Aas3_0
                                         theGlobalAssetId = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property GlobalAssetId of an instance of class Entity " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "globalAssetId"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property GlobalAssetId of an instance of class Entity " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "globalAssetId"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12281,32 +10070,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSpecificAssetIds = ParseListOfClass<ISpecificAssetId>(
+                                        reader,
+                                        SpecificAssetIdFromElement,
+                                        out error);
 
-                                    int indexSpecificAssetIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISpecificAssetId? item = SpecificAssetIdFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSpecificAssetIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "specificAssetIds"));
-                                            return null;
-                                        }
-
-                                        theSpecificAssetIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSpecificAssetIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "specificAssetIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12399,27 +10173,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Entity, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Entity, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Entity", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -12433,8 +10188,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -12446,44 +10199,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Entity, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Entity, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -12635,20 +10358,16 @@ namespace AasCore.Aas3_0
                                         theTopic = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Topic of an instance of class EventPayload " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "topic"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Topic of an instance of class EventPayload " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "topic"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12689,20 +10408,16 @@ namespace AasCore.Aas3_0
                                         theTimeStamp = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property TimeStamp of an instance of class EventPayload " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "timeStamp"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property TimeStamp of an instance of class EventPayload " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "timeStamp"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12737,20 +10452,16 @@ namespace AasCore.Aas3_0
                                         reader);
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Payload of an instance of class EventPayload " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "payload"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Payload of an instance of class EventPayload " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "payload"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -12858,27 +10569,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class EventPayload, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class EventPayload, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "EventPayload", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -12892,8 +10584,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -12905,44 +10595,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class EventPayload, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class EventPayload, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -13078,32 +10738,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13130,20 +10775,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class BasicEventElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13170,20 +10811,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class BasicEventElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13194,32 +10831,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13230,32 +10852,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13280,32 +10887,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13316,32 +10908,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13352,32 +10929,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13528,20 +11090,16 @@ namespace AasCore.Aas3_0
                                         theMessageTopic = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property MessageTopic of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "messageTopic"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property MessageTopic of an instance of class BasicEventElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "messageTopic"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13582,20 +11140,16 @@ namespace AasCore.Aas3_0
                                         theLastUpdate = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property LastUpdate of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "lastUpdate"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property LastUpdate of an instance of class BasicEventElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "lastUpdate"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13622,20 +11176,16 @@ namespace AasCore.Aas3_0
                                         theMinInterval = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property MinInterval of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "minInterval"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property MinInterval of an instance of class BasicEventElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "minInterval"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13662,20 +11212,16 @@ namespace AasCore.Aas3_0
                                         theMaxInterval = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property MaxInterval of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "maxInterval"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property MaxInterval of an instance of class BasicEventElement " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "maxInterval"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -13792,27 +11338,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class BasicEventElement, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class BasicEventElement, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "BasicEventElement", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -13826,8 +11353,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -13839,44 +11364,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class BasicEventElement, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class BasicEventElement, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -13960,32 +11455,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14012,20 +11492,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Operation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Operation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14052,20 +11528,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Operation " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Operation " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14076,32 +11548,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14112,32 +11569,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14162,32 +11604,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14198,32 +11625,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14234,32 +11646,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14270,32 +11667,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theInputVariables = ParseListOfClass<IOperationVariable>(
+                                        reader,
+                                        OperationVariableFromElement,
+                                        out error);
 
-                                    int indexInputVariables = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IOperationVariable? item = OperationVariableFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexInputVariables));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "inputVariables"));
-                                            return null;
-                                        }
-
-                                        theInputVariables.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexInputVariables++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "inputVariables"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14306,32 +11688,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theOutputVariables = ParseListOfClass<IOperationVariable>(
+                                        reader,
+                                        OperationVariableFromElement,
+                                        out error);
 
-                                    int indexOutputVariables = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IOperationVariable? item = OperationVariableFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexOutputVariables));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "outputVariables"));
-                                            return null;
-                                        }
-
-                                        theOutputVariables.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexOutputVariables++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "outputVariables"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14342,32 +11709,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theInoutputVariables = ParseListOfClass<IOperationVariable>(
+                                        reader,
+                                        OperationVariableFromElement,
+                                        out error);
 
-                                    int indexInoutputVariables = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IOperationVariable? item = OperationVariableFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexInoutputVariables));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "inoutputVariables"));
-                                            return null;
-                                        }
-
-                                        theInoutputVariables.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexInoutputVariables++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "inoutputVariables"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14449,27 +11801,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Operation, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Operation, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Operation", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -14483,8 +11816,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -14496,44 +11827,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Operation, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Operation, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -14729,27 +12030,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class OperationVariable, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class OperationVariable, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "OperationVariable", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -14763,8 +12045,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -14776,44 +12056,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class OperationVariable, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class OperationVariable, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -14894,32 +12144,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14946,20 +12181,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class Capability " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class Capability " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -14986,20 +12217,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class Capability " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class Capability " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15010,32 +12237,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15046,32 +12258,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15096,32 +12293,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSupplementalSemanticIds = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexSupplementalSemanticIds = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSupplementalSemanticIds));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "supplementalSemanticIds"));
-                                            return null;
-                                        }
-
-                                        theSupplementalSemanticIds.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSupplementalSemanticIds++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "supplementalSemanticIds"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15132,32 +12314,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theQualifiers = ParseListOfClass<IQualifier>(
+                                        reader,
+                                        QualifierFromElement,
+                                        out error);
 
-                                    int indexQualifiers = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IQualifier? item = QualifierFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexQualifiers));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "qualifiers"));
-                                            return null;
-                                        }
-
-                                        theQualifiers.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexQualifiers++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "qualifiers"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15168,32 +12335,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15272,27 +12424,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Capability, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Capability, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Capability", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -15306,8 +12439,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -15319,44 +12450,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Capability, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Capability, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -15437,32 +12538,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theExtensions = ParseListOfClass<IExtension>(
+                                        reader,
+                                        ExtensionFromElement,
+                                        out error);
 
-                                    int indexExtensions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IExtension? item = ExtensionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexExtensions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "extensions"));
-                                            return null;
-                                        }
-
-                                        theExtensions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexExtensions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "extensions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15489,20 +12575,16 @@ namespace AasCore.Aas3_0
                                         theCategory = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Category of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "category"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Category of an instance of class ConceptDescription " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "category"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15529,20 +12611,16 @@ namespace AasCore.Aas3_0
                                         theIdShort = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property IdShort of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "idShort"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property IdShort of an instance of class ConceptDescription " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "idShort"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15553,32 +12631,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDisplayName = ParseListOfClass<ILangStringNameType>(
+                                        reader,
+                                        LangStringNameTypeFromElement,
+                                        out error);
 
-                                    int indexDisplayName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringNameType? item = LangStringNameTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDisplayName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "displayName"));
-                                            return null;
-                                        }
-
-                                        theDisplayName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDisplayName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "displayName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15589,32 +12652,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDescription = ParseListOfClass<ILangStringTextType>(
+                                        reader,
+                                        LangStringTextTypeFromElement,
+                                        out error);
 
-                                    int indexDescription = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringTextType? item = LangStringTextTypeFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDescription));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "description"));
-                                            return null;
-                                        }
-
-                                        theDescription.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDescription++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "description"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15655,20 +12703,16 @@ namespace AasCore.Aas3_0
                                         theId = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Id of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "id"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Id of an instance of class ConceptDescription " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "id"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15679,32 +12723,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theEmbeddedDataSpecifications = ParseListOfClass<IEmbeddedDataSpecification>(
+                                        reader,
+                                        EmbeddedDataSpecificationFromElement,
+                                        out error);
 
-                                    int indexEmbeddedDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexEmbeddedDataSpecifications));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "embeddedDataSpecifications"));
-                                            return null;
-                                        }
-
-                                        theEmbeddedDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexEmbeddedDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "embeddedDataSpecifications"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15715,32 +12744,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theIsCaseOf = ParseListOfClass<IReference>(
+                                        reader,
+                                        ReferenceFromElement,
+                                        out error);
 
-                                    int indexIsCaseOf = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IReference? item = ReferenceFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexIsCaseOf));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "isCaseOf"));
-                                            return null;
-                                        }
-
-                                        theIsCaseOf.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexIsCaseOf++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "isCaseOf"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -15829,27 +12843,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ConceptDescription, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ConceptDescription, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "ConceptDescription", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -15863,8 +12858,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -15876,44 +12869,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ConceptDescription, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ConceptDescription, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -16057,32 +13020,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theKeys = ParseListOfClass<IKey>(
+                                        reader,
+                                        KeyFromElement,
+                                        out error);
 
-                                    int indexKeys = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IKey? item = KeyFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexKeys));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "keys"));
-                                            return null;
-                                        }
-
-                                        theKeys.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexKeys++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "keys"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -16175,27 +13123,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Reference, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Reference, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Reference", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -16209,8 +13138,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -16222,44 +13149,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Reference, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Reference, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -16404,20 +13301,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class Key " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class Key " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -16509,27 +13402,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Key, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Key, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Key", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -16543,8 +13417,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -16556,44 +13428,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Key, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Key, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -16742,20 +13584,16 @@ namespace AasCore.Aas3_0
                                         theLanguage = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Language of an instance of class LangStringNameType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "language"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Language of an instance of class LangStringNameType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "language"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -16782,20 +13620,16 @@ namespace AasCore.Aas3_0
                                         theText = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Text of an instance of class LangStringNameType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "text"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Text of an instance of class LangStringNameType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "text"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -16887,27 +13721,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringNameType, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringNameType, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "LangStringNameType", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -16921,8 +13736,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -16934,44 +13747,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringNameType, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringNameType, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -17061,20 +13844,16 @@ namespace AasCore.Aas3_0
                                         theLanguage = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Language of an instance of class LangStringTextType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "language"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Language of an instance of class LangStringTextType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "language"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -17101,20 +13880,16 @@ namespace AasCore.Aas3_0
                                         theText = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Text of an instance of class LangStringTextType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "text"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Text of an instance of class LangStringTextType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "text"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -17206,27 +13981,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringTextType, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringTextType, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "LangStringTextType", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -17240,8 +13996,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -17253,44 +14007,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringTextType, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringTextType, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -17365,32 +14089,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theAssetAdministrationShells = ParseListOfClass<IAssetAdministrationShell>(
+                                        reader,
+                                        AssetAdministrationShellFromElement,
+                                        out error);
 
-                                    int indexAssetAdministrationShells = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IAssetAdministrationShell? item = AssetAdministrationShellFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexAssetAdministrationShells));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "assetAdministrationShells"));
-                                            return null;
-                                        }
-
-                                        theAssetAdministrationShells.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexAssetAdministrationShells++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "assetAdministrationShells"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -17401,32 +14110,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theSubmodels = ParseListOfClass<ISubmodel>(
+                                        reader,
+                                        SubmodelFromElement,
+                                        out error);
 
-                                    int indexSubmodels = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ISubmodel? item = SubmodelFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexSubmodels));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "submodels"));
-                                            return null;
-                                        }
-
-                                        theSubmodels.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexSubmodels++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "submodels"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -17437,32 +14131,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theConceptDescriptions = ParseListOfClass<IConceptDescription>(
+                                        reader,
+                                        ConceptDescriptionFromElement,
+                                        out error);
 
-                                    int indexConceptDescriptions = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IConceptDescription? item = ConceptDescriptionFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexConceptDescriptions));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "conceptDescriptions"));
-                                            return null;
-                                        }
-
-                                        theConceptDescriptions.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexConceptDescriptions++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "conceptDescriptions"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -17535,27 +14214,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Environment, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Environment, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Environment", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -17569,8 +14229,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -17582,44 +14240,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Environment, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Environment, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -17888,27 +14516,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class EmbeddedDataSpecification, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class EmbeddedDataSpecification, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "EmbeddedDataSpecification", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -17922,8 +14531,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -17935,44 +14542,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class EmbeddedDataSpecification, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class EmbeddedDataSpecification, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -18071,20 +14648,16 @@ namespace AasCore.Aas3_0
                                         theMin = reader.ReadContentAsBoolean();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Min of an instance of class LevelType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "min"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Min of an instance of class LevelType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "min"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -18118,20 +14691,16 @@ namespace AasCore.Aas3_0
                                         theNom = reader.ReadContentAsBoolean();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Nom of an instance of class LevelType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "nom"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Nom of an instance of class LevelType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "nom"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -18165,20 +14734,16 @@ namespace AasCore.Aas3_0
                                         theTyp = reader.ReadContentAsBoolean();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Typ of an instance of class LevelType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "typ"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Typ of an instance of class LevelType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "typ"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -18212,20 +14777,16 @@ namespace AasCore.Aas3_0
                                         theMax = reader.ReadContentAsBoolean();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Max of an instance of class LevelType " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "max"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Max of an instance of class LevelType " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "max"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -18339,27 +14900,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LevelType, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LevelType, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "LevelType", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -18373,8 +14915,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -18386,44 +14926,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LevelType, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LevelType, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -18513,20 +15023,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class ValueReferencePair " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class ValueReferencePair " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -18632,27 +15138,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ValueReferencePair, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ValueReferencePair, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "ValueReferencePair", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -18666,8 +15153,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -18679,44 +15164,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ValueReferencePair, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ValueReferencePair, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -18789,32 +15244,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theValueReferencePairs = ParseListOfClass<IValueReferencePair>(
+                                        reader,
+                                        ValueReferencePairFromElement,
+                                        out error);
 
-                                    int indexValueReferencePairs = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        IValueReferencePair? item = ValueReferencePairFromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexValueReferencePairs));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "valueReferencePairs"));
-                                            return null;
-                                        }
-
-                                        theValueReferencePairs.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexValueReferencePairs++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "valueReferencePairs"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -18895,27 +15335,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ValueList, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class ValueList, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "ValueList", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -18929,8 +15350,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -18942,44 +15361,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ValueList, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class ValueList, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -19069,20 +15458,16 @@ namespace AasCore.Aas3_0
                                         theLanguage = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Language of an instance of class LangStringPreferredNameTypeIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "language"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Language of an instance of class LangStringPreferredNameTypeIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "language"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -19109,20 +15494,16 @@ namespace AasCore.Aas3_0
                                         theText = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Text of an instance of class LangStringPreferredNameTypeIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "text"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Text of an instance of class LangStringPreferredNameTypeIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "text"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -19214,27 +15595,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringPreferredNameTypeIec61360, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringPreferredNameTypeIec61360, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "LangStringPreferredNameTypeIec61360", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -19248,8 +15610,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -19261,44 +15621,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringPreferredNameTypeIec61360, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringPreferredNameTypeIec61360, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -19388,20 +15718,16 @@ namespace AasCore.Aas3_0
                                         theLanguage = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Language of an instance of class LangStringShortNameTypeIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "language"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Language of an instance of class LangStringShortNameTypeIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "language"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -19428,20 +15754,16 @@ namespace AasCore.Aas3_0
                                         theText = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Text of an instance of class LangStringShortNameTypeIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "text"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Text of an instance of class LangStringShortNameTypeIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "text"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -19533,27 +15855,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringShortNameTypeIec61360, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringShortNameTypeIec61360, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "LangStringShortNameTypeIec61360", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -19567,8 +15870,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -19580,44 +15881,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringShortNameTypeIec61360, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringShortNameTypeIec61360, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -19707,20 +15978,16 @@ namespace AasCore.Aas3_0
                                         theLanguage = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Language of an instance of class LangStringDefinitionTypeIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "language"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Language of an instance of class LangStringDefinitionTypeIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "language"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -19747,20 +16014,16 @@ namespace AasCore.Aas3_0
                                         theText = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Text of an instance of class LangStringDefinitionTypeIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "text"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Text of an instance of class LangStringDefinitionTypeIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "text"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -19852,27 +16115,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringDefinitionTypeIec61360, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class LangStringDefinitionTypeIec61360, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "LangStringDefinitionTypeIec61360", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -19886,8 +16130,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -19899,44 +16141,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringDefinitionTypeIec61360, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class LangStringDefinitionTypeIec61360, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -20020,32 +16232,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    thePreferredName = ParseListOfClass<ILangStringPreferredNameTypeIec61360>(
+                                        reader,
+                                        LangStringPreferredNameTypeIec61360FromElement,
+                                        out error);
 
-                                    int indexPreferredName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringPreferredNameTypeIec61360? item = LangStringPreferredNameTypeIec61360FromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexPreferredName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "preferredName"));
-                                            return null;
-                                        }
-
-                                        thePreferredName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexPreferredName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "preferredName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20056,32 +16253,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theShortName = ParseListOfClass<ILangStringShortNameTypeIec61360>(
+                                        reader,
+                                        LangStringShortNameTypeIec61360FromElement,
+                                        out error);
 
-                                    int indexShortName = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringShortNameTypeIec61360? item = LangStringShortNameTypeIec61360FromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexShortName));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "shortName"));
-                                            return null;
-                                        }
-
-                                        theShortName.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexShortName++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "shortName"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20108,20 +16290,16 @@ namespace AasCore.Aas3_0
                                         theUnit = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Unit of an instance of class DataSpecificationIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "unit"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Unit of an instance of class DataSpecificationIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "unit"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20162,20 +16340,16 @@ namespace AasCore.Aas3_0
                                         theSourceOfDefinition = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property SourceOfDefinition of an instance of class DataSpecificationIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "sourceOfDefinition"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property SourceOfDefinition of an instance of class DataSpecificationIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "sourceOfDefinition"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20202,20 +16376,16 @@ namespace AasCore.Aas3_0
                                         theSymbol = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Symbol of an instance of class DataSpecificationIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "symbol"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Symbol of an instance of class DataSpecificationIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "symbol"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20281,32 +16451,17 @@ namespace AasCore.Aas3_0
 
                                 if (!isEmptyProperty)
                                 {
-                                    SkipNoneWhitespaceAndComments(reader);
+                                    theDefinition = ParseListOfClass<ILangStringDefinitionTypeIec61360>(
+                                        reader,
+                                        LangStringDefinitionTypeIec61360FromElement,
+                                        out error);
 
-                                    int indexDefinition = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    if (error != null)
                                     {
-                                        ILangStringDefinitionTypeIec61360? item = LangStringDefinitionTypeIec61360FromElement(
-                                            reader, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDefinition));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "definition"));
-                                            return null;
-                                        }
-
-                                        theDefinition.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDefinition++;
-                                        SkipNoneWhitespaceAndComments(reader);
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "definition"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20333,20 +16488,16 @@ namespace AasCore.Aas3_0
                                         theValueFormat = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property ValueFormat of an instance of class DataSpecificationIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "valueFormat"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property ValueFormat of an instance of class DataSpecificationIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "valueFormat"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20387,20 +16538,16 @@ namespace AasCore.Aas3_0
                                         theValue = reader.ReadContentAsString();
                                     }
                                     catch (System.Exception exception)
+                                            when (exception is System.FormatException
+                                                || exception is System.Xml.XmlException)
                                     {
-                                        if (exception is System.FormatException
-                                            || exception is System.Xml.XmlException)
-                                        {
-                                            error = new Reporting.Error(
-                                                "The property Value of an instance of class DataSpecificationIec61360 " +
-                                                $"could not be de-serialized: {exception.Message}");
-                                            error.PrependSegment(
-                                                new Reporting.NameSegment(
-                                                    "value"));
-                                            return null;
-                                        }
-
-                                        throw;
+                                        error = new Reporting.Error(
+                                            "The property Value of an instance of class DataSpecificationIec61360 " +
+                                            $"could not be de-serialized: {exception.Message}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "value"));
+                                        return null;
                                     }
                                 }
                                 break;
@@ -20506,27 +16653,8 @@ namespace AasCore.Aas3_0
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class DataSpecificationIec61360, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class DataSpecificationIec61360, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "DataSpecificationIec61360", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -20540,8 +16668,6 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -20553,44 +16679,14 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class DataSpecificationIec61360, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class DataSpecificationIec61360, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
