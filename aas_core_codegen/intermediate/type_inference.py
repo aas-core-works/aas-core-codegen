@@ -1257,7 +1257,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             items = collection_type.items
             index_value = node.index.value
-            if not (-len(items) <= index_value < len(items)):
+            if not (
+                -len(items) <= index_value < len(items)
+            ):  # pylint: disable=superfluous-parens
                 self.errors.append(
                     Error(
                         node.index.original_node,

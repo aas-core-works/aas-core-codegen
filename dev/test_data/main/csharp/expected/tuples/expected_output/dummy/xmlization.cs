@@ -460,6 +460,223 @@ namespace dummy
             }
 
             /// <summary>
+            /// Read a single list item, positioned at its start element.
+            /// </summary>
+            /// <typeparam name="T">Type of the parsed item</typeparam>
+            private delegate T? ClassItemDeserializer<T>(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                ) where T : class;
+
+            /// <summary>
+            /// Parse a sequence of list items with <paramref name="deserializeItem" />,
+            /// stopping (without consuming) at the first non-element node.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed properties whose items are
+            /// de-serialized into a reference type (<em>e.g.</em>, a string, a byte
+            /// array or a class instance).
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static List<T> ParseListOfClass<T>(
+                Xml.XmlReader reader,
+                ClassItemDeserializer<T> deserializeItem,
+                out Reporting.Error? error
+                ) where T : class
+            {
+                error = null;
+                List<T> result = new List<T>();
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                int index = 0;
+                while (reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    T? item = deserializeItem(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(
+                        item
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected item null when error null"));
+
+                    index++;
+                    SkipNoneWhitespaceAndComments(reader);
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a single list item, positioned at its start element.
+            /// </summary>
+            /// <typeparam name="T">Type of the parsed item</typeparam>
+            private delegate T? StructItemDeserializer<T>(
+                Xml.XmlReader reader,
+                out Reporting.Error? error
+                ) where T : struct;
+
+            /// <summary>
+            /// Parse a sequence of list items with <paramref name="deserializeItem" />,
+            /// stopping (without consuming) at the first non-element node.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed properties whose items are
+            /// de-serialized into a value type (<em>e.g.</em>, a bool, a number or
+            /// an enumeration literal).
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static List<T> ParseListOfStruct<T>(
+                Xml.XmlReader reader,
+                StructItemDeserializer<T> deserializeItem,
+                out Reporting.Error? error
+                ) where T : struct
+            {
+                error = null;
+                List<T> result = new List<T>();
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                int index = 0;
+                while (reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    T? item = deserializeItem(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(
+                        item
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected item null when error null"));
+
+                    index++;
+                    SkipNoneWhitespaceAndComments(reader);
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read the opening tag of an XML element representing an instance of
+            /// <paramref name="className" />, without consuming its content.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by the de-serialization of every concrete class from
+            /// an XML element.
+            /// </remarks>
+            private static string ReadStartElementOfClass(
+                Xml.XmlReader reader,
+                string className,
+                out bool isEmptyElement,
+                out Reporting.Error? error
+                )
+            {
+                error = null;
+                isEmptyElement = false;
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (reader.EOF)
+                {
+                    error = new Reporting.Error(
+                        $"Expected an XML element representing an instance of class {className}, " +
+                        "but reached the end-of-file");
+                    return "";
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.Element)
+                {
+                    error = new Reporting.Error(
+                        $"Expected an XML element representing an instance of class {className}, " +
+                        $"but got a node of type {reader.NodeType} " +
+                        $"with value {reader.Value}");
+                    return "";
+                }
+
+                string elementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return "";
+                }
+
+                isEmptyElement = reader.IsEmptyElement;
+                return elementName;
+            }
+
+            /// <summary>
+            /// Consume the closing tag matching <paramref name="expectedElementName" />,
+            /// unless <paramref name="isEmptyElement" /> indicates that the element was
+            /// self-closing and thus has no separate closing tag to consume.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by the de-serialization of every concrete class from
+            /// an XML element.
+            /// </remarks>
+            private static void ConsumeCloseTag(
+                Xml.XmlReader reader,
+                string expectedElementName,
+                bool isEmptyElement,
+                out Reporting.Error? error
+                )
+            {
+                error = null;
+
+                if (isEmptyElement)
+                {
+                    return;
+                }
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (reader.EOF)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a closing element </{expectedElementName}>, " +
+                        "but reached the end-of-file");
+                    return;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a closing element </{expectedElementName}>, " +
+                        $"but got a node of type {reader.NodeType} " +
+                        $"with value {reader.Value}");
+                    return;
+                }
+
+                string endElementName = TryElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return;
+                }
+
+                if (endElementName != expectedElementName)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a closing element </{expectedElementName}>, " +
+                        $"but got a closing element </{endElementName}>");
+                    return;
+                }
+
+                // Skip the end element
+                reader.Read();
+            }
+
+            /// <summary>
             /// Read a <c>&lt;v&gt;</c> and parse its content as a literal of
             /// <see cref="Aas.Result"/>.
             /// </summary>
@@ -718,27 +935,8 @@ namespace dummy
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SomeItem, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class SomeItem, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "SomeItem", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -752,8 +950,6 @@ namespace dummy
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -765,44 +961,14 @@ namespace dummy
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SomeItem, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class SomeItem, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -988,27 +1154,8 @@ namespace dummy
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AnotherItem, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class AnotherItem, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "AnotherItem", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -1022,8 +1169,6 @@ namespace dummy
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -1035,44 +1180,14 @@ namespace dummy
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AnotherItem, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class AnotherItem, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
@@ -1463,27 +1578,8 @@ namespace dummy
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Something, " +
-                        "but reached the end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element representing an instance of class Something, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                string elementName = TryElementName(
-                    reader, out error);
+                string elementName = ReadStartElementOfClass(
+                    reader, "Something", out bool isEmptyElement, out error);
                 if (error != null)
                 {
                     return null;
@@ -1497,8 +1593,6 @@ namespace dummy
                     return null;
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-
                 // Skip the element node and go to the content
                 reader.Read();
 
@@ -1510,44 +1604,14 @@ namespace dummy
                     return null;
                 }
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (!isEmptyElement)
+                ConsumeCloseTag(
+                    reader,
+                    elementName,
+                    isEmptyElement,
+                    out error);
+                if (error != null)
                 {
-                    if (reader.EOF)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Something, " +
-                            "but reached the end-of-file");
-                        return null;
-                    }
-
-                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
-                    {
-                        error = new Reporting.Error(
-                            "Expected an XML end element concluding an instance of class Something, " +
-                            $"but got a node of type {reader.NodeType} " +
-                            $"with value {reader.Value}");
-                        return null;
-                    }
-
-                    string endElementName = TryElementName(
-                        reader, out error);
-                    if (error != null)
-                    {
-                        return null;
-                    }
-
-                    if (endElementName != elementName)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected an XML end element with an name {elementName}, " +
-                            $"but got: {endElementName}");
-                        return null;
-                    }
-
-                    // Skip the end element
-                    reader.Read();
+                    return null;
                 }
 
                 return result;
