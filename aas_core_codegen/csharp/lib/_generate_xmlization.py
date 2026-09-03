@@ -112,24 +112,25 @@ def _generate_read_v_element() -> Stripped:
     return Stripped(
         f"""\
 /// <summary>
-/// Consume a <c>&lt;v&gt;</c> element from the reader and return whether
-/// it was a self-closing (empty) element.
+/// Consume a start element named <paramref name="expectedName" /> from
+/// the reader and return whether it was a self-closing (empty) element.
 /// </summary>
 private static bool ReadVElement(
 {I}Xml.XmlReader reader,
+{I}string expectedName,
 {I}out Reporting.Error? error
 {I})
 {{
 {I}if (reader.EOF) {{
 {II}error = new Reporting.Error(
-{III}"Expected a <v> element, but got an end-of-file.");
+{III}$"Expected a <{{expectedName}}> element, but got an end-of-file.");
 {II}return false;
 {I}}}
 
 {I}if (reader.NodeType != Xml.XmlNodeType.Element)
 {I}{{
 {II}error = new Reporting.Error(
-{III}"Expected a <v> start element, " +
+{III}$"Expected a <{{expectedName}}> start element, " +
 {III}$"but got the node of type {{reader.NodeType}} " +
 {III}$"with the value {{reader.Value}}");
 {II}return false;
@@ -141,10 +142,10 @@ private static bool ReadVElement(
 {I}{{
 {II}return false;
 {I}}}
-{I}if (elementName != "v")
+{I}if (elementName != expectedName)
 {I}{{
 {II}error = new Reporting.Error(
-{III}"Expected a <v> element, " +
+{III}$"Expected a <{{expectedName}}> element, " +
 {III}$"but got an element {{elementName}}");
 {II}return false;
 {I}}}
@@ -162,23 +163,25 @@ def _generate_read_v_end_element() -> Stripped:
     return Stripped(
         f"""\
 /// <summary>
-/// Consume a <c>&lt;/v&gt;</c> element from the reader.
+/// Consume an end element named <paramref name="expectedName" /> from
+/// the reader.
 /// </summary>
 private static void ReadVEndElement(
 {I}Xml.XmlReader reader,
+{I}string expectedName,
 {I}out Reporting.Error? error
 {I})
 {{
 {I}if (reader.EOF) {{
 {II}error = new Reporting.Error(
-{III}"Expected a </v> element, but got an end-of-file.");
+{III}$"Expected a </{{expectedName}}> element, but got an end-of-file.");
 {II}return;
 {I}}}
 
 {I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
 {I}{{
 {II}error = new Reporting.Error(
-{III}"Expected a </v> end element, " +
+{III}$"Expected a </{{expectedName}}> end element, " +
 {III}$"but got the node of type {{reader.NodeType}} " +
 {III}$"with the value {{reader.Value}}");
 {II}return;
@@ -190,10 +193,10 @@ private static void ReadVEndElement(
 {I}{{
 {II}return;
 {I}}}
-{I}if (elementName != "v")
+{I}if (elementName != expectedName)
 {I}{{
 {II}error = new Reporting.Error(
-{III}"Expected a </v> element, " +
+{III}$"Expected a </{{expectedName}}> element, " +
 {III}$"but got an end element {{elementName}}");
 {II}return;
 {I}}}
@@ -221,10 +224,11 @@ def _generate_read_v_element_as_primitive_functions() -> List[Stripped]:
 /// </summary>
 private static {result_type}? {function_name}(
 {I}Xml.XmlReader reader,
+{I}string elementName,
 {I}out Reporting.Error? error
 {I})
 {{
-{I}bool isEmptyVElement = ReadVElement(reader, out error);
+{I}bool isEmptyVElement = ReadVElement(reader, elementName, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -245,14 +249,16 @@ private static {result_type}? {function_name}(
 {II}{{
 {III}result = {deserialization_expr};
 {II}}}
-{II}catch (System.FormatException exception)
+{II}catch (System.Exception exception)
+{IIII}when (exception is System.FormatException
+{IIIII}|| exception is System.Xml.XmlException)
 {II}{{
 {III}error = new Reporting.Error(
 {IIII}$"The content could not be de-serialized as {result_type}: {{exception}}");
 {III}return null;
 {II}}}
 
-{II}ReadVEndElement(reader, out error);
+{II}ReadVEndElement(reader, elementName, out error);
 {II}if (error != null)
 {II}{{
 {III}return null;
@@ -279,10 +285,11 @@ private static {result_type}? {function_name}(
 /// </summary>
 private static string? ReadVElementAsString(
 {I}Xml.XmlReader reader,
+{I}string elementName,
 {I}out Reporting.Error? error
 {I})
 {{
-{I}bool isEmptyVElement = ReadVElement(reader, out error);
+{I}bool isEmptyVElement = ReadVElement(reader, elementName, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -310,7 +317,7 @@ private static string? ReadVElementAsString(
 {III}return null;
 {II}}}
 
-{II}ReadVEndElement(reader, out error);
+{II}ReadVEndElement(reader, elementName, out error);
 {II}if (error != null)
 {II}{{
 {III}return null;
@@ -334,10 +341,11 @@ private static string? ReadVElementAsString(
 /// </summary>
 private static byte[]? ReadVElementAsBytes(
 {I}Xml.XmlReader reader,
+{I}string elementName,
 {I}out Reporting.Error? error
 {I})
 {{
-{I}bool isEmptyVElement = ReadVElement(reader, out error);
+{I}bool isEmptyVElement = ReadVElement(reader, elementName, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -370,7 +378,7 @@ private static byte[]? ReadVElementAsBytes(
 {III}return null;
 {II}}}
 
-{II}ReadVEndElement(reader, out error);
+{II}ReadVEndElement(reader, elementName, out error);
 {II}if (error != null)
 {II}{{
 {III}return null;
@@ -383,6 +391,126 @@ private static byte[]? ReadVElementAsBytes(
     )
 
     return result
+
+
+def _generate_parse_list_of_class_helpers() -> Stripped:
+    """Generate the generic helper to de-serialize a list of reference-type items."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read a single list item, positioned at its start element.
+/// </summary>
+/// <typeparam name="T">Type of the parsed item</typeparam>
+private delegate T? ClassItemDeserializer<T>(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I}) where T : class;
+
+/// <summary>
+/// Parse a sequence of list items with <paramref name="deserializeItem" />,
+/// stopping (without consuming) at the first non-element node.
+/// </summary>
+/// <remarks>
+/// This is shared by all the list-typed properties whose items are
+/// de-serialized into a reference type (<em>e.g.</em>, a string, a byte
+/// array or a class instance).
+/// </remarks>
+/// <typeparam name="T">Type of a single list item</typeparam>
+private static List<T> ParseListOfClass<T>(
+{I}Xml.XmlReader reader,
+{I}ClassItemDeserializer<T> deserializeItem,
+{I}out Reporting.Error? error
+{I}) where T : class
+{{
+{I}error = null;
+{I}List<T> result = new List<T>();
+
+{I}SkipNoneWhitespaceAndComments(reader);
+
+{I}int index = 0;
+{I}while (reader.NodeType == Xml.XmlNodeType.Element)
+{I}{{
+{II}T? item = deserializeItem(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.IndexSegment(
+{IIIII}index));
+{III}return result;
+{II}}}
+
+{II}result.Add(
+{III}item
+{IIII}?? throw new System.InvalidOperationException(
+{IIIII}"Unexpected item null when error null"));
+
+{II}index++;
+{II}SkipNoneWhitespaceAndComments(reader);
+{I}}}
+
+{I}return result;
+}}"""
+    )
+
+
+def _generate_parse_list_of_struct_helpers() -> Stripped:
+    """Generate the generic helper to de-serialize a list of value-type items."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read a single list item, positioned at its start element.
+/// </summary>
+/// <typeparam name="T">Type of the parsed item</typeparam>
+private delegate T? StructItemDeserializer<T>(
+{I}Xml.XmlReader reader,
+{I}out Reporting.Error? error
+{I}) where T : struct;
+
+/// <summary>
+/// Parse a sequence of list items with <paramref name="deserializeItem" />,
+/// stopping (without consuming) at the first non-element node.
+/// </summary>
+/// <remarks>
+/// This is shared by all the list-typed properties whose items are
+/// de-serialized into a value type (<em>e.g.</em>, a bool, a number or
+/// an enumeration literal).
+/// </remarks>
+/// <typeparam name="T">Type of a single list item</typeparam>
+private static List<T> ParseListOfStruct<T>(
+{I}Xml.XmlReader reader,
+{I}StructItemDeserializer<T> deserializeItem,
+{I}out Reporting.Error? error
+{I}) where T : struct
+{{
+{I}error = null;
+{I}List<T> result = new List<T>();
+
+{I}SkipNoneWhitespaceAndComments(reader);
+
+{I}int index = 0;
+{I}while (reader.NodeType == Xml.XmlNodeType.Element)
+{I}{{
+{II}T? item = deserializeItem(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.IndexSegment(
+{IIIII}index));
+{III}return result;
+{II}}}
+
+{II}result.Add(
+{III}item
+{IIII}?? throw new System.InvalidOperationException(
+{IIIII}"Unexpected item null when error null"));
+
+{II}index++;
+{II}SkipNoneWhitespaceAndComments(reader);
+{I}}}
+
+{I}return result;
+}}"""
+    )
 
 
 def _generate_read_v_element_as_enumeration(
@@ -398,10 +526,11 @@ def _generate_read_v_element_as_enumeration(
 /// </summary>
 private static Aas.{enum_name}? ReadVElementAs{enum_name}(
 {I}Xml.XmlReader reader,
+{I}string elementName,
 {I}out Reporting.Error? error
 {I})
 {{
-{I}string? text = ReadVElementAsString(reader, out error);
+{I}string? text = ReadVElementAsString(reader, elementName, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -497,20 +626,16 @@ else
 {II}{target_var} = {indent_but_first_line(deserialization_expr, I)};
 {I}}}
 {I}catch (System.Exception exception)
+{III}when (exception is System.FormatException
+{IIII}|| exception is System.Xml.XmlException)
 {I}{{
-{II}if (exception is System.FormatException
-{III}|| exception is System.Xml.XmlException)
-{II}{{
-{III}error = new Reporting.Error(
-{IIII}"The property {prop_name} of an instance of class {cls_name} " +
-{IIII}$"could not be de-serialized: {{exception.Message}}");
-{III}error.PrependSegment(
-{IIII}new Reporting.NameSegment(
-{IIIII}{xml_prop_name_literal}));
-{III}return null;
-{II}}}
-
-{II}throw;
+{II}error = new Reporting.Error(
+{III}"The property {prop_name} of an instance of class {cls_name} " +
+{III}$"could not be de-serialized: {{exception.Message}}");
+{II}error.PrependSegment(
+{III}new Reporting.NameSegment(
+{IIII}{xml_prop_name_literal}));
+{II}return null;
 {I}}}
 }}"""
     )
@@ -704,6 +829,8 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
     assert isinstance(type_anno, intermediate.ListTypeAnnotation), "Pre-condition"
 
     deserialize_method: Stripped
+    is_v_element: bool
+    is_value_type: bool
 
     primitive_type = intermediate.try_primitive_type(type_anno.items)
 
@@ -711,17 +838,24 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
         isinstance(type_anno.items, intermediate.OurTypeAnnotation)
         and isinstance(type_anno.items.our_type, intermediate.Enumeration)
     ):
+        is_v_element = True
+
         if primitive_type is not None:
             if primitive_type is intermediate.PrimitiveType.BOOL:
                 deserialize_method = Stripped("ReadVElementAsBoolean")
+                is_value_type = True
             elif primitive_type is intermediate.PrimitiveType.INT:
                 deserialize_method = Stripped("ReadVElementAsLong")
+                is_value_type = True
             elif primitive_type is intermediate.PrimitiveType.FLOAT:
                 deserialize_method = Stripped("ReadVElementAsDouble")
+                is_value_type = True
             elif primitive_type is intermediate.PrimitiveType.STR:
                 deserialize_method = Stripped("ReadVElementAsString")
+                is_value_type = False
             elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
                 deserialize_method = Stripped("ReadVElementAsBytes")
+                is_value_type = False
             else:
                 assert_never(primitive_type)
         else:
@@ -731,11 +865,15 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
 
             enum_name = csharp_naming.enum_name(type_anno.items.our_type.name)
             deserialize_method = Stripped(f"ReadVElementAs{enum_name}")
+            is_value_type = True
 
     elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
         type_anno.items.our_type,
         (intermediate.AbstractClass, intermediate.ConcreteClass),
     ):
+        is_v_element = False
+        is_value_type = False
+
         if (
             isinstance(type_anno.items.our_type, intermediate.AbstractClass)
             or len(type_anno.items.our_type.concrete_descendants) > 0
@@ -758,38 +896,39 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
     xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-    index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
 
     item_type = csharp_common.generate_type(type_anno.items)
 
+    parse_list_function = "ParseListOfStruct" if is_value_type else "ParseListOfClass"
+
+    # NOTE (mristin):
+    # A method group such as ``FooFromElement`` already matches the expected
+    # ``(Xml.XmlReader, out Reporting.Error?) -> T?`` signature of the item
+    # deserializer, so we can pass it on directly. A ``<v>`` element, on the
+    # other hand, needs its fixed local name "v" bound in a lambda.
+    item_deserializer = (
+        Stripped(
+            f"""\
+(Xml.XmlReader itemReader, out Reporting.Error? itemError) => {deserialize_method}(
+{I}itemReader, "v", out itemError)"""
+        )
+        if is_v_element
+        else deserialize_method
+    )
+
     body_for_non_empty_property = Stripped(
         f"""\
-SkipNoneWhitespaceAndComments(reader);
+{target_var} = {parse_list_function}<{item_type}>(
+{I}reader,
+{I}{indent_but_first_line(item_deserializer, I)},
+{I}out error);
 
-int {index_var} = 0;
-while (reader.NodeType == Xml.XmlNodeType.Element)
+if (error != null)
 {{
-{I}{item_type}? item = {deserialize_method}(
-{II}reader, out error);
-
-{I}if (error != null)
-{I}{{
-{II}error.PrependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-error.PrependSegment(
-{I}new Reporting.NameSegment(
-{II}{xml_prop_name_literal}));
-{II}return null;
-{I}}}
-
-{I}{target_var}.Add(
-{II}item
-{III}?? throw new System.InvalidOperationException(
-{IIII}"Unexpected item null when error null"));
-
-{I}{index_var}++;
-{I}SkipNoneWhitespaceAndComments(reader);
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{xml_prop_name_literal}));
+{I}return null;
 }}"""
     )
 
@@ -1185,6 +1324,127 @@ internal static Aas.{name}? {name}FromSequence(
     return Stripped(writer.getvalue()), None
 
 
+def _generate_read_start_element_of_class() -> Stripped:
+    """Generate the shared helper to read the opening tag of a class instance."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read the opening tag of an XML element representing an instance of
+/// <paramref name="className" />, without consuming its content.
+/// </summary>
+/// <remarks>
+/// This is shared by the de-serialization of every concrete class from
+/// an XML element.
+/// </remarks>
+private static string ReadStartElementOfClass(
+{I}Xml.XmlReader reader,
+{I}string className,
+{I}out bool isEmptyElement,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}error = null;
+{I}isEmptyElement = false;
+
+{I}SkipNoneWhitespaceAndComments(reader);
+
+{I}if (reader.EOF)
+{I}{{
+{II}error = new Reporting.Error(
+{III}$"Expected an XML element representing an instance of class {{className}}, " +
+{III}"but reached the end-of-file");
+{II}return "";
+{I}}}
+
+{I}if (reader.NodeType != Xml.XmlNodeType.Element)
+{I}{{
+{II}error = new Reporting.Error(
+{III}$"Expected an XML element representing an instance of class {{className}}, " +
+{III}$"but got a node of type {{reader.NodeType}} " +
+{III}$"with value {{reader.Value}}");
+{II}return "";
+{I}}}
+
+{I}string elementName = TryElementName(
+{II}reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return "";
+{I}}}
+
+{I}isEmptyElement = reader.IsEmptyElement;
+{I}return elementName;
+}}"""
+    )
+
+
+def _generate_consume_close_tag() -> Stripped:
+    """Generate the shared helper to consume the closing tag of an XML element."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Consume the closing tag matching <paramref name="expectedElementName" />,
+/// unless <paramref name="isEmptyElement" /> indicates that the element was
+/// self-closing and thus has no separate closing tag to consume.
+/// </summary>
+/// <remarks>
+/// This is shared by the de-serialization of every concrete class from
+/// an XML element.
+/// </remarks>
+private static void ConsumeCloseTag(
+{I}Xml.XmlReader reader,
+{I}string expectedElementName,
+{I}bool isEmptyElement,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}error = null;
+
+{I}if (isEmptyElement)
+{I}{{
+{II}return;
+{I}}}
+
+{I}SkipNoneWhitespaceAndComments(reader);
+
+{I}if (reader.EOF)
+{I}{{
+{II}error = new Reporting.Error(
+{III}$"Expected a closing element </{{expectedElementName}}>, " +
+{III}"but reached the end-of-file");
+{II}return;
+{I}}}
+
+{I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
+{I}{{
+{II}error = new Reporting.Error(
+{III}$"Expected a closing element </{{expectedElementName}}>, " +
+{III}$"but got a node of type {{reader.NodeType}} " +
+{III}$"with value {{reader.Value}}");
+{II}return;
+{I}}}
+
+{I}string endElementName = TryElementName(
+{II}reader, out error);
+{I}if (error != null)
+{I}{{
+{II}return;
+{I}}}
+
+{I}if (endElementName != expectedElementName)
+{I}{{
+{II}error = new Reporting.Error(
+{III}$"Expected a closing element </{{expectedElementName}}>, " +
+{III}$"but got a closing element </{{endElementName}}>");
+{II}return;
+{I}}}
+
+{I}// Skip the end element
+{I}reader.Read();
+}}"""
+    )
+
+
 def _generate_deserialize_impl_concrete_cls_from_element(
     cls: intermediate.ConcreteClass,
 ) -> Stripped:
@@ -1201,27 +1461,8 @@ def _generate_deserialize_impl_concrete_cls_from_element(
         f"""\
 error = null;
 
-SkipNoneWhitespaceAndComments(reader);
-
-if (reader.EOF)
-{{
-{I}error = new Reporting.Error(
-{II}"Expected an XML element representing an instance of class {name}, " +
-{II}"but reached the end-of-file");
-{I}return null;
-}}
-
-if (reader.NodeType != Xml.XmlNodeType.Element)
-{{
-{I}error = new Reporting.Error(
-{II}"Expected an XML element representing an instance of class {name}, " +
-{II}$"but got a node of type {{reader.NodeType}} " +
-{II}$"with value {{reader.Value}}");
-{I}return null;
-}}
-
-string elementName = TryElementName(
-    reader, out error);
+string elementName = ReadStartElementOfClass(
+{I}reader, {csharp_common.string_literal(name)}, out bool isEmptyElement, out error);
 if (error != null)
 {{
 {I}return null;
@@ -1235,8 +1476,6 @@ if (elementName != {xml_name_literal})
 {I}return null;
 }}
 
-bool isEmptyElement = reader.IsEmptyElement;
-
 // Skip the element node and go to the content
 reader.Read();
 
@@ -1248,44 +1487,14 @@ if (error != null)
 {I}return null;
 }}
 
-SkipNoneWhitespaceAndComments(reader);
-
-if (!isEmptyElement)
+ConsumeCloseTag(
+{I}reader,
+{I}elementName,
+{I}isEmptyElement,
+{I}out error);
+if (error != null)
 {{
-{I}if (reader.EOF)
-{I}{{
-{II}error = new Reporting.Error(
-{III}"Expected an XML end element concluding an instance of class {name}, " +
-{III}"but reached the end-of-file");
-{II}return null;
-{I}}}
-
-{I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
-{I}{{
-{II}error = new Reporting.Error(
-{III}"Expected an XML end element concluding an instance of class {name}, " +
-{III}$"but got a node of type {{reader.NodeType}} " +
-{III}$"with value {{reader.Value}}");
-{II}return null;
-{I}}}
-
-{I}string endElementName = TryElementName(
-{II}reader, out error);
-{I}if (error != null)
-{I}{{
-{II}return null;
-{I}}}
-
-{I}if (endElementName != elementName)
-{I}{{
-{II}error = new Reporting.Error(
-{III}$"Expected an XML end element with an name {{elementName}}, " +
-{III}$"but got: {{endElementName}}");
-{II}return null;
-{I}}}
-
-{I}// Skip the end element
-{I}reader.Read();
+{I}return null;
 }}
 
 return result;"""
@@ -1422,6 +1631,10 @@ def _generate_deserialize_impl(
         _generate_read_v_element(),
         _generate_read_v_end_element(),
         *_generate_read_v_element_as_primitive_functions(),
+        _generate_parse_list_of_class_helpers(),
+        _generate_parse_list_of_struct_helpers(),
+        _generate_read_start_element_of_class(),
+        _generate_consume_close_tag(),
     ]  # type: List[Stripped]
 
     for enumeration in symbol_table.enumerations:
