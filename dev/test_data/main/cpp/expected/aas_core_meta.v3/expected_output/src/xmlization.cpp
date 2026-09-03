@@ -2626,19 +2626,20 @@ common::optional<DeserializationError> SkipWhitespace(
   return common::nullopt;
 }
 
+template <typename T, typename DispatchT>
 std::pair<
-  common::optional<
-    std::shared_ptr<types::IClass>
-  >,
+  common::optional<std::shared_ptr<T> >,
   common::optional<DeserializationError>
-> ClassFromElement(
-  ReaderMergingText& reader
+> DeserializeClassFromElement(
+  ReaderMergingText& reader,
+  const std::wstring& interface_name,
+  const DispatchT& dispatch
 ) {
   #ifdef DEBUG
   if (reader.node().kind() == NodeKind::Error) {
     throw std::logic_error(
-      "Unexpected unhandled XML error in ClassFromElement. "
-      "ClassFromElement expects no reader error at entry."
+      "Unexpected unhandled XML error in DeserializeClassFromElement. "
+      "DeserializeClassFromElement expects no reader error at entry."
     );
   }
   #endif
@@ -2648,24 +2649,25 @@ std::pair<
   error = SkipBof(reader);
   if (error.has_value()) {
     return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(std::move(*error));
   }
 
   error = SkipWhitespace(reader);
   if (error.has_value()) {
     return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(std::move(*error));
   }
 
   if (reader.node().kind() != NodeKind::Start) {
     return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(
       common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IClass, but got ",
+        L"Expected a start element opening an instance of ",
+        interface_name,
+        L", but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
@@ -2682,7 +2684,7 @@ std::pair<
   );
   if (!model_type.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(
       common::Concat(
       L"Unexpected start element as its name does not correspond "
@@ -2698,7 +2700,7 @@ std::pair<
 
   if (reader.node().kind() == NodeKind::Error) {
     auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(
       reader
     );
@@ -2711,213 +2713,11 @@ std::pair<
     return noInstanceAndError;
   }
 
-  common::optional<
-    std::shared_ptr<types::IClass>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kExtension:
-      std::tie(instance, error) = ExtensionFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kAdministrativeInformation:
-      std::tie(instance, error) = AdministrativeInformationFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kQualifier:
-      std::tie(instance, error) = QualifierFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kAssetAdministrationShell:
-      std::tie(instance, error) = AssetAdministrationShellFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kAssetInformation:
-      std::tie(instance, error) = AssetInformationFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kResource:
-      std::tie(instance, error) = ResourceFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kSpecificAssetId:
-      std::tie(instance, error) = SpecificAssetIdFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kEventPayload:
-      std::tie(instance, error) = EventPayloadFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kOperationVariable:
-      std::tie(instance, error) = OperationVariableFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kConceptDescription:
-      std::tie(instance, error) = ConceptDescriptionFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kReference:
-      std::tie(instance, error) = ReferenceFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kKey:
-      std::tie(instance, error) = KeyFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kLangStringNameType:
-      std::tie(instance, error) = LangStringNameTypeFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kLangStringTextType:
-      std::tie(instance, error) = LangStringTextTypeFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kEnvironment:
-      std::tie(instance, error) = EnvironmentFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kEmbeddedDataSpecification:
-      std::tie(instance, error) = EmbeddedDataSpecificationFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kLevelType:
-      std::tie(instance, error) = LevelTypeFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kValueReferencePair:
-      std::tie(instance, error) = ValueReferencePairFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kValueList:
-      std::tie(instance, error) = ValueListFromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kLangStringPreferredNameTypeIec61360:
-      std::tie(instance, error) = LangStringPreferredNameTypeIec61360FromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kLangStringShortNameTypeIec61360:
-      std::tie(instance, error) = LangStringShortNameTypeIec61360FromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kLangStringDefinitionTypeIec61360:
-      std::tie(instance, error) = LangStringDefinitionTypeIec61360FromSequence<
-        types::IClass
-      >(reader);
-      break;
-    case types::ModelType::kDataSpecificationIec61360:
-      std::tie(instance, error) = DataSpecificationIec61360FromSequence<
-        types::IClass
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IClass>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IClass from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
+  common::optional<std::shared_ptr<T> > instance;
+  std::tie(
+    instance,
+    error
+  ) = dispatch(reader, *model_type, name);
 
   if (error.has_value()) {
     PrependElementSegmentToDeserializationError(
@@ -2926,7 +2726,7 @@ std::pair<
     );
 
     return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(std::move(*error));
   }
 
@@ -2938,7 +2738,7 @@ std::pair<
     );
 
     return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(std::move(*error));
   }
 
@@ -2947,8 +2747,9 @@ std::pair<
       common::Concat(
         L"Expected a stop element </",
         common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IClass, but got ",
+        L"> closing an instance of ",
+        interface_name,
+        L", but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
@@ -2959,33 +2760,7 @@ std::pair<
     );
 
     return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IClass, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(std::move(*error));
   }
 
@@ -3001,12 +2776,200 @@ std::pair<
     );
 
     return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IClass>
+      std::shared_ptr<T>
     >(std::move(*error));
   }
 
   return InstanceAndNoDeserializationError(
     std::move(*instance)
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IClass>
+  >,
+  common::optional<DeserializationError>
+> ClassFromElement(
+  ReaderMergingText& reader
+) {
+  return DeserializeClassFromElement<types::IClass>(
+    reader,
+    L"IClass",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IClass> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kExtension:
+          return ExtensionFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kAdministrativeInformation:
+          return AdministrativeInformationFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kQualifier:
+          return QualifierFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kAssetAdministrationShell:
+          return AssetAdministrationShellFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kAssetInformation:
+          return AssetInformationFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kResource:
+          return ResourceFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kSpecificAssetId:
+          return SpecificAssetIdFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kEventPayload:
+          return EventPayloadFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kOperationVariable:
+          return OperationVariableFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kConceptDescription:
+          return ConceptDescriptionFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kReference:
+          return ReferenceFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kKey:
+          return KeyFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kLangStringNameType:
+          return LangStringNameTypeFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kLangStringTextType:
+          return LangStringTextTypeFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kEnvironment:
+          return EnvironmentFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kEmbeddedDataSpecification:
+          return EmbeddedDataSpecificationFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kLevelType:
+          return LevelTypeFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kValueReferencePair:
+          return ValueReferencePairFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kValueList:
+          return ValueListFromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kLangStringPreferredNameTypeIec61360:
+          return LangStringPreferredNameTypeIec61360FromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kLangStringShortNameTypeIec61360:
+          return LangStringShortNameTypeIec61360FromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kLangStringDefinitionTypeIec61360:
+          return LangStringDefinitionTypeIec61360FromSequence<
+            types::IClass
+          >(a_reader);
+        case types::ModelType::kDataSpecificationIec61360:
+          return DataSpecificationIec61360FromSequence<
+            types::IClass
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IClass>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IClass from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -3018,279 +2981,103 @@ std::pair<
 > HasSemanticsFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in HasSemanticsFromElement. "
-      "HasSemanticsFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasSemantics>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IHasSemantics, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasSemantics>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IHasSemantics>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IHasSemantics>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kExtension:
-      std::tie(instance, error) = ExtensionFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kQualifier:
-      std::tie(instance, error) = QualifierFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kSpecificAssetId:
-      std::tie(instance, error) = SpecificAssetIdFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::IHasSemantics
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IHasSemantics>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IHasSemantics from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasSemantics, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasSemantics, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasSemantics>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IHasSemantics>(
+    reader,
+    L"IHasSemantics",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IHasSemantics> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kExtension:
+          return ExtensionFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kQualifier:
+          return QualifierFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kSpecificAssetId:
+          return SpecificAssetIdFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::IHasSemantics
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IHasSemantics>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IHasSemantics from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -3302,194 +3089,35 @@ std::pair<
 > ExtensionFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ExtensionFromElement. "
-      "ExtensionFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IExtension>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IExtension, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IExtension>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IExtension>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IExtension>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kExtension:
-      std::tie(instance, error) = ExtensionFromSequence<
-        types::IExtension
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IExtension>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IExtension from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IExtension, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IExtension, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IExtension>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IExtension>(
+    reader,
+    L"IExtension",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IExtension> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kExtension:
+          return ExtensionFromSequence<
+            types::IExtension
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IExtension>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IExtension from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -3501,274 +3129,99 @@ std::pair<
 > HasExtensionsFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in HasExtensionsFromElement. "
-      "HasExtensionsFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasExtensions>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IHasExtensions, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasExtensions>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IHasExtensions>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IHasExtensions>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kAssetAdministrationShell:
-      std::tie(instance, error) = AssetAdministrationShellFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kConceptDescription:
-      std::tie(instance, error) = ConceptDescriptionFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::IHasExtensions
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IHasExtensions>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IHasExtensions from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasExtensions, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasExtensions, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasExtensions>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IHasExtensions>(
+    reader,
+    L"IHasExtensions",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IHasExtensions> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kAssetAdministrationShell:
+          return AssetAdministrationShellFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kConceptDescription:
+          return ConceptDescriptionFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::IHasExtensions
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IHasExtensions>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IHasExtensions from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -3780,274 +3233,99 @@ std::pair<
 > ReferableFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ReferableFromElement. "
-      "ReferableFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IReferable>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IReferable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IReferable>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IReferable>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IReferable>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kAssetAdministrationShell:
-      std::tie(instance, error) = AssetAdministrationShellFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kConceptDescription:
-      std::tie(instance, error) = ConceptDescriptionFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::IReferable
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IReferable>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IReferable from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IReferable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IReferable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferable>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IReferable>(
+    reader,
+    L"IReferable",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IReferable> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kAssetAdministrationShell:
+          return AssetAdministrationShellFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kConceptDescription:
+          return ConceptDescriptionFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::IReferable
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::IReferable
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IReferable>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IReferable from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -4059,204 +3337,43 @@ std::pair<
 > IdentifiableFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in IdentifiableFromElement. "
-      "IdentifiableFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IIdentifiable>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IIdentifiable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IIdentifiable>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IIdentifiable>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IIdentifiable>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kAssetAdministrationShell:
-      std::tie(instance, error) = AssetAdministrationShellFromSequence<
-        types::IIdentifiable
-      >(reader);
-      break;
-    case types::ModelType::kConceptDescription:
-      std::tie(instance, error) = ConceptDescriptionFromSequence<
-        types::IIdentifiable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IIdentifiable
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IIdentifiable>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IIdentifiable from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IIdentifiable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IIdentifiable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IIdentifiable>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IIdentifiable>(
+    reader,
+    L"IIdentifiable",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IIdentifiable> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kAssetAdministrationShell:
+          return AssetAdministrationShellFromSequence<
+            types::IIdentifiable
+          >(a_reader);
+        case types::ModelType::kConceptDescription:
+          return ConceptDescriptionFromSequence<
+            types::IIdentifiable
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IIdentifiable
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IIdentifiable>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IIdentifiable from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -4268,194 +3385,35 @@ std::pair<
 > HasKindFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in HasKindFromElement. "
-      "HasKindFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasKind>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IHasKind, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasKind>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IHasKind>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IHasKind>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IHasKind
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IHasKind>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IHasKind from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasKind, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasKind, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasKind>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IHasKind>(
+    reader,
+    L"IHasKind",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IHasKind> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IHasKind
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IHasKind>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IHasKind from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -4467,279 +3425,103 @@ std::pair<
 > HasDataSpecificationFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in HasDataSpecificationFromElement. "
-      "HasDataSpecificationFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IHasDataSpecification, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IHasDataSpecification>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kAdministrativeInformation:
-      std::tie(instance, error) = AdministrativeInformationFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kAssetAdministrationShell:
-      std::tie(instance, error) = AssetAdministrationShellFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kConceptDescription:
-      std::tie(instance, error) = ConceptDescriptionFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::IHasDataSpecification
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IHasDataSpecification>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IHasDataSpecification from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasDataSpecification, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IHasDataSpecification, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IHasDataSpecification>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IHasDataSpecification>(
+    reader,
+    L"IHasDataSpecification",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IHasDataSpecification> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kAdministrativeInformation:
+          return AdministrativeInformationFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kAssetAdministrationShell:
+          return AssetAdministrationShellFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kConceptDescription:
+          return ConceptDescriptionFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::IHasDataSpecification
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IHasDataSpecification>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IHasDataSpecification from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -4751,194 +3533,35 @@ std::pair<
 > AdministrativeInformationFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in AdministrativeInformationFromElement. "
-      "AdministrativeInformationFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IAdministrativeInformation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IAdministrativeInformation>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kAdministrativeInformation:
-      std::tie(instance, error) = AdministrativeInformationFromSequence<
-        types::IAdministrativeInformation
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IAdministrativeInformation>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IAdministrativeInformation from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAdministrativeInformation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAdministrativeInformation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAdministrativeInformation>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IAdministrativeInformation>(
+    reader,
+    L"IAdministrativeInformation",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IAdministrativeInformation> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kAdministrativeInformation:
+          return AdministrativeInformationFromSequence<
+            types::IAdministrativeInformation
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IAdministrativeInformation>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IAdministrativeInformation from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -4950,264 +3573,91 @@ std::pair<
 > QualifiableFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in QualifiableFromElement. "
-      "QualifiableFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IQualifiable>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IQualifiable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IQualifiable>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IQualifiable>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IQualifiable>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::IQualifiable
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IQualifiable>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IQualifiable from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IQualifiable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IQualifiable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifiable>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IQualifiable>(
+    reader,
+    L"IQualifiable",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IQualifiable> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::IQualifiable
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IQualifiable>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IQualifiable from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -5219,194 +3669,35 @@ std::pair<
 > QualifierFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in QualifierFromElement. "
-      "QualifierFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IQualifier>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IQualifier, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IQualifier>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IQualifier>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IQualifier>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kQualifier:
-      std::tie(instance, error) = QualifierFromSequence<
-        types::IQualifier
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IQualifier>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IQualifier from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IQualifier, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IQualifier, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IQualifier>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IQualifier>(
+    reader,
+    L"IQualifier",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IQualifier> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kQualifier:
+          return QualifierFromSequence<
+            types::IQualifier
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IQualifier>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IQualifier from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -5418,194 +3709,35 @@ std::pair<
 > AssetAdministrationShellFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in AssetAdministrationShellFromElement. "
-      "AssetAdministrationShellFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IAssetAdministrationShell, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IAssetAdministrationShell>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kAssetAdministrationShell:
-      std::tie(instance, error) = AssetAdministrationShellFromSequence<
-        types::IAssetAdministrationShell
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IAssetAdministrationShell>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IAssetAdministrationShell from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAssetAdministrationShell, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAssetAdministrationShell, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetAdministrationShell>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IAssetAdministrationShell>(
+    reader,
+    L"IAssetAdministrationShell",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IAssetAdministrationShell> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kAssetAdministrationShell:
+          return AssetAdministrationShellFromSequence<
+            types::IAssetAdministrationShell
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IAssetAdministrationShell>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IAssetAdministrationShell from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -5617,194 +3749,35 @@ std::pair<
 > AssetInformationFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in AssetInformationFromElement. "
-      "AssetInformationFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAssetInformation>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IAssetInformation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAssetInformation>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IAssetInformation>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IAssetInformation>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kAssetInformation:
-      std::tie(instance, error) = AssetInformationFromSequence<
-        types::IAssetInformation
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IAssetInformation>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IAssetInformation from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAssetInformation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAssetInformation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAssetInformation>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IAssetInformation>(
+    reader,
+    L"IAssetInformation",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IAssetInformation> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kAssetInformation:
+          return AssetInformationFromSequence<
+            types::IAssetInformation
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IAssetInformation>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IAssetInformation from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -5816,194 +3789,35 @@ std::pair<
 > ResourceFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ResourceFromElement. "
-      "ResourceFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IResource>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IResource, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IResource>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IResource>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IResource>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kResource:
-      std::tie(instance, error) = ResourceFromSequence<
-        types::IResource
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IResource>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IResource from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IResource, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IResource, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IResource>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IResource>(
+    reader,
+    L"IResource",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IResource> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kResource:
+          return ResourceFromSequence<
+            types::IResource
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IResource>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IResource from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -6015,194 +3829,35 @@ std::pair<
 > SpecificAssetIdFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in SpecificAssetIdFromElement. "
-      "SpecificAssetIdFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ISpecificAssetId, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ISpecificAssetId>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kSpecificAssetId:
-      std::tie(instance, error) = SpecificAssetIdFromSequence<
-        types::ISpecificAssetId
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ISpecificAssetId>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ISpecificAssetId from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISpecificAssetId, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISpecificAssetId, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISpecificAssetId>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ISpecificAssetId>(
+    reader,
+    L"ISpecificAssetId",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ISpecificAssetId> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kSpecificAssetId:
+          return SpecificAssetIdFromSequence<
+            types::ISpecificAssetId
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ISpecificAssetId>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ISpecificAssetId from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -6214,194 +3869,35 @@ std::pair<
 > SubmodelFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in SubmodelFromElement. "
-      "SubmodelFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodel>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ISubmodel, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodel>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ISubmodel>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ISubmodel>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kSubmodel:
-      std::tie(instance, error) = SubmodelFromSequence<
-        types::ISubmodel
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ISubmodel>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ISubmodel from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodel, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodel, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodel>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ISubmodel>(
+    reader,
+    L"ISubmodel",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ISubmodel> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kSubmodel:
+          return SubmodelFromSequence<
+            types::ISubmodel
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ISubmodel>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ISubmodel from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -6413,259 +3909,87 @@ std::pair<
 > SubmodelElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in SubmodelElementFromElement. "
-      "SubmodelElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodelElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ISubmodelElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodelElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ISubmodelElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ISubmodelElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::ISubmodelElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ISubmodelElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ISubmodelElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodelElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodelElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ISubmodelElement>(
+    reader,
+    L"ISubmodelElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ISubmodelElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::ISubmodelElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ISubmodelElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ISubmodelElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -6677,199 +4001,39 @@ std::pair<
 > RelationshipElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in RelationshipElementFromElement. "
-      "RelationshipElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IRelationshipElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IRelationshipElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IRelationshipElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IRelationshipElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IRelationshipElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRelationshipElement:
-      std::tie(instance, error) = RelationshipElementFromSequence<
-        types::IRelationshipElement
-      >(reader);
-      break;
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IRelationshipElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IRelationshipElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IRelationshipElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IRelationshipElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IRelationshipElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRelationshipElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IRelationshipElement>(
+    reader,
+    L"IRelationshipElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IRelationshipElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRelationshipElement:
+          return RelationshipElementFromSequence<
+            types::IRelationshipElement
+          >(a_reader);
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IRelationshipElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IRelationshipElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IRelationshipElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -6881,194 +4045,35 @@ std::pair<
 > SubmodelElementListFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in SubmodelElementListFromElement. "
-      "SubmodelElementListFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ISubmodelElementList, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ISubmodelElementList>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kSubmodelElementList:
-      std::tie(instance, error) = SubmodelElementListFromSequence<
-        types::ISubmodelElementList
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ISubmodelElementList>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ISubmodelElementList from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodelElementList, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodelElementList, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementList>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ISubmodelElementList>(
+    reader,
+    L"ISubmodelElementList",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ISubmodelElementList> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kSubmodelElementList:
+          return SubmodelElementListFromSequence<
+            types::ISubmodelElementList
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ISubmodelElementList>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ISubmodelElementList from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -7080,194 +4085,35 @@ std::pair<
 > SubmodelElementCollectionFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in SubmodelElementCollectionFromElement. "
-      "SubmodelElementCollectionFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ISubmodelElementCollection, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ISubmodelElementCollection>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kSubmodelElementCollection:
-      std::tie(instance, error) = SubmodelElementCollectionFromSequence<
-        types::ISubmodelElementCollection
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ISubmodelElementCollection>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ISubmodelElementCollection from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodelElementCollection, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ISubmodelElementCollection, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ISubmodelElementCollection>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ISubmodelElementCollection>(
+    reader,
+    L"ISubmodelElementCollection",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ISubmodelElementCollection> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kSubmodelElementCollection:
+          return SubmodelElementCollectionFromSequence<
+            types::ISubmodelElementCollection
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ISubmodelElementCollection>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ISubmodelElementCollection from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -7279,219 +4125,55 @@ std::pair<
 > DataElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in DataElementFromElement. "
-      "DataElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IDataElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IDataElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IDataElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IDataElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IDataElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IDataElement
-      >(reader);
-      break;
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IDataElement
-      >(reader);
-      break;
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IDataElement
-      >(reader);
-      break;
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IDataElement
-      >(reader);
-      break;
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IDataElement
-      >(reader);
-      break;
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IDataElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IDataElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IDataElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IDataElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IDataElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IDataElement>(
+    reader,
+    L"IDataElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IDataElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IDataElement
+          >(a_reader);
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IDataElement
+          >(a_reader);
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IDataElement
+          >(a_reader);
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IDataElement
+          >(a_reader);
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IDataElement
+          >(a_reader);
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IDataElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IDataElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IDataElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -7503,194 +4185,35 @@ std::pair<
 > PropertyFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in PropertyFromElement. "
-      "PropertyFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IProperty>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IProperty, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IProperty>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IProperty>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IProperty>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kProperty:
-      std::tie(instance, error) = PropertyFromSequence<
-        types::IProperty
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IProperty>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IProperty from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IProperty, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IProperty, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IProperty>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IProperty>(
+    reader,
+    L"IProperty",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IProperty> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kProperty:
+          return PropertyFromSequence<
+            types::IProperty
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IProperty>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IProperty from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -7702,194 +4225,35 @@ std::pair<
 > MultiLanguagePropertyFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in MultiLanguagePropertyFromElement. "
-      "MultiLanguagePropertyFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IMultiLanguageProperty, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IMultiLanguageProperty>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kMultiLanguageProperty:
-      std::tie(instance, error) = MultiLanguagePropertyFromSequence<
-        types::IMultiLanguageProperty
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IMultiLanguageProperty>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IMultiLanguageProperty from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IMultiLanguageProperty, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IMultiLanguageProperty, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IMultiLanguageProperty>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IMultiLanguageProperty>(
+    reader,
+    L"IMultiLanguageProperty",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IMultiLanguageProperty> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kMultiLanguageProperty:
+          return MultiLanguagePropertyFromSequence<
+            types::IMultiLanguageProperty
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IMultiLanguageProperty>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IMultiLanguageProperty from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -7901,194 +4265,35 @@ std::pair<
 > RangeFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in RangeFromElement. "
-      "RangeFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IRange>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IRange, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IRange>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IRange>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IRange>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kRange:
-      std::tie(instance, error) = RangeFromSequence<
-        types::IRange
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IRange>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IRange from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IRange, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IRange, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IRange>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IRange>(
+    reader,
+    L"IRange",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IRange> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kRange:
+          return RangeFromSequence<
+            types::IRange
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IRange>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IRange from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -8100,194 +4305,35 @@ std::pair<
 > ReferenceElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ReferenceElementFromElement. "
-      "ReferenceElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IReferenceElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IReferenceElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IReferenceElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IReferenceElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IReferenceElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kReferenceElement:
-      std::tie(instance, error) = ReferenceElementFromSequence<
-        types::IReferenceElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IReferenceElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IReferenceElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IReferenceElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IReferenceElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReferenceElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IReferenceElement>(
+    reader,
+    L"IReferenceElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IReferenceElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kReferenceElement:
+          return ReferenceElementFromSequence<
+            types::IReferenceElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IReferenceElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IReferenceElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -8299,194 +4345,35 @@ std::pair<
 > BlobFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in BlobFromElement. "
-      "BlobFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IBlob>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IBlob, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IBlob>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IBlob>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IBlob>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kBlob:
-      std::tie(instance, error) = BlobFromSequence<
-        types::IBlob
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IBlob>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IBlob from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IBlob, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IBlob, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBlob>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IBlob>(
+    reader,
+    L"IBlob",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IBlob> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kBlob:
+          return BlobFromSequence<
+            types::IBlob
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IBlob>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IBlob from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -8498,194 +4385,35 @@ std::pair<
 > FileFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in FileFromElement. "
-      "FileFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IFile>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IFile, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IFile>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IFile>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IFile>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kFile:
-      std::tie(instance, error) = FileFromSequence<
-        types::IFile
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IFile>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IFile from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IFile, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IFile, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IFile>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IFile>(
+    reader,
+    L"IFile",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IFile> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kFile:
+          return FileFromSequence<
+            types::IFile
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IFile>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IFile from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -8697,194 +4425,35 @@ std::pair<
 > AnnotatedRelationshipElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in AnnotatedRelationshipElementFromElement. "
-      "AnnotatedRelationshipElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IAnnotatedRelationshipElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IAnnotatedRelationshipElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kAnnotatedRelationshipElement:
-      std::tie(instance, error) = AnnotatedRelationshipElementFromSequence<
-        types::IAnnotatedRelationshipElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IAnnotatedRelationshipElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IAnnotatedRelationshipElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAnnotatedRelationshipElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAnnotatedRelationshipElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAnnotatedRelationshipElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IAnnotatedRelationshipElement>(
+    reader,
+    L"IAnnotatedRelationshipElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IAnnotatedRelationshipElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kAnnotatedRelationshipElement:
+          return AnnotatedRelationshipElementFromSequence<
+            types::IAnnotatedRelationshipElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IAnnotatedRelationshipElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IAnnotatedRelationshipElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -8896,194 +4465,35 @@ std::pair<
 > EntityFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in EntityFromElement. "
-      "EntityFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEntity>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IEntity, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEntity>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IEntity>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IEntity>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kEntity:
-      std::tie(instance, error) = EntityFromSequence<
-        types::IEntity
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IEntity>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IEntity from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEntity, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEntity, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEntity>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IEntity>(
+    reader,
+    L"IEntity",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IEntity> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kEntity:
+          return EntityFromSequence<
+            types::IEntity
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IEntity>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IEntity from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -9095,194 +4505,35 @@ std::pair<
 > EventPayloadFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in EventPayloadFromElement. "
-      "EventPayloadFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEventPayload>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IEventPayload, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEventPayload>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IEventPayload>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IEventPayload>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kEventPayload:
-      std::tie(instance, error) = EventPayloadFromSequence<
-        types::IEventPayload
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IEventPayload>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IEventPayload from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEventPayload, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEventPayload, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventPayload>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IEventPayload>(
+    reader,
+    L"IEventPayload",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IEventPayload> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kEventPayload:
+          return EventPayloadFromSequence<
+            types::IEventPayload
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IEventPayload>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IEventPayload from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -9294,194 +4545,35 @@ std::pair<
 > EventElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in EventElementFromElement. "
-      "EventElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEventElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IEventElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEventElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IEventElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IEventElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IEventElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IEventElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IEventElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEventElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEventElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEventElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IEventElement>(
+    reader,
+    L"IEventElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IEventElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IEventElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IEventElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IEventElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -9493,194 +4585,35 @@ std::pair<
 > BasicEventElementFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in BasicEventElementFromElement. "
-      "BasicEventElementFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IBasicEventElement>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IBasicEventElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IBasicEventElement>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IBasicEventElement>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IBasicEventElement>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kBasicEventElement:
-      std::tie(instance, error) = BasicEventElementFromSequence<
-        types::IBasicEventElement
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IBasicEventElement>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IBasicEventElement from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IBasicEventElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IBasicEventElement, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IBasicEventElement>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IBasicEventElement>(
+    reader,
+    L"IBasicEventElement",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IBasicEventElement> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kBasicEventElement:
+          return BasicEventElementFromSequence<
+            types::IBasicEventElement
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IBasicEventElement>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IBasicEventElement from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -9692,194 +4625,35 @@ std::pair<
 > OperationFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in OperationFromElement. "
-      "OperationFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IOperation>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IOperation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IOperation>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IOperation>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IOperation>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kOperation:
-      std::tie(instance, error) = OperationFromSequence<
-        types::IOperation
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IOperation>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IOperation from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IOperation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IOperation, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperation>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IOperation>(
+    reader,
+    L"IOperation",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IOperation> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kOperation:
+          return OperationFromSequence<
+            types::IOperation
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IOperation>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IOperation from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -9891,194 +4665,35 @@ std::pair<
 > OperationVariableFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in OperationVariableFromElement. "
-      "OperationVariableFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IOperationVariable>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IOperationVariable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IOperationVariable>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IOperationVariable>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IOperationVariable>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kOperationVariable:
-      std::tie(instance, error) = OperationVariableFromSequence<
-        types::IOperationVariable
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IOperationVariable>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IOperationVariable from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IOperationVariable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IOperationVariable, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IOperationVariable>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IOperationVariable>(
+    reader,
+    L"IOperationVariable",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IOperationVariable> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kOperationVariable:
+          return OperationVariableFromSequence<
+            types::IOperationVariable
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IOperationVariable>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IOperationVariable from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -10090,194 +4705,35 @@ std::pair<
 > CapabilityFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in CapabilityFromElement. "
-      "CapabilityFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ICapability>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ICapability, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ICapability>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ICapability>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ICapability>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kCapability:
-      std::tie(instance, error) = CapabilityFromSequence<
-        types::ICapability
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ICapability>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ICapability from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ICapability, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ICapability, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ICapability>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ICapability>(
+    reader,
+    L"ICapability",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ICapability> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kCapability:
+          return CapabilityFromSequence<
+            types::ICapability
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ICapability>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ICapability from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -10289,194 +4745,35 @@ std::pair<
 > ConceptDescriptionFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ConceptDescriptionFromElement. "
-      "ConceptDescriptionFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IConceptDescription>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IConceptDescription, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IConceptDescription>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IConceptDescription>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IConceptDescription>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kConceptDescription:
-      std::tie(instance, error) = ConceptDescriptionFromSequence<
-        types::IConceptDescription
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IConceptDescription>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IConceptDescription from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IConceptDescription, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IConceptDescription, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IConceptDescription>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IConceptDescription>(
+    reader,
+    L"IConceptDescription",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IConceptDescription> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kConceptDescription:
+          return ConceptDescriptionFromSequence<
+            types::IConceptDescription
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IConceptDescription>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IConceptDescription from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -10488,194 +4785,35 @@ std::pair<
 > ReferenceFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ReferenceFromElement. "
-      "ReferenceFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IReference>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IReference, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IReference>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IReference>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IReference>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kReference:
-      std::tie(instance, error) = ReferenceFromSequence<
-        types::IReference
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IReference>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IReference from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IReference, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IReference, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IReference>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IReference>(
+    reader,
+    L"IReference",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IReference> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kReference:
+          return ReferenceFromSequence<
+            types::IReference
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IReference>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IReference from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -10687,194 +4825,35 @@ std::pair<
 > KeyFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in KeyFromElement. "
-      "KeyFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IKey>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IKey, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IKey>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IKey>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IKey>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kKey:
-      std::tie(instance, error) = KeyFromSequence<
-        types::IKey
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IKey>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IKey from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IKey, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IKey, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IKey>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IKey>(
+    reader,
+    L"IKey",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IKey> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kKey:
+          return KeyFromSequence<
+            types::IKey
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IKey>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IKey from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -10886,214 +4865,51 @@ std::pair<
 > AbstractLangStringFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in AbstractLangStringFromElement. "
-      "AbstractLangStringFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAbstractLangString>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IAbstractLangString, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IAbstractLangString>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IAbstractLangString>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IAbstractLangString>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLangStringDefinitionTypeIec61360:
-      std::tie(instance, error) = LangStringDefinitionTypeIec61360FromSequence<
-        types::IAbstractLangString
-      >(reader);
-      break;
-    case types::ModelType::kLangStringNameType:
-      std::tie(instance, error) = LangStringNameTypeFromSequence<
-        types::IAbstractLangString
-      >(reader);
-      break;
-    case types::ModelType::kLangStringPreferredNameTypeIec61360:
-      std::tie(instance, error) = LangStringPreferredNameTypeIec61360FromSequence<
-        types::IAbstractLangString
-      >(reader);
-      break;
-    case types::ModelType::kLangStringShortNameTypeIec61360:
-      std::tie(instance, error) = LangStringShortNameTypeIec61360FromSequence<
-        types::IAbstractLangString
-      >(reader);
-      break;
-    case types::ModelType::kLangStringTextType:
-      std::tie(instance, error) = LangStringTextTypeFromSequence<
-        types::IAbstractLangString
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IAbstractLangString>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IAbstractLangString from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAbstractLangString, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IAbstractLangString, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IAbstractLangString>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IAbstractLangString>(
+    reader,
+    L"IAbstractLangString",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IAbstractLangString> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLangStringDefinitionTypeIec61360:
+          return LangStringDefinitionTypeIec61360FromSequence<
+            types::IAbstractLangString
+          >(a_reader);
+        case types::ModelType::kLangStringNameType:
+          return LangStringNameTypeFromSequence<
+            types::IAbstractLangString
+          >(a_reader);
+        case types::ModelType::kLangStringPreferredNameTypeIec61360:
+          return LangStringPreferredNameTypeIec61360FromSequence<
+            types::IAbstractLangString
+          >(a_reader);
+        case types::ModelType::kLangStringShortNameTypeIec61360:
+          return LangStringShortNameTypeIec61360FromSequence<
+            types::IAbstractLangString
+          >(a_reader);
+        case types::ModelType::kLangStringTextType:
+          return LangStringTextTypeFromSequence<
+            types::IAbstractLangString
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IAbstractLangString>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IAbstractLangString from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -11105,194 +4921,35 @@ std::pair<
 > LangStringNameTypeFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in LangStringNameTypeFromElement. "
-      "LangStringNameTypeFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringNameType>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ILangStringNameType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringNameType>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ILangStringNameType>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ILangStringNameType>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLangStringNameType:
-      std::tie(instance, error) = LangStringNameTypeFromSequence<
-        types::ILangStringNameType
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ILangStringNameType>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ILangStringNameType from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringNameType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringNameType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringNameType>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ILangStringNameType>(
+    reader,
+    L"ILangStringNameType",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ILangStringNameType> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLangStringNameType:
+          return LangStringNameTypeFromSequence<
+            types::ILangStringNameType
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ILangStringNameType>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ILangStringNameType from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -11304,194 +4961,35 @@ std::pair<
 > LangStringTextTypeFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in LangStringTextTypeFromElement. "
-      "LangStringTextTypeFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringTextType>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ILangStringTextType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringTextType>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ILangStringTextType>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ILangStringTextType>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLangStringTextType:
-      std::tie(instance, error) = LangStringTextTypeFromSequence<
-        types::ILangStringTextType
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ILangStringTextType>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ILangStringTextType from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringTextType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringTextType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringTextType>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ILangStringTextType>(
+    reader,
+    L"ILangStringTextType",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ILangStringTextType> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLangStringTextType:
+          return LangStringTextTypeFromSequence<
+            types::ILangStringTextType
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ILangStringTextType>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ILangStringTextType from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -11503,194 +5001,35 @@ std::pair<
 > EnvironmentFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in EnvironmentFromElement. "
-      "EnvironmentFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEnvironment>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IEnvironment, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEnvironment>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IEnvironment>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IEnvironment>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kEnvironment:
-      std::tie(instance, error) = EnvironmentFromSequence<
-        types::IEnvironment
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IEnvironment>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IEnvironment from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEnvironment, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEnvironment, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEnvironment>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IEnvironment>(
+    reader,
+    L"IEnvironment",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IEnvironment> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kEnvironment:
+          return EnvironmentFromSequence<
+            types::IEnvironment
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IEnvironment>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IEnvironment from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -11702,194 +5041,35 @@ std::pair<
 > DataSpecificationContentFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in DataSpecificationContentFromElement. "
-      "DataSpecificationContentFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IDataSpecificationContent, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IDataSpecificationContent>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kDataSpecificationIec61360:
-      std::tie(instance, error) = DataSpecificationIec61360FromSequence<
-        types::IDataSpecificationContent
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IDataSpecificationContent>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IDataSpecificationContent from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IDataSpecificationContent, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IDataSpecificationContent, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationContent>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IDataSpecificationContent>(
+    reader,
+    L"IDataSpecificationContent",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IDataSpecificationContent> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kDataSpecificationIec61360:
+          return DataSpecificationIec61360FromSequence<
+            types::IDataSpecificationContent
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IDataSpecificationContent>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IDataSpecificationContent from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -11901,194 +5081,35 @@ std::pair<
 > EmbeddedDataSpecificationFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in EmbeddedDataSpecificationFromElement. "
-      "EmbeddedDataSpecificationFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IEmbeddedDataSpecification, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IEmbeddedDataSpecification>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kEmbeddedDataSpecification:
-      std::tie(instance, error) = EmbeddedDataSpecificationFromSequence<
-        types::IEmbeddedDataSpecification
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IEmbeddedDataSpecification>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IEmbeddedDataSpecification from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEmbeddedDataSpecification, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IEmbeddedDataSpecification, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IEmbeddedDataSpecification>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IEmbeddedDataSpecification>(
+    reader,
+    L"IEmbeddedDataSpecification",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IEmbeddedDataSpecification> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kEmbeddedDataSpecification:
+          return EmbeddedDataSpecificationFromSequence<
+            types::IEmbeddedDataSpecification
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IEmbeddedDataSpecification from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -12100,194 +5121,35 @@ std::pair<
 > LevelTypeFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in LevelTypeFromElement. "
-      "LevelTypeFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILevelType>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ILevelType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILevelType>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ILevelType>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ILevelType>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLevelType:
-      std::tie(instance, error) = LevelTypeFromSequence<
-        types::ILevelType
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ILevelType>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ILevelType from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILevelType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILevelType, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILevelType>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ILevelType>(
+    reader,
+    L"ILevelType",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ILevelType> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLevelType:
+          return LevelTypeFromSequence<
+            types::ILevelType
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ILevelType>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ILevelType from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -12299,194 +5161,35 @@ std::pair<
 > ValueReferencePairFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ValueReferencePairFromElement. "
-      "ValueReferencePairFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IValueReferencePair>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IValueReferencePair, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IValueReferencePair>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IValueReferencePair>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IValueReferencePair>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kValueReferencePair:
-      std::tie(instance, error) = ValueReferencePairFromSequence<
-        types::IValueReferencePair
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IValueReferencePair>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IValueReferencePair from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IValueReferencePair, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IValueReferencePair, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueReferencePair>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IValueReferencePair>(
+    reader,
+    L"IValueReferencePair",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IValueReferencePair> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kValueReferencePair:
+          return ValueReferencePairFromSequence<
+            types::IValueReferencePair
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IValueReferencePair>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IValueReferencePair from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -12498,194 +5201,35 @@ std::pair<
 > ValueListFromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in ValueListFromElement. "
-      "ValueListFromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IValueList>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IValueList, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IValueList>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IValueList>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IValueList>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kValueList:
-      std::tie(instance, error) = ValueListFromSequence<
-        types::IValueList
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IValueList>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IValueList from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IValueList, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IValueList, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IValueList>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IValueList>(
+    reader,
+    L"IValueList",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IValueList> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kValueList:
+          return ValueListFromSequence<
+            types::IValueList
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IValueList>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IValueList from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -12697,194 +5241,35 @@ std::pair<
 > LangStringPreferredNameTypeIec61360FromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in LangStringPreferredNameTypeIec61360FromElement. "
-      "LangStringPreferredNameTypeIec61360FromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ILangStringPreferredNameTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLangStringPreferredNameTypeIec61360:
-      std::tie(instance, error) = LangStringPreferredNameTypeIec61360FromSequence<
-        types::ILangStringPreferredNameTypeIec61360
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ILangStringPreferredNameTypeIec61360 from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringPreferredNameTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringPreferredNameTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ILangStringPreferredNameTypeIec61360>(
+    reader,
+    L"ILangStringPreferredNameTypeIec61360",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ILangStringPreferredNameTypeIec61360> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLangStringPreferredNameTypeIec61360:
+          return LangStringPreferredNameTypeIec61360FromSequence<
+            types::ILangStringPreferredNameTypeIec61360
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ILangStringPreferredNameTypeIec61360 from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -12896,194 +5281,35 @@ std::pair<
 > LangStringShortNameTypeIec61360FromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in LangStringShortNameTypeIec61360FromElement. "
-      "LangStringShortNameTypeIec61360FromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ILangStringShortNameTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLangStringShortNameTypeIec61360:
-      std::tie(instance, error) = LangStringShortNameTypeIec61360FromSequence<
-        types::ILangStringShortNameTypeIec61360
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ILangStringShortNameTypeIec61360 from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringShortNameTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringShortNameTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ILangStringShortNameTypeIec61360>(
+    reader,
+    L"ILangStringShortNameTypeIec61360",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ILangStringShortNameTypeIec61360> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLangStringShortNameTypeIec61360:
+          return LangStringShortNameTypeIec61360FromSequence<
+            types::ILangStringShortNameTypeIec61360
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ILangStringShortNameTypeIec61360 from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -13095,194 +5321,35 @@ std::pair<
 > LangStringDefinitionTypeIec61360FromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in LangStringDefinitionTypeIec61360FromElement. "
-      "LangStringDefinitionTypeIec61360FromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of ILangStringDefinitionTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kLangStringDefinitionTypeIec61360:
-      std::tie(instance, error) = LangStringDefinitionTypeIec61360FromSequence<
-        types::ILangStringDefinitionTypeIec61360
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of ILangStringDefinitionTypeIec61360 from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringDefinitionTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of ILangStringDefinitionTypeIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::ILangStringDefinitionTypeIec61360>(
+    reader,
+    L"ILangStringDefinitionTypeIec61360",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::ILangStringDefinitionTypeIec61360> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kLangStringDefinitionTypeIec61360:
+          return LangStringDefinitionTypeIec61360FromSequence<
+            types::ILangStringDefinitionTypeIec61360
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of ILangStringDefinitionTypeIec61360 from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 
@@ -13294,194 +5361,35 @@ std::pair<
 > DataSpecificationIec61360FromElement(
   ReaderMergingText& reader
 ) {
-  #ifdef DEBUG
-  if (reader.node().kind() == NodeKind::Error) {
-    throw std::logic_error(
-      "Unexpected unhandled XML error in DataSpecificationIec61360FromElement. "
-      "DataSpecificationIec61360FromElement expects no reader error at entry."
-    );
-  }
-  #endif
-
-  common::optional<DeserializationError> error;
-
-  error = SkipBof(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  if (reader.node().kind() != NodeKind::Start) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(
-      common::Concat(
-        L"Expected a start element opening an instance "
-        L"of IDataSpecificationIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-  }
-
-  const std::string name(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StartNode&
-    >(reader.node()).name
-  );
-
-  common::optional<types::ModelType> model_type(
-    ModelTypeFromElementName(name)
-  );
-  if (!model_type.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(
-      common::Concat(
-      L"Unexpected start element as its name does not correspond "
-      L"to any model type: ",
-      common::Utf8ToWstring(name)
-      )
-    );
-  }
-
-  // NOTE (mristin):
-  // We consume the start element.
-  reader.Read();
-
-  if (reader.node().kind() == NodeKind::Error) {
-    auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(noInstanceAndError.second)
-    );
-
-    return noInstanceAndError;
-  }
-
-  common::optional<
-    std::shared_ptr<types::IDataSpecificationIec61360>
-  > instance;
-
-  switch (*model_type) {
-    case types::ModelType::kDataSpecificationIec61360:
-      std::tie(instance, error) = DataSpecificationIec61360FromSequence<
-        types::IDataSpecificationIec61360
-      >(reader);
-      break;
-    default:
-      return NoInstanceAndDeserializationErrorWithCause<
-        std::shared_ptr<types::IDataSpecificationIec61360>
-      >(
-        common::Concat(
-          L"Impossible to de-serialize an instance "
-          L"of IDataSpecificationIec61360 from <",
-          common::Utf8ToWstring(name),
-          L">"
-        )
-      );
-  }
-
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  error = SkipWhitespace(reader);
-  if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  if (!IsStopNodeWithName(reader.node(), name)) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IDataSpecificationIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  const StopNode& stop_node(
-    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-      const StopNode&
-    >(reader.node())
-  );
-  if (stop_node.name != name) {
-    error = DeserializationError(
-      common::Concat(
-        L"Expected a stop element </",
-        common::Utf8ToWstring(name),
-        L"> closing an instance "
-        L"of IDataSpecificationIec61360, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  // NOTE (mristin):
-  // We consume the stop element.
-  reader.Read();
-  if (reader.node().kind() == NodeKind::Error) {
-    error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
-    return NoInstanceAndDeserializationError<
-      std::shared_ptr<types::IDataSpecificationIec61360>
-    >(std::move(*error));
-  }
-
-  return InstanceAndNoDeserializationError(
-    std::move(*instance)
+  return DeserializeClassFromElement<types::IDataSpecificationIec61360>(
+    reader,
+    L"IDataSpecificationIec61360",
+    [](
+      ReaderMergingText& a_reader,
+      types::ModelType a_model_type,
+      const std::string& a_name
+    ) -> std::pair<
+      common::optional<std::shared_ptr<types::IDataSpecificationIec61360> >,
+      common::optional<DeserializationError>
+    > {
+      switch (a_model_type) {
+        case types::ModelType::kDataSpecificationIec61360:
+          return DataSpecificationIec61360FromSequence<
+            types::IDataSpecificationIec61360
+          >(a_reader);
+        default:
+          return NoInstanceAndDeserializationErrorWithCause<
+            std::shared_ptr<types::IDataSpecificationIec61360>
+          >(
+            common::Concat(
+              L"Impossible to de-serialize an instance "
+              L"of IDataSpecificationIec61360 from <",
+              common::Utf8ToWstring(a_name),
+              L">"
+            )
+          );
+      }
+    }
   );
 }
 

@@ -2142,6 +2142,183 @@ common::optional<DeserializationError> SkipWhitespace(
     ]
 
 
+def _generate_deserialize_class_from_element_generic() -> Stripped:
+    """
+    Generate a generic function to de-serialize an instance of a class from an element.
+
+    The function factors out the common structure shared by all
+    the ``{Cls}FromElement`` functions -- reading the start element, looking up
+    the model type, dispatching to the concrete de-serialization and reading
+    the corresponding stop element -- so that the individual ``{Cls}FromElement``
+    functions only need to supply the dispatch specific to their interface.
+    """
+    model_type_from_element_name = cpp_naming.function_name(
+        Identifier("model_type_from_element_name")
+    )
+
+    return Stripped(
+        f"""\
+template <typename T, typename DispatchT>
+std::pair<
+{I}common::optional<std::shared_ptr<T> >,
+{I}common::optional<DeserializationError>
+> DeserializeClassFromElement(
+{I}ReaderMergingText& reader,
+{I}const std::wstring& interface_name,
+{I}const DispatchT& dispatch
+) {{
+{I}#ifdef DEBUG
+{I}if (reader.node().kind() == NodeKind::Error) {{
+{II}throw std::logic_error(
+{III}"Unexpected unhandled XML error in DeserializeClassFromElement. "
+{III}"DeserializeClassFromElement expects no reader error at entry."
+{II});
+{I}}}
+{I}#endif
+
+{I}common::optional<DeserializationError> error;
+
+{I}error = SkipBof(reader);
+{I}if (error.has_value()) {{
+{II}return NoInstanceAndDeserializationError<
+{III}std::shared_ptr<T>
+{II}>(std::move(*error));
+{I}}}
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return NoInstanceAndDeserializationError<
+{III}std::shared_ptr<T>
+{II}>(std::move(*error));
+{I}}}
+
+{I}if (reader.node().kind() != NodeKind::Start) {{
+{II}return NoInstanceAndDeserializationErrorWithCause<
+{III}std::shared_ptr<T>
+{II}>(
+{III}common::Concat(
+{IIII}L"Expected a start element opening an instance of ",
+{IIII}interface_name,
+{IIII}L", but got ",
+{IIII}NodeToHumanReadableWstring(reader.node())
+{III})
+{II});
+{I}}}
+
+{I}const std::string name(
+{II}static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+{III}const StartNode&
+{II}>(reader.node()).name
+{I});
+
+{I}common::optional<types::ModelType> model_type(
+{II}{model_type_from_element_name}(name)
+{I});
+{I}if (!model_type.has_value()) {{
+{II}return NoInstanceAndDeserializationErrorWithCause<
+{III}std::shared_ptr<T>
+{II}>(
+{III}common::Concat(
+{III}L"Unexpected start element as its name does not correspond "
+{III}L"to any model type: ",
+{III}common::Utf8ToWstring(name)
+{III})
+{II});
+{I}}}
+
+{I}// NOTE (mristin):
+{I}// We consume the start element.
+{I}reader.Read();
+
+{I}if (reader.node().kind() == NodeKind::Error) {{
+{II}auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
+{III}std::shared_ptr<T>
+{II}>(
+{III}reader
+{II});
+
+{II}PrependElementSegmentToDeserializationError(
+{III}name,
+{III}*(noInstanceAndError.second)
+{II});
+
+{II}return noInstanceAndError;
+{I}}}
+
+{I}common::optional<std::shared_ptr<T> > instance;
+{I}std::tie(
+{II}instance,
+{II}error
+{I}) = dispatch(reader, *model_type, name);
+
+{I}if (error.has_value()) {{
+{II}PrependElementSegmentToDeserializationError(
+{III}name,
+{III}*error
+{II});
+
+{II}return NoInstanceAndDeserializationError<
+{III}std::shared_ptr<T>
+{II}>(std::move(*error));
+{I}}}
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}PrependElementSegmentToDeserializationError(
+{III}name,
+{III}*error
+{II});
+
+{II}return NoInstanceAndDeserializationError<
+{III}std::shared_ptr<T>
+{II}>(std::move(*error));
+{I}}}
+
+{I}if (!IsStopNodeWithName(reader.node(), name)) {{
+{II}error = DeserializationError(
+{III}common::Concat(
+{IIII}L"Expected a stop element </",
+{IIII}common::Utf8ToWstring(name),
+{IIII}L"> closing an instance of ",
+{IIII}interface_name,
+{IIII}L", but got ",
+{IIII}NodeToHumanReadableWstring(reader.node())
+{III})
+{II});
+
+{II}PrependElementSegmentToDeserializationError(
+{III}name,
+{III}*error
+{II});
+
+{II}return NoInstanceAndDeserializationError<
+{III}std::shared_ptr<T>
+{II}>(std::move(*error));
+{I}}}
+
+{I}// NOTE (mristin):
+{I}// We consume the stop element.
+{I}reader.Read();
+{I}if (reader.node().kind() == NodeKind::Error) {{
+{II}error = DeserializationErrorFromReader(reader);
+
+{II}PrependElementSegmentToDeserializationError(
+{III}name,
+{III}*error
+{II});
+
+{II}return NoInstanceAndDeserializationError<
+{III}std::shared_ptr<T>
+{II}>(std::move(*error));
+{I}}}
+
+{I}return InstanceAndNoDeserializationError(
+{II}std::move(*instance)
+{I});
+}}"""
+    )
+
+
 def _generate_class_from_element(
     interface_name: Identifier,
     function_name: Identifier,
@@ -2166,10 +2343,9 @@ def _generate_class_from_element(
             Stripped(
                 f"""\
 case types::{model_type_enum}::{model_type_literal}:
-{I}std::tie(instance, error) = {cls_from_sequence}<
+{I}return {cls_from_sequence}<
 {II}types::{interface_name}
-{I}>(reader);
-{I}break;"""
+{I}>(a_reader);"""
             )
         )
 
@@ -2183,7 +2359,7 @@ default:
 {II}common::Concat(
 {III}L"Impossible to de-serialize an instance "
 {III}L"of {interface_name} from <",
-{III}common::Utf8ToWstring(name),
+{III}common::Utf8ToWstring(a_name),
 {III}L">"
 {II})
 {I});"""
@@ -2192,8 +2368,8 @@ default:
 
     case_blocks_joined = "\n".join(case_blocks)
 
-    model_type_from_element_name = cpp_naming.function_name(
-        Identifier("model_type_from_element_name")
+    deserialize_class_from_element = cpp_naming.function_name(
+        Identifier("deserialize_class_from_element")
     )
 
     return Stripped(
@@ -2206,179 +2382,21 @@ std::pair<
 > {function_name}(
 {I}ReaderMergingText& reader
 ) {{
-{I}#ifdef DEBUG
-{I}if (reader.node().kind() == NodeKind::Error) {{
-{II}throw std::logic_error(
-{III}"Unexpected unhandled XML error in {function_name}. "
-{III}"{function_name} expects no reader error at entry."
-{II});
-{I}}}
-{I}#endif
-
-{I}common::optional<DeserializationError> error;
-
-{I}error = SkipBof(reader);
-{I}if (error.has_value()) {{
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}error = SkipWhitespace(reader);
-{I}if (error.has_value()) {{
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}if (reader.node().kind() != NodeKind::Start) {{
-{II}return NoInstanceAndDeserializationErrorWithCause<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(
-{III}common::Concat(
-{IIII}L"Expected a start element opening an instance "
-{IIII}L"of {interface_name}, but got ",
-{IIII}NodeToHumanReadableWstring(reader.node())
-{III})
-{II});
-{I}}}
-
-{I}const std::string name(
-{II}static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-{III}const StartNode&
-{II}>(reader.node()).name
-{I});
-
-{I}common::optional<types::ModelType> model_type(
-{II}{model_type_from_element_name}(name)
-{I});
-{I}if (!model_type.has_value()) {{
-{II}return NoInstanceAndDeserializationErrorWithCause<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(
-{III}common::Concat(
-{III}L"Unexpected start element as its name does not correspond "
-{III}L"to any model type: ",
-{III}common::Utf8ToWstring(name)
-{III})
-{II});
-{I}}}
-
-{I}// NOTE (mristin):
-{I}// We consume the start element.
-{I}reader.Read();
-
-{I}if (reader.node().kind() == NodeKind::Error) {{
-{II}auto noInstanceAndError = NoInstanceAndDeserializationErrorFromReader<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(
-{III}reader
-{II});
-
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*(noInstanceAndError.second)
-{II});
-
-{II}return noInstanceAndError;
-{I}}}
-
-{I}common::optional<
-{II}std::shared_ptr<types::{interface_name}>
-{I}> instance;
-
-{I}switch (*model_type) {{
-{II}{indent_but_first_line(case_blocks_joined, II)}
-{I}}}
-
-{I}if (error.has_value()) {{
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}error = SkipWhitespace(reader);
-{I}if (error.has_value()) {{
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}if (!IsStopNodeWithName(reader.node(), name)) {{
-{II}error = DeserializationError(
-{III}common::Concat(
-{IIII}L"Expected a stop element </",
-{IIII}common::Utf8ToWstring(name),
-{IIII}L"> closing an instance "
-{IIII}L"of {interface_name}, but got ",
-{IIII}NodeToHumanReadableWstring(reader.node())
-{III})
-{II});
-
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}const StopNode& stop_node(
-{II}static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-{III}const StopNode&
-{II}>(reader.node())
-{I});
-{I}if (stop_node.name != name) {{
-{II}error = DeserializationError(
-{III}common::Concat(
-{IIII}L"Expected a stop element </",
-{IIII}common::Utf8ToWstring(name),
-{IIII}L"> closing an instance "
-{IIII}L"of {interface_name}, but got ",
-{IIII}NodeToHumanReadableWstring(reader.node())
-{III})
-{II});
-
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}// NOTE (mristin):
-{I}// We consume the stop element.
-{I}reader.Read();
-{I}if (reader.node().kind() == NodeKind::Error) {{
-{II}error = DeserializationErrorFromReader(reader);
-
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
-{II}return NoInstanceAndDeserializationError<
-{III}std::shared_ptr<types::{interface_name}>
-{II}>(std::move(*error));
-{I}}}
-
-{I}return InstanceAndNoDeserializationError(
-{II}std::move(*instance)
+{I}return {deserialize_class_from_element}<types::{interface_name}>(
+{II}reader,
+{II}L"{interface_name}",
+{II}[](
+{III}ReaderMergingText& a_reader,
+{III}types::ModelType a_model_type,
+{III}const std::string& a_name
+{II}) -> std::pair<
+{III}common::optional<std::shared_ptr<types::{interface_name}> >,
+{III}common::optional<DeserializationError>
+{II}> {{
+{III}switch (a_model_type) {{
+{IIII}{indent_but_first_line(case_blocks_joined, IIII)}
+{III}}}
+{II}}}
 {I});
 }}"""
     )
@@ -5754,6 +5772,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         *_generate_instance_and_error_factories_and_manipulations(),
         _generate_skip_bof(),
         *_generate_skip_whitespace(),
+        _generate_deserialize_class_from_element_generic(),
         _generate_class_from_element(
             interface_name=Identifier("IClass"),
             function_name=cpp_naming.function_name(Identifier("class_from_element")),
