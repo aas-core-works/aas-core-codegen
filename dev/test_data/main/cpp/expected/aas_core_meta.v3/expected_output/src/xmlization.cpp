@@ -8333,7 +8333,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfExtension::kSemanticId:
+      case properties::OfExtension::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -8341,7 +8341,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfExtension::kSupplementalSemanticIds:
+      }
+      case properties::OfExtension::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -8352,25 +8353,29 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfExtension::kName:
+      }
+      case properties::OfExtension::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfExtension::kValueType:
+      }
+      case properties::OfExtension::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfExtension::kValue:
+      }
+      case properties::OfExtension::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfExtension::kRefersTo:
+      }
+      case properties::OfExtension::kRefersTo: {
         std::tie(
           the_refers_to,
           error
@@ -8381,6 +8386,7 @@ std::pair<
           ReferenceFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -8622,7 +8628,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications:
+      case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -8633,19 +8639,22 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfAdministrativeInformation::kVersion:
+      }
+      case properties::OfAdministrativeInformation::kVersion: {
         std::tie(
           the_version,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAdministrativeInformation::kRevision:
+      }
+      case properties::OfAdministrativeInformation::kRevision: {
         std::tie(
           the_revision,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAdministrativeInformation::kCreator:
+      }
+      case properties::OfAdministrativeInformation::kCreator: {
         std::tie(
           the_creator,
           error
@@ -8653,12 +8662,14 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAdministrativeInformation::kTemplateId:
+      }
+      case properties::OfAdministrativeInformation::kTemplateId: {
         std::tie(
           the_template_id,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -8893,7 +8904,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfQualifier::kSemanticId:
+      case properties::OfQualifier::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -8901,7 +8912,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfQualifier::kSupplementalSemanticIds:
+      }
+      case properties::OfQualifier::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -8912,31 +8924,36 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfQualifier::kKind:
+      }
+      case properties::OfQualifier::kKind: {
         std::tie(
           the_kind,
           error
         ) = DeserializeQualifierKind(reader);
         break;
-      case properties::OfQualifier::kType:
+      }
+      case properties::OfQualifier::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQualifier::kValueType:
+      }
+      case properties::OfQualifier::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfQualifier::kValue:
+      }
+      case properties::OfQualifier::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQualifier::kValueId:
+      }
+      case properties::OfQualifier::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -8944,6 +8961,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -9224,7 +9242,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAssetAdministrationShell::kExtensions:
+      case properties::OfAssetAdministrationShell::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -9235,19 +9253,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kCategory:
+      }
+      case properties::OfAssetAdministrationShell::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kIdShort:
+      }
+      case properties::OfAssetAdministrationShell::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kDisplayName:
+      }
+      case properties::OfAssetAdministrationShell::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -9258,7 +9279,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kDescription:
+      }
+      case properties::OfAssetAdministrationShell::kDescription: {
         std::tie(
           the_description,
           error
@@ -9269,7 +9291,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kAdministration:
+      }
+      case properties::OfAssetAdministrationShell::kAdministration: {
         std::tie(
           the_administration,
           error
@@ -9277,13 +9300,15 @@ std::pair<
           types::IAdministrativeInformation
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kId:
+      }
+      case properties::OfAssetAdministrationShell::kId: {
         std::tie(
           the_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications:
+      }
+      case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -9294,7 +9319,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kDerivedFrom:
+      }
+      case properties::OfAssetAdministrationShell::kDerivedFrom: {
         std::tie(
           the_derived_from,
           error
@@ -9302,7 +9328,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kAssetInformation:
+      }
+      case properties::OfAssetAdministrationShell::kAssetInformation: {
         std::tie(
           the_asset_information,
           error
@@ -9310,7 +9337,8 @@ std::pair<
           types::IAssetInformation
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kSubmodels:
+      }
+      case properties::OfAssetAdministrationShell::kSubmodels: {
         std::tie(
           the_submodels,
           error
@@ -9321,6 +9349,7 @@ std::pair<
           ReferenceFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -9575,19 +9604,21 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAssetInformation::kAssetKind:
+      case properties::OfAssetInformation::kAssetKind: {
         std::tie(
           the_asset_kind,
           error
         ) = DeserializeAssetKind(reader);
         break;
-      case properties::OfAssetInformation::kGlobalAssetId:
+      }
+      case properties::OfAssetInformation::kGlobalAssetId: {
         std::tie(
           the_global_asset_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetInformation::kSpecificAssetIds:
+      }
+      case properties::OfAssetInformation::kSpecificAssetIds: {
         std::tie(
           the_specific_asset_ids,
           error
@@ -9598,13 +9629,15 @@ std::pair<
           SpecificAssetIdFromElement
         );
         break;
-      case properties::OfAssetInformation::kAssetType:
+      }
+      case properties::OfAssetInformation::kAssetType: {
         std::tie(
           the_asset_type,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetInformation::kDefaultThumbnail:
+      }
+      case properties::OfAssetInformation::kDefaultThumbnail: {
         std::tie(
           the_default_thumbnail,
           error
@@ -9612,6 +9645,7 @@ std::pair<
           types::IResource
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -9840,18 +9874,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfResource::kPath:
+      case properties::OfResource::kPath: {
         std::tie(
           the_path,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfResource::kContentType:
+      }
+      case properties::OfResource::kContentType: {
         std::tie(
           the_content_type,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -10091,7 +10127,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSpecificAssetId::kSemanticId:
+      case properties::OfSpecificAssetId::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -10099,7 +10135,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSpecificAssetId::kSupplementalSemanticIds:
+      }
+      case properties::OfSpecificAssetId::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -10110,19 +10147,22 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSpecificAssetId::kName:
+      }
+      case properties::OfSpecificAssetId::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSpecificAssetId::kValue:
+      }
+      case properties::OfSpecificAssetId::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSpecificAssetId::kExternalSubjectId:
+      }
+      case properties::OfSpecificAssetId::kExternalSubjectId: {
         std::tie(
           the_external_subject_id,
           error
@@ -10130,6 +10170,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -10420,7 +10461,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodel::kExtensions:
+      case properties::OfSubmodel::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -10431,19 +10472,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfSubmodel::kCategory:
+      }
+      case properties::OfSubmodel::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kIdShort:
+      }
+      case properties::OfSubmodel::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kDisplayName:
+      }
+      case properties::OfSubmodel::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -10454,7 +10498,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfSubmodel::kDescription:
+      }
+      case properties::OfSubmodel::kDescription: {
         std::tie(
           the_description,
           error
@@ -10465,7 +10510,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfSubmodel::kAdministration:
+      }
+      case properties::OfSubmodel::kAdministration: {
         std::tie(
           the_administration,
           error
@@ -10473,19 +10519,22 @@ std::pair<
           types::IAdministrativeInformation
         >(reader);
         break;
-      case properties::OfSubmodel::kId:
+      }
+      case properties::OfSubmodel::kId: {
         std::tie(
           the_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kKind:
+      }
+      case properties::OfSubmodel::kKind: {
         std::tie(
           the_kind,
           error
         ) = DeserializeModellingKind(reader);
         break;
-      case properties::OfSubmodel::kSemanticId:
+      }
+      case properties::OfSubmodel::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -10493,7 +10542,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodel::kSupplementalSemanticIds:
+      }
+      case properties::OfSubmodel::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -10504,7 +10554,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSubmodel::kQualifiers:
+      }
+      case properties::OfSubmodel::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -10515,7 +10566,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfSubmodel::kEmbeddedDataSpecifications:
+      }
+      case properties::OfSubmodel::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -10526,7 +10578,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfSubmodel::kSubmodelElements:
+      }
+      case properties::OfSubmodel::kSubmodelElements: {
         std::tie(
           the_submodel_elements,
           error
@@ -10537,6 +10590,7 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -10817,7 +10871,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfRelationshipElement::kExtensions:
+      case properties::OfRelationshipElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -10828,19 +10882,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfRelationshipElement::kCategory:
+      }
+      case properties::OfRelationshipElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRelationshipElement::kIdShort:
+      }
+      case properties::OfRelationshipElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRelationshipElement::kDisplayName:
+      }
+      case properties::OfRelationshipElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -10851,7 +10908,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfRelationshipElement::kDescription:
+      }
+      case properties::OfRelationshipElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -10862,7 +10920,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfRelationshipElement::kSemanticId:
+      }
+      case properties::OfRelationshipElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -10870,7 +10929,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRelationshipElement::kSupplementalSemanticIds:
+      }
+      case properties::OfRelationshipElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -10881,7 +10941,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfRelationshipElement::kQualifiers:
+      }
+      case properties::OfRelationshipElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -10892,7 +10953,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfRelationshipElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfRelationshipElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -10903,7 +10965,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfRelationshipElement::kFirst:
+      }
+      case properties::OfRelationshipElement::kFirst: {
         std::tie(
           the_first,
           error
@@ -10911,7 +10974,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRelationshipElement::kSecond:
+      }
+      case properties::OfRelationshipElement::kSecond: {
         std::tie(
           the_second,
           error
@@ -10919,6 +10983,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -11217,7 +11282,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodelElementList::kExtensions:
+      case properties::OfSubmodelElementList::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -11228,19 +11293,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kCategory:
+      }
+      case properties::OfSubmodelElementList::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementList::kIdShort:
+      }
+      case properties::OfSubmodelElementList::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementList::kDisplayName:
+      }
+      case properties::OfSubmodelElementList::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -11251,7 +11319,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kDescription:
+      }
+      case properties::OfSubmodelElementList::kDescription: {
         std::tie(
           the_description,
           error
@@ -11262,7 +11331,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kSemanticId:
+      }
+      case properties::OfSubmodelElementList::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -11270,7 +11340,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementList::kSupplementalSemanticIds:
+      }
+      case properties::OfSubmodelElementList::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -11281,7 +11352,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kQualifiers:
+      }
+      case properties::OfSubmodelElementList::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -11292,7 +11364,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kEmbeddedDataSpecifications:
+      }
+      case properties::OfSubmodelElementList::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -11303,13 +11376,15 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kOrderRelevant:
+      }
+      case properties::OfSubmodelElementList::kOrderRelevant: {
         std::tie(
           the_order_relevant,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfSubmodelElementList::kSemanticIdListElement:
+      }
+      case properties::OfSubmodelElementList::kSemanticIdListElement: {
         std::tie(
           the_semantic_id_list_element,
           error
@@ -11317,19 +11392,22 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementList::kTypeValueListElement:
+      }
+      case properties::OfSubmodelElementList::kTypeValueListElement: {
         std::tie(
           the_type_value_list_element,
           error
         ) = DeserializeAasSubmodelElements(reader);
         break;
-      case properties::OfSubmodelElementList::kValueTypeListElement:
+      }
+      case properties::OfSubmodelElementList::kValueTypeListElement: {
         std::tie(
           the_value_type_list_element,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfSubmodelElementList::kValue:
+      }
+      case properties::OfSubmodelElementList::kValue: {
         std::tie(
           the_value,
           error
@@ -11340,6 +11418,7 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -11623,7 +11702,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodelElementCollection::kExtensions:
+      case properties::OfSubmodelElementCollection::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -11634,19 +11713,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kCategory:
+      }
+      case properties::OfSubmodelElementCollection::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementCollection::kIdShort:
+      }
+      case properties::OfSubmodelElementCollection::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementCollection::kDisplayName:
+      }
+      case properties::OfSubmodelElementCollection::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -11657,7 +11739,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kDescription:
+      }
+      case properties::OfSubmodelElementCollection::kDescription: {
         std::tie(
           the_description,
           error
@@ -11668,7 +11751,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kSemanticId:
+      }
+      case properties::OfSubmodelElementCollection::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -11676,7 +11760,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementCollection::kSupplementalSemanticIds:
+      }
+      case properties::OfSubmodelElementCollection::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -11687,7 +11772,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kQualifiers:
+      }
+      case properties::OfSubmodelElementCollection::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -11698,7 +11784,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications:
+      }
+      case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -11709,7 +11796,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kValue:
+      }
+      case properties::OfSubmodelElementCollection::kValue: {
         std::tie(
           the_value,
           error
@@ -11720,6 +11808,7 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -11989,7 +12078,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfProperty::kExtensions:
+      case properties::OfProperty::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -12000,19 +12089,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfProperty::kCategory:
+      }
+      case properties::OfProperty::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kIdShort:
+      }
+      case properties::OfProperty::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kDisplayName:
+      }
+      case properties::OfProperty::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -12023,7 +12115,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfProperty::kDescription:
+      }
+      case properties::OfProperty::kDescription: {
         std::tie(
           the_description,
           error
@@ -12034,7 +12127,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfProperty::kSemanticId:
+      }
+      case properties::OfProperty::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -12042,7 +12136,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfProperty::kSupplementalSemanticIds:
+      }
+      case properties::OfProperty::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -12053,7 +12148,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfProperty::kQualifiers:
+      }
+      case properties::OfProperty::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -12064,7 +12160,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfProperty::kEmbeddedDataSpecifications:
+      }
+      case properties::OfProperty::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -12075,19 +12172,22 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfProperty::kValueType:
+      }
+      case properties::OfProperty::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfProperty::kValue:
+      }
+      case properties::OfProperty::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kValueId:
+      }
+      case properties::OfProperty::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -12095,6 +12195,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -12380,7 +12481,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfMultiLanguageProperty::kExtensions:
+      case properties::OfMultiLanguageProperty::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -12391,19 +12492,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kCategory:
+      }
+      case properties::OfMultiLanguageProperty::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfMultiLanguageProperty::kIdShort:
+      }
+      case properties::OfMultiLanguageProperty::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfMultiLanguageProperty::kDisplayName:
+      }
+      case properties::OfMultiLanguageProperty::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -12414,7 +12518,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kDescription:
+      }
+      case properties::OfMultiLanguageProperty::kDescription: {
         std::tie(
           the_description,
           error
@@ -12425,7 +12530,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kSemanticId:
+      }
+      case properties::OfMultiLanguageProperty::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -12433,7 +12539,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfMultiLanguageProperty::kSupplementalSemanticIds:
+      }
+      case properties::OfMultiLanguageProperty::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -12444,7 +12551,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kQualifiers:
+      }
+      case properties::OfMultiLanguageProperty::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -12455,7 +12563,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications:
+      }
+      case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -12466,7 +12575,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kValue:
+      }
+      case properties::OfMultiLanguageProperty::kValue: {
         std::tie(
           the_value,
           error
@@ -12477,7 +12587,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kValueId:
+      }
+      case properties::OfMultiLanguageProperty::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -12485,6 +12596,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -12753,7 +12865,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfRange::kExtensions:
+      case properties::OfRange::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -12764,19 +12876,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfRange::kCategory:
+      }
+      case properties::OfRange::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kIdShort:
+      }
+      case properties::OfRange::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kDisplayName:
+      }
+      case properties::OfRange::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -12787,7 +12902,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfRange::kDescription:
+      }
+      case properties::OfRange::kDescription: {
         std::tie(
           the_description,
           error
@@ -12798,7 +12914,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfRange::kSemanticId:
+      }
+      case properties::OfRange::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -12806,7 +12923,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRange::kSupplementalSemanticIds:
+      }
+      case properties::OfRange::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -12817,7 +12935,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfRange::kQualifiers:
+      }
+      case properties::OfRange::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -12828,7 +12947,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfRange::kEmbeddedDataSpecifications:
+      }
+      case properties::OfRange::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -12839,24 +12959,28 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfRange::kValueType:
+      }
+      case properties::OfRange::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfRange::kMin:
+      }
+      case properties::OfRange::kMin: {
         std::tie(
           the_min,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kMax:
+      }
+      case properties::OfRange::kMax: {
         std::tie(
           the_max,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -13136,7 +13260,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfReferenceElement::kExtensions:
+      case properties::OfReferenceElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -13147,19 +13271,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfReferenceElement::kCategory:
+      }
+      case properties::OfReferenceElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfReferenceElement::kIdShort:
+      }
+      case properties::OfReferenceElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfReferenceElement::kDisplayName:
+      }
+      case properties::OfReferenceElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -13170,7 +13297,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfReferenceElement::kDescription:
+      }
+      case properties::OfReferenceElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -13181,7 +13309,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfReferenceElement::kSemanticId:
+      }
+      case properties::OfReferenceElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -13189,7 +13318,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfReferenceElement::kSupplementalSemanticIds:
+      }
+      case properties::OfReferenceElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -13200,7 +13330,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfReferenceElement::kQualifiers:
+      }
+      case properties::OfReferenceElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -13211,7 +13342,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfReferenceElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfReferenceElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -13222,7 +13354,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfReferenceElement::kValue:
+      }
+      case properties::OfReferenceElement::kValue: {
         std::tie(
           the_value,
           error
@@ -13230,6 +13363,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -13497,7 +13631,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBlob::kExtensions:
+      case properties::OfBlob::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -13508,19 +13642,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfBlob::kCategory:
+      }
+      case properties::OfBlob::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlob::kIdShort:
+      }
+      case properties::OfBlob::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlob::kDisplayName:
+      }
+      case properties::OfBlob::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -13531,7 +13668,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfBlob::kDescription:
+      }
+      case properties::OfBlob::kDescription: {
         std::tie(
           the_description,
           error
@@ -13542,7 +13680,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfBlob::kSemanticId:
+      }
+      case properties::OfBlob::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -13550,7 +13689,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBlob::kSupplementalSemanticIds:
+      }
+      case properties::OfBlob::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -13561,7 +13701,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfBlob::kQualifiers:
+      }
+      case properties::OfBlob::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -13572,7 +13713,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfBlob::kEmbeddedDataSpecifications:
+      }
+      case properties::OfBlob::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -13583,18 +13725,21 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfBlob::kValue:
+      }
+      case properties::OfBlob::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeByteArray(reader);
         break;
-      case properties::OfBlob::kContentType:
+      }
+      case properties::OfBlob::kContentType: {
         std::tie(
           the_content_type,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -13873,7 +14018,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfFile::kExtensions:
+      case properties::OfFile::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -13884,19 +14029,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfFile::kCategory:
+      }
+      case properties::OfFile::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kIdShort:
+      }
+      case properties::OfFile::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kDisplayName:
+      }
+      case properties::OfFile::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -13907,7 +14055,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfFile::kDescription:
+      }
+      case properties::OfFile::kDescription: {
         std::tie(
           the_description,
           error
@@ -13918,7 +14067,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfFile::kSemanticId:
+      }
+      case properties::OfFile::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -13926,7 +14076,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfFile::kSupplementalSemanticIds:
+      }
+      case properties::OfFile::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -13937,7 +14088,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfFile::kQualifiers:
+      }
+      case properties::OfFile::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -13948,7 +14100,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfFile::kEmbeddedDataSpecifications:
+      }
+      case properties::OfFile::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -13959,18 +14112,21 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfFile::kValue:
+      }
+      case properties::OfFile::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kContentType:
+      }
+      case properties::OfFile::kContentType: {
         std::tie(
           the_content_type,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -14255,7 +14411,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAnnotatedRelationshipElement::kExtensions:
+      case properties::OfAnnotatedRelationshipElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -14266,19 +14422,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kCategory:
+      }
+      case properties::OfAnnotatedRelationshipElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kIdShort:
+      }
+      case properties::OfAnnotatedRelationshipElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kDisplayName:
+      }
+      case properties::OfAnnotatedRelationshipElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -14289,7 +14448,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kDescription:
+      }
+      case properties::OfAnnotatedRelationshipElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -14300,7 +14460,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kSemanticId:
+      }
+      case properties::OfAnnotatedRelationshipElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -14308,7 +14469,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds:
+      }
+      case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -14319,7 +14481,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kQualifiers:
+      }
+      case properties::OfAnnotatedRelationshipElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -14330,7 +14493,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -14341,7 +14505,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kFirst:
+      }
+      case properties::OfAnnotatedRelationshipElement::kFirst: {
         std::tie(
           the_first,
           error
@@ -14349,7 +14514,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kSecond:
+      }
+      case properties::OfAnnotatedRelationshipElement::kSecond: {
         std::tie(
           the_second,
           error
@@ -14357,7 +14523,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kAnnotations:
+      }
+      case properties::OfAnnotatedRelationshipElement::kAnnotations: {
         std::tie(
           the_annotations,
           error
@@ -14368,6 +14535,7 @@ std::pair<
           DataElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -14667,7 +14835,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEntity::kExtensions:
+      case properties::OfEntity::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -14678,19 +14846,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfEntity::kCategory:
+      }
+      case properties::OfEntity::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kIdShort:
+      }
+      case properties::OfEntity::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kDisplayName:
+      }
+      case properties::OfEntity::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -14701,7 +14872,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfEntity::kDescription:
+      }
+      case properties::OfEntity::kDescription: {
         std::tie(
           the_description,
           error
@@ -14712,7 +14884,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfEntity::kSemanticId:
+      }
+      case properties::OfEntity::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -14720,7 +14893,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEntity::kSupplementalSemanticIds:
+      }
+      case properties::OfEntity::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -14731,7 +14905,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfEntity::kQualifiers:
+      }
+      case properties::OfEntity::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -14742,7 +14917,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfEntity::kEmbeddedDataSpecifications:
+      }
+      case properties::OfEntity::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -14753,7 +14929,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfEntity::kStatements:
+      }
+      case properties::OfEntity::kStatements: {
         std::tie(
           the_statements,
           error
@@ -14764,19 +14941,22 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
-      case properties::OfEntity::kEntityType:
+      }
+      case properties::OfEntity::kEntityType: {
         std::tie(
           the_entity_type,
           error
         ) = DeserializeEntityType(reader);
         break;
-      case properties::OfEntity::kGlobalAssetId:
+      }
+      case properties::OfEntity::kGlobalAssetId: {
         std::tie(
           the_global_asset_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kSpecificAssetIds:
+      }
+      case properties::OfEntity::kSpecificAssetIds: {
         std::tie(
           the_specific_asset_ids,
           error
@@ -14787,6 +14967,7 @@ std::pair<
           SpecificAssetIdFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -15043,7 +15224,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEventPayload::kSource:
+      case properties::OfEventPayload::kSource: {
         std::tie(
           the_source,
           error
@@ -15051,7 +15232,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kSourceSemanticId:
+      }
+      case properties::OfEventPayload::kSourceSemanticId: {
         std::tie(
           the_source_semantic_id,
           error
@@ -15059,7 +15241,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kObservableReference:
+      }
+      case properties::OfEventPayload::kObservableReference: {
         std::tie(
           the_observable_reference,
           error
@@ -15067,7 +15250,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kObservableSemanticId:
+      }
+      case properties::OfEventPayload::kObservableSemanticId: {
         std::tie(
           the_observable_semantic_id,
           error
@@ -15075,13 +15259,15 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kTopic:
+      }
+      case properties::OfEventPayload::kTopic: {
         std::tie(
           the_topic,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEventPayload::kSubjectId:
+      }
+      case properties::OfEventPayload::kSubjectId: {
         std::tie(
           the_subject_id,
           error
@@ -15089,18 +15275,21 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kTimeStamp:
+      }
+      case properties::OfEventPayload::kTimeStamp: {
         std::tie(
           the_time_stamp,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEventPayload::kPayload:
+      }
+      case properties::OfEventPayload::kPayload: {
         std::tie(
           the_payload,
           error
         ) = DeserializeByteArray(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -15406,7 +15595,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBasicEventElement::kExtensions:
+      case properties::OfBasicEventElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -15417,19 +15606,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfBasicEventElement::kCategory:
+      }
+      case properties::OfBasicEventElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kIdShort:
+      }
+      case properties::OfBasicEventElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kDisplayName:
+      }
+      case properties::OfBasicEventElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -15440,7 +15632,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfBasicEventElement::kDescription:
+      }
+      case properties::OfBasicEventElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -15451,7 +15644,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfBasicEventElement::kSemanticId:
+      }
+      case properties::OfBasicEventElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -15459,7 +15653,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kSupplementalSemanticIds:
+      }
+      case properties::OfBasicEventElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -15470,7 +15665,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfBasicEventElement::kQualifiers:
+      }
+      case properties::OfBasicEventElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -15481,7 +15677,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfBasicEventElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfBasicEventElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -15492,7 +15689,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfBasicEventElement::kObserved:
+      }
+      case properties::OfBasicEventElement::kObserved: {
         std::tie(
           the_observed,
           error
@@ -15500,25 +15698,29 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kDirection:
+      }
+      case properties::OfBasicEventElement::kDirection: {
         std::tie(
           the_direction,
           error
         ) = DeserializeDirection(reader);
         break;
-      case properties::OfBasicEventElement::kState:
+      }
+      case properties::OfBasicEventElement::kState: {
         std::tie(
           the_state,
           error
         ) = DeserializeStateOfEvent(reader);
         break;
-      case properties::OfBasicEventElement::kMessageTopic:
+      }
+      case properties::OfBasicEventElement::kMessageTopic: {
         std::tie(
           the_message_topic,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kMessageBroker:
+      }
+      case properties::OfBasicEventElement::kMessageBroker: {
         std::tie(
           the_message_broker,
           error
@@ -15526,24 +15728,28 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kLastUpdate:
+      }
+      case properties::OfBasicEventElement::kLastUpdate: {
         std::tie(
           the_last_update,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kMinInterval:
+      }
+      case properties::OfBasicEventElement::kMinInterval: {
         std::tie(
           the_min_interval,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kMaxInterval:
+      }
+      case properties::OfBasicEventElement::kMaxInterval: {
         std::tie(
           the_max_interval,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -15858,7 +16064,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfOperation::kExtensions:
+      case properties::OfOperation::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -15869,19 +16075,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfOperation::kCategory:
+      }
+      case properties::OfOperation::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfOperation::kIdShort:
+      }
+      case properties::OfOperation::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfOperation::kDisplayName:
+      }
+      case properties::OfOperation::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -15892,7 +16101,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfOperation::kDescription:
+      }
+      case properties::OfOperation::kDescription: {
         std::tie(
           the_description,
           error
@@ -15903,7 +16113,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfOperation::kSemanticId:
+      }
+      case properties::OfOperation::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -15911,7 +16122,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfOperation::kSupplementalSemanticIds:
+      }
+      case properties::OfOperation::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -15922,7 +16134,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfOperation::kQualifiers:
+      }
+      case properties::OfOperation::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -15933,7 +16146,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfOperation::kEmbeddedDataSpecifications:
+      }
+      case properties::OfOperation::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -15944,7 +16158,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfOperation::kInputVariables:
+      }
+      case properties::OfOperation::kInputVariables: {
         std::tie(
           the_input_variables,
           error
@@ -15955,7 +16170,8 @@ std::pair<
           OperationVariableFromElement
         );
         break;
-      case properties::OfOperation::kOutputVariables:
+      }
+      case properties::OfOperation::kOutputVariables: {
         std::tie(
           the_output_variables,
           error
@@ -15966,7 +16182,8 @@ std::pair<
           OperationVariableFromElement
         );
         break;
-      case properties::OfOperation::kInoutputVariables:
+      }
+      case properties::OfOperation::kInoutputVariables: {
         std::tie(
           the_inoutput_variables,
           error
@@ -15977,6 +16194,7 @@ std::pair<
           OperationVariableFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16198,12 +16416,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfOperationVariable::kValue:
+      case properties::OfOperationVariable::kValue: {
         std::tie(
           the_value,
           error
         ) = SubmodelElementFromElement(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16468,7 +16687,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfCapability::kExtensions:
+      case properties::OfCapability::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -16479,19 +16698,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfCapability::kCategory:
+      }
+      case properties::OfCapability::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfCapability::kIdShort:
+      }
+      case properties::OfCapability::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfCapability::kDisplayName:
+      }
+      case properties::OfCapability::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -16502,7 +16724,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfCapability::kDescription:
+      }
+      case properties::OfCapability::kDescription: {
         std::tie(
           the_description,
           error
@@ -16513,7 +16736,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfCapability::kSemanticId:
+      }
+      case properties::OfCapability::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -16521,7 +16745,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfCapability::kSupplementalSemanticIds:
+      }
+      case properties::OfCapability::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -16532,7 +16757,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfCapability::kQualifiers:
+      }
+      case properties::OfCapability::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -16543,7 +16769,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfCapability::kEmbeddedDataSpecifications:
+      }
+      case properties::OfCapability::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -16554,6 +16781,7 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16810,7 +17038,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfConceptDescription::kExtensions:
+      case properties::OfConceptDescription::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -16821,19 +17049,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfConceptDescription::kCategory:
+      }
+      case properties::OfConceptDescription::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kIdShort:
+      }
+      case properties::OfConceptDescription::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kDisplayName:
+      }
+      case properties::OfConceptDescription::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -16844,7 +17075,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfConceptDescription::kDescription:
+      }
+      case properties::OfConceptDescription::kDescription: {
         std::tie(
           the_description,
           error
@@ -16855,7 +17087,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfConceptDescription::kAdministration:
+      }
+      case properties::OfConceptDescription::kAdministration: {
         std::tie(
           the_administration,
           error
@@ -16863,13 +17096,15 @@ std::pair<
           types::IAdministrativeInformation
         >(reader);
         break;
-      case properties::OfConceptDescription::kId:
+      }
+      case properties::OfConceptDescription::kId: {
         std::tie(
           the_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kEmbeddedDataSpecifications:
+      }
+      case properties::OfConceptDescription::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -16880,7 +17115,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfConceptDescription::kIsCaseOf:
+      }
+      case properties::OfConceptDescription::kIsCaseOf: {
         std::tie(
           the_is_case_of,
           error
@@ -16891,6 +17127,7 @@ std::pair<
           ReferenceFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17131,13 +17368,14 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfReference::kType:
+      case properties::OfReference::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeReferenceTypes(reader);
         break;
-      case properties::OfReference::kReferredSemanticId:
+      }
+      case properties::OfReference::kReferredSemanticId: {
         std::tie(
           the_referred_semantic_id,
           error
@@ -17145,7 +17383,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfReference::kKeys:
+      }
+      case properties::OfReference::kKeys: {
         std::tie(
           the_keys,
           error
@@ -17156,6 +17395,7 @@ std::pair<
           KeyFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17390,18 +17630,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfKey::kType:
+      case properties::OfKey::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeKeyTypes(reader);
         break;
-      case properties::OfKey::kValue:
+      }
+      case properties::OfKey::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17635,18 +17877,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringNameType::kLanguage:
+      case properties::OfLangStringNameType::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringNameType::kText:
+      }
+      case properties::OfLangStringNameType::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17880,18 +18124,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringTextType::kLanguage:
+      case properties::OfLangStringTextType::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringTextType::kText:
+      }
+      case properties::OfLangStringTextType::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18139,7 +18385,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEnvironment::kAssetAdministrationShells:
+      case properties::OfEnvironment::kAssetAdministrationShells: {
         std::tie(
           the_asset_administration_shells,
           error
@@ -18150,7 +18396,8 @@ std::pair<
           AssetAdministrationShellFromElement
         );
         break;
-      case properties::OfEnvironment::kSubmodels:
+      }
+      case properties::OfEnvironment::kSubmodels: {
         std::tie(
           the_submodels,
           error
@@ -18161,7 +18408,8 @@ std::pair<
           SubmodelFromElement
         );
         break;
-      case properties::OfEnvironment::kConceptDescriptions:
+      }
+      case properties::OfEnvironment::kConceptDescriptions: {
         std::tie(
           the_concept_descriptions,
           error
@@ -18172,6 +18420,7 @@ std::pair<
           ConceptDescriptionFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18386,7 +18635,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEmbeddedDataSpecification::kDataSpecification:
+      case properties::OfEmbeddedDataSpecification::kDataSpecification: {
         std::tie(
           the_data_specification,
           error
@@ -18394,12 +18643,14 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEmbeddedDataSpecification::kDataSpecificationContent:
+      }
+      case properties::OfEmbeddedDataSpecification::kDataSpecificationContent: {
         std::tie(
           the_data_specification_content,
           error
         ) = DataSpecificationContentFromElement(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18637,30 +18888,34 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLevelType::kMin:
+      case properties::OfLevelType::kMin: {
         std::tie(
           the_min,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfLevelType::kNom:
+      }
+      case properties::OfLevelType::kNom: {
         std::tie(
           the_nom,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfLevelType::kTyp:
+      }
+      case properties::OfLevelType::kTyp: {
         std::tie(
           the_typ,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfLevelType::kMax:
+      }
+      case properties::OfLevelType::kMax: {
         std::tie(
           the_max,
           error
         ) = DeserializeBool(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18912,13 +19167,14 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfValueReferencePair::kValue:
+      case properties::OfValueReferencePair::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfValueReferencePair::kValueId:
+      }
+      case properties::OfValueReferencePair::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -18926,6 +19182,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19161,7 +19418,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfValueList::kValueReferencePairs:
+      case properties::OfValueList::kValueReferencePairs: {
         std::tie(
           the_value_reference_pairs,
           error
@@ -19172,6 +19429,7 @@ std::pair<
           ValueReferencePairFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19396,18 +19654,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringPreferredNameTypeIec61360::kLanguage:
+      case properties::OfLangStringPreferredNameTypeIec61360::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringPreferredNameTypeIec61360::kText:
+      }
+      case properties::OfLangStringPreferredNameTypeIec61360::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19641,18 +19901,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringShortNameTypeIec61360::kLanguage:
+      case properties::OfLangStringShortNameTypeIec61360::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringShortNameTypeIec61360::kText:
+      }
+      case properties::OfLangStringShortNameTypeIec61360::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19886,18 +20148,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringDefinitionTypeIec61360::kLanguage:
+      case properties::OfLangStringDefinitionTypeIec61360::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringDefinitionTypeIec61360::kText:
+      }
+      case properties::OfLangStringDefinitionTypeIec61360::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -20169,7 +20433,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfDataSpecificationIec61360::kPreferredName:
+      case properties::OfDataSpecificationIec61360::kPreferredName: {
         std::tie(
           the_preferred_name,
           error
@@ -20180,7 +20444,8 @@ std::pair<
           LangStringPreferredNameTypeIec61360FromElement
         );
         break;
-      case properties::OfDataSpecificationIec61360::kShortName:
+      }
+      case properties::OfDataSpecificationIec61360::kShortName: {
         std::tie(
           the_short_name,
           error
@@ -20191,13 +20456,15 @@ std::pair<
           LangStringShortNameTypeIec61360FromElement
         );
         break;
-      case properties::OfDataSpecificationIec61360::kUnit:
+      }
+      case properties::OfDataSpecificationIec61360::kUnit: {
         std::tie(
           the_unit,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kUnitId:
+      }
+      case properties::OfDataSpecificationIec61360::kUnitId: {
         std::tie(
           the_unit_id,
           error
@@ -20205,25 +20472,29 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kSourceOfDefinition:
+      }
+      case properties::OfDataSpecificationIec61360::kSourceOfDefinition: {
         std::tie(
           the_source_of_definition,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kSymbol:
+      }
+      case properties::OfDataSpecificationIec61360::kSymbol: {
         std::tie(
           the_symbol,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kDataType:
+      }
+      case properties::OfDataSpecificationIec61360::kDataType: {
         std::tie(
           the_data_type,
           error
         ) = DeserializeDataTypeIec61360(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kDefinition:
+      }
+      case properties::OfDataSpecificationIec61360::kDefinition: {
         std::tie(
           the_definition,
           error
@@ -20234,13 +20505,15 @@ std::pair<
           LangStringDefinitionTypeIec61360FromElement
         );
         break;
-      case properties::OfDataSpecificationIec61360::kValueFormat:
+      }
+      case properties::OfDataSpecificationIec61360::kValueFormat: {
         std::tie(
           the_value_format,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kValueList:
+      }
+      case properties::OfDataSpecificationIec61360::kValueList: {
         std::tie(
           the_value_list,
           error
@@ -20248,13 +20521,15 @@ std::pair<
           types::IValueList
         >(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kValue:
+      }
+      case properties::OfDataSpecificationIec61360::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kLevelType:
+      }
+      case properties::OfDataSpecificationIec61360::kLevelType: {
         std::tie(
           the_level_type,
           error
@@ -20262,6 +20537,7 @@ std::pair<
           types::ILevelType
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

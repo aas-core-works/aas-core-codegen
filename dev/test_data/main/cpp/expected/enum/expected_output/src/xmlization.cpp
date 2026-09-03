@@ -2368,12 +2368,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeResult:
+      case properties::OfSomething::kSomeResult: {
         std::tie(
           the_some_result,
           error
         ) = DeserializeResult(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

@@ -2761,18 +2761,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBranch::kIdentifier:
+      case properties::OfBranch::kIdentifier: {
         std::tie(
           the_identifier,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBranch::kDescription:
+      }
+      case properties::OfBranch::kDescription: {
         std::tie(
           the_description,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3008,24 +3010,27 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLeaf::kIdentifier:
+      case properties::OfLeaf::kIdentifier: {
         std::tie(
           the_identifier,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLeaf::kDescription:
+      }
+      case properties::OfLeaf::kDescription: {
         std::tie(
           the_description,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLeaf::kValue:
+      }
+      case properties::OfLeaf::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeInt64(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3272,30 +3277,34 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBlossom::kIdentifier:
+      case properties::OfBlossom::kIdentifier: {
         std::tie(
           the_identifier,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlossom::kDescription:
+      }
+      case properties::OfBlossom::kDescription: {
         std::tie(
           the_description,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlossom::kValue:
+      }
+      case properties::OfBlossom::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeInt64(reader);
         break;
-      case properties::OfBlossom::kDetails:
+      }
+      case properties::OfBlossom::kDetails: {
         std::tie(
           the_details,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3547,18 +3556,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeChoice:
+      case properties::OfSomething::kSomeChoice: {
         std::tie(
           the_some_choice,
           error
         ) = NodeFromElement(reader);
         break;
-      case properties::OfSomething::kSomethingWithoutChoice:
+      }
+      case properties::OfSomething::kSomethingWithoutChoice: {
         std::tie(
           the_something_without_choice,
           error
         ) = BranchFromElement(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3792,13 +3803,14 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfContainer::kNode:
+      case properties::OfContainer::kNode: {
         std::tie(
           the_node,
           error
         ) = NodeFromElement(reader);
         break;
-      case properties::OfContainer::kSomething:
+      }
+      case properties::OfContainer::kSomething: {
         std::tie(
           the_something,
           error
@@ -3806,6 +3818,7 @@ std::pair<
           types::ISomething
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

@@ -2321,18 +2321,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfQueryCondition::kEq:
+      case properties::OfQueryCondition::kEq: {
         std::tie(
           the_eq,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQueryCondition::kNotEq:
+      }
+      case properties::OfQueryCondition::kNotEq: {
         std::tie(
           the_not_eq,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

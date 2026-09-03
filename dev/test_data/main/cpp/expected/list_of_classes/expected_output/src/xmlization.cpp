@@ -2722,12 +2722,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomeItem::kName:
+      case properties::OfSomeItem::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -2950,12 +2951,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAnotherItem::kSerialNumber:
+      case properties::OfAnotherItem::kSerialNumber: {
         std::tie(
           the_serial_number,
           error
         ) = DeserializeInt64(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3178,12 +3180,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSimple::kName:
+      case properties::OfSimple::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3416,7 +3419,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeItems:
+      case properties::OfSomething::kSomeItems: {
         std::tie(
           the_some_items,
           error
@@ -3427,7 +3430,8 @@ std::pair<
           AbstractItemFromElement
         );
         break;
-      case properties::OfSomething::kSomeSimples:
+      }
+      case properties::OfSomething::kSomeSimples: {
         std::tie(
           the_some_simples,
           error
@@ -3438,6 +3442,7 @@ std::pair<
           SimpleFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

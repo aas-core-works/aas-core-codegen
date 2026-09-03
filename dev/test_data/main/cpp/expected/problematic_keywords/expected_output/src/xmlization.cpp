@@ -2335,30 +2335,34 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kInterface:
+      case properties::OfSomething::kInterface: {
         std::tie(
           the_interface,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSomething::kType:
+      }
+      case properties::OfSomething::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSomething::kRange:
+      }
+      case properties::OfSomething::kRange: {
         std::tie(
           the_range,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSomething::kVoid:
+      }
+      case properties::OfSomething::kVoid: {
         std::tie(
           the_void,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

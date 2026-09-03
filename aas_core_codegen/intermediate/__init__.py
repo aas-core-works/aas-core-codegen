@@ -12,6 +12,7 @@ PYTHON_TYPE_TO_PRIMITIVE_TYPE = _types.PYTHON_TYPE_TO_PRIMITIVE_TYPE
 PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
+TupleTypeAnnotation = _types.TupleTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
 SummaryRemarksDescription = _types.SummaryRemarksDescription
 SummaryRemarksConstraintsDescription = _types.SummaryRemarksConstraintsDescription

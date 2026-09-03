@@ -269,10 +269,7 @@ if ({target_var} == null)
         )
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert not isinstance(
-            type_anno.items,
-            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
-        ), (
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
             f"(mristin): We generate only code for lists of atomic values in the JSON "
             f"de-serialization, but got a list of type {type_anno}. "
             f"Please contact the developers if you need this feature."
@@ -333,6 +330,104 @@ foreach (Nodes.JsonNode? item in {array_var})
 {IIII}"Unexpected result null when error is null"));
 {I}{index_var}++;
 }}"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        array_var = csharp_naming.variable_name(Identifier(f"array_{arg.name}"))
+
+        item_vars = []  # type: List[Stripped]
+        item_blocks = []  # type: List[Stripped]
+
+        for i, item_type_anno in enumerate(type_anno.items):
+            assert isinstance(
+                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"Expected an atomic tuple item (a primitive, a constrained "
+                f"primitive, an enumeration or a class), but got {item_type_anno}. "
+                f"This should have already been verified in "
+                f"intermediate._translate._verify_only_simple_type_patterns."
+            )
+
+            item_node_var = csharp_naming.variable_name(
+                Identifier(f"node_{arg.name}_{i}")
+            )
+            item_var = csharp_naming.variable_name(Identifier(f"item_{arg.name}_{i}"))
+            item_vars.append(item_var)
+
+            item_type = csharp_common.generate_type(item_type_anno)
+            parse_method = _parse_method_for_atomic_value(item_type_anno)
+
+            item_blocks.append(
+                Stripped(
+                    f"""\
+Nodes.JsonNode? {item_node_var} = {array_var}[{i}];
+if ({item_node_var} == null)
+{{
+{I}error = new Reporting.Error(
+{II}"Expected a non-null item, but got a null");
+{I}error.PrependSegment(
+{II}new Reporting.IndexSegment(
+{III}{i}));
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
+}}
+{item_type}? {item_var} = {parse_method}(
+{I}{item_node_var} ?? throw new System.InvalidOperationException(),
+{I}out error);
+if (error != null)
+{{
+{I}error.PrependSegment(
+{II}new Reporting.IndexSegment(
+{III}{i}));
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
+}}"""
+                )
+            )
+
+        item_blocks_joined = "\n\n".join(item_blocks)
+        tuple_literal = csharp_common.generate_tuple_literal(
+            [
+                Stripped(
+                    f"""\
+{item_var}
+?? throw new System.InvalidOperationException(
+{I}"Unexpected {item_var} null when error is also null")"""
+                )
+                for item_var in item_vars
+            ]
+        )
+        expected_count = len(type_anno.items)
+
+        parse_block = Stripped(
+            f"""\
+Nodes.JsonArray? {array_var} = keyValue.Value as Nodes.JsonArray;
+if ({array_var} == null)
+{{
+{I}error = new Reporting.Error(
+{II}$"Expected a JsonArray, but got {{keyValue.Value.GetType()}}");
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
+}}
+if ({array_var}.Count != {expected_count})
+{{
+{I}error = new Reporting.Error(
+{II}$"Expected exactly {expected_count} item(s) in the JsonArray, " +
+{II}$"but got: {{{array_var}.Count}}");
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
+}}
+{item_blocks_joined}
+
+{target_var} = {tuple_literal};"""
         )
     else:
         assert_never(arg.type_annotation)
@@ -1180,10 +1275,7 @@ def _generate_transform_property(
         )
         stmts.append(Stripped(f"result[{prop_literal}] = {conversion_expr};"))
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert not isinstance(
-            type_anno.items,
-            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
-        ), (
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
             f"(mristin): We generate only code for lists of atomic values in the JSON "
             f"serialization, but got a list of type {type_anno}. "
             f"Please contact the developers if you need this feature."
@@ -1206,6 +1298,43 @@ foreach ({item_type} item in {source_expr})
 {I}{array_var}.Add(
 {II}{indent_but_first_line(item_conversion_expr, II)});
 }}
+result[{prop_literal}] = {array_var};"""
+            )
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        array_var = csharp_naming.variable_name(Identifier(f"array_{prop.name}"))
+
+        add_stmts = []  # type: List[Stripped]
+        for i, item_type_anno in enumerate(type_anno.items):
+            assert isinstance(
+                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"Expected an atomic tuple item (a primitive, a constrained "
+                f"primitive, an enumeration or a class), but got {item_type_anno}. "
+                f"This should have already been verified in "
+                f"intermediate._translate._verify_only_simple_type_patterns."
+            )
+
+            item_conversion_expr = _generate_serialize_atomic_value(
+                type_annotation=item_type_anno,
+                source_expr=Stripped(f"{source_expr}.Item{i + 1}"),
+            )
+            add_stmts.append(
+                Stripped(
+                    f"""\
+{array_var}.Add(
+{I}{indent_but_first_line(item_conversion_expr, I)});"""
+                )
+            )
+
+        add_stmts_joined = "\n".join(add_stmts)
+
+        stmts.append(
+            Stripped(
+                f"""\
+var {array_var} = new Nodes.JsonArray();
+{add_stmts_joined}
 result[{prop_literal}] = {array_var};"""
             )
         )

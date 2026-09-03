@@ -943,6 +943,152 @@ if (!isEmptyProperty)
     )
 
 
+def _generate_deserialize_tuple_property(prop: intermediate.Property) -> Stripped:
+    """Generate the code to de-serialize a property ``prop`` as a tuple."""
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+    assert isinstance(type_anno, intermediate.TupleTypeAnnotation), "Pre-condition"
+
+    prop_name = csharp_naming.property_name(prop.name)
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
+    target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
+
+    item_vars = []  # type: List[Stripped]
+    item_blocks = []  # type: List[Stripped]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        item_var = csharp_naming.variable_name(Identifier(f"item_{prop.name}_{i}"))
+        item_vars.append(item_var)
+
+        item_type = csharp_common.generate_type(item_type_anno)
+
+        primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+        deserialize_call: Stripped
+
+        if primitive_type is not None:
+            v_name_literal = csharp_common.string_literal(f"v{i + 1}")
+
+            method: str
+            if primitive_type is intermediate.PrimitiveType.BOOL:
+                method = "ReadVElementAsBoolean"
+            elif primitive_type is intermediate.PrimitiveType.INT:
+                method = "ReadVElementAsLong"
+            elif primitive_type is intermediate.PrimitiveType.FLOAT:
+                method = "ReadVElementAsDouble"
+            elif primitive_type is intermediate.PrimitiveType.STR:
+                method = "ReadVElementAsString"
+            elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                method = "ReadVElementAsBytes"
+            else:
+                assert_never(primitive_type)
+
+            deserialize_call = Stripped(
+                f"""\
+{method}(
+{I}reader, {v_name_literal}, out error)"""
+            )
+        elif isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+            item_type_anno.our_type, intermediate.Enumeration
+        ):
+            enum_name = csharp_naming.enum_name(item_type_anno.our_type.name)
+            v_name_literal = csharp_common.string_literal(f"v{i + 1}")
+
+            deserialize_call = Stripped(
+                f"""\
+ReadVElementAs{enum_name}(
+{I}reader, {v_name_literal}, out error)"""
+            )
+        else:
+            # NOTE (mristin):
+            # A tuple item can only be a primitive value, a constrained primitive,
+            # an enumeration literal or a class instance; see
+            # intermediate._translate._verify_only_simple_type_patterns.
+            assert isinstance(item_type_anno, intermediate.OurTypeAnnotation) and (
+                isinstance(
+                    item_type_anno.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                )
+            ), (
+                f"Unexpected tuple item type {item_type_anno} at index {i} "
+                f"for the property {prop.name!r}"
+            )
+
+            our_type = item_type_anno.our_type
+            if (
+                isinstance(our_type, intermediate.AbstractClass)
+                or len(our_type.concrete_descendants) > 0
+            ):
+                deserialize_method_name = (
+                    f"{csharp_naming.interface_name(our_type.name)}FromElement"
+                )
+            else:
+                deserialize_method_name = (
+                    f"{csharp_naming.class_name(our_type.name)}FromElement"
+                )
+
+            deserialize_call = Stripped(
+                f"""\
+{deserialize_method_name}(
+{I}reader, out error)"""
+            )
+
+        item_block = Stripped(
+            f"""\
+{item_type}? {item_var} = {indent_but_first_line(deserialize_call, I)};
+if (error != null)
+{{
+{I}error.PrependSegment(
+{II}new Reporting.IndexSegment(
+{III}{i}));
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{xml_prop_name_literal}));
+{I}return null;
+}}"""
+        )
+
+        if i < len(type_anno.items) - 1:
+            item_block = Stripped(
+                f"{item_block}\nSkipNoneWhitespaceAndComments(reader);"
+            )
+
+        item_blocks.append(item_block)
+
+    item_blocks_joined = "\n\n".join(item_blocks)
+    tuple_literal = csharp_common.generate_tuple_literal(
+        [
+            Stripped(
+                f"""\
+{item_var}
+?? throw new System.InvalidOperationException(
+{I}"Unexpected {item_var} null when error is also null")"""
+            )
+            for item_var in item_vars
+        ]
+    )
+
+    return Stripped(
+        f"""\
+if (isEmptyProperty)
+{{
+{I}error = new Reporting.Error(
+{II}"The property {prop_name} can not be de-serialized " +
+{II}"from a self-closing element since it needs content");
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{xml_prop_name_literal}));
+{I}return null;
+}}
+
+SkipNoneWhitespaceAndComments(reader);
+
+{item_blocks_joined}
+
+{target_var} = {tuple_literal};"""
+    )
+
+
 @require(lambda prop, cls: id(prop) in cls.property_id_set)
 def _generate_deserialize_property(
     prop: intermediate.Property, cls: intermediate.ConcreteClass
@@ -982,6 +1128,9 @@ def _generate_deserialize_property(
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         blocks.append(_generate_deserialize_list_property(prop=prop))
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        blocks.append(_generate_deserialize_tuple_property(prop=prop))
 
     else:
         assert_never(type_anno)
@@ -2206,6 +2355,110 @@ if (that.{prop_name} != null)
     return result
 
 
+def _generate_serialize_tuple_property_as_content(
+    prop: intermediate.Property,
+) -> Stripped:
+    """Generate the serialization of a tuple ``prop`` as a sequence of elements."""
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    assert isinstance(type_anno, intermediate.TupleTypeAnnotation)
+
+    prop_name = csharp_naming.property_name(prop.name)
+
+    item_blocks = []  # type: List[Stripped]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        item_expr = f"that.{prop_name}.Item{i + 1}"
+        primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+        if primitive_type is not None:
+            v_name_literal = csharp_common.string_literal(f"v{i + 1}")
+
+            write_value_statement: Stripped
+
+            if (
+                primitive_type is intermediate.PrimitiveType.BOOL
+                or primitive_type is intermediate.PrimitiveType.INT
+                or primitive_type is intermediate.PrimitiveType.FLOAT
+                or primitive_type is intermediate.PrimitiveType.STR
+            ):
+                write_value_statement = Stripped(f"writer.WriteValue({item_expr});")
+            elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                write_value_statement = Stripped(
+                    f"writer.WriteBase64({item_expr}, 0, {item_expr}.Length);"
+                )
+            else:
+                assert_never(primitive_type)
+
+            item_blocks.append(
+                Stripped(
+                    f"""\
+writer.WriteStartElement({v_name_literal}, NS);
+{write_value_statement}
+writer.WriteEndElement();"""
+                )
+            )
+        elif isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+            item_type_anno.our_type, intermediate.Enumeration
+        ):
+            enum_name = csharp_naming.enum_name(item_type_anno.our_type.name)
+            v_name_literal = csharp_common.string_literal(f"v{i + 1}")
+
+            item_blocks.append(
+                Stripped(
+                    f"""\
+writer.WriteStartElement({v_name_literal}, NS);
+writer.WriteValue(
+{I}Stringification.ToString({item_expr})
+{II}?? throw new System.ArgumentException(
+{III}"Invalid literal for the enumeration {enum_name}: " +
+{III}{item_expr}.ToString()));
+writer.WriteEndElement();"""
+                )
+            )
+        else:
+            # NOTE (mristin):
+            # A tuple item can only be a primitive value, a constrained primitive,
+            # an enumeration literal or a class instance; see
+            # intermediate._translate._verify_only_simple_type_patterns.
+            assert isinstance(item_type_anno, intermediate.OurTypeAnnotation) and (
+                isinstance(
+                    item_type_anno.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                )
+            ), (
+                f"Unexpected tuple item type {item_type_anno} at index {i} "
+                f"for the property {prop.name!r}"
+            )
+
+            item_blocks.append(Stripped(f"this.Visit({item_expr}, writer);"))
+
+    item_blocks_joined = "\n\n".join(item_blocks)
+
+    xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
+
+    result = Stripped(
+        f"""\
+writer.WriteStartElement(
+{I}{xml_prop_name_literal},
+{I}NS);
+
+{item_blocks_joined}
+
+writer.WriteEndElement();"""
+    )
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        result = Stripped(
+            f"""\
+if (that.{prop_name} != null)
+{{
+{I}{indent_but_first_line(result, I)}
+}}"""
+        )
+
+    return result
+
+
 def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stripped:
     """Generate the code to serialize the ``prop`` as content of an XML element."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
@@ -2241,6 +2494,9 @@ def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stri
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         body = _generate_serialize_list_property_as_content(prop=prop)
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = _generate_serialize_tuple_property_as_content(prop=prop)
 
     else:
         assert_never(type_anno)

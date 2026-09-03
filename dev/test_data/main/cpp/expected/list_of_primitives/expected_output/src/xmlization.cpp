@@ -2189,7 +2189,8 @@ std::pair<
   common::optional<DeserializationError>
 > DeserializeValueFromVElement(
   ReaderMergingText& reader,
-  const DeserializeT& deserialize_content
+  const DeserializeT& deserialize_content,
+  const std::string& expected_name
 ) {
   #ifdef DEBUG
   if (reader.node().kind() == NodeKind::Error) {
@@ -2203,7 +2204,9 @@ std::pair<
   if (reader.node().kind() != NodeKind::Start) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a start element <v> enclosing a value, but got ",
+        L"Expected a start element <",
+        common::Utf8ToWstring(expected_name),
+        L"> enclosing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
@@ -2215,17 +2218,19 @@ std::pair<
     >(reader.node()).name
   );
 
-  if (start_name != "v") {
+  if (start_name != expected_name) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a start element <v> enclosing a value, but got ",
+        L"Expected a start element <",
+        common::Utf8ToWstring(expected_name),
+        L"> enclosing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
   }
 
   // NOTE (mristin):
-  // We consume the <v>.
+  // We consume the start element.
   reader.Read();
 
   if (reader.node().kind() == NodeKind::Error) {
@@ -2241,7 +2246,9 @@ std::pair<
 
   if (error.has_value()) {
     error->path.segments.emplace_front(
-      common::make_unique<ElementSegment>(L"v")
+      common::make_unique<ElementSegment>(
+        common::Utf8ToWstring(expected_name)
+      )
     );
 
     return NoInstanceAndDeserializationError<T>(
@@ -2252,7 +2259,9 @@ std::pair<
   if (reader.node().kind() != NodeKind::Stop) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a closing element </v> closing a value, but got ",
+        L"Expected a closing element </",
+        common::Utf8ToWstring(expected_name),
+        L"> closing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
@@ -2265,17 +2274,19 @@ std::pair<
   );
 
 
-  if (stop_name != "v") {
+  if (stop_name != expected_name) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a stop element </v> closing a value, but got ",
+        L"Expected a closing element </",
+        common::Utf8ToWstring(expected_name),
+        L"> closing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
   }
 
   // NOTE (mristin):
-  // We consume the </v>.
+  // We consume the closing element.
   reader.Read();
 
   if (reader.node().kind() == NodeKind::Error) {
@@ -2546,7 +2557,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeBools:
+      case properties::OfSomething::kSomeBools: {
         std::tie(
           the_some_bools,
           error
@@ -2559,12 +2570,14 @@ std::pair<
               bool
             >(
               a_reader,
-              DeserializeBool
+              DeserializeBool,
+              "v"
             );
           }
         );
         break;
-      case properties::OfSomething::kSomeInts:
+      }
+      case properties::OfSomething::kSomeInts: {
         std::tie(
           the_some_ints,
           error
@@ -2577,12 +2590,14 @@ std::pair<
               int64_t
             >(
               a_reader,
-              DeserializeInt64
+              DeserializeInt64,
+              "v"
             );
           }
         );
         break;
-      case properties::OfSomething::kSomeFloats:
+      }
+      case properties::OfSomething::kSomeFloats: {
         std::tie(
           the_some_floats,
           error
@@ -2595,12 +2610,14 @@ std::pair<
               double
             >(
               a_reader,
-              DeserializeDouble
+              DeserializeDouble,
+              "v"
             );
           }
         );
         break;
-      case properties::OfSomething::kSomeStrings:
+      }
+      case properties::OfSomething::kSomeStrings: {
         std::tie(
           the_some_strings,
           error
@@ -2613,12 +2630,14 @@ std::pair<
               std::wstring
             >(
               a_reader,
-              DeserializeWstring
+              DeserializeWstring,
+              "v"
             );
           }
         );
         break;
-      case properties::OfSomething::kSomeBytes:
+      }
+      case properties::OfSomething::kSomeBytes: {
         std::tie(
           the_some_bytes,
           error
@@ -2631,11 +2650,13 @@ std::pair<
               std::vector<std::uint8_t>
             >(
               a_reader,
-              DeserializeByteArray
+              DeserializeByteArray,
+              "v"
             );
           }
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

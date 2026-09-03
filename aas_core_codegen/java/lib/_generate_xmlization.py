@@ -198,25 +198,33 @@ private static byte[] readContentAsBase64(
     )
 
 
-def _generate_try_v_start_element() -> Stripped:
-    """Generate the function to consume a starting ``<v>`` element."""
+def _generate_try_named_start_element() -> Stripped:
+    """
+    Generate the function to consume a starting element of an expected name.
+
+    The expected local name is passed in as an argument, since it is used both
+    for the items of a list (always wrapped in a repeated ``<v>``) and for the
+    items of a tuple (each wrapped in its own ``<v1>``, ``<v2>`` *etc.*,
+    one-based, matching the position of the item in the tuple).
+    """
     return Stripped(
         f"""\
 /**
- * Consume a {{@code <v>}} element from the reader and return whether
- * it was a self-closing (empty) element.
+ * Consume a starting element of the {{@code expectedName}} from the reader
+ * and return whether it was a self-closing (empty) element.
  */
-private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {{
+private static _Result<Boolean> tryNamedStartElement(
+{I}XMLEventReader reader, String expectedName) {{
 {I}if (currentEvent(reader).isEndDocument()) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a <v> element, but got an end-of-file.");
+{III}"Expected a <" + expectedName + "> element, but got an end-of-file.");
 {II}return _Result.failure(error);
 {I}}}
 
 {I}if (!currentEvent(reader).isStartElement()) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a <v> start element, but got the node of type "
-{IIII}+ getEventTypeAsString(currentEvent(reader)));
+{III}"Expected a <" + expectedName + "> start element, but got the node "
+{IIII}+ "of type " + getEventTypeAsString(currentEvent(reader)));
 {II}return _Result.failure(error);
 {I}}}
 
@@ -225,9 +233,10 @@ private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {{
 {II}return tryElementName.castTo(Boolean.class);
 {I}}}
 
-{I}if (!"v".equals(tryElementName.getResult())) {{
+{I}if (!expectedName.equals(tryElementName.getResult())) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a <v> element, but got an element " + tryElementName.getResult());
+{III}"Expected a <" + expectedName + "> element, but got an element "
+{IIII}+ tryElementName.getResult());
 {II}return _Result.failure(error);
 {I}}}
 
@@ -237,26 +246,28 @@ private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {{
     )
 
 
-def _generate_try_v_end_element() -> Stripped:
-    """Generate the function to consume a closing ``</v>`` element."""
+def _generate_try_named_end_element() -> Stripped:
+    """Generate the function to consume a closing element of an expected name."""
     return Stripped(
         f"""\
 /**
- * Consume a {{@code </v>}} element from the reader.
+ * Consume a closing element of the {{@code expectedName}} from the reader.
  */
-private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {{
+private static _Result<XMLEvent> tryNamedEndElement(
+{I}XMLEventReader reader, String expectedName) {{
 {I}skipWhitespaceAndComments(reader);
 
 {I}if (currentEvent(reader).isEndDocument()) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a </v> element, but got an end-of-file.");
+{III}"Expected a closing element for " + expectedName + ", "
+{IIII}+ "but got an end-of-file.");
 {II}return _Result.failure(error);
 {I}}}
 
 {I}if (!currentEvent(reader).isEndElement()) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a </v> end element, but got the node of type "
-{IIII}+ getEventTypeAsString(currentEvent(reader)));
+{III}"Expected a closing element for " + expectedName + ", "
+{IIII}+ "but got the node of type " + getEventTypeAsString(currentEvent(reader)));
 {II}return _Result.failure(error);
 {I}}}
 
@@ -265,9 +276,10 @@ private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {{
 {II}return tryElementName.castTo(XMLEvent.class);
 {I}}}
 
-{I}if (!"v".equals(tryElementName.getResult())) {{
+{I}if (!expectedName.equals(tryElementName.getResult())) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a </v> element, but got an end element " + tryElementName.getResult());
+{III}"Expected a closing element for " + expectedName + ", "
+{IIII}+ "but got an end element " + tryElementName.getResult());
 {II}return _Result.failure(error);
 {I}}}
 
@@ -275,38 +287,45 @@ private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {{
 {II}return _Result.success(reader.nextEvent());
 {I}}} catch (XMLStreamException xmlStreamException) {{
 {II}throw new Xmlization.DeserializeException("",
-{III}"Failed in method tryVEndElement because of: " +
+{III}"Failed in method tryNamedEndElement because of: " +
 {IIII}xmlStreamException.getMessage());
 {I}}}
 }}"""
     )
 
 
-def _generate_try_v_element_as_primitive_functions() -> List[Stripped]:
-    """Generate the functions to read a ``<v>`` element as a primitive value."""
+def _generate_try_named_element_as_primitive_functions() -> List[Stripped]:
+    """
+    Generate the functions to read a named element as a primitive value.
+
+    These are shared between the items of a list (wrapped in a repeated
+    ``<v>``) and the items of a tuple (each wrapped in its own ``<v1>``,
+    ``<v2>`` *etc.*).
+    """
     result = []  # type: List[Stripped]
 
     for function_name, result_type, deserialization_expr in (
-        ("tryVElementAsBoolean", "Boolean", "readContentAsBool(reader)"),
-        ("tryVElementAsLong", "Long", "readContentAsLong(reader)"),
-        ("tryVElementAsDouble", "Double", "readContentAsDouble(reader)"),
+        ("tryNamedElementAsBoolean", "Boolean", "readContentAsBool(reader)"),
+        ("tryNamedElementAsLong", "Long", "readContentAsLong(reader)"),
+        ("tryNamedElementAsDouble", "Double", "readContentAsDouble(reader)"),
     ):
         result.append(
             Stripped(
                 f"""\
 /**
- * Read the content of a {{@code <v>}} element and parse it as {result_type}.
+ * Read the content of a named element and parse it as {result_type}.
  */
-private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
-{I}final _Result<Boolean> tryVStart = tryVStartElement(reader);
-{I}if (tryVStart.isError()) {{
-{II}return tryVStart.castTo({result_type}.class);
+private static _Result<{result_type}> {function_name}(
+{I}XMLEventReader reader, String expectedName) {{
+{I}final _Result<Boolean> tryStart = tryNamedStartElement(reader, expectedName);
+{I}if (tryStart.isError()) {{
+{II}return tryStart.castTo({result_type}.class);
 {I}}}
 
-{I}if (tryVStart.getResult()) {{
+{I}if (tryStart.getResult()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected an XML content representing {result_type}, " +
-{III}"but got a self-closing <v /> element");
+{III}"but got a self-closing <" + expectedName + " /> element");
 {II}return _Result.failure(error);
 {I}}}
 
@@ -315,14 +334,14 @@ private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
 {II}result = {deserialization_expr};
 {I}}} catch (Exception exception) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"The content of a <v> element could not be de-serialized " +
-{III}"as {result_type}: " + exception.getMessage());
+{III}"The content of a <" + expectedName + "> element could not be "
+{IIII}+ "de-serialized as {result_type}: " + exception.getMessage());
 {II}return _Result.failure(error);
 {I}}}
 
-{I}final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
-{I}if (tryVEnd.isError()) {{
-{II}return tryVEnd.castTo({result_type}.class);
+{I}final _Result<XMLEvent> tryEnd = tryNamedEndElement(reader, expectedName);
+{I}if (tryEnd.isError()) {{
+{II}return tryEnd.castTo({result_type}.class);
 {I}}}
 
 {I}return _Result.success(result);
@@ -330,40 +349,37 @@ private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
             )
         )
 
-    # A self-closing <v /> represents an empty string.
+    # A self-closing named element represents an empty string.
     result.append(
         Stripped(
             f"""\
 /**
- * Read the content of a {{@code <v>}} element and parse it as a string.
+ * Read the content of a named element and parse it as a string.
  */
-private static _Result<String> tryVElementAsString(XMLEventReader reader) {{
-{I}final _Result<Boolean> tryVStart = tryVStartElement(reader);
-{I}if (tryVStart.isError()) {{
-{II}return tryVStart.castTo(String.class);
+private static _Result<String> tryNamedElementAsString(
+{I}XMLEventReader reader, String expectedName) {{
+{I}final _Result<Boolean> tryStart = tryNamedStartElement(reader, expectedName);
+{I}if (tryStart.isError()) {{
+{II}return tryStart.castTo(String.class);
 {I}}}
 
 {I}final String result;
-{I}if (tryVStart.getResult()) {{
+{I}if (tryStart.getResult()) {{
 {II}result = "";
 {I}}} else {{
 {II}try {{
 {III}result = readContentAsString(reader);
 {II}}} catch (Exception exception) {{
 {III}final Reporting.Error error = new Reporting.Error(
-{IIII}"The content of a <v> element could not be de-serialized " +
-{IIII}"as String: " + exception.getMessage());
+{IIII}"The content of a <" + expectedName + "> element could not be "
+{IIIII}+ "de-serialized as String: " + exception.getMessage());
 {III}return _Result.failure(error);
 {II}}}
 {I}}}
 
-{I}// NOTE (mristin):
-{I}// A self-closing <v /> is represented as a pair of start and end events
-{I}// in StAX, so we need to consume the end element even if the <v /> was
-{I}// empty.
-{I}final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
-{I}if (tryVEnd.isError()) {{
-{II}return tryVEnd.castTo(String.class);
+{I}final _Result<XMLEvent> tryEnd = tryNamedEndElement(reader, expectedName);
+{I}if (tryEnd.isError()) {{
+{II}return tryEnd.castTo(String.class);
 {I}}}
 
 {I}return _Result.success(result);
@@ -371,40 +387,37 @@ private static _Result<String> tryVElementAsString(XMLEventReader reader) {{
         )
     )
 
-    # A self-closing <v /> represents empty bytes.
+    # A self-closing named element represents empty bytes.
     result.append(
         Stripped(
             f"""\
 /**
- * Read a {{@code <v>}} element as base64-encoded bytes.
+ * Read a named element as base64-encoded bytes.
  */
-private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {{
-{I}final _Result<Boolean> tryVStart = tryVStartElement(reader);
-{I}if (tryVStart.isError()) {{
-{II}return tryVStart.castTo(byte[].class);
+private static _Result<byte[]> tryNamedElementAsBytes(
+{I}XMLEventReader reader, String expectedName) {{
+{I}final _Result<Boolean> tryStart = tryNamedStartElement(reader, expectedName);
+{I}if (tryStart.isError()) {{
+{II}return tryStart.castTo(byte[].class);
 {I}}}
 
 {I}final byte[] result;
-{I}if (tryVStart.getResult()) {{
+{I}if (tryStart.getResult()) {{
 {II}result = new byte[0];
 {I}}} else {{
 {II}try {{
 {III}result = readContentAsBase64(reader);
 {II}}} catch (Exception exception) {{
 {III}final Reporting.Error error = new Reporting.Error(
-{IIII}"The content of a <v> element could not be de-serialized " +
-{IIII}"as base64-encoded bytes: " + exception.getMessage());
+{IIII}"The content of a <" + expectedName + "> element could not be "
+{IIIII}+ "de-serialized as base64-encoded bytes: " + exception.getMessage());
 {III}return _Result.failure(error);
 {II}}}
 {I}}}
 
-{I}// NOTE (mristin):
-{I}// A self-closing <v /> is represented as a pair of start and end events
-{I}// in StAX, so we need to consume the end element even if the <v /> was
-{I}// empty.
-{I}final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
-{I}if (tryVEnd.isError()) {{
-{II}return tryVEnd.castTo(byte[].class);
+{I}final _Result<XMLEvent> tryEnd = tryNamedEndElement(reader, expectedName);
+{I}if (tryEnd.isError()) {{
+{II}return tryEnd.castTo(byte[].class);
 {I}}}
 
 {I}return _Result.success(result);
@@ -415,10 +428,17 @@ private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {{
     return result
 
 
-def _generate_try_v_element_as_enumeration(
+def _generate_try_named_element_as_enumeration(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
-    """Generate the function to de-serialize a literal of ``enumeration`` from a ``<v>``."""
+    """
+    Generate the function to de-serialize a literal of ``enumeration`` from
+    a named element.
+
+    This is shared between the items of a list (always read from a repeated
+    ``<v>``) and the items of a tuple (each read from its own ``<v1>``,
+    ``<v2>`` *etc.*).
+    """
     enum_name = java_naming.enum_name(enumeration.name)
     from_str_name = java_naming.private_property_name(
         Identifier(f"{enumeration.name}_from_string")
@@ -427,11 +447,12 @@ def _generate_try_v_element_as_enumeration(
     return Stripped(
         f"""\
 /**
- * Read a {{@code <v>}} element and parse its content as a literal
+ * Read a named element and parse its content as a literal
  * of {{@link {enum_name}}}.
  */
-private static _Result<{enum_name}> tryVElementAs{enum_name}(XMLEventReader reader) {{
-{I}final _Result<String> tryText = tryVElementAsString(reader);
+private static _Result<{enum_name}> tryNamedElementAs{enum_name}(
+{I}XMLEventReader reader, String expectedName) {{
+{I}final _Result<String> tryText = tryNamedElementAsString(reader, expectedName);
 {I}if (tryText.isError()) {{
 {II}return tryText.castTo({enum_name}.class);
 {I}}}
@@ -894,6 +915,71 @@ if ({try_target_var}.isError()) {{
     )
 
 
+def _xml_deserialize_atomic_item_call(
+    item_type_anno: intermediate.TypeAnnotationUnion, name_literal: Stripped
+) -> Stripped:
+    """
+    Generate the call expression for de-serializing a single atomic item.
+
+    The item is expected to be atomic: a primitive, a constrained primitive,
+    an enumeration literal or a class (dispatched through the interface, if
+    the class has concrete descendants). A primitive or an enumeration
+    literal is read from a named element (``name_literal``, *e.g.*, ``"v"``
+    for the items of a list, or ``"v1"``, ``"v2"`` *etc.* for the items of
+    a tuple); a class is dispatched through its own natural element tag, so
+    ``name_literal`` is not needed in that case.
+    """
+    primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+    if primitive_type is not None:
+        if primitive_type is intermediate.PrimitiveType.BOOL:
+            method = "tryNamedElementAsBoolean"
+        elif primitive_type is intermediate.PrimitiveType.INT:
+            method = "tryNamedElementAsLong"
+        elif primitive_type is intermediate.PrimitiveType.FLOAT:
+            method = "tryNamedElementAsDouble"
+        elif primitive_type is intermediate.PrimitiveType.STR:
+            method = "tryNamedElementAsString"
+        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+            method = "tryNamedElementAsBytes"
+        else:
+            assert_never(primitive_type)
+
+        return Stripped(f"{method}(reader, {name_literal})")
+
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        item_type_anno.our_type, intermediate.Enumeration
+    ):
+        enum_name = java_naming.enum_name(item_type_anno.our_type.name)
+        return Stripped(f"tryNamedElementAs{enum_name}(reader, {name_literal})")
+
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        item_type_anno.our_type,
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    ):
+        item_our_type = item_type_anno.our_type
+
+        if (
+            isinstance(item_our_type, intermediate.AbstractClass)
+            or len(item_our_type.concrete_descendants) > 0
+        ):
+            interface_name = java_naming.interface_name(item_our_type.name)
+            return Stripped(f"try{interface_name}FromElement(reader)")
+        else:
+            class_name = java_naming.class_name(item_our_type.name)
+            return Stripped(f"try{class_name}FromElement(reader)")
+    else:
+        raise NotImplementedError(
+            f"We only handle XML de/serialization of atomic items "
+            f"(primitives, constrained primitives, enumeration literals) "
+            f"or classes, but you want to generate the code for an item of "
+            f"type {item_type_anno}. Please contact the developers if you need "
+            f"this feature."
+        )
+
+    raise AssertionError("Should not have gotten here")
+
+
 def _generate_deserialize_list_property(
     prop: intermediate.Property, cls: intermediate.ConcreteClass
 ) -> Stripped:
@@ -910,51 +996,9 @@ def _generate_deserialize_list_property(
 
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-    primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-    deserialize_method: str
-
-    if primitive_type is not None:
-        if primitive_type is intermediate.PrimitiveType.BOOL:
-            deserialize_method = "VElementAsBoolean"
-        elif primitive_type is intermediate.PrimitiveType.INT:
-            deserialize_method = "VElementAsLong"
-        elif primitive_type is intermediate.PrimitiveType.FLOAT:
-            deserialize_method = "VElementAsDouble"
-        elif primitive_type is intermediate.PrimitiveType.STR:
-            deserialize_method = "VElementAsString"
-        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-            deserialize_method = "VElementAsBytes"
-        else:
-            assert_never(primitive_type)
-    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type, intermediate.Enumeration
-    ):
-        enum_name = java_naming.enum_name(type_anno.items.our_type.name)
-        deserialize_method = f"VElementAs{enum_name}"
-    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass),
-    ):
-        item_our_type = type_anno.items.our_type
-
-        if (
-            isinstance(item_our_type, intermediate.AbstractClass)
-            or len(item_our_type.concrete_descendants) > 0
-        ):
-            interface_name = java_naming.interface_name(item_our_type.name)
-            deserialize_method = f"{interface_name}FromElement"
-        else:
-            class_name = java_naming.class_name(item_our_type.name)
-            deserialize_method = f"{class_name}FromElement"
-    else:
-        raise NotImplementedError(
-            f"We only handle XML de/serialization of lists containing atomic "
-            f"values (primitives, constrained primitives, enumeration literals) "
-            f"or classes, but you want to generate the code for a list of "
-            f"type {type_anno}. Please contact the developers if you need "
-            f"this feature."
-        )
+    item_deserialize_call = _xml_deserialize_atomic_item_call(
+        item_type_anno=type_anno.items, name_literal=Stripped('"v"')
+    )
 
     item_type = java_common.generate_type(type_anno.items)
 
@@ -978,7 +1022,7 @@ if (!isEmptyProperty) {{
 {I}}}
 {I}while (currentEvent(reader).isStartElement()) {{
 
-{II}_Result<? extends {item_type}> itemResult = try{deserialize_method}(reader);
+{II}_Result<? extends {item_type}> itemResult = {item_deserialize_call};
 
 {II}if (itemResult.isError()) {{
 {III}itemResult.getError()
@@ -996,6 +1040,106 @@ if (!isEmptyProperty) {{
 {I}}}
 }}"""
     )
+
+
+def _generate_deserialize_tuple_property(
+    prop: intermediate.Property, cls: intermediate.ConcreteClass
+) -> Stripped:
+    """Generate the code to de-serialize a property ``prop`` as a tuple."""
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+    assert isinstance(type_anno, intermediate.TupleTypeAnnotation), (
+        f"This function is expected to be called only for a property whose "
+        f"(optional-stripped) type is a tuple, since the caller "
+        f"(_generate_deserialize_property) already dispatches on "
+        f"intermediate.TupleTypeAnnotation before invoking us, but the "
+        f"property {prop.name!r} has the type {prop.type_annotation}."
+    )
+
+    target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
+    cls_name = java_naming.class_name(cls.name)
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
+    arity = len(type_anno.items)
+
+    blocks = [
+        Stripped(
+            f"""\
+if (isEmptyProperty) {{
+{I}final Reporting.Error error = new Reporting.Error(
+{II}"Expected exactly {arity} item(s), but got a self-closing element");
+{I}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
+{I}return _Result.failure(error);
+}}"""
+        )
+    ]  # type: List[Stripped]
+
+    item_vars = []  # type: List[str]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        item_var = java_naming.variable_name(Identifier(f"item_{prop.name}_{i}"))
+        item_vars.append(item_var)
+
+        item_type = java_common.generate_type(item_type_anno)
+
+        is_class_item = isinstance(
+            item_type_anno, intermediate.OurTypeAnnotation
+        ) and isinstance(
+            item_type_anno.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        )
+
+        item_deserialize_call = _xml_deserialize_atomic_item_call(
+            item_type_anno=item_type_anno,
+            name_literal=java_common.string_literal(f"v{i + 1}"),
+        )
+
+        if is_class_item:
+            # NOTE (mristin):
+            # A class item is dispatched through its own natural element tag,
+            # unlike an atomic item, which is wrapped in ``<v{i+1}>``.
+            read_stmt = Stripped(
+                f"""\
+skipWhitespaceAndComments(reader);
+if (!currentEvent(reader).isStartElement()) {{
+{I}final Reporting.Error error = new Reporting.Error(
+{II}"Expected a start element opening an instance of {item_type}, but got an XML "
+{III}+ getEventTypeAsString(currentEvent(reader)));
+{I}error.prependSegment(new Reporting.IndexSegment({i}));
+{I}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
+{I}return _Result.failure(error);
+}}
+final _Result<? extends {item_type}> {item_var}Result = {item_deserialize_call};"""
+            )
+        else:
+            read_stmt = Stripped(
+                f"""\
+final _Result<? extends {item_type}> {item_var}Result =
+{I}{item_deserialize_call};"""
+            )
+
+        blocks.append(
+            Stripped(
+                f"""\
+{read_stmt}
+if ({item_var}Result.isError()) {{
+{I}{item_var}Result.getError()
+{II}.prependSegment(new Reporting.IndexSegment({i}));
+{I}{item_var}Result.getError()
+{II}.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
+{I}return {item_var}Result.castTo({cls_name}.class);
+}}"""
+            )
+        )
+
+    tuple_literal = java_common.generate_tuple_literal(
+        item_exprs=[Stripped(f"{item_var}Result.getResult()") for item_var in item_vars]
+    )
+
+    blocks.append(
+        Stripped(f"{target_var} = {indent_but_first_line(tuple_literal, I)};")
+    )
+
+    return Stripped("\n\n".join(blocks))
 
 
 @require(lambda prop, cls: id(prop) in cls.property_id_set)
@@ -1037,6 +1181,9 @@ def _generate_deserialize_property(
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         blocks.append(_generate_deserialize_list_property(prop=prop, cls=cls))
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        blocks.append(_generate_deserialize_tuple_property(prop=prop, cls=cls))
 
     else:
         assert_never(type_anno)
@@ -1092,6 +1239,7 @@ private static _Result<{name}> try{name}FromSequence(
                 intermediate.PrimitiveTypeAnnotation,
                 intermediate.OurTypeAnnotation,
                 intermediate.ListTypeAnnotation,
+                intermediate.TupleTypeAnnotation,
             ),
         )
 
@@ -1502,13 +1650,13 @@ def _generate_deserialize_impl(
         _generate_skip_start_document(),
         _generate_try_element_name(),
         _generate_try_content_for_primitives(),
-        _generate_try_v_start_element(),
-        _generate_try_v_end_element(),
-        *_generate_try_v_element_as_primitive_functions(),
+        _generate_try_named_start_element(),
+        _generate_try_named_end_element(),
+        *_generate_try_named_element_as_primitive_functions(),
     ]  # type: List[Stripped]
 
     for enumeration in symbol_table.enumerations:
-        blocks.append(_generate_try_v_element_as_enumeration(enumeration))
+        blocks.append(_generate_try_named_element_as_enumeration(enumeration))
 
     errors = []  # type: List[Error]
 
@@ -2074,6 +2222,155 @@ try {{
     return result
 
 
+def _xml_item_write_stmt(
+    item_type_anno: intermediate.TypeAnnotationUnion,
+    item_access: Stripped,
+    element_name_literal: Stripped,
+) -> Stripped:
+    """
+    Generate the statement(s) writing a single atomic item to the ``writer``.
+
+    Unlike the analogous helper used for lists (which iterates with a fixed
+    ``item`` loop variable and a repeated ``<v>`` tag), this one is
+    parameterized by an arbitrary ``item_access`` expression and
+    ``element_name_literal``, since the items of a tuple are read from
+    fixed, differently-typed positions -- each wrapped in its own ``<vN>``
+    tag -- rather than from a loop.
+    """
+    primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+    if primitive_type is not None:
+        if (
+            primitive_type is intermediate.PrimitiveType.BOOL
+            or primitive_type is intermediate.PrimitiveType.INT
+            or primitive_type is intermediate.PrimitiveType.FLOAT
+            or primitive_type is intermediate.PrimitiveType.STR
+        ):
+            return Stripped(
+                f"""\
+writer.writeStartElement({element_name_literal});
+writer.writeCharacters({item_access}.toString());
+writer.writeEndElement();"""
+            )
+        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+            return Stripped(
+                f"""\
+writer.writeStartElement({element_name_literal});
+writer.writeCharacters(
+{I}Base64.getEncoder().encodeToString({item_access}));
+writer.writeEndElement();"""
+            )
+        else:
+            assert_never(primitive_type)
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        item_type_anno.our_type, intermediate.Enumeration
+    ):
+        enum_name = java_naming.enum_name(item_type_anno.our_type.name)
+        return Stripped(
+            f"""\
+writer.writeStartElement({element_name_literal});
+final Optional<String> itemText = Stringification.toString({item_access});
+if (!itemText.isPresent()) {{
+{I}throw new IllegalArgumentException(
+{II}"Invalid literal for the enumeration {enum_name}: " + {item_access}.toString());
+}}
+writer.writeCharacters(itemText.get());
+writer.writeEndElement();"""
+        )
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        item_type_anno.our_type,
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    ):
+        return Stripped(f"this.visit({item_access}, writer);")
+    else:
+        raise NotImplementedError(
+            f"We only handle XML de/serialization of atomic items "
+            f"(primitives, constrained primitives, enumeration literals) "
+            f"or classes, but you want to generate the code for an item of "
+            f"type {item_type_anno}. Please contact the developers if you need "
+            f"this feature."
+        )
+
+    raise AssertionError("Should not have gotten here")
+
+
+def _generate_serialize_tuple_property_as_content(
+    prop: intermediate.Property,
+) -> Stripped:
+    """Generate the serialization of a tuple ``prop`` as a sequence of elements."""
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+    assert isinstance(type_anno, intermediate.TupleTypeAnnotation), (
+        f"This function is expected to be called only for a property whose "
+        f"(optional-stripped) type is a tuple, since the caller "
+        f"(_generate_serialize_property_as_content) already dispatches on "
+        f"intermediate.TupleTypeAnnotation before invoking us, but the "
+        f"property {prop.name!r} has the type {prop.type_annotation}."
+    )
+
+    getter_name = java_naming.getter_name(prop.name)
+    xml_prop_name_literal = java_common.string_literal(prop.xml_name)
+
+    optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+
+    source_expr = Stripped(
+        f"that.{getter_name}().get()" if optional else f"that.{getter_name}()"
+    )
+
+    item_write_stmts = [
+        _xml_item_write_stmt(
+            item_type_anno=item_type_anno,
+            item_access=Stripped(f"{source_expr}.item{i + 1}()"),
+            element_name_literal=java_common.string_literal(f"v{i + 1}"),
+        )
+        for i, item_type_anno in enumerate(type_anno.items)
+    ]
+
+    items_body = "\n".join(item_write_stmts)
+
+    result: Stripped
+
+    if optional:
+        result = Stripped(
+            f"""\
+if (that.{getter_name}().isPresent()) {{
+{I}writer.writeStartElement(
+{I}{xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
+{I}{indent_but_first_line(items_body, I)}
+{I}writer.writeEndElement();
+}}"""
+        )
+    else:
+        result = Stripped(
+            f"""\
+writer.writeStartElement(
+{I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
+
+{items_body}
+
+writer.writeEndElement();"""
+        )
+
+    result = Stripped(
+        f"""\
+try {{
+{I}{indent_but_first_line(result, I)}
+}} catch (Exception exception) {{
+{I}throw new SerializeException("",exception.getMessage());
+}}"""
+    )
+
+    return result
+
+
 def _generate_serialize_list_property_as_content(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -2088,64 +2385,11 @@ def _generate_serialize_list_property_as_content(
         f"property {prop.name!r} has the type {prop.type_annotation}."
     )
 
-    primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-    item_write_stmt: Stripped
-
-    if primitive_type is not None:
-        if (
-            primitive_type is intermediate.PrimitiveType.BOOL
-            or primitive_type is intermediate.PrimitiveType.INT
-            or primitive_type is intermediate.PrimitiveType.FLOAT
-            or primitive_type is intermediate.PrimitiveType.STR
-        ):
-            item_write_stmt = Stripped(
-                """\
-writer.writeStartElement("v");
-writer.writeCharacters(item.toString());
-writer.writeEndElement();"""
-            )
-        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-            item_write_stmt = Stripped(
-                f"""\
-writer.writeStartElement("v");
-writer.writeCharacters(
-{I}Base64.getEncoder().encodeToString(item));
-writer.writeEndElement();"""
-            )
-        else:
-            assert_never(primitive_type)
-    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type, intermediate.Enumeration
-    ):
-        enum_name = java_naming.enum_name(type_anno.items.our_type.name)
-        item_write_stmt = Stripped(
-            f"""\
-writer.writeStartElement("v");
-final Optional<String> itemText = Stringification.toString(item);
-if (!itemText.isPresent()) {{
-{I}throw new IllegalArgumentException(
-{II}"Invalid literal for the enumeration {enum_name}: " + item.toString());
-}}
-writer.writeCharacters(itemText.get());
-writer.writeEndElement();"""
-        )
-    elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass),
-    ):
-        item_write_stmt = Stripped(
-            """\
-this.visit(item, writer);"""
-        )
-    else:
-        raise NotImplementedError(
-            f"We only handle XML de/serialization of lists containing atomic "
-            f"values (primitives, constrained primitives, enumeration literals) "
-            f"or classes, but you want to generate the code for a list of "
-            f"type {type_anno}. Please contact the developers if you need "
-            f"this feature."
-        )
+    item_write_stmt = _xml_item_write_stmt(
+        item_type_anno=type_anno.items,
+        item_access=Stripped("item"),
+        element_name_literal=Stripped('"v"'),
+    )
 
     item_type = java_common.generate_type(type_anno.items)
 
@@ -2234,6 +2478,9 @@ def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stri
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         body = _generate_serialize_list_property_as_content(prop=prop)
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = _generate_serialize_tuple_property_as_content(prop=prop)
 
     else:
         assert_never(type_anno)
@@ -2488,6 +2735,7 @@ def generate(
         Stripped("import java.util.function.Function;"),
         Stripped("import java.util.List;"),
         Stripped("import java.util.Optional;"),
+        Stripped(f"import {package}.common.*;"),
         Stripped(f"import {package}.reporting.Reporting;"),
         Stripped(f"import {package}.stringification.Stringification;"),
         Stripped(f"import {package}.types.enums.*;"),

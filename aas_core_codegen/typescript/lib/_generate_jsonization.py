@@ -500,9 +500,8 @@ if (parsedOrError.error !== null) {{
             )
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert not isinstance(
-                type_anno.items,
-                (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
             ), (
                 "We chose to implement only a very limited pattern matching; "
                 "see intermediate._translate_._verify_only_simple_type_patterns"
@@ -558,6 +557,89 @@ for (const jsonableItem of iterable) {{
 }}
 
 this.{prop_name} = items;
+return null;"""
+            )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_count = len(type_anno.items)
+
+            item_var_names = [
+                typescript_naming.variable_name(Identifier(f"item_{i}_or_error"))
+                for i in range(item_count)
+            ]
+
+            item_blocks = []  # type: List[Stripped]
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                ), (
+                    "Tuple items are restricted to atomic types (primitives, "
+                    "constrained primitives, classes and enumerations) by "
+                    "intermediate._translate._verify_only_simple_type_patterns, so no "
+                    "nested optionals, lists or tuples are expected here."
+                )
+
+                parse_function = _parse_function_for_atomic_value(item_type_anno)
+                item_var_name = item_var_names[i]
+
+                item_blocks.append(
+                    Stripped(
+                        f"""\
+const {item_var_name} = {parse_function}(
+{I}array[{i}]
+);
+if ({item_var_name}.error !== null) {{
+{I}{item_var_name}.error.path.prepend(
+{II}new IndexSegment(
+{III}array,
+{III}{i}
+{II})
+{I});
+{I}return {item_var_name}.error;
+}}"""
+                    )
+                )
+
+            item_blocks_joined = "\n\n".join(item_blocks)
+
+            tuple_items_joined = ",\n".join(
+                f"{item_var_name}.mustValue()" for item_var_name in item_var_names
+            )
+
+            body = Stripped(
+                f"""\
+if (jsonable === null) {{
+{I}return new DeserializationError(
+{II}"Expected an iterable, but got null"
+{I});
+}}
+if (typeof jsonable !== "object") {{
+{I}return new DeserializationError(
+{II}`Expected an iterable, but got: ${{typeof jsonable}}`
+{I});
+}}
+if (typeof jsonable[Symbol.iterator] !== "function") {{
+{I}return new DeserializationError(
+{II}"Expected an iterable with iterator function, " +
+{III}`but got iterator of type: ${{typeof jsonable[Symbol.iterator]}}`
+{I});
+}}
+
+const iterable = <Iterable<JsonValue>>jsonable;
+const array = Array.from(iterable);
+
+if (array.length !== {item_count}) {{
+{I}return new DeserializationError(
+{II}`Expected exactly {item_count} item(s) in the array, ` +
+{III}`but got: ${{array.length}}`
+{I});
+}}
+
+{item_blocks_joined}
+
+this.{prop_name} = [
+{I}{indent_but_first_line(tuple_items_joined, I)}
+];
 return null;"""
             )
 
@@ -1167,6 +1249,34 @@ for (const item of that.{prop_name}) {{
 {I});
 }}
 jsonable[{key_literal}] = {var_name};"""
+            )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_expressions = []  # type: List[Stripped]
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                ), (
+                    "Tuple items are restricted to atomic types (primitives, "
+                    "constrained primitives, classes and enumerations) by "
+                    "intermediate._translate._verify_only_simple_type_patterns, so no "
+                    "nested optionals, lists or tuples are expected here."
+                )
+
+                item_expressions.append(
+                    _generate_transform_atomic_value(
+                        access_expression=Stripped(f"that.{prop_name}[{i}]"),
+                        type_anno=item_type_anno,
+                    )
+                )
+
+            item_expressions_joined = ",\n".join(item_expressions)
+
+            block = Stripped(
+                f"""\
+jsonable[{key_literal}] = [
+{I}{indent_but_first_line(item_expressions_joined, I)}
+];"""
             )
 
         else:

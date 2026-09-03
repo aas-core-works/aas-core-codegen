@@ -955,6 +955,13 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             items_primitive_type = intermediate.try_primitive_type(type_anno.items)
 
+            # NOTE (mristin):
+            # Class items are dispatched through their own natural element tag, so
+            # their read function already verifies the tag. Atomic (primitive or
+            # enumeration) items, on the other hand, are always wrapped in a ``<v>``
+            # element, so we have to verify that tag ourselves.
+            is_v_element = True
+
             if items_primitive_type is not None:
                 read_item = Identifier(
                     _READ_FUNCTION_BY_PRIMITIVE_TYPE[items_primitive_type]
@@ -980,6 +987,7 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                         type_anno.items.our_type,
                         (intermediate.AbstractClass, intermediate.ConcreteClass),
                     ):
+                        is_v_element = False
                         read_item = python_naming.function_name(
                             Identifier(
                                 f"_read_{type_anno.items.our_type.name}_as_element"
@@ -1001,6 +1009,33 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
             items_type = python_common.generate_type(
                 type_anno.items, types_module=Identifier("aas_types")
             )
+
+            if is_v_element:
+                item_read_block = Stripped(
+                    f"""\
+try:
+{I}item = _read_v_element(
+{II}next_element,
+{II}iterator,
+{II}"v",
+{II}{read_item}
+{I})
+except DeserializationException as exception:
+{I}exception.path._prepend(IndexSegment(next_element, item_i))
+{I}raise"""
+                )
+            else:
+                item_read_block = Stripped(
+                    f"""\
+try:
+{I}item = {read_item}(
+{II}next_element,
+{II}iterator
+{I})
+except DeserializationException as exception:
+{I}exception.path._prepend(IndexSegment(next_element, item_i))
+{I}raise"""
+                )
 
             method_body = Stripped(
                 f"""\
@@ -1035,19 +1070,146 @@ while True:
 {III}f"but got event {{next_event!r}} and element {{next_element.tag!r}}"
 {II})
 
-{I}try:
-{II}item = {read_item}(
-{III}next_element,
-{III}iterator
-{II})
-{I}except DeserializationException as exception:
-{II}exception.path._prepend(IndexSegment(next_element, item_i))
-{II}raise
+{I}{indent_but_first_line(item_read_block, I)}
 
 {I}result.append(item)
 {I}item_i += 1
 
 self.{prop_name} = result"""
+            )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_var_names = [f"item_{i}" for i in range(len(type_anno.items))]
+
+            read_item_blocks = []  # type: List[Stripped]
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                ), (
+                    "Tuple items are restricted to atomic types (primitives, "
+                    "constrained primitives, classes and enumerations) by "
+                    "intermediate._translate._verify_only_simple_type_patterns, so "
+                    "no nested optionals, lists or tuples are expected here."
+                )
+
+                item_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+                # NOTE (mristin):
+                # Class items are dispatched through their own natural element tag, so
+                # their read function already verifies the tag. Atomic (primitive or
+                # enumeration) items, on the other hand, are always wrapped in
+                # a positional ``<v1>``, ``<v2>``, *etc.* element, so we have to
+                # verify that tag ourselves.
+                item_is_v_element = True
+
+                if item_primitive_type is not None:
+                    read_item = Identifier(
+                        _READ_FUNCTION_BY_PRIMITIVE_TYPE[item_primitive_type]
+                    )
+                elif isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
+                    raise AssertionError("Expected to handle this case before")
+
+                elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+                    if isinstance(item_type_anno.our_type, intermediate.Enumeration):
+                        read_item = python_naming.private_function_name(
+                            Identifier(
+                                f"read_{item_type_anno.our_type.name}"
+                                f"_from_element_text"
+                            )
+                        )
+
+                    elif isinstance(
+                        item_type_anno.our_type, intermediate.ConstrainedPrimitive
+                    ):
+                        raise AssertionError("Expected to handle this case before")
+
+                    elif isinstance(
+                        item_type_anno.our_type,
+                        (intermediate.AbstractClass, intermediate.ConcreteClass),
+                    ):
+                        item_is_v_element = False
+                        read_item = python_naming.function_name(
+                            Identifier(
+                                f"_read_{item_type_anno.our_type.name}_as_element"
+                            )
+                        )
+
+                    else:
+                        # noinspection PyTypeChecker
+                        assert_never(item_type_anno.our_type)
+                else:
+                    # noinspection PyTypeChecker
+                    assert_never(item_type_anno)
+
+                item_var_name = item_var_names[i]
+
+                if item_is_v_element:
+                    v_name = f"v{i + 1}"
+                    item_read_block = Stripped(
+                        f"""\
+try:
+{I}{item_var_name} = _read_v_element(
+{II}next_element,
+{II}iterator,
+{II}"{v_name}",
+{II}{read_item}
+{I})
+except DeserializationException as exception:
+{I}exception.path._prepend(IndexSegment(next_element, {i}))
+{I}raise"""
+                    )
+                else:
+                    item_read_block = Stripped(
+                        f"""\
+try:
+{I}{item_var_name} = {read_item}(
+{II}next_element,
+{II}iterator
+{I})
+except DeserializationException as exception:
+{I}exception.path._prepend(IndexSegment(next_element, {i}))
+{I}raise"""
+                    )
+
+                read_item_blocks.append(
+                    Stripped(
+                        f"""\
+next_event_element = next(iterator, None)
+if next_event_element is None:
+{I}raise DeserializationException(
+{II}"Expected the item {i} of the tuple, but got end-of-input"
+{I})
+
+next_event, next_element = next_event_element
+if next_event != 'start':
+{I}raise DeserializationException(
+{II}f"Expected a start element corresponding to the item {i} "
+{II}f"of the tuple, but got event {{next_event!r}} "
+{II}f"and element {{next_element.tag!r}}"
+{I})
+
+{item_read_block}"""
+                    )
+                )
+
+            read_item_blocks_joined = "\n\n".join(read_item_blocks)
+            tuple_items_joined = ",\n".join(item_var_names)
+
+            method_body = Stripped(
+                f"""\
+if element.text is not None and len(element.text.strip()) != 0:
+{I}raise DeserializationException(
+{II}f"Expected only item elements and whitespace text, "
+{II}f"but got text: {{element.text!r}}"
+{I})
+
+{read_item_blocks_joined}
+
+_read_end_element(element, iterator)
+
+self.{prop_name} = (
+{I}{indent_but_first_line(tuple_items_joined, I)}
+)"""
             )
 
         else:
@@ -1782,6 +1944,98 @@ else:
                                 f"Please contact the developers if you need this feature."
                             )
 
+                elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+                    item_write_stmts = []  # type: List[Stripped]
+                    for i, item_type_anno in enumerate(type_anno.items):
+                        assert isinstance(
+                            item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                        ), (
+                            "Tuple items are restricted to atomic types "
+                            "(primitives, constrained primitives, classes and "
+                            "enumerations) by "
+                            "intermediate._translate._verify_only_simple_type_patterns"
+                            ", so no nested optionals, lists or tuples are expected "
+                            "here."
+                        )
+
+                        item_access = f"that.{prop_name}[{i}]"
+                        item_xml_literal = python_common.string_literal(f"v{i + 1}")
+
+                        item_primitive_type = intermediate.try_primitive_type(
+                            item_type_anno
+                        )
+
+                        if item_primitive_type is not None:
+                            write_method = _WRITE_METHOD_BY_PRIMITIVE_TYPE[
+                                item_primitive_type
+                            ]
+                            item_write_stmts.append(
+                                Stripped(
+                                    f"""\
+self.{write_method}(
+{I}{item_xml_literal},
+{I}{item_access}
+)"""
+                                )
+                            )
+
+                        elif isinstance(
+                            item_type_anno, intermediate.PrimitiveTypeAnnotation
+                        ):
+                            raise AssertionError("Expected to be handled before")
+
+                        elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+                            if isinstance(
+                                item_type_anno.our_type, intermediate.Enumeration
+                            ):
+                                item_write_stmts.append(
+                                    Stripped(
+                                        f"""\
+self._write_str_as_element(
+{I}{item_xml_literal},
+{I}{item_access}.value
+)"""
+                                    )
+                                )
+
+                            elif isinstance(
+                                item_type_anno.our_type,
+                                intermediate.ConstrainedPrimitive,
+                            ):
+                                raise AssertionError("Expected to be handled before")
+
+                            elif isinstance(
+                                item_type_anno.our_type,
+                                (
+                                    intermediate.AbstractClass,
+                                    intermediate.ConcreteClass,
+                                ),
+                            ):
+                                # NOTE (mristin):
+                                # Unlike primitives, constrained primitives and
+                                # enumeration literals, a class writes its own
+                                # element tag through ``self.visit``, exactly as we
+                                # do for the lists above.
+                                item_write_stmts.append(
+                                    Stripped(f"self.visit({item_access})")
+                                )
+
+                            else:
+                                # noinspection PyTypeChecker
+                                assert_never(item_type_anno.our_type)
+                        else:
+                            # noinspection PyTypeChecker
+                            assert_never(item_type_anno)
+
+                    item_write_stmts_joined = "\n".join(item_write_stmts)
+
+                    write_prop = Stripped(
+                        f"""\
+self._write_start_element({xml_prop_literal})
+{item_write_stmts_joined}
+self._write_end_element({xml_prop_literal})"""
+                    )
+
                 else:
                     assert_never(type_anno)
 
@@ -2393,6 +2647,7 @@ from typing import (
 {I}Sequence,
 {I}TextIO,
 {I}Tuple,
+{I}TypeVar,
 {I}Union,
 {I}TYPE_CHECKING
 )
@@ -2697,6 +2952,47 @@ def _parse_element_tag(element: Element) -> str:
 {III})
 
 {I}return element.tag[len(_NAMESPACE_IN_CURLY_BRACKETS):]"""
+            ),
+            Stripped(
+                f"""\
+_ValueT = TypeVar("_ValueT")
+
+
+def _read_v_element(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]],
+{I}expected_tag: str,
+{I}read_content: Callable[
+{II}[Element, Iterator[Tuple[str, Element]]],
+{II}_ValueT
+{I}]
+) -> _ValueT:
+{I}\"\"\"
+{I}Verify that :paramref:`element` bears the :paramref:`expected_tag`, and
+{I}delegate the reading of its content to :paramref:`read_content`.
+
+{I}This is used to read a single positional item wrapped in a named element,
+{I}such as ``<v>`` for a list item, or ``<v1>``, ``<v2>``, *etc.* for
+{I}a tuple item.
+
+{I}:param element: look-ahead element
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:param expected_tag: expected tag of :paramref:`element`
+{I}:param read_content: to read the content of :paramref:`element`
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return: parsed value
+{I}\"\"\"
+{I}tag_wo_ns = _parse_element_tag(element)
+{I}if tag_wo_ns != expected_tag:
+{II}raise DeserializationException(
+{III}f"Expected an element with the tag {{expected_tag!r}}, "
+{III}f"but got an element with tag: {{tag_wo_ns!r}}"
+{II})
+
+{I}return read_content(element, iterator)"""
             ),
             Stripped(
                 f"""\

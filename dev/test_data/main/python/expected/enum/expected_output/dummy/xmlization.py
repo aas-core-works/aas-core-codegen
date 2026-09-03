@@ -83,6 +83,7 @@ from typing import (
     Sequence,
     TextIO,
     Tuple,
+    TypeVar,
     Union,
     TYPE_CHECKING
 )
@@ -722,6 +723,46 @@ def _parse_element_tag(element: Element) -> str:
             )
 
     return element.tag[len(_NAMESPACE_IN_CURLY_BRACKETS):]
+
+
+_ValueT = TypeVar("_ValueT")
+
+
+def _read_v_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    expected_tag: str,
+    read_content: Callable[
+        [Element, Iterator[Tuple[str, Element]]],
+        _ValueT
+    ]
+) -> _ValueT:
+    """
+    Verify that :paramref:`element` bears the :paramref:`expected_tag`, and
+    delegate the reading of its content to :paramref:`read_content`.
+
+    This is used to read a single positional item wrapped in a named element,
+    such as ``<v>`` for a list item, or ``<v1>``, ``<v2>``, *etc.* for
+    a tuple item.
+
+    :param element: look-ahead element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param expected_tag: expected tag of :paramref:`element`
+    :param read_content: to read the content of :paramref:`element`
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed value
+    """
+    tag_wo_ns = _parse_element_tag(element)
+    if tag_wo_ns != expected_tag:
+        raise DeserializationException(
+            f"Expected an element with the tag {expected_tag!r}, "
+            f"but got an element with tag: {tag_wo_ns!r}"
+        )
+
+    return read_content(element, iterator)
 
 
 def _raise_if_has_tail_or_attrib(

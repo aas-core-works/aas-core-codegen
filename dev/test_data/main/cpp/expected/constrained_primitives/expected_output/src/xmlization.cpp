@@ -2342,36 +2342,41 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeBool:
+      case properties::OfSomething::kSomeBool: {
         std::tie(
           the_some_bool,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfSomething::kSomeInt:
+      }
+      case properties::OfSomething::kSomeInt: {
         std::tie(
           the_some_int,
           error
         ) = DeserializeInt64(reader);
         break;
-      case properties::OfSomething::kSomeFloat:
+      }
+      case properties::OfSomething::kSomeFloat: {
         std::tie(
           the_some_float,
           error
         ) = DeserializeDouble(reader);
         break;
-      case properties::OfSomething::kSomeString:
+      }
+      case properties::OfSomething::kSomeString: {
         std::tie(
           the_some_string,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSomething::kSomeBytes:
+      }
+      case properties::OfSomething::kSomeBytes: {
         std::tie(
           the_some_bytes,
           error
         ) = DeserializeByteArray(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(

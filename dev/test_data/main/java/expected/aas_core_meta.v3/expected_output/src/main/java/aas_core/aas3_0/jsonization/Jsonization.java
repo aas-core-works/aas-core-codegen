@@ -5,6 +5,7 @@
 
 package aas_core.aas3_0.jsonization;
 
+import aas_core.aas3_0.common.*;
 import aas_core.aas3_0.reporting.Reporting;
 import aas_core.aas3_0.types.enums.*;
 import aas_core.aas3_0.types.impl.*;

@@ -290,7 +290,17 @@ func readTextAsLong(
 {II}return
 {I}}}
 
-{I}value, err = strconv.ParseInt(text, 10, 64)
+{I}var parseErr error
+{I}value, parseErr = strconv.ParseInt(text, 10, 64)
+{I}if parseErr != nil {{
+{II}err = newDeserializationError(
+{III}fmt.Sprintf(
+{IIII}"Expected a value as xs:long, but it could not be parsed: %s: %s",
+{IIII}parseErr.Error(), text,
+{III}),
+{II})
+{II}return
+{I}}}
 
 {I}return
 }}"""
@@ -677,33 +687,11 @@ func readListOfScalars[T Scalar](
 {III}break
 {II}}}
 
-{II}var local string
-{II}local, err = parseAsStartElementAndExtractLocalName(
-{III}current,
-{II})
-{II}if err != nil {{
-{III}return
-{II}}}
-
-{II}if local != "v" {{
-{III}err = newDeserializationError(
-{IIII}fmt.Sprintf(
-{IIIII}"Expected start element 'v' as a delimiter for a list of values, "+
-{IIIIII}"but got %s",
-{IIIII}local,
-{IIII}),
-{III})
-{II}}}
-
-{II}// Move the current to the value
-{II}current, err = readNext(decoder, current)
-{II}if err != nil {{
-{III}return
-{II}}}
-
 {II}var value T
 {II}var valueErr error
-{II}value, current, valueErr = readTextAsT(decoder, current)
+{II}value, current, valueErr = readScalarWithName(
+{III}decoder, current, "v", readTextAsT,
+{II})
 {II}if valueErr != nil {{
 {III}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
 {IIII}deseriaErr.Path.PrependIndex(
@@ -717,19 +705,72 @@ func readListOfScalars[T Scalar](
 {II}values = append(values, value)
 
 {II}i++
-
-{II}err = checkEndElement(current, local)
-{II}if err != nil {{
-{III}return
-{II}}}
-
-{II}current, err = readNext(decoder, nil)
-{II}if err != nil {{
-{III}return
-{II}}}
 {I}}}
 
 {I}next = current
+{I}return
+}}"""
+    )
+
+
+def _generate_read_scalar_with_name() -> Stripped:
+    return Stripped(
+        f"""\
+// Read a scalar, *i.e.*, a non-instance, wrapped in a single element bearing
+// the `expectedName`, as a positional item of a tuple.
+//
+// The resulting `next` token points to the first token just after the wrapping
+// element.
+func readScalarWithName[T Scalar](
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}expectedName string,
+{I}readTextAsT func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{I}) (value T, aNext xml.Token, anErr error),
+) (value T, next xml.Token, err error) {{
+{I}current, err = skipEmptyTextWhitespaceAndComments(decoder, current)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}var local string
+{I}local, err = parseAsStartElementAndExtractLocalName(
+{II}current,
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}if local != expectedName {{
+{II}err = newDeserializationError(
+{III}fmt.Sprintf(
+{IIII}"Expected start element %s as a tuple item delimiter, "+
+{IIIII}"but got %s",
+{IIII}expectedName, local,
+{III}),
+{II})
+{II}return
+{I}}}
+
+{I}// Move the current to the value
+{I}current, err = readNext(decoder, current)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}value, current, err = readTextAsT(decoder, current)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = checkEndElement(current, local)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}next, err = readNext(decoder, current)
 {I}return
 }}"""
     )
@@ -1070,6 +1111,117 @@ if valueErr == nil {{
                 else:
                     # noinspection PyTypeChecker
                     assert_never(type_anno.items)
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_vars = []  # type: List[str]
+            item_var_decls = []  # type: List[Stripped]
+            item_snippets = []  # type: List[Stripped]
+
+            for i, item_type_anno in enumerate(type_anno.items):
+                item_var = golang_naming.variable_name(
+                    Identifier(f"item_{prop.name}_{i}")
+                )
+                item_vars.append(item_var)
+
+                item_type = golang_common.generate_type(
+                    type_annotation=item_type_anno, types_package=Identifier("aastypes")
+                )
+
+                item_var_decls.append(Stripped(f"var {item_var} {item_type}"))
+
+                if isinstance(
+                    item_type_anno, intermediate.OurTypeAnnotation
+                ) and isinstance(
+                    item_type_anno.our_type,
+                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                ):
+                    read_with_lookahead_function = golang_naming.private_function_name(
+                        Identifier(
+                            f"read_{item_type_anno.our_type.name}_with_lookahead"
+                        )
+                    )
+
+                    item_snippets.append(
+                        Stripped(
+                            f"""\
+current, valueErr = skipEmptyTextWhitespaceAndComments(decoder, current)
+if valueErr == nil {{
+{I}{item_var}, valueErr = {read_with_lookahead_function}(
+{II}decoder,
+{II}current,
+{I})
+{I}if valueErr == nil {{
+{II}current, valueErr = readNext(decoder, current)
+{I}}}
+}}"""
+                        )
+                    )
+
+                else:
+                    if isinstance(
+                        item_type_anno, intermediate.OurTypeAnnotation
+                    ) and isinstance(item_type_anno.our_type, intermediate.Enumeration):
+                        read_text_function = golang_naming.private_function_name(
+                            Identifier(f"read_text_as_{item_type_anno.our_type.name}")
+                        )
+                    else:
+                        items_primitive_type = intermediate.try_primitive_type(
+                            item_type_anno
+                        )
+                        assert items_primitive_type is not None
+                        read_text_function = _READ_FUNCTION_BY_PRIMITIVE_TYPE[
+                            items_primitive_type
+                        ]
+
+                    v_name_literal = golang_common.string_literal(f"v{i + 1}")
+
+                    item_snippets.append(
+                        Stripped(
+                            f"""\
+{item_var}, current, valueErr = readScalarWithName(
+{I}decoder,
+{I}current,
+{I}{v_name_literal},
+{I}{read_text_function},
+)"""
+                        )
+                    )
+
+            tuple_type = golang_common.generate_type(
+                type_annotation=type_anno, types_package=Identifier("aastypes")
+            )
+
+            item_vars_joined = "\n".join(f"{item_var}," for item_var in item_vars)
+
+            # NOTE (mristin, 2026-09-03):
+            # The tuple construction is nested as the innermost block so that all
+            # the item variables, declared once up-front, are only used once we know
+            # that every single item has been successfully read.
+            nested = Stripped(
+                f"""\
+{prop_var} = {tuple_type}{{
+{I}{indent_but_first_line(item_vars_joined, I)}
+}}"""
+            )
+            for snippet in reversed(item_snippets):
+                nested = Stripped(
+                    f"""\
+{snippet}
+if valueErr == nil {{
+{I}{indent_but_first_line(nested, I)}
+}}"""
+                )
+
+            item_var_decls_joined = "\n".join(item_var_decls)
+
+            case_body_blocks.append(
+                Stripped(
+                    f"""\
+{item_var_decls_joined}
+
+{nested}"""
+                )
+            )
 
         else:
             # noinspection PyTypeChecker
@@ -2322,6 +2474,98 @@ err = writeListOfInstancesProperty(
 {if_err_nil_prepend_name_if_serialization_error_return}"""
             )
 
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_write_blocks = []  # type: List[Stripped]
+
+        for i, item_type_anno in enumerate(type_anno.items):
+            item_expr = f"{access_expr}.Item{i + 1}"
+
+            if_item_err_nil_prepend_index_return = Stripped(
+                f"""\
+if err != nil {{
+{I}if seriaErr, ok := err.(*SerializationError); ok {{
+{II}seriaErr.Path.PrependIndex(
+{III}&aasreporting.IndexSegment{{
+{IIII}Index: {i},
+{III}}},
+{II})
+{I}}}
+{I}return
+}}"""
+            )
+
+            if isinstance(
+                item_type_anno, intermediate.OurTypeAnnotation
+            ) and isinstance(
+                item_type_anno.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                item_write_blocks.append(
+                    Stripped(
+                        f"""\
+err = Marshal(
+{I}encoder,
+{I}{item_expr},
+{I}false,
+)
+{if_item_err_nil_prepend_index_return}"""
+                    )
+                )
+
+            else:
+                if isinstance(
+                    item_type_anno, intermediate.OurTypeAnnotation
+                ) and isinstance(item_type_anno.our_type, intermediate.Enumeration):
+                    write_function = golang_naming.private_function_name(
+                        Identifier(f"write_{item_type_anno.our_type.name}_as_text")
+                    )
+                else:
+                    items_primitive_type = intermediate.try_primitive_type(
+                        item_type_anno
+                    )
+                    assert items_primitive_type is not None
+                    write_function = _WRITE_FUNCTION_BY_PRIMITIVE_TYPE[
+                        items_primitive_type
+                    ]
+
+                v_name_literal = golang_common.string_literal(f"v{i + 1}")
+
+                item_write_blocks.append(
+                    Stripped(
+                        f"""\
+err = writeScalarProperty(
+{I}encoder,
+{I}{v_name_literal},
+{I}{item_expr},
+{I}{write_function},
+)
+{if_item_err_nil_prepend_index_return}"""
+                    )
+                )
+
+        item_write_blocks_joined = "\n\n".join(item_write_blocks)
+
+        write_block = Stripped(
+            f"""\
+err = writeStartElement(
+{I}encoder,
+{I}{local_literal},
+{I}false,
+)
+if err != nil {{
+{I}return
+}}
+
+{item_write_blocks_joined}
+
+err = writeEndElement(
+{I}encoder,
+{I}{local_literal},
+{I}false,
+)
+{if_err_nil_prepend_name_if_serialization_error_return}"""
+        )
+
     else:
         assert_never(type_anno)
 
@@ -2636,6 +2880,7 @@ const Namespace = {namespace_literal}"""
             _generate_parse_as_start_element_and_extract_local_name(),
             _generate_check_end_element(),
             _generate_scalar_definition(),
+            _generate_read_scalar_with_name(),
             _generate_read_list_of_scalars(),
             _generate_read_list_of_instances(),
         ]

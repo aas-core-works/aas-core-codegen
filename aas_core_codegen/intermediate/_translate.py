@@ -61,6 +61,8 @@ from aas_core_codegen.intermediate._types import (
     Constructor,
     OurType,
     ListTypeAnnotation,
+    TupleTypeAnnotation,
+    AtomicTypeAnnotationAsTuple,
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     STR_TO_PRIMITIVE_TYPE,
@@ -1007,6 +1009,19 @@ def _to_type_annotation(
 
             return OptionalTypeAnnotation(
                 value=_to_type_annotation(parsed.subscripts[0]),
+                parsed=parsed,
+            )
+
+        elif parsed.identifier == "Tuple":
+            assert len(parsed.subscripts) >= 1, (
+                f"Expected at least one subscript for the Tuple type annotation, "
+                f"but got: {parsed}; this should have been caught before!"
+            )
+
+            return TupleTypeAnnotation(
+                items=[
+                    _to_type_annotation(subscript) for subscript in parsed.subscripts
+                ],
                 parsed=parsed,
             )
 
@@ -2262,6 +2277,10 @@ def _over_our_type_annotations(
 
     elif isinstance(something, ListTypeAnnotation):
         yield from _over_our_type_annotations(something.items)
+
+    elif isinstance(something, TupleTypeAnnotation):
+        for item in something.items:
+            yield from _over_our_type_annotations(item)
 
     elif isinstance(something, OptionalTypeAnnotation):
         yield from _over_our_type_annotations(something.value)
@@ -4448,8 +4467,12 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
     in the future. At this point, we restrict ourselves to the following patterns:
 
     * Non-nested optional types, *i.e.* optional of optionals, are unexpected;
-    * Lists of optionals are unexpected; and
-    * Lists of non-classes are unexpected.
+    * Lists of optionals are unexpected;
+    * Lists of non-classes are unexpected;
+    * Tuples of optionals are unexpected; and
+    * Tuples of non-atomic types (*i.e.* of lists, tuples or optionals) are
+      unexpected -- we only support tuples of primitives, constrained primitives,
+      classes and enumerations.
     """
     errors = []  # type: List[Error]
     for cls in symbol_table.classes:
@@ -4476,6 +4499,27 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
                             f"We currently support only a limited set of "
                             f"type annotation patterns. At the moment, we handle "
                             f"only lists non-optionals, "
+                            f"but the property {prop.name!r} "
+                            f"of the class {cls.name!r} "
+                            f"has type: {prop.type_annotation}. "
+                            f"Please contact the developers if you need "
+                            f"this functionality",
+                        )
+                    )
+
+            elif isinstance(type_anno, TupleTypeAnnotation):
+                if not all(
+                    isinstance(item, AtomicTypeAnnotationAsTuple)
+                    for item in type_anno.items
+                ):
+                    errors.append(
+                        Error(
+                            prop.parsed.node,
+                            f"We currently support only a limited set of "
+                            f"type annotation patterns. At the moment, we handle "
+                            f"only tuples of primitives, constrained primitives, "
+                            f"classes and enumerations (*i.e.* no tuples of "
+                            f"optionals, lists or nested tuples), "
                             f"but the property {prop.name!r} "
                             f"of the class {cls.name!r} "
                             f"has type: {prop.type_annotation}. "
@@ -4678,6 +4722,10 @@ def _over_type_annotation_and_nested_type_annotations(
         yield from _over_type_annotation_and_nested_type_annotations(
             type_annotation.items
         )
+
+    elif isinstance(type_annotation, TupleTypeAnnotation):
+        for item in type_annotation.items:
+            yield from _over_type_annotation_and_nested_type_annotations(item)
 
     else:
         pass

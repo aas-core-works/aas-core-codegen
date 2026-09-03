@@ -2808,7 +2808,11 @@ std::pair<
 
 
 def _generate_deserialize_atomic_value_from_v_element() -> Stripped:
-    """Generate the function to deserialize non-class atomic values from ``<v>``."""
+    """
+    Generate the function to deserialize non-class atomic values from a named
+    element such as ``<v>`` (for list items) or ``<v1>``, ``<v2>``, *etc.* (for
+    tuple items).
+    """
     return Stripped(
         f"""\
 template <typename T, typename DeserializeT>
@@ -2817,7 +2821,8 @@ std::pair<
 {I}common::optional<DeserializationError>
 > DeserializeValueFromVElement(
 {I}ReaderMergingText& reader,
-{I}const DeserializeT& deserialize_content
+{I}const DeserializeT& deserialize_content,
+{I}const std::string& expected_name
 ) {{
 {I}#ifdef DEBUG
 {I}if (reader.node().kind() == NodeKind::Error) {{
@@ -2831,7 +2836,9 @@ std::pair<
 {I}if (reader.node().kind() != NodeKind::Start) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a start element <v> enclosing a value, but got ",
+{IIII}L"Expected a start element <",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> enclosing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
@@ -2843,17 +2850,19 @@ std::pair<
 {II}>(reader.node()).name
 {I});
 
-{I}if (start_name != "v") {{
+{I}if (start_name != expected_name) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a start element <v> enclosing a value, but got ",
+{IIII}L"Expected a start element <",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> enclosing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
 {I}}}
 
 {I}// NOTE (mristin):
-{I}// We consume the <v>.
+{I}// We consume the start element.
 {I}reader.Read();
 
 {I}if (reader.node().kind() == NodeKind::Error) {{
@@ -2869,7 +2878,9 @@ std::pair<
 
 {I}if (error.has_value()) {{
 {II}error->path.segments.emplace_front(
-{III}common::make_unique<ElementSegment>(L"v")
+{III}common::make_unique<ElementSegment>(
+{IIII}common::Utf8ToWstring(expected_name)
+{III})
 {II});
 
 {II}return NoInstanceAndDeserializationError<T>(
@@ -2880,7 +2891,9 @@ std::pair<
 {I}if (reader.node().kind() != NodeKind::Stop) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a closing element </v> closing a value, but got ",
+{IIII}L"Expected a closing element </",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> closing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
@@ -2893,17 +2906,19 @@ std::pair<
 {I});
 
 
-{I}if (stop_name != "v") {{
+{I}if (stop_name != expected_name) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a stop element </v> closing a value, but got ",
+{IIII}L"Expected a closing element </",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> closing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
 {I}}}
 
 {I}// NOTE (mristin):
-{I}// We consume the </v>.
+{I}// We consume the closing element.
 {I}reader.Read();
 
 {I}if (reader.node().kind() == NodeKind::Error) {{
@@ -3169,6 +3184,85 @@ const std::unordered_map<
     return result
 
 
+def _xml_deserialize_item_expr(
+    item_type_anno: intermediate.AtomicTypeAnnotation,
+    item_type: Stripped,
+    v_element_name: str,
+) -> Stripped:
+    """
+    Generate the expression of the callable to de-serialize an atomic item from XML.
+
+    The ``v_element_name`` denotes the wrapping element expected for a non-class
+    atomic value (*e.g.*, ``v`` for a list item or ``v1``, ``v2``, *etc.* for
+    a tuple item). Class items ignore ``v_element_name`` as they are de-serialized
+    directly from their own element.
+    """
+    items_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+    if items_primitive_type is not None:
+        deserialize_text = _PRIMITIVE_TYPE_TO_DESERIALIZE[items_primitive_type]
+
+        v_element_name_literal = cpp_common.string_literal(v_element_name)
+
+        return Stripped(
+            f"""\
+[](ReaderMergingText& a_reader) {{
+{I}return DeserializeValueFromVElement<
+{II}{indent_but_first_line(item_type, II)}
+{I}>(
+{II}a_reader,
+{II}{deserialize_text},
+{II}{v_element_name_literal}
+{I});
+}}"""
+        )
+
+    if isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
+        raise AssertionError("Expected to handle this case before")
+
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(item_type_anno.our_type, intermediate.Enumeration):
+            deserialize_text = cpp_naming.function_name(
+                Identifier(f"deserialize_{item_type_anno.our_type.name}")
+            )
+
+            v_element_name_literal = cpp_common.string_literal(v_element_name)
+
+            return Stripped(
+                f"""\
+[](ReaderMergingText& a_reader) {{
+{I}return DeserializeValueFromVElement<
+{II}{indent_but_first_line(item_type, II)}
+{I}>(
+{II}a_reader,
+{II}{deserialize_text},
+{II}{v_element_name_literal}
+{I});
+}}"""
+            )
+
+        elif isinstance(item_type_anno.our_type, intermediate.ConstrainedPrimitive):
+            raise AssertionError("Expected to handle this case before")
+
+        elif isinstance(
+            item_type_anno.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        ):
+            return cpp_naming.function_name(
+                Identifier(f"{item_type_anno.our_type.name}_from_element")
+            )
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(item_type_anno.our_type)
+
+    else:
+        # noinspection PyTypeChecker
+        assert_never(item_type_anno)
+
+    raise AssertionError("Should not have gotten here")
+
+
 def _generate_deserialize_list_property(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -3190,70 +3284,16 @@ def _generate_deserialize_list_property(
         type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
-    deserialize_item_expr: Stripped
-
-    items_primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-    if items_primitive_type is not None:
-        deserialize_text = _PRIMITIVE_TYPE_TO_DESERIALIZE[items_primitive_type]
-
-        deserialize_item_expr = Stripped(
-            f"""\
-[](ReaderMergingText& a_reader) {{
-{I}return DeserializeValueFromVElement<
-{II}{indent_but_first_line(item_type, II)}
-{I}>(
-{II}a_reader,
-{II}{deserialize_text}
-{I});
-}}"""
+    if not isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple):
+        raise NotImplementedError(
+            "NOTE (mristin): We currently generate XML de-serialization only for "
+            f"the lists of atomic values, but we got: {prop.type_annotation}. "
+            f"Please contact the developers if you need this feature."
         )
 
-    else:
-        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-            raise AssertionError("Expected to handle this case before")
-
-        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                deserialize_text = cpp_naming.function_name(
-                    Identifier(f"deserialize_{type_anno.items.our_type.name}")
-                )
-
-                deserialize_item_expr = Stripped(
-                    f"""\
-[](ReaderMergingText& a_reader) {{
-{I}return DeserializeValueFromVElement<
-{II}{indent_but_first_line(item_type, II)}
-{I}>(
-{II}a_reader,
-{II}{deserialize_text}
-{I});
-}}"""
-                )
-
-            elif isinstance(
-                type_anno.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                raise AssertionError("Expected to handle this case before")
-
-            elif isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                deserialize_item_expr = cpp_naming.function_name(
-                    Identifier(f"{type_anno.items.our_type.name}_from_element")
-                )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.items.our_type)
-
-        else:
-            raise NotImplementedError(
-                "NOTE (mristin): We currently generate XML de-serialization only for "
-                f"the lists of atomic values, but we got: {prop.type_annotation}. "
-                f"Please contact the developers if you need this feature."
-            )
+    deserialize_item_expr = _xml_deserialize_item_expr(
+        item_type_anno=type_anno.items, item_type=item_type, v_element_name="v"
+    )
 
     return Stripped(
         f"""\
@@ -3266,6 +3306,108 @@ std::tie(
 {I}reader,
 {I}{indent_but_first_line(deserialize_item_expr, I)}
 );"""
+    )
+
+
+def _generate_deserialize_tuple_property(
+    prop: intermediate.Property,
+) -> Stripped:
+    """
+    Generate the de-serialization snippet for a property annotated with a tuple type.
+
+    Non-class items are wrapped in ``<v1>``, ``<v2>``, *etc.* elements (1-based),
+    while class items are de-serialized directly from their own element, mirroring
+    how lists of classes are handled.
+    """
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    assert isinstance(type_anno, intermediate.TupleTypeAnnotation)
+
+    var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
+
+    item_var_names = [
+        cpp_naming.variable_name(Identifier(f"the_{prop.name}_item_{i}"))
+        for i in range(len(type_anno.items))
+    ]
+
+    deserializer_var_names = [
+        cpp_naming.variable_name(Identifier(f"deserialize_{prop.name}_item_{i}"))
+        for i in range(len(type_anno.items))
+    ]
+
+    item_declarations = []  # type: List[Stripped]
+    item_blocks = []  # type: List[Stripped]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Tuple items are restricted to atomic types (primitives, "
+            "constrained primitives, classes and enumerations) by "
+            "intermediate._translate._verify_only_simple_type_patterns, so no "
+            "nested optionals, lists or tuples are expected here."
+        )
+
+        item_type = cpp_common.generate_type(
+            type_annotation=item_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        item_declarations.append(
+            Stripped(f"common::optional<{item_type}> {item_var_names[i]};")
+        )
+
+        deserialize_item_expr = _xml_deserialize_item_expr(
+            item_type_anno=item_type_anno,
+            item_type=item_type,
+            v_element_name=f"v{i + 1}",
+        )
+
+        item_blocks.append(
+            Stripped(
+                f"""\
+auto {deserializer_var_names[i]} = {indent_but_first_line(deserialize_item_expr, I)};
+std::tie(
+{I}{item_var_names[i]},
+{I}error
+) = {deserializer_var_names[i]}(reader);
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<IndexSegment>(
+{III}{i}
+{II})
+{I});
+{I}break;
+}}
+
+error = SkipWhitespace(reader);
+if (error.has_value()) {{
+{I}break;
+}}"""
+            )
+        )
+
+    item_declarations_joined = "\n".join(item_declarations)
+    item_blocks_joined = "\n\n".join(item_blocks)
+
+    tuple_items_joined = ",\n".join(
+        f"std::move(*{item_var_name})" for item_var_name in item_var_names
+    )
+
+    return Stripped(
+        f"""\
+{item_declarations_joined}
+
+do {{
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}break;
+{I}}}
+
+{I}{indent_but_first_line(item_blocks_joined, I)}
+}} while (false);
+
+if (!error.has_value()) {{
+{I}{var_name} = std::make_tuple(
+{II}{indent_but_first_line(tuple_items_joined, II)}
+{I});
+}}"""
     )
 
 
@@ -3357,6 +3499,10 @@ std::tie(
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             return _generate_deserialize_list_property(
+                prop=prop,
+            )
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            return _generate_deserialize_tuple_property(
                 prop=prop,
             )
         else:
@@ -3462,9 +3608,10 @@ common::optional<
         case_blocks.append(
             Stripped(
                 f"""\
-case properties::{prop_enum_name}::{prop_literal}:
+case properties::{prop_enum_name}::{prop_literal}: {{
 {I}{indent_but_first_line(code, I)}
-{I}break;"""
+{I}break;
+}}"""
             )
         )
 
@@ -4893,6 +5040,145 @@ error = SerializeListOfInstances(
             )
 
 
+def _generate_serialize_tuple_property(
+    type_anno: intermediate.TupleTypeAnnotation, getter_expr: Stripped
+) -> Stripped:
+    """
+    Serialize the tuple at ``getter_expr``.
+
+    Non-class items are wrapped in ``<v1>``, ``<v2>``, *etc.* elements (1-based),
+    while class items write their own element directly, mirroring how lists of
+    classes are handled.
+    """
+    item_stmts = []  # type: List[Stripped]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Tuple items are restricted to atomic types (primitives, "
+            "constrained primitives, classes and enumerations) by "
+            "intermediate._translate._verify_only_simple_type_patterns, so no "
+            "nested optionals, lists or tuples are expected here."
+        )
+
+        item_getter_expr = Stripped(f"std::get<{i}>({getter_expr})")
+
+        items_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+        is_class_item = isinstance(
+            item_type_anno, intermediate.OurTypeAnnotation
+        ) and isinstance(
+            item_type_anno.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        )
+
+        if not is_class_item:
+            if items_primitive_type is not None:
+                serialize_function = _PRIMITIVE_TYPE_TO_SERIALIZE[items_primitive_type]
+            elif isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
+                raise AssertionError("Expected to handle this case before")
+            elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+                if isinstance(item_type_anno.our_type, intermediate.Enumeration):
+                    serialize_function = cpp_naming.function_name(
+                        Identifier(f"serialize_{item_type_anno.our_type.name}")
+                    )
+                elif isinstance(
+                    item_type_anno.our_type, intermediate.ConstrainedPrimitive
+                ):
+                    raise AssertionError("Expected to handle this case before")
+                else:
+                    # NOTE (mristin):
+                    # This branch is unreachable in practice: ``is_class_item`` is
+                    # ``False`` here, so ``item_type_anno.our_type`` can not be
+                    # an ``AbstractClass``/``ConcreteClass``, but mypy can not
+                    # correlate the ``is_class_item`` boolean with the narrowing
+                    # of ``item_type_anno.our_type``, so we can not use
+                    # ``assert_never`` here.
+                    raise AssertionError(
+                        f"Expected to handle this case above: {item_type_anno.our_type}"
+                    )
+            else:
+                # noinspection PyTypeChecker
+                assert_never(item_type_anno)
+
+            v_name_literal = cpp_common.string_literal(f"v{i + 1}")
+
+            item_stmts.append(
+                Stripped(
+                    f"""\
+writer.StartElement(
+{I}{v_name_literal}
+);
+if (writer.error().has_value()) {{
+{I}error = writer.move_error();
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<iteration::IndexSegment>(
+{III}{i}
+{II})
+{I});
+{I}break;
+}}
+
+error = {serialize_function}(
+{I}{indent_but_first_line(item_getter_expr, I)},
+{I}writer
+);
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<iteration::IndexSegment>(
+{III}{i}
+{II})
+{I});
+{I}break;
+}}
+
+writer.StopElement(
+{I}{v_name_literal}
+);
+if (writer.error().has_value()) {{
+{I}error = writer.move_error();
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<iteration::IndexSegment>(
+{III}{i}
+{II})
+{I});
+{I}break;
+}}"""
+                )
+            )
+        else:
+            assert isinstance(item_type_anno, intermediate.OurTypeAnnotation)
+            serialize_function = cpp_naming.function_name(
+                Identifier(f"serialize_{item_type_anno.our_type.name}_ptr_as_element")
+            )
+
+            item_stmts.append(
+                Stripped(
+                    f"""\
+error = {serialize_function}(
+{I}{indent_but_first_line(item_getter_expr, I)},
+{I}writer
+);
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<iteration::IndexSegment>(
+{III}{i}
+{II})
+{I});
+{I}break;
+}}"""
+                )
+            )
+
+    item_stmts_joined = "\n\n".join(item_stmts)
+
+    return Stripped(
+        f"""\
+do {{
+{I}{indent_but_first_line(item_stmts_joined, I)}
+}} while (false);"""
+    )
+
+
 def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
     """Generate code to serialize a property."""
     blocks = []  # type: List[Stripped]
@@ -4984,6 +5270,11 @@ error = {serialize_function}(
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             code = _generate_serialize_list_property(
                 item_type_annotation=type_anno.items, getter_expr=getter_expr
+            )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            code = _generate_serialize_tuple_property(
+                type_anno=type_anno, getter_expr=getter_expr
             )
 
         else:
@@ -5562,8 +5853,58 @@ def _type_annotation_contains_list(
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return True
 
+    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
+        # NOTE (mristin):
+        # Tuples are heterogeneous and fixed-length, so their items are always
+        # de-serialized one by one, without ever looping over ``DeserializeList``.
+        return False
+
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         return _type_annotation_contains_list(type_annotation.value)
+
+    else:
+        # noinspection PyTypeChecker
+        assert_never(type_annotation)
+
+
+def _type_annotation_contains_tuple_with_atomic_non_class_item(
+    type_annotation: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether the type annotation is a tuple with a non-class atomic item.
+
+    Such tuples need ``DeserializeValueFromVElement`` for their non-class items,
+    just as lists of non-class atomic values do.
+    """
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return False
+
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        return False
+
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        return False
+
+    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
+        for item in type_annotation.items:
+            assert isinstance(item, intermediate.AtomicTypeAnnotationAsTuple)
+
+            if isinstance(item, intermediate.PrimitiveTypeAnnotation):
+                return True
+
+            elif isinstance(item, intermediate.OurTypeAnnotation):
+                if isinstance(
+                    item.our_type,
+                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
+                ):
+                    return True
+
+        return False
+
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        return _type_annotation_contains_tuple_with_atomic_non_class_item(
+            type_annotation.value
+        )
 
     else:
         # noinspection PyTypeChecker
@@ -5617,9 +5958,26 @@ def _type_annotation_contains_list_of_atomic_non_class_values(
                 type_annotation.items.value
             )
 
+        elif isinstance(type_annotation.items, intermediate.TupleTypeAnnotation):
+            # NOTE (mristin):
+            # No meta-model currently declares a list of tuples, and other parts of
+            # the code generation would already reject it defensively, so this can
+            # not actually occur in practice, but we still handle it explicitly for
+            # exhaustiveness. A tuple is not itself an atomic non-class value, so
+            # we return ``False``.
+            return False
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_annotation.items)
+
+    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
+        # NOTE (mristin):
+        # Tuples never loop over ``SerializeListOfVElements``/
+        # ``DeserializeValueFromVElement`` through a list-like generic function;
+        # see :py:func:`_type_annotation_contains_tuple_with_atomic_non_class_item`
+        # for the tuple-specific check.
+        return False
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         return _type_annotation_contains_list_of_atomic_non_class_values(
@@ -5674,9 +6032,24 @@ def _type_annotation_contains_list_of_instances(
                 type_annotation.items.value
             )
 
+        elif isinstance(type_annotation.items, intermediate.TupleTypeAnnotation):
+            # NOTE (mristin):
+            # No meta-model currently declares a list of tuples, and other parts of
+            # the code generation would already reject it defensively, so this can
+            # not actually occur in practice, but we still handle it explicitly for
+            # exhaustiveness. A tuple is not itself an instance, so we return
+            # ``False``.
+            return False
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_annotation.items)
+
+    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
+        # NOTE (mristin):
+        # Tuple class items are de-serialized/serialized directly, one by one,
+        # without ever looping over ``SerializeListOfInstances``.
+        return False
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         return _type_annotation_contains_list_of_instances(type_annotation.value)
@@ -5801,6 +6174,9 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
 
     if any(
         _type_annotation_contains_list_of_atomic_non_class_values(prop.type_annotation)
+        or _type_annotation_contains_tuple_with_atomic_non_class_item(
+            prop.type_annotation
+        )
         for cls in symbol_table.concrete_classes
         for prop in cls.properties
     ):

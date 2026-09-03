@@ -233,10 +233,7 @@ if ({target_var}Result.isError()) {{
         )
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert not isinstance(
-            type_anno.items,
-            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
-        ), (
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
             f"We only support lists of atomic values (primitives, constrained "
             f"primitives, enumeration literals) or classes when de-serializing "
             f"from JSON, but the argument {arg.name!r} has the unsupported "
@@ -299,6 +296,83 @@ for (JsonNode item : {array_var}) {{
 {I}{index_var}++;
 }}"""
         )
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        arity = len(type_anno.items)
+
+        array_var = java_naming.variable_name(Identifier(f"array_{arg.name}"))
+
+        cls_name = java_naming.class_name(cls.name)
+
+        item_blocks = [
+            Stripped(
+                f"""\
+final JsonNode {array_var} = currentNode.getValue();
+if (!{array_var}.isArray()) {{
+{I}final Reporting.Error error = new Reporting.Error(
+{II}"Expected a JsonArray, but got " + {array_var}.getNodeType());
+{I}error.prependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return _Result.failure(error);
+}}
+if ({array_var}.size() != {arity}) {{
+{I}final Reporting.Error error = new Reporting.Error(
+{II}"Expected exactly {arity} item(s), but got " + {array_var}.size());
+{I}error.prependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return _Result.failure(error);
+}}"""
+            )
+        ]  # type: List[Stripped]
+
+        item_vars = []  # type: List[str]
+
+        for i, item_type_anno in enumerate(type_anno.items):
+            assert isinstance(
+                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"Expected an atomic tuple item (a primitive, a constrained "
+                f"primitive, an enumeration or a class), but got {item_type_anno}. "
+                f"This should have already been verified in "
+                f"intermediate._translate._verify_only_simple_type_patterns."
+            )
+
+            item_var = java_naming.variable_name(Identifier(f"item_{arg.name}_{i}"))
+            item_vars.append(item_var)
+
+            item_type = java_common.generate_type(item_type_anno)
+            parse_method = _parse_method_for_atomic_value(item_type_anno)
+
+            item_blocks.append(
+                Stripped(
+                    f"""\
+final _Result<? extends {item_type}> {item_var}Result =
+{I}{parse_method}({array_var}.get({i}));
+if ({item_var}Result.isError()) {{
+{I}{item_var}Result.getError()
+{II}.prependSegment(new Reporting.IndexSegment({i}));
+{I}{item_var}Result.getError()
+{II}.prependSegment(new Reporting.NameSegment({json_literal}));
+{I}return {item_var}Result.castTo({cls_name}.class);
+}}"""
+                )
+            )
+
+        tuple_literal = java_common.generate_tuple_literal(
+            item_exprs=[
+                Stripped(f"{item_var}Result.getResult()") for item_var in item_vars
+            ]
+        )
+
+        item_blocks.append(
+            Stripped(
+                f"""\
+{target_var} = {indent_but_first_line(tuple_literal, I)};"""
+            )
+        )
+
+        parse_block = Stripped("\n\n".join(item_blocks))
     else:
         assert_never(arg.type_annotation)
 
@@ -994,10 +1068,7 @@ def _generate_transform_property(
         )
         stmts.append(Stripped(f"result.set({prop_literal}, {conversion_expr});"))
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert not isinstance(
-            type_anno.items,
-            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
-        ), (
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
             f"We only support lists of atomic values (primitives, constrained "
             f"primitives, enumeration literals) or classes when serializing "
             f"to JSON, but the property {prop.name!r} has the unsupported "
@@ -1024,6 +1095,41 @@ for ({item_type} item : {source_expr}) {{
 result.set({prop_literal}, {array_var});"""
             )
         )
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        array_var = java_naming.variable_name(Identifier(f"array_{prop.name}"))
+
+        item_stmts = [
+            Stripped(
+                f"final ArrayNode {array_var} = JsonNodeFactory.instance.arrayNode();"
+            )
+        ]  # type: List[Stripped]
+
+        for i, item_type_anno in enumerate(type_anno.items):
+            assert isinstance(
+                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
+                f"Expected an atomic tuple item (a primitive, a constrained "
+                f"primitive, an enumeration or a class), but got {item_type_anno}. "
+                f"This should have already been verified in "
+                f"intermediate._translate._verify_only_simple_type_patterns."
+            )
+
+            item_conversion_expr = _generate_serialize_atomic_value(
+                type_annotation=item_type_anno,
+                source_expr=Stripped(f"{source_expr}.item{i + 1}()"),
+            )
+
+            item_stmts.append(
+                Stripped(
+                    f"""\
+{array_var}.add(
+{I}{indent_but_first_line(item_conversion_expr, I)});"""
+                )
+            )
+
+        item_stmts.append(Stripped(f"result.set({prop_literal}, {array_var});"))
+
+        stmts.append(Stripped("\n".join(item_stmts)))
     else:
         assert_never(type_anno)
 
@@ -1290,6 +1396,7 @@ def generate(
     errors = []  # type: List[Error]
 
     imports = [
+        Stripped(f"import {package}.common.*;"),
         Stripped(f"import {package}.reporting.Reporting;"),
         Stripped(f"import {package}.types.enums.*;"),
         Stripped(f"import {package}.types.impl.*;"),

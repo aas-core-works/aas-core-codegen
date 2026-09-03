@@ -1365,6 +1365,183 @@ if (error.has_value()) {{
     )
 
 
+def _deserialize_expr_for_atomic_item(
+    item_type_anno: intermediate.AtomicTypeAnnotation,
+) -> Stripped:
+    """Generate the expression of the callable to de-serialize a tuple item."""
+    items_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+    if items_primitive_type is not None:
+        return _PRIMITIVE_TYPE_TO_DESERIALIZE[items_primitive_type]
+
+    if isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
+        raise AssertionError("This case should have been handled before.")
+
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(item_type_anno.our_type, intermediate.Enumeration):
+            return cpp_naming.function_name(
+                Identifier(f"deserialize_{item_type_anno.our_type.name}")
+            )
+
+        elif isinstance(item_type_anno.our_type, intermediate.ConstrainedPrimitive):
+            raise AssertionError("This case should have been handled before.")
+
+        elif isinstance(
+            item_type_anno.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        ):
+            deserialize_cls = _determine_deserialize_function_for_class(
+                cls=item_type_anno.our_type
+            )
+
+            return Stripped(
+                f"""\
+[&additional_properties](const nlohmann::json& a_json) {{
+{I}return {deserialize_cls}(a_json, additional_properties);
+}}"""
+            )
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(item_type_anno.our_type)
+
+    else:
+        # noinspection PyTypeChecker
+        assert_never(item_type_anno)
+
+    raise AssertionError("Should not have gotten here")
+
+
+def _generate_deserialize_tuple_property(
+    prop: intermediate.Property, ok_type: Stripped
+) -> Stripped:
+    """
+    Generate the snippet to de-serialize the tuple property.
+
+    We assume that the check whether the property is set is performed elsewhere.
+
+    The ``ok_type`` denotes the type of the deserialized instance, *not* the property.
+    We have to distinguish between cases where we directly create an upcast pointer to
+    an ancestor class, and cases where there are no ancestor classes.
+    """
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+    assert isinstance(type_anno, intermediate.TupleTypeAnnotation)
+
+    var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
+    json_prop_name = prop.json_name
+    json_prop_name_literal = cpp_common.string_literal(json_prop_name)
+    array_var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}_array"))
+
+    item_var_names = [
+        cpp_naming.variable_name(Identifier(f"the_{prop.name}_item_{i}"))
+        for i in range(len(type_anno.items))
+    ]
+
+    item_declarations = []  # type: List[Stripped]
+    item_deserialize_stmts = []  # type: List[Stripped]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Tuple items are restricted to atomic types (primitives, "
+            "constrained primitives, classes and enumerations) by "
+            "intermediate._translate._verify_only_simple_type_patterns, so no "
+            "nested optionals, lists or tuples are expected here."
+        )
+
+        item_type = cpp_common.generate_type(
+            item_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        item_declarations.append(
+            Stripped(f"common::optional<{item_type}> {item_var_names[i]};")
+        )
+
+        deserialize_item_expr = _deserialize_expr_for_atomic_item(item_type_anno)
+
+        item_deserialize_stmts.append(
+            Stripped(
+                f"""\
+std::tie(
+{I}{item_var_names[i]},
+{I}error
+) = {indent_but_first_line(deserialize_item_expr, I)}(
+{I}{array_var_name}[{i}]
+);
+
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<IndexSegment>(
+{III}{i}
+{II})
+{I});
+{I}break;
+}}"""
+            )
+        )
+
+    item_declarations_joined = "\n".join(item_declarations)
+    item_deserialize_stmts_joined = "\n\n".join(item_deserialize_stmts)
+
+    tuple_items_joined = ",\n".join(
+        f"std::move(*{item_var_name})" for item_var_name in item_var_names
+    )
+
+    return Stripped(
+        f"""\
+{item_declarations_joined}
+
+if (!json[{json_prop_name_literal}].is_array()) {{
+{I}std::wstring message = common::Concat(
+{II}L"Expected an array, but got: ",
+{II}common::Utf8ToWstring(
+{III}json[{json_prop_name_literal}].type_name()
+{II})
+{I});
+
+{I}error = common::make_optional<DeserializationError>(
+{II}message
+{I});
+}} else if (json[{json_prop_name_literal}].size() != {len(type_anno.items)}) {{
+{I}std::wstring message = common::Concat(
+{II}L"Expected exactly {len(type_anno.items)} item(s) in the array, "
+{II}L"but got: ",
+{II}std::to_wstring(json[{json_prop_name_literal}].size())
+{I});
+
+{I}error = common::make_optional<DeserializationError>(
+{II}message
+{I});
+}} else {{
+{I}const nlohmann::json& {array_var_name} = json[{json_prop_name_literal}];
+
+{I}do {{
+{II}{indent_but_first_line(item_deserialize_stmts_joined, II)}
+{I}}} while (false);
+}}
+
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<PropertySegment>(
+{III}{cpp_common.wstring_literal(json_prop_name)}
+{II})
+{I});
+
+{I}return std::make_pair<
+{II}common::optional<std::shared_ptr<{ok_type}> >,
+{II}common::optional<DeserializationError>
+{I}>(
+{II}common::nullopt,
+{II}std::move(error)
+{I});
+}}
+
+{var_name} = std::make_tuple(
+{I}{indent_but_first_line(tuple_items_joined, I)}
+);"""
+    )
+
+
 def _generate_deserialize_property(
     prop: intermediate.Property, ok_type: Stripped
 ) -> Stripped:
@@ -1401,6 +1578,8 @@ def _generate_deserialize_property(
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         code = _generate_deserialize_list_property(prop=prop, ok_type=ok_type)
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        code = _generate_deserialize_tuple_property(prop=prop, ok_type=ok_type)
     else:
         # noinspection PyTypeChecker
         assert_never(type_anno)
@@ -2474,6 +2653,184 @@ result[{json_prop_name_literal}] = std::move(
         assert_never(serialize_list)
 
 
+def _generate_serialize_tuple_property(
+    getter_expr: Stripped,
+    type_anno: intermediate.TupleTypeAnnotation,
+    property_name: Identifier,
+    json_name: str,
+) -> Stripped:
+    """
+    Generate the snippet to serialize the given property as a tuple.
+
+    The ``getter_expr`` refers to the C++ expression specifying the tuple
+    to be serialized.
+
+    The ``property_name`` refers to the intermediate property name, and
+    the ``json_name`` to its name in the JSON serialization.
+    """
+    json_prop_name_literal = cpp_common.string_literal(json_name)
+    array_var = cpp_naming.variable_name(Identifier(f"json_{property_name}"))
+
+    def fallible_item_stmt(item_index: int, serialize_expr: Stripped) -> Stripped:
+        """Generate the statement for an item whose serialization might fail."""
+        item_var = cpp_naming.variable_name(
+            Identifier(f"json_{property_name}_item_{item_index}")
+        )
+        return Stripped(
+            f"""\
+common::optional<nlohmann::json> {item_var};
+std::tie(
+{I}{item_var},
+{I}error
+) = {indent_but_first_line(serialize_expr, I)};
+if (error.has_value()) {{
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<iteration::IndexSegment>(
+{III}{item_index}
+{II})
+{I});
+{I}error->path.segments.emplace_front(
+{II}common::make_unique<iteration::PropertySegment>(
+{III}iteration::Property::{cpp_naming.enum_literal_name(property_name)}
+{II})
+{I});
+
+{I}return std::make_pair<
+{II}common::optional<nlohmann::json>,
+{II}common::optional<SerializationError>
+{I}>(
+{II}common::nullopt,
+{II}std::move(error)
+{I});
+}}
+
+{array_var}.emplace_back(std::move(*{item_var}));"""
+        )
+
+    item_stmts = []  # type: List[Stripped]
+
+    for i, item_type_anno in enumerate(type_anno.items):
+        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            "Tuple items are restricted to atomic types (primitives, "
+            "constrained primitives, classes and enumerations) by "
+            "intermediate._translate._verify_only_simple_type_patterns, so no "
+            "nested optionals, lists or tuples are expected here."
+        )
+
+        item_getter_expr = Stripped(f"std::get<{i}>({getter_expr})")
+
+        items_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+        if items_primitive_type is not None:
+            if items_primitive_type is intermediate.PrimitiveType.BOOL:
+                item_stmts.append(
+                    Stripped(f"{array_var}.emplace_back({item_getter_expr});")
+                )
+
+            elif items_primitive_type is intermediate.PrimitiveType.INT:
+                item_stmts.append(
+                    fallible_item_stmt(
+                        item_index=i,
+                        serialize_expr=Stripped(
+                            f"""\
+SerializeInt64(
+{I}{item_getter_expr}
+)"""
+                        ),
+                    )
+                )
+
+            elif items_primitive_type is intermediate.PrimitiveType.FLOAT:
+                item_stmts.append(
+                    Stripped(f"{array_var}.emplace_back({item_getter_expr});")
+                )
+
+            elif items_primitive_type is intermediate.PrimitiveType.STR:
+                item_stmts.append(
+                    Stripped(
+                        f"""\
+{array_var}.emplace_back(
+{I}SerializeWstring(
+{II}{item_getter_expr}
+{I})
+);"""
+                    )
+                )
+
+            elif items_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+                item_stmts.append(
+                    Stripped(
+                        f"""\
+{array_var}.emplace_back(
+{I}stringification::Base64Encode(
+{II}{item_getter_expr}
+{I})
+);"""
+                    )
+                )
+
+            else:
+                # noinspection PyTypeChecker
+                assert_never(items_primitive_type)
+
+        elif isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
+            raise AssertionError("Expected this case to be handled before")
+
+        elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+            if isinstance(item_type_anno.our_type, intermediate.Enumeration):
+                item_stmts.append(
+                    Stripped(
+                        f"""\
+{array_var}.emplace_back(
+{I}stringification::to_string(
+{II}{item_getter_expr}
+{I})
+);"""
+                    )
+                )
+
+            elif isinstance(item_type_anno.our_type, intermediate.ConstrainedPrimitive):
+                raise AssertionError("Expected this case to be handled before")
+
+            elif isinstance(
+                item_type_anno.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                item_stmts.append(
+                    fallible_item_stmt(
+                        item_index=i,
+                        serialize_expr=Stripped(
+                            f"""\
+SerializeIClass(
+{I}*{item_getter_expr}
+)"""
+                        ),
+                    )
+                )
+
+            else:
+                # noinspection PyTypeChecker
+                assert_never(item_type_anno.our_type)
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(item_type_anno)
+
+    item_stmts_joined = "\n\n".join(item_stmts)
+
+    return Stripped(
+        f"""\
+nlohmann::json {array_var} = nlohmann::json::array();
+{array_var}.get_ptr<nlohmann::json::array_t*>()->reserve(
+{I}{len(type_anno.items)}
+);
+
+{item_stmts_joined}
+
+result[{json_prop_name_literal}] = std::move({array_var});"""
+    )
+
+
 def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
     """Generate code snippet to serialize the property ``prop``."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
@@ -2559,6 +2916,14 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
             json_name=json_prop_name,
         )
 
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        code = _generate_serialize_tuple_property(
+            getter_expr=getter_expr,
+            type_anno=type_anno,
+            property_name=prop.name,
+            json_name=json_prop_name,
+        )
+
     else:
         # noinspection PyTypeChecker
         assert_never(type_anno)
@@ -2637,6 +3002,21 @@ nlohmann::json result = nlohmann::json::object();"""
 
             if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
                 needs_error = True
+                break
+
+        if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            for item_type_anno in type_anno.items:
+                item_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+                if item_primitive_type is intermediate.PrimitiveType.INT:
+                    needs_error = True
+                    break
+
+                if isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+                    needs_error = True
+                    break
+
+            if needs_error:
                 break
 
     if needs_error:
@@ -2794,6 +3174,12 @@ def _type_annotation_contains_list(
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         return True
+
+    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
+        # NOTE (mristin):
+        # Tuples are heterogeneous and fixed-length, so we never de-serialize them
+        # with the generic ``DeserializeList``.
+        return False
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         return _type_annotation_contains_list(type_annotation.value)

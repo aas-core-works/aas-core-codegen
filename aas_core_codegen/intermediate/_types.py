@@ -7,6 +7,7 @@ from typing import (
     Optional,
     Union,
     TypeVar,
+    List,
     Mapping,
     MutableMapping,
     Final,
@@ -160,9 +161,29 @@ class ListTypeAnnotation(TypeAnnotation):
         return f"List[{self.items}]"
 
 
+class TupleTypeAnnotation(TypeAnnotation):
+    """
+    Represent a type annotation involving a ``Tuple[...]`` of fixed length.
+
+    Unlike :class:`ListTypeAnnotation`, the items are heterogeneous and their
+    number is fixed.
+    """
+
+    def __init__(
+        self, items: Sequence["TypeAnnotationUnion"], parsed: parse.TypeAnnotation
+    ):
+        TypeAnnotation.__init__(self, parsed=parsed)
+
+        self.items = items
+
+    def __str__(self) -> str:
+        items_joined = ", ".join(str(item) for item in self.items)
+        return f"Tuple[{items_joined}]"
+
+
 # NOTE (mristin, 2021-11-19):
-# We do not support other generic types except for ``List``. In the future we might
-# add support for ``Set``, ``MutableMapping`` *etc.*
+# We do not support other generic types except for ``List`` and ``Tuple``. In the
+# future we might add support for ``Set``, ``MutableMapping`` *etc.*
 
 
 class OptionalTypeAnnotation(TypeAnnotation):
@@ -181,6 +202,7 @@ TypeAnnotationUnion = Union[
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
     ListTypeAnnotation,
+    TupleTypeAnnotation,
     OptionalTypeAnnotation,
 ]
 
@@ -192,6 +214,7 @@ TypeAnnotationUnionAsTuple = (
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
     ListTypeAnnotation,
+    TupleTypeAnnotation,
     OptionalTypeAnnotation,
 )
 
@@ -201,6 +224,7 @@ TypeAnnotationExceptOptional = Union[
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
     ListTypeAnnotation,
+    TupleTypeAnnotation,
 ]
 
 assert_union_without_excluded(
@@ -213,6 +237,7 @@ TypeAnnotationExceptOptionalAsTuple = (
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
     ListTypeAnnotation,
+    TupleTypeAnnotation,
 )
 assert TypeAnnotationExceptOptionalAsTuple == get_args(TypeAnnotationExceptOptional)
 
@@ -224,7 +249,7 @@ assert AtomicTypeAnnotationAsTuple == get_args(AtomicTypeAnnotation)
 assert_union_without_excluded(
     original_union=TypeAnnotationUnion,
     subset_union=AtomicTypeAnnotation,
-    excluded=[ListTypeAnnotation, OptionalTypeAnnotation],
+    excluded=[ListTypeAnnotation, TupleTypeAnnotation, OptionalTypeAnnotation],
 )
 
 
@@ -250,6 +275,13 @@ def type_annotations_equal(
     elif isinstance(that, ListTypeAnnotation):
         assert isinstance(other, ListTypeAnnotation)
         return type_annotations_equal(that.items, other.items)
+
+    elif isinstance(that, TupleTypeAnnotation):
+        assert isinstance(other, TupleTypeAnnotation)
+        return len(that.items) == len(other.items) and all(
+            type_annotations_equal(that_item, other_item)
+            for that_item, other_item in zip(that.items, other.items)
+        )
 
     elif isinstance(that, OptionalTypeAnnotation):
         assert isinstance(other, OptionalTypeAnnotation)
@@ -3210,6 +3242,18 @@ def map_descendability(
             mapping[a_type_annotation] = result
             return result
 
+        elif isinstance(a_type_annotation, TupleTypeAnnotation):
+            # NOTE (mristin, 2026-09-02):
+            # We deliberately recurse into *all* the items, and not just until
+            # the first descendable one, so that the ``mapping`` cache is populated
+            # for every item.
+            item_results = [
+                recurse(a_type_annotation=item) for item in a_type_annotation.items
+            ]
+            result = any(item_results)
+            mapping[a_type_annotation] = result
+            return result
+
         elif isinstance(a_type_annotation, OptionalTypeAnnotation):
             result = recurse(a_type_annotation=a_type_annotation.value)
             mapping[a_type_annotation] = result
@@ -3234,25 +3278,22 @@ def collect_ids_of_our_types_in_properties(symbol_table: SymbolTable) -> Set[int
     result = set()  # type: Set[int]
     for cls in symbol_table.classes:
         for prop in cls.properties:
-            type_anno = prop.type_annotation
+            stack = [prop.type_annotation]  # type: List[TypeAnnotationUnion]
+            while len(stack) > 0:
+                type_anno = stack.pop()
 
-            old_type_anno = None  # type: Optional[TypeAnnotation]
-            while True:
                 if isinstance(type_anno, OptionalTypeAnnotation):
-                    # noinspection PyUnresolvedReferences
-                    type_anno = type_anno.value
+                    stack.append(type_anno.value)
                 elif isinstance(type_anno, ListTypeAnnotation):
-                    type_anno = type_anno.items
+                    stack.append(type_anno.items)
+                elif isinstance(type_anno, TupleTypeAnnotation):
+                    stack.extend(type_anno.items)
                 elif isinstance(type_anno, PrimitiveTypeAnnotation):
-                    break
+                    pass
                 elif isinstance(type_anno, OurTypeAnnotation):
                     result.add(id(type_anno.our_type))
-                    break
                 else:
                     assert_never(type_anno)
-
-                assert old_type_anno is not type_anno, "Loop invariant"
-                old_type_anno = type_anno
 
     return result
 

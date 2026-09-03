@@ -698,6 +698,115 @@ for i, itemJsonable := range jsonableArray {{
 {prop_var} = array"""
             )
 
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            tuple_type = golang_common.generate_type(
+                type_annotation=type_anno, types_package=Identifier("aastypes")
+            )
+
+            item_vars = []  # type: List[str]
+            item_blocks = []  # type: List[Stripped]
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                ), (
+                    f"NOTE (mristin): We expect only atomic items in a tuple "
+                    f"at the moment, but got {item_type_anno} in {type_anno}. "
+                    f"This should have already been verified in "
+                    f"intermediate._translate._verify_only_simple_type_patterns."
+                )
+
+                parse_function = _determine_parse_function_for_atomic_value(
+                    item_type_anno
+                )
+
+                item_type = golang_common.generate_type(
+                    type_annotation=item_type_anno, types_package=Identifier("aastypes")
+                )
+
+                item_var = golang_naming.variable_name(
+                    Identifier(f"the_{prop.name}_{i}")
+                )
+                item_vars.append(item_var)
+
+                item_blocks.append(
+                    Stripped(
+                        f"""\
+var {item_var} {item_type}
+{item_var}, err = {parse_function}(
+{I}jsonableArray[{i}],
+)
+if err != nil {{
+{I}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{II}deseriaErr.Path.PrependIndex(
+{III}&aasreporting.IndexSegment{{
+{IIII}Index: {i},
+{III}}},
+{II})
+
+{II}deseriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {json_prop_literal},
+{III}}},
+{II})
+{I}}}
+
+{I}return
+}}"""
+                    )
+                )
+
+            item_blocks_joined = "\n\n".join(item_blocks)
+            item_vars_joined = "\n".join(f"{item_var}," for item_var in item_vars)
+            arity = len(type_anno.items)
+
+            case_body = Stripped(
+                f"""\
+jsonableArray, ok := v.([]interface{{}})
+if !ok {{
+{I}deseriaErr := newDeserializationError(
+{II}fmt.Sprintf(
+{III}"Expected an array, but got %T",
+{III}v,
+{II}),
+{I})
+
+{I}deseriaErr.Path.PrependName(
+{II}&aasreporting.NameSegment{{
+{III}Name: {json_prop_literal},
+{II}}},
+{I})
+
+{I}err = deseriaErr
+
+{I}return
+}}
+
+if len(jsonableArray) != {arity} {{
+{I}deseriaErr := newDeserializationError(
+{II}fmt.Sprintf(
+{III}"Expected an array of exactly {arity} item(s), but got %d item(s)",
+{III}len(jsonableArray),
+{II}),
+{I})
+
+{I}deseriaErr.Path.PrependName(
+{II}&aasreporting.NameSegment{{
+{III}Name: {json_prop_literal},
+{II}}},
+{I})
+
+{I}err = deseriaErr
+
+{I}return
+}}
+
+{item_blocks_joined}
+
+{prop_var} = {tuple_type}{{
+{I}{indent_but_first_line(item_vars_joined, I)}
+}}"""
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
@@ -1134,7 +1243,11 @@ TypeAnnotationExceptList = Union[
 assert_union_without_excluded(
     original_union=intermediate.TypeAnnotationUnion,
     subset_union=TypeAnnotationExceptList,
-    excluded=[intermediate.ListTypeAnnotation],
+    # NOTE (mristin, 2026-09-03):
+    # ``ListTypeAnnotation`` and ``TupleTypeAnnotation`` are handled directly in
+    # the calling code (see ``_generate_cls_to_map``), which unrolls them into
+    # calls of this function on the atomic items.
+    excluded=[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation],
 )
 
 
@@ -1302,7 +1415,9 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
         block: Stripped
 
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert not isinstance(type_anno.items, intermediate.ListTypeAnnotation), (
+            assert isinstance(
+                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
+            ), (
                 "(mristin): We currently generate only the code to serialize lists of "
                 "atomic values. If you need this feature, please contact "
                 "the developers."
@@ -1372,8 +1487,90 @@ result[{json_prop_literal}] = {prop_jsonable_var}"""
             )
 
             block = Stripped("\n".join(statements))
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            statements = [
+                Stripped(
+                    f"""\
+{prop_jsonable_var} := make(
+{I}[]interface{{}},
+{I}{len(type_anno.items)},
+)"""
+                )
+            ]
+
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                ), (
+                    f"NOTE (mristin): We expect only atomic items in a tuple "
+                    f"at the moment, but got {item_type_anno} in {type_anno}. "
+                    f"This should have already been verified in "
+                    f"intermediate._translate._verify_only_simple_type_patterns."
+                )
+
+                # fmt: off
+                serialize_expr, needs_error_checking = (
+                    _generate_expression_to_serialize_atomic_value(
+                        access_expression=f"that.{getter_name}().Item{i + 1}",
+                        type_annotation=item_type_anno,
+                    )
+                )
+                # fmt: on
+
+                if needs_error_checking:
+                    statements.append(
+                        Stripped(
+                            f"""\
+{{
+{I}var jsonable interface{{}}
+{I}jsonable, err = {indent_but_first_line(serialize_expr, I)}
+{I}if err != nil {{
+{II}if seriaErr, ok := err.(*SerializationError); ok {{
+{III}seriaErr.Path.PrependIndex(
+{IIII}&aasreporting.IndexSegment{{
+{IIIII}Index: {i},
+{IIII}}},
+{III})
+
+{III}seriaErr.Path.PrependName(
+{IIII}&aasreporting.NameSegment{{
+{IIIII}Name: {prop_literal},
+{IIII}}},
+{III})
+{II}}}
+
+{II}return
+{I}}}
+{I}{prop_jsonable_var}[{i}] = jsonable
+}}"""
+                        )
+                    )
+                else:
+                    statements.append(
+                        Stripped(
+                            f"""\
+{prop_jsonable_var}[{i}] = {indent_but_first_line(serialize_expr, I)}"""
+                        )
+                    )
+
+            statements.append(
+                Stripped(f"result[{json_prop_literal}] = {prop_jsonable_var}")
+            )
+
+            block = Stripped("\n".join(statements))
         else:
-            assert not isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
+            assert isinstance(
+                prop.type_annotation,
+                (
+                    intermediate.PrimitiveTypeAnnotation,
+                    intermediate.OurTypeAnnotation,
+                    intermediate.OptionalTypeAnnotation,
+                ),
+            ), (
+                f"Since {type_anno} is neither a list nor a tuple, "
+                f"we expect the property to be atomic (optionally wrapped), "
+                f"but got {prop.type_annotation}."
+            )
 
             # fmt: off
             serialize_expr, needs_error_checking = (
@@ -1530,6 +1727,8 @@ def generate(
     """Generate code for JSON de/serialization."""
     aastypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
+    aascommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
+
     aasreporting_url_literal = golang_common.string_literal(f"{repo_url}/reporting")
 
     aasstringification_url_literal = golang_common.string_literal(
@@ -1557,6 +1756,7 @@ import (
 {I}"fmt"
 {I}"math"
 {I}b64 "encoding/base64"
+{I}aascommon {aascommon_url_literal}
 {I}aasreporting {aasreporting_url_literal}
 {I}aasstringification {aasstringification_url_literal}
 {I}aastypes {aastypes_url_literal}

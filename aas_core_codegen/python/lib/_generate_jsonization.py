@@ -515,7 +515,11 @@ self.{prop_name} = {function_name}(
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert not isinstance(
                 type_anno.items,
-                (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+                (
+                    intermediate.OptionalTypeAnnotation,
+                    intermediate.ListTypeAnnotation,
+                    intermediate.TupleTypeAnnotation,
+                ),
             ), (
                 "We chose to implement only a very limited pattern matching; "
                 "see intermediate._translate_._verify_only_simple_type_patterns"
@@ -554,6 +558,78 @@ for i, jsonable_item in enumerate(array_like):
 {I}items.append(item)
 
 self.{prop_name} = items"""
+            )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_count = len(type_anno.items)
+
+            item_var_names = [f"item_{i}" for i in range(item_count)]
+
+            item_blocks = []  # type: List[Stripped]
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                ), (
+                    "Tuple items are restricted to atomic types (primitives, "
+                    "constrained primitives, classes and enumerations) by "
+                    "intermediate._translate._verify_only_simple_type_patterns, so no "
+                    "nested optionals, lists or tuples are expected here."
+                )
+
+                parse_function = _parse_function_for_atomic_value(item_type_anno)
+                item_var_name = item_var_names[i]
+
+                item_blocks.append(
+                    Stripped(
+                        f"""\
+try:
+{I}{item_var_name} = {parse_function}(
+{II}array_like[{i}]
+{I})
+except DeserializationException as exception:
+{I}exception.path._prepend(
+{II}IndexSegment(
+{III}array_like,
+{III}{i}
+{II})
+{I})
+{I}raise"""
+                    )
+                )
+
+            item_blocks_joined = "\n\n".join(item_blocks)
+
+            tuple_items_joined = ",\n".join(item_var_names)
+
+            body = Stripped(
+                f"""\
+array_like = _try_to_cast_to_array_like(jsonable)
+if array_like is None:
+{I}raise DeserializationException(
+{II}f"Expected something array-like, but got: {{type(jsonable)}}"
+{I})
+
+# NOTE (mristin):
+# Unlike a list, a tuple is heterogeneous, so we need to index the individual
+# items by their fixed position, and a general ``Iterable`` does not support
+# that.
+if not isinstance(array_like, collections.abc.Sequence):
+{I}raise DeserializationException(
+{II}f"Expected something indexable to de-serialize a tuple, "
+{II}f"but got: {{type(jsonable)}}"
+{I})
+
+if len(array_like) != {item_count}:
+{I}raise DeserializationException(
+{II}f"Expected exactly {item_count} item(s) in the array, "
+{II}f"but got: {{len(array_like)}}"
+{I})
+
+{item_blocks_joined}
+
+self.{prop_name} = (
+{I}{indent_but_first_line(tuple_items_joined, I)}
+)"""
             )
 
         else:
@@ -1023,6 +1099,38 @@ jsonable[{key_literal}] = [
 ]"""
                 )
 
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_expressions = []  # type: List[Stripped]
+            for i, item_type_anno in enumerate(type_anno.items):
+                assert isinstance(
+                    item_type_anno,
+                    (
+                        intermediate.PrimitiveTypeAnnotation,
+                        intermediate.OurTypeAnnotation,
+                    ),
+                ), (
+                    "Tuple items are restricted to atomic types (primitives, "
+                    "constrained primitives, classes and enumerations) by "
+                    "intermediate._translate._verify_only_simple_type_patterns, so no "
+                    "nested optionals, lists or tuples are expected here."
+                )
+
+                item_expressions.append(
+                    _generate_transform_atomic_value(
+                        access_expression=Stripped(f"that.{prop_name}[{i}]"),
+                        type_anno=item_type_anno,
+                    )
+                )
+
+            item_expressions_joined = ",\n".join(item_expressions)
+
+            block = Stripped(
+                f"""\
+jsonable[{key_literal}] = [
+{I}{indent_but_first_line(item_expressions_joined, I)}
+]"""
+            )
+
         else:
             assert_never(type_anno)
 
@@ -1154,6 +1262,7 @@ from typing import (
 {I}MutableMapping,
 {I}Optional,
 {I}Sequence,
+{I}Tuple,
 {I}Union,
 )
 
