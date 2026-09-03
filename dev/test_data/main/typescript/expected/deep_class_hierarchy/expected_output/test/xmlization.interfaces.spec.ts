@@ -27,6 +27,20 @@ test(
 );
 
 test(
+  "INode XML round-trip via " +
+  "nodeFromXmlString starting from Branch OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBranch();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.nodeFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "INode XML round-trip " +
   "starting from Leaf OK",
   () => {
@@ -43,6 +57,20 @@ test(
 );
 
 test(
+  "INode XML round-trip via " +
+  "nodeFromXmlString starting from Leaf OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalLeaf();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.nodeFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "INode XML round-trip " +
   "starting from Blossom OK",
   () => {
@@ -55,6 +83,20 @@ test(
 
     const asInterface = AasTypes.asNode(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "INode XML round-trip via " +
+  "nodeFromXmlString starting from Blossom OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlossom();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.nodeFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -64,6 +106,17 @@ test("INode XML deserialization fail", () => {
 });
 
 test(
+  "INode XML deserialization fail via " +
+  "nodeFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.nodeFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
+
+test(
   "IBranch XML round-trip " +
   "starting from Leaf OK",
   () => {
@@ -80,6 +133,20 @@ test(
 );
 
 test(
+  "IBranch XML round-trip via " +
+  "branchFromXmlString starting from Leaf OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalLeaf();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.branchFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IBranch XML round-trip " +
   "starting from Blossom OK",
   () => {
@@ -92,6 +159,20 @@ test(
 
     const asInterface = AasTypes.asBranch(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IBranch XML round-trip via " +
+  "branchFromXmlString starting from Blossom OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlossom();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.branchFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -111,10 +192,35 @@ test(
   }
 );
 
+test(
+  "IBranch XML round-trip via " +
+  "branchFromXmlString starting from Branch OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBranch();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.branchFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IBranch XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IBranch XML deserialization fail via " +
+  "branchFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.branchFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "ILeaf XML round-trip " +
@@ -129,6 +235,20 @@ test(
 
     const asInterface = AasTypes.asLeaf(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ILeaf XML round-trip via " +
+  "leafFromXmlString starting from Blossom OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlossom();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.leafFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -148,10 +268,35 @@ test(
   }
 );
 
+test(
+  "ILeaf XML round-trip via " +
+  "leafFromXmlString starting from Leaf OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalLeaf();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.leafFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("ILeaf XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "ILeaf XML deserialization fail via " +
+  "leafFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.leafFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 // This code has been automatically generated by aas-core-codegen.
 // Do NOT edit or append.
