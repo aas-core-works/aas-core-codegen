@@ -14,6 +14,7 @@ from aas_core_codegen.typescript import (
 from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
 )
 
 
@@ -48,6 +49,9 @@ import * as TestCommonXmlization from "./commonXmlization";"""
 
         interface_name_typescript = typescript_naming.interface_name(cls.name)
         as_function = typescript_naming.function_name(Identifier(f"as_{cls.name}"))
+        from_xml_string_function = typescript_naming.function_name(
+            Identifier(f"{cls.name}_from_xml_string")
+        )
 
         for implementer_cls in cls.interface.implementers:
             if (
@@ -82,6 +86,25 @@ test(
                 )
             )
 
+            blocks.append(
+                Stripped(
+                    f"""\
+test(
+{I}"{interface_name_typescript} XML round-trip via " +
+{I}"{from_xml_string_function} starting from {cls_name_typescript} OK",
+{I}() => {{
+{II}const instance = TestCommonXmlization.{load_minimal_name}();
+
+{II}const xmlText = AasXmlization.toXmlString(instance);
+{II}const anotherInstanceOrError = AasXmlization.{from_xml_string_function}(
+{III}xmlText
+{II});
+{II}expect(anotherInstanceOrError.error).toBeNull();
+{I}}}
+);"""
+                )
+            )
+
         blocks.append(
             Stripped(
                 f"""\
@@ -89,6 +112,22 @@ test("{interface_name_typescript} XML deserialization fail", () => {{
 {I}const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
 {I}expect(instanceOrError.error).not.toBeNull();
 }});"""
+            )
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+test(
+{I}"{interface_name_typescript} XML deserialization fail via " +
+{I}"{from_xml_string_function}",
+{I}() => {{
+{II}const instanceOrError = AasXmlization.{from_xml_string_function}(
+{III}"This is not XML."
+{II});
+{II}expect(instanceOrError.error).not.toBeNull();
+{I}}}
+);"""
             )
         )
 

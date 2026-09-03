@@ -27,6 +27,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from AnnotatedRelationshipElement OK",
   () => {
@@ -39,6 +53,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -59,6 +87,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from Blob OK",
   () => {
@@ -71,6 +113,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -91,6 +147,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Capability OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalCapability();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from Entity OK",
   () => {
@@ -103,6 +173,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Entity OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalEntity();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -123,6 +207,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from MultiLanguageProperty OK",
   () => {
@@ -135,6 +233,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -155,6 +267,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Operation OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalOperation();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from Property OK",
   () => {
@@ -167,6 +293,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -187,6 +327,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from ReferenceElement OK",
   () => {
@@ -199,6 +353,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -219,6 +387,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from SubmodelElementCollection OK",
   () => {
@@ -235,6 +417,20 @@ test(
 );
 
 test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from SubmodelElementCollection OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementCollection();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasSemantics XML round-trip " +
   "starting from SubmodelElementList OK",
   () => {
@@ -247,6 +443,20 @@ test(
 
     const asInterface = AasTypes.asHasSemantics(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasSemantics XML round-trip via " +
+  "hasSemanticsFromXmlString starting from SubmodelElementList OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementList();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -256,6 +466,17 @@ test("IHasSemantics XML deserialization fail", () => {
 });
 
 test(
+  "IHasSemantics XML deserialization fail via " +
+  "hasSemanticsFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.hasSemanticsFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from RelationshipElement OK",
   () => {
@@ -268,6 +489,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -288,6 +523,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from AssetAdministrationShell OK",
   () => {
@@ -300,6 +549,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from AssetAdministrationShell OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAssetAdministrationShell();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -320,6 +583,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from Blob OK",
   () => {
@@ -332,6 +609,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -352,6 +643,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Capability OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalCapability();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from ConceptDescription OK",
   () => {
@@ -364,6 +669,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from ConceptDescription OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalConceptDescription();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -384,6 +703,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Entity OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalEntity();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from File OK",
   () => {
@@ -396,6 +729,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -416,6 +763,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from Operation OK",
   () => {
@@ -428,6 +789,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Operation OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalOperation();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -448,6 +823,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from Range OK",
   () => {
@@ -460,6 +849,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -480,6 +883,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from Submodel OK",
   () => {
@@ -492,6 +909,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -512,6 +943,20 @@ test(
 );
 
 test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from SubmodelElementCollection OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementCollection();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasExtensions XML round-trip " +
   "starting from SubmodelElementList OK",
   () => {
@@ -524,6 +969,20 @@ test(
 
     const asInterface = AasTypes.asHasExtensions(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasExtensions XML round-trip via " +
+  "hasExtensionsFromXmlString starting from SubmodelElementList OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementList();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -533,6 +992,17 @@ test("IHasExtensions XML deserialization fail", () => {
 });
 
 test(
+  "IHasExtensions XML deserialization fail via " +
+  "hasExtensionsFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.hasExtensionsFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from RelationshipElement OK",
   () => {
@@ -545,6 +1015,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -565,6 +1049,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from AssetAdministrationShell OK",
   () => {
@@ -577,6 +1075,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from AssetAdministrationShell OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAssetAdministrationShell();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -597,6 +1109,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from Blob OK",
   () => {
@@ -609,6 +1135,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -629,6 +1169,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Capability OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalCapability();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from ConceptDescription OK",
   () => {
@@ -641,6 +1195,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from ConceptDescription OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalConceptDescription();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -661,6 +1229,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Entity OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalEntity();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from File OK",
   () => {
@@ -673,6 +1255,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -693,6 +1289,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from Operation OK",
   () => {
@@ -705,6 +1315,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Operation OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalOperation();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -725,6 +1349,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from Range OK",
   () => {
@@ -737,6 +1375,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -757,6 +1409,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from Submodel OK",
   () => {
@@ -769,6 +1435,20 @@ test(
 
     const asInterface = AasTypes.asReferable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -789,6 +1469,20 @@ test(
 );
 
 test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from SubmodelElementCollection OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementCollection();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IReferable XML round-trip " +
   "starting from SubmodelElementList OK",
   () => {
@@ -804,10 +1498,35 @@ test(
   }
 );
 
+test(
+  "IReferable XML round-trip via " +
+  "referableFromXmlString starting from SubmodelElementList OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementList();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.referableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IReferable XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IReferable XML deserialization fail via " +
+  "referableFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.referableFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IIdentifiable XML round-trip " +
@@ -822,6 +1541,20 @@ test(
 
     const asInterface = AasTypes.asIdentifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IIdentifiable XML round-trip via " +
+  "identifiableFromXmlString starting from AssetAdministrationShell OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAssetAdministrationShell();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.identifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -842,6 +1575,20 @@ test(
 );
 
 test(
+  "IIdentifiable XML round-trip via " +
+  "identifiableFromXmlString starting from ConceptDescription OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalConceptDescription();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.identifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IIdentifiable XML round-trip " +
   "starting from Submodel OK",
   () => {
@@ -857,10 +1604,35 @@ test(
   }
 );
 
+test(
+  "IIdentifiable XML round-trip via " +
+  "identifiableFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.identifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IIdentifiable XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IIdentifiable XML deserialization fail via " +
+  "identifiableFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.identifiableFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IHasKind XML round-trip " +
@@ -878,10 +1650,35 @@ test(
   }
 );
 
+test(
+  "IHasKind XML round-trip via " +
+  "hasKindFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasKindFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IHasKind XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IHasKind XML deserialization fail via " +
+  "hasKindFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.hasKindFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IHasDataSpecification XML round-trip " +
@@ -900,6 +1697,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from AnnotatedRelationshipElement OK",
   () => {
@@ -912,6 +1723,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -932,6 +1757,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from AssetAdministrationShell OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAssetAdministrationShell();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from BasicEventElement OK",
   () => {
@@ -944,6 +1783,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -964,6 +1817,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from Capability OK",
   () => {
@@ -976,6 +1843,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Capability OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalCapability();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -996,6 +1877,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from ConceptDescription OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalConceptDescription();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from Entity OK",
   () => {
@@ -1008,6 +1903,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Entity OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalEntity();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1028,6 +1937,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from MultiLanguageProperty OK",
   () => {
@@ -1040,6 +1963,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1060,6 +1997,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Operation OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalOperation();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from Property OK",
   () => {
@@ -1072,6 +2023,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1092,6 +2057,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from ReferenceElement OK",
   () => {
@@ -1104,6 +2083,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1124,6 +2117,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from SubmodelElementCollection OK",
   () => {
@@ -1140,6 +2147,20 @@ test(
 );
 
 test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from SubmodelElementCollection OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementCollection();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IHasDataSpecification XML round-trip " +
   "starting from SubmodelElementList OK",
   () => {
@@ -1152,6 +2173,20 @@ test(
 
     const asInterface = AasTypes.asHasDataSpecification(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IHasDataSpecification XML round-trip via " +
+  "hasDataSpecificationFromXmlString starting from SubmodelElementList OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementList();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1161,6 +2196,17 @@ test("IHasDataSpecification XML deserialization fail", () => {
 });
 
 test(
+  "IHasDataSpecification XML deserialization fail via " +
+  "hasDataSpecificationFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.hasDataSpecificationFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from RelationshipElement OK",
   () => {
@@ -1173,6 +2219,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1193,6 +2253,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from BasicEventElement OK",
   () => {
@@ -1205,6 +2279,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1225,6 +2313,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from Capability OK",
   () => {
@@ -1237,6 +2339,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Capability OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalCapability();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1257,6 +2373,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Entity OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalEntity();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from File OK",
   () => {
@@ -1269,6 +2399,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1289,6 +2433,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from Operation OK",
   () => {
@@ -1301,6 +2459,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Operation OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalOperation();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1321,6 +2493,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from Range OK",
   () => {
@@ -1337,6 +2523,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from ReferenceElement OK",
   () => {
@@ -1349,6 +2549,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1369,6 +2583,20 @@ test(
 );
 
 test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from Submodel OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodel();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IQualifiable XML round-trip " +
   "starting from SubmodelElementCollection OK",
   () => {
@@ -1381,6 +2609,20 @@ test(
 
     const asInterface = AasTypes.asQualifiable(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from SubmodelElementCollection OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementCollection();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1400,10 +2642,35 @@ test(
   }
 );
 
+test(
+  "IQualifiable XML round-trip via " +
+  "qualifiableFromXmlString starting from SubmodelElementList OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementList();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.qualifiableFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IQualifiable XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IQualifiable XML deserialization fail via " +
+  "qualifiableFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.qualifiableFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "ISubmodelElement XML round-trip " +
@@ -1422,6 +2689,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from AnnotatedRelationshipElement OK",
   () => {
@@ -1434,6 +2715,20 @@ test(
 
     const asInterface = AasTypes.asSubmodelElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1454,6 +2749,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from Blob OK",
   () => {
@@ -1466,6 +2775,20 @@ test(
 
     const asInterface = AasTypes.asSubmodelElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1486,6 +2809,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from Capability OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalCapability();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from Entity OK",
   () => {
@@ -1498,6 +2835,20 @@ test(
 
     const asInterface = AasTypes.asSubmodelElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from Entity OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalEntity();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1518,6 +2869,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from MultiLanguageProperty OK",
   () => {
@@ -1530,6 +2895,20 @@ test(
 
     const asInterface = AasTypes.asSubmodelElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1550,6 +2929,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from Operation OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalOperation();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from Property OK",
   () => {
@@ -1562,6 +2955,20 @@ test(
 
     const asInterface = AasTypes.asSubmodelElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1582,6 +2989,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from ReferenceElement OK",
   () => {
@@ -1594,6 +3015,20 @@ test(
 
     const asInterface = AasTypes.asSubmodelElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1614,6 +3049,20 @@ test(
 );
 
 test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from SubmodelElementCollection OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementCollection();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "ISubmodelElement XML round-trip " +
   "starting from SubmodelElementList OK",
   () => {
@@ -1629,10 +3078,35 @@ test(
   }
 );
 
+test(
+  "ISubmodelElement XML round-trip via " +
+  "submodelElementFromXmlString starting from SubmodelElementList OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalSubmodelElementList();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.submodelElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("ISubmodelElement XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "ISubmodelElement XML deserialization fail via " +
+  "submodelElementFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.submodelElementFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IRelationshipElement XML round-trip " +
@@ -1647,6 +3121,20 @@ test(
 
     const asInterface = AasTypes.asRelationshipElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IRelationshipElement XML round-trip via " +
+  "relationshipElementFromXmlString starting from AnnotatedRelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalAnnotatedRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.relationshipElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1666,10 +3154,35 @@ test(
   }
 );
 
+test(
+  "IRelationshipElement XML round-trip via " +
+  "relationshipElementFromXmlString starting from RelationshipElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRelationshipElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.relationshipElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IRelationshipElement XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IRelationshipElement XML deserialization fail via " +
+  "relationshipElementFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.relationshipElementFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IDataElement XML round-trip " +
@@ -1684,6 +3197,20 @@ test(
 
     const asInterface = AasTypes.asDataElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IDataElement XML round-trip via " +
+  "dataElementFromXmlString starting from Blob OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBlob();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1704,6 +3231,20 @@ test(
 );
 
 test(
+  "IDataElement XML round-trip via " +
+  "dataElementFromXmlString starting from File OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalFile();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IDataElement XML round-trip " +
   "starting from MultiLanguageProperty OK",
   () => {
@@ -1716,6 +3257,20 @@ test(
 
     const asInterface = AasTypes.asDataElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IDataElement XML round-trip via " +
+  "dataElementFromXmlString starting from MultiLanguageProperty OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalMultiLanguageProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1736,6 +3291,20 @@ test(
 );
 
 test(
+  "IDataElement XML round-trip via " +
+  "dataElementFromXmlString starting from Property OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalProperty();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
+test(
   "IDataElement XML round-trip " +
   "starting from Range OK",
   () => {
@@ -1748,6 +3317,20 @@ test(
 
     const asInterface = AasTypes.asDataElement(anotherInstance);
     expect(asInterface).not.toBeNull();
+  }
+);
+
+test(
+  "IDataElement XML round-trip via " +
+  "dataElementFromXmlString starting from Range OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalRange();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
   }
 );
 
@@ -1767,10 +3350,35 @@ test(
   }
 );
 
+test(
+  "IDataElement XML round-trip via " +
+  "dataElementFromXmlString starting from ReferenceElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalReferenceElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IDataElement XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IDataElement XML deserialization fail via " +
+  "dataElementFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.dataElementFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IEventElement XML round-trip " +
@@ -1788,15 +3396,51 @@ test(
   }
 );
 
+test(
+  "IEventElement XML round-trip via " +
+  "eventElementFromXmlString starting from BasicEventElement OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalBasicEventElement();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.eventElementFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IEventElement XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
 
+test(
+  "IEventElement XML deserialization fail via " +
+  "eventElementFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.eventElementFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
+
 test("IAbstractLangString XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IAbstractLangString XML deserialization fail via " +
+  "abstractLangStringFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.abstractLangStringFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 test(
   "IDataSpecificationContent XML round-trip " +
@@ -1814,10 +3458,35 @@ test(
   }
 );
 
+test(
+  "IDataSpecificationContent XML round-trip via " +
+  "dataSpecificationContentFromXmlString starting from DataSpecificationIec61360 OK",
+  () => {
+    const instance = TestCommonXmlization.loadMinimalDataSpecificationIec61360();
+
+    const xmlText = AasXmlization.toXmlString(instance);
+    const anotherInstanceOrError = AasXmlization.dataSpecificationContentFromXmlString(
+      xmlText
+    );
+    expect(anotherInstanceOrError.error).toBeNull();
+  }
+);
+
 test("IDataSpecificationContent XML deserialization fail", () => {
   const instanceOrError = AasXmlization.fromXmlString("This is not XML.");
   expect(instanceOrError.error).not.toBeNull();
 });
+
+test(
+  "IDataSpecificationContent XML deserialization fail via " +
+  "dataSpecificationContentFromXmlString",
+  () => {
+    const instanceOrError = AasXmlization.dataSpecificationContentFromXmlString(
+      "This is not XML."
+    );
+    expect(instanceOrError.error).not.toBeNull();
+  }
+);
 
 // This code has been automatically generated by aas-core-codegen.
 // Do NOT edit or append.

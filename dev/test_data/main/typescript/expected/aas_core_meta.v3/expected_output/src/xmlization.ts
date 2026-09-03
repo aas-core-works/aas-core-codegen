@@ -201,6 +201,221 @@ function checkExpectedCloseTag(
 }
 
 /**
+ * Read the next token from `cursor`, expecting it to be the closing XML
+ * element named `expectedLocalName`, and consume it.
+ */
+function consumeCloseTag(
+  cursor: XmlCursor,
+  expectedLocalName: string
+): DeserializationError | null {
+  const closeTag = cursor.current();
+  if (!(closeTag instanceof CloseTagToken)) {
+    return new DeserializationError(
+      `Expected a closing element '${expectedLocalName}', ` +
+      `but got token kind: ${currentTokenKind(cursor)}`
+    );
+  }
+
+  const closeError = checkExpectedCloseTag(closeTag, expectedLocalName);
+  if (closeError !== null) {
+    return closeError;
+  }
+
+  cursor.advance();
+  return null;
+}
+
+/**
+ * Read the next non-ignorable token from `cursor`, expecting it to be
+ * an opening XML element in the expected namespace.
+ *
+ * This is shared by the parsing of a single list item, a single tuple
+ * item, and the dispatch-parsing of an interface.
+ *
+ * @param cursor - to read from
+ * @returns the opening tag, or an error
+ */
+function readNextOpenTag(
+  cursor: XmlCursor
+): AasCommon.Either<OpenTagToken, DeserializationError> {
+  cursor.skipIgnorable();
+  const token = cursor.current();
+  if (token === null) {
+    return newDeserializationError<OpenTagToken>(
+      "Expected an XML element, but got end of token stream"
+    );
+  }
+  if (!(token instanceof OpenTagToken)) {
+    return newDeserializationError<OpenTagToken>(
+      `Expected an XML element, but got token kind: ${token.kind}`
+    );
+  }
+
+  const namespaceError = checkExpectedOpenTagNamespace(token);
+  if (namespaceError !== null) {
+    return new AasCommon.Either<OpenTagToken, DeserializationError>(
+      null,
+      namespaceError
+    );
+  }
+
+  return new AasCommon.Either<OpenTagToken, DeserializationError>(token, null);
+}
+
+/**
+ * Read the next XML element from `cursor`, expecting it to be named
+ * `expectedLocalName`, parse its text content with `parseTextFn` and
+ * consume the matching closing element.
+ *
+ * This is shared by the parsing of a single list item (with a fixed
+ * local name, *e.g.*, `"v"`) and the parsing of a single tuple item (with
+ * a positional local name, *e.g.*, `"v1"`).
+ *
+ * @param cursor - to read from
+ * @param expectedLocalName - the expected local name of the element
+ * @param parseTextFn - parses the text content of the element
+ * @returns parsed value, or an error
+ * @typeParam T - type of the parsed value
+ */
+function parseNamedVElement<T>(
+  cursor: XmlCursor,
+  expectedLocalName: string,
+  parseTextFn: (text: string) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<T, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<T, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const observedLocalName = localNameOfTag(startTag.tag);
+  if (observedLocalName !== expectedLocalName) {
+    return newDeserializationError<T>(
+      `Expected the element '${expectedLocalName}', ` +
+        `but got '${observedLocalName}'`
+    );
+  }
+
+  cursor.advance();
+
+  const text = parseTextContent(cursor);
+
+  const closeError = consumeCloseTag(cursor, expectedLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<T, DeserializationError>(null, closeError);
+  }
+
+  return parseTextFn(text);
+}
+
+/**
+ * Read the next XML element from `cursor`, expecting it to be named
+ * `expectedLocalName`, parse its content with `parseFn` and consume the
+ * matching closing element.
+ *
+ * This is used for a list or a tuple item whose concrete type is statically
+ * known (*i.e.*, it has no further descendants), so we can reject
+ * an unexpected element based on its local name alone, without wastefully
+ * parsing its full (possibly deeply nested) content.
+ *
+ * @param cursor - to read from
+ * @param expectedLocalName - the expected local name of the element
+ * @param parseFn - parses the sequence of properties of the class instance
+ * @returns the parsed instance, or an error
+ * @typeParam T - type of the parsed instance
+ */
+function parseNamedClassElement<T>(
+  cursor: XmlCursor,
+  expectedLocalName: string,
+  parseFn: (cursor: XmlCursor) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<T, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<T, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const observedLocalName = localNameOfTag(startTag.tag);
+  if (observedLocalName !== expectedLocalName) {
+    return newDeserializationError<T>(
+      `Expected the element '${expectedLocalName}', ` +
+        `but got '${observedLocalName}'`
+    );
+  }
+
+  cursor.advance();
+
+  const instanceOrError = parseFn(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, expectedLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<T, DeserializationError>(null, closeError);
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse a sequence of list items from `cursor`, stopping (without consuming)
+ * at the first closing element.
+ *
+ * The caller is expected to read and verify the property's own closing
+ * element afterwards.
+ *
+ * @param cursor - to read from
+ * @param parseItem - parses a single list item
+ * @returns the parsed items, or an error
+ * @typeParam T - type of a single list item
+ */
+function parseList<T>(
+  cursor: XmlCursor,
+  parseItem: (cursor: XmlCursor) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<Array<T>, DeserializationError> {
+  const items = new Array<T>();
+  let itemIndex = 0;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const maybeClose = cursor.current();
+    if (maybeClose === null) {
+      return newDeserializationError<Array<T>>(
+        "Expected an XML element corresponding to a list item " +
+          "or property closing element, but got end of token stream"
+      );
+    }
+
+    if (maybeClose instanceof CloseTagToken) {
+      break;
+    }
+
+    const itemOrError = parseItem(cursor);
+    if (itemOrError.error !== null) {
+      itemOrError.error.path.prepend(new IndexSegment(itemIndex));
+      return new AasCommon.Either<Array<T>, DeserializationError>(
+        null,
+        itemOrError.error
+      );
+    }
+
+    items.push(itemOrError.mustValue());
+    itemIndex++;
+    cursor.skipIgnorable();
+  }
+
+  return new AasCommon.Either<Array<T>, DeserializationError>(items, null);
+}
+
+/**
  * Cursor over parsed XML SAX tokens.
  */
 class XmlCursor {
@@ -310,10 +525,13 @@ function readRequiredRootOpenTag(
   );
 }
 
-function parseTextContentAndConsumeEndTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<string, DeserializationError> {
+/**
+ * Consume the text (or CDATA) content at `cursor`, if any.
+ *
+ * The caller is responsible for reading and verifying the closing element
+ * afterwards.
+ */
+function parseTextContent(cursor: XmlCursor): string {
   cursor.skipIgnorable();
 
   let text = "";
@@ -324,91 +542,7 @@ function parseTextContentAndConsumeEndTag(
     cursor.skipIgnorable();
   }
 
-  const closeToken = cursor.current();
-  if (!(closeToken instanceof CloseTagToken)) {
-    return newDeserializationError<string>(
-      "Expected property closing XML element, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const localName = localNameOfTag(startTag.tag);
-  const closeError = checkExpectedCloseTag(closeToken, localName);
-  if (closeError !== null) {
-    return new AasCommon.Either<string, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
-  return new AasCommon.Either<string, DeserializationError>(
-    text,
-    null
-  );
-}
-
-function parsePropertyAsClassInstance(
-  cursor: XmlCursor,
-  propertyStartTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  cursor.skipIgnorable();
-
-  const token = cursor.current();
-  if (!(token instanceof OpenTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected nested class element in XML property, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const namespaceError = checkExpectedOpenTagNamespace(token);
-  if (namespaceError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      namespaceError
-    );
-  }
-
-  const localName = localNameOfTag(token.tag);
-  const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localName);
-  if (dispatch === undefined) {
-    return newDeserializationError<AasTypes.Class>(
-      `Unexpected nested class XML element: ${localName}`
-    );
-  }
-
-  cursor.advance();
-  const instanceOrError = dispatch(cursor, token);
-  if (instanceOrError.error !== null) {
-    return instanceOrError;
-  }
-
-  cursor.skipIgnorable();
-  const propertyCloseToken = cursor.current();
-  if (!(propertyCloseToken instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected property closing XML element after nested class, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const expectedPropertyLocalName = localNameOfTag(propertyStartTag.tag);
-  const propertyCloseError = checkExpectedCloseTag(
-    propertyCloseToken,
-    expectedPropertyLocalName
-  );
-  if (propertyCloseError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      propertyCloseError
-    );
-  }
-
-  cursor.advance();
-
-  return instanceOrError;
+  return text;
 }
 
 function parseBooleanText(
@@ -732,11 +866,17 @@ function serializeDataTypeIec61360Text(
   return escapeXmlText(AasStringification.mustDataTypeIec61360ToString(value));
 }
 
-function parseExtensionFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Extension}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseExtensionFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Extension, DeserializationError> {
   let theSemanticId: AasTypes.Reference | null = null;
   let theSupplementalSemanticIds: Array<AasTypes.Reference> | null = null;
   let theName: string | null = null;
@@ -749,7 +889,7 @@ function parseExtensionFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Extension>(
         `Unexpected end of token stream while parsing Extension`
       );
     }
@@ -759,7 +899,7 @@ function parseExtensionFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Extension>(
         "Expected an XML property start element or the closing element of " +
         `Extension, but got token kind: ${token.kind}`
       );
@@ -767,7 +907,7 @@ function parseExtensionFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Extension, DeserializationError>(
         null,
         namespaceError
       );
@@ -789,23 +929,22 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -819,84 +958,29 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -910,15 +994,20 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -936,15 +1025,20 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDataTypeDefXsdText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDataTypeDefXsdText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -962,15 +1056,20 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -988,84 +1087,29 @@ function parseExtensionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theRefersTo = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theRefersTo = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -1079,7 +1123,7 @@ function parseExtensionFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Extension, DeserializationError>(
         null,
         propertyError
       );
@@ -1088,26 +1132,8 @@ function parseExtensionFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Extension, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theName === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Extension>(
       "The required property 'name' is missing"
     );
   }
@@ -1120,17 +1146,23 @@ function parseExtensionFromOpenTag(
     theValue,
     theRefersTo
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Extension, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseAdministrativeInformationFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!AdministrativeInformation}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseAdministrativeInformationFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.AdministrativeInformation, DeserializationError> {
   let theEmbeddedDataSpecifications: Array<AasTypes.EmbeddedDataSpecification> | null = null;
   let theVersion: string | null = null;
   let theRevision: string | null = null;
@@ -1142,7 +1174,7 @@ function parseAdministrativeInformationFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AdministrativeInformation>(
         `Unexpected end of token stream while parsing AdministrativeInformation`
       );
     }
@@ -1152,7 +1184,7 @@ function parseAdministrativeInformationFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AdministrativeInformation>(
         "Expected an XML property start element or the closing element of " +
         `AdministrativeInformation, but got token kind: ${token.kind}`
       );
@@ -1160,7 +1192,7 @@ function parseAdministrativeInformationFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AdministrativeInformation, DeserializationError>(
         null,
         namespaceError
       );
@@ -1182,84 +1214,29 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -1273,15 +1250,20 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1299,15 +1281,20 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1325,23 +1312,22 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "creator" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theCreator = casted;
+        theCreator = classOrError.mustValue();
         break;
       }
 
@@ -1355,15 +1341,20 @@ function parseAdministrativeInformationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1381,7 +1372,7 @@ function parseAdministrativeInformationFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AdministrativeInformation, DeserializationError>(
         null,
         propertyError
       );
@@ -1389,24 +1380,6 @@ function parseAdministrativeInformationFromOpenTag(
 
     cursor.skipIgnorable();
   }
-
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `AdministrativeInformation, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
 
   // No required properties
 
@@ -1417,17 +1390,23 @@ function parseAdministrativeInformationFromOpenTag(
     theCreator,
     theTemplateId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.AdministrativeInformation, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseQualifierFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Qualifier}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseQualifierFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Qualifier, DeserializationError> {
   let theSemanticId: AasTypes.Reference | null = null;
   let theSupplementalSemanticIds: Array<AasTypes.Reference> | null = null;
   let theKind: AasTypes.QualifierKind | null = null;
@@ -1441,7 +1420,7 @@ function parseQualifierFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Qualifier>(
         `Unexpected end of token stream while parsing Qualifier`
       );
     }
@@ -1451,7 +1430,7 @@ function parseQualifierFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Qualifier>(
         "Expected an XML property start element or the closing element of " +
         `Qualifier, but got token kind: ${token.kind}`
       );
@@ -1459,7 +1438,7 @@ function parseQualifierFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Qualifier, DeserializationError>(
         null,
         namespaceError
       );
@@ -1481,23 +1460,22 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -1511,84 +1489,29 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -1602,15 +1525,20 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseQualifierKindText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseQualifierKindText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1628,15 +1556,20 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1654,15 +1587,20 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDataTypeDefXsdText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDataTypeDefXsdText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1680,15 +1618,20 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1706,23 +1649,22 @@ function parseQualifierFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "valueId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValueId = casted;
+        theValueId = classOrError.mustValue();
         break;
       }
 
@@ -1736,7 +1678,7 @@ function parseQualifierFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Qualifier, DeserializationError>(
         null,
         propertyError
       );
@@ -1745,32 +1687,14 @@ function parseQualifierFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Qualifier, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Qualifier>(
       "The required property 'type' is missing"
     );
   }
 
   if (theValueType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Qualifier>(
       "The required property 'valueType' is missing"
     );
   }
@@ -1784,17 +1708,23 @@ function parseQualifierFromOpenTag(
     theValue,
     theValueId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Qualifier, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseAssetAdministrationShellFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!AssetAdministrationShell}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseAssetAdministrationShellFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.AssetAdministrationShell, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -1812,7 +1742,7 @@ function parseAssetAdministrationShellFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AssetAdministrationShell>(
         `Unexpected end of token stream while parsing AssetAdministrationShell`
       );
     }
@@ -1822,7 +1752,7 @@ function parseAssetAdministrationShellFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AssetAdministrationShell>(
         "Expected an XML property start element or the closing element of " +
         `AssetAdministrationShell, but got token kind: ${token.kind}`
       );
@@ -1830,7 +1760,7 @@ function parseAssetAdministrationShellFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AssetAdministrationShell, DeserializationError>(
         null,
         namespaceError
       );
@@ -1852,84 +1782,29 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -1943,15 +1818,20 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1969,15 +1849,20 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -1995,84 +1880,29 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -2086,84 +1916,29 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -2177,23 +1952,22 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const classOrError = parseAdministrativeInformationFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseAdministrativeInformationFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asAdministrativeInformation(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "administration" +
-              " to contain an instance of IAdministrativeInformation"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theAdministration = casted;
+        theAdministration = classOrError.mustValue();
         break;
       }
 
@@ -2207,15 +1981,20 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -2233,84 +2012,29 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -2324,23 +2048,22 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "derivedFrom" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theDerivedFrom = casted;
+        theDerivedFrom = classOrError.mustValue();
         break;
       }
 
@@ -2354,23 +2077,22 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const classOrError = parseAssetInformationFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseAssetInformationFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asAssetInformation(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "assetInformation" +
-              " to contain an instance of IAssetInformation"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theAssetInformation = casted;
+        theAssetInformation = classOrError.mustValue();
         break;
       }
 
@@ -2384,84 +2106,29 @@ function parseAssetAdministrationShellFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSubmodels = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSubmodels = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -2475,7 +2142,7 @@ function parseAssetAdministrationShellFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AssetAdministrationShell, DeserializationError>(
         null,
         propertyError
       );
@@ -2484,32 +2151,14 @@ function parseAssetAdministrationShellFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `AssetAdministrationShell, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theId === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.AssetAdministrationShell>(
       "The required property 'id' is missing"
     );
   }
 
   if (theAssetInformation === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.AssetAdministrationShell>(
       "The required property 'assetInformation' is missing"
     );
   }
@@ -2527,17 +2176,23 @@ function parseAssetAdministrationShellFromOpenTag(
     theDerivedFrom,
     theSubmodels
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.AssetAdministrationShell, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseAssetInformationFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!AssetInformation}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseAssetInformationFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.AssetInformation, DeserializationError> {
   let theAssetKind: AasTypes.AssetKind | null = null;
   let theGlobalAssetId: string | null = null;
   let theSpecificAssetIds: Array<AasTypes.SpecificAssetId> | null = null;
@@ -2549,7 +2204,7 @@ function parseAssetInformationFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AssetInformation>(
         `Unexpected end of token stream while parsing AssetInformation`
       );
     }
@@ -2559,7 +2214,7 @@ function parseAssetInformationFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AssetInformation>(
         "Expected an XML property start element or the closing element of " +
         `AssetInformation, but got token kind: ${token.kind}`
       );
@@ -2567,7 +2222,7 @@ function parseAssetInformationFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AssetInformation, DeserializationError>(
         null,
         namespaceError
       );
@@ -2589,15 +2244,20 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseAssetKindText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseAssetKindText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -2615,15 +2275,20 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -2641,84 +2306,29 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.SpecificAssetId>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSpecificAssetId(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISpecificAssetId"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.SpecificAssetId>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "specificAssetId",
+            parseSpecificAssetIdFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSpecificAssetIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSpecificAssetIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -2732,15 +2342,20 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -2758,23 +2373,22 @@ function parseAssetInformationFromOpenTag(
           break;
         }
 
-        const classOrError = parseResourceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseResourceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asResource(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "defaultThumbnail" +
-              " to contain an instance of IResource"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theDefaultThumbnail = casted;
+        theDefaultThumbnail = classOrError.mustValue();
         break;
       }
 
@@ -2788,7 +2402,7 @@ function parseAssetInformationFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AssetInformation, DeserializationError>(
         null,
         propertyError
       );
@@ -2797,26 +2411,8 @@ function parseAssetInformationFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `AssetInformation, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theAssetKind === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.AssetInformation>(
       "The required property 'assetKind' is missing"
     );
   }
@@ -2828,17 +2424,23 @@ function parseAssetInformationFromOpenTag(
     theAssetType,
     theDefaultThumbnail
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.AssetInformation, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseResourceFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Resource}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseResourceFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Resource, DeserializationError> {
   let thePath: string | null = null;
   let theContentType: string | null = null;
 
@@ -2847,7 +2449,7 @@ function parseResourceFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Resource>(
         `Unexpected end of token stream while parsing Resource`
       );
     }
@@ -2857,7 +2459,7 @@ function parseResourceFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Resource>(
         "Expected an XML property start element or the closing element of " +
         `Resource, but got token kind: ${token.kind}`
       );
@@ -2865,7 +2467,7 @@ function parseResourceFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Resource, DeserializationError>(
         null,
         namespaceError
       );
@@ -2887,15 +2489,20 @@ function parseResourceFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -2913,15 +2520,20 @@ function parseResourceFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -2939,7 +2551,7 @@ function parseResourceFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Resource, DeserializationError>(
         null,
         propertyError
       );
@@ -2948,26 +2560,8 @@ function parseResourceFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Resource, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (thePath === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Resource>(
       "The required property 'path' is missing"
     );
   }
@@ -2976,17 +2570,23 @@ function parseResourceFromOpenTag(
     thePath,
     theContentType
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Resource, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseSpecificAssetIdFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!SpecificAssetId}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseSpecificAssetIdFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.SpecificAssetId, DeserializationError> {
   let theSemanticId: AasTypes.Reference | null = null;
   let theSupplementalSemanticIds: Array<AasTypes.Reference> | null = null;
   let theName: string | null = null;
@@ -2998,7 +2598,7 @@ function parseSpecificAssetIdFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.SpecificAssetId>(
         `Unexpected end of token stream while parsing SpecificAssetId`
       );
     }
@@ -3008,7 +2608,7 @@ function parseSpecificAssetIdFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.SpecificAssetId>(
         "Expected an XML property start element or the closing element of " +
         `SpecificAssetId, but got token kind: ${token.kind}`
       );
@@ -3016,7 +2616,7 @@ function parseSpecificAssetIdFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.SpecificAssetId, DeserializationError>(
         null,
         namespaceError
       );
@@ -3038,23 +2638,22 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -3068,84 +2667,29 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -3159,15 +2703,20 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -3185,15 +2734,20 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -3211,23 +2765,22 @@ function parseSpecificAssetIdFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "externalSubjectId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theExternalSubjectId = casted;
+        theExternalSubjectId = classOrError.mustValue();
         break;
       }
 
@@ -3241,7 +2794,7 @@ function parseSpecificAssetIdFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.SpecificAssetId, DeserializationError>(
         null,
         propertyError
       );
@@ -3250,32 +2803,14 @@ function parseSpecificAssetIdFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `SpecificAssetId, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theName === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.SpecificAssetId>(
       "The required property 'name' is missing"
     );
   }
 
   if (theValue === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.SpecificAssetId>(
       "The required property 'value' is missing"
     );
   }
@@ -3287,17 +2822,23 @@ function parseSpecificAssetIdFromOpenTag(
     theSupplementalSemanticIds,
     theExternalSubjectId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.SpecificAssetId, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseSubmodelFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Submodel}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseSubmodelFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Submodel, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -3317,7 +2858,7 @@ function parseSubmodelFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Submodel>(
         `Unexpected end of token stream while parsing Submodel`
       );
     }
@@ -3327,7 +2868,7 @@ function parseSubmodelFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Submodel>(
         "Expected an XML property start element or the closing element of " +
         `Submodel, but got token kind: ${token.kind}`
       );
@@ -3335,7 +2876,7 @@ function parseSubmodelFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Submodel, DeserializationError>(
         null,
         namespaceError
       );
@@ -3357,84 +2898,29 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -3448,15 +2934,20 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -3474,15 +2965,20 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -3500,84 +2996,29 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -3591,84 +3032,29 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -3682,23 +3068,22 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const classOrError = parseAdministrativeInformationFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseAdministrativeInformationFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asAdministrativeInformation(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "administration" +
-              " to contain an instance of IAdministrativeInformation"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theAdministration = casted;
+        theAdministration = classOrError.mustValue();
         break;
       }
 
@@ -3712,15 +3097,20 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -3738,15 +3128,20 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseModellingKindText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseModellingKindText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -3764,23 +3159,22 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -3794,84 +3188,29 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -3885,84 +3224,29 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -3976,84 +3260,29 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4067,84 +3296,25 @@ function parseSubmodelFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.ISubmodelElement>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSubmodelElement(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISubmodelElement"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.ISubmodelElement>(
+          cursor,
+          dispatchParseSubmodelElementElement
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSubmodelElements = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSubmodelElements = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4158,7 +3328,7 @@ function parseSubmodelFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Submodel, DeserializationError>(
         null,
         propertyError
       );
@@ -4167,26 +3337,8 @@ function parseSubmodelFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Submodel, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theId === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Submodel>(
       "The required property 'id' is missing"
     );
   }
@@ -4206,17 +3358,23 @@ function parseSubmodelFromOpenTag(
     theEmbeddedDataSpecifications,
     theSubmodelElements
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Submodel, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseRelationshipElementFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!RelationshipElement}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseRelationshipElementFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.RelationshipElement, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -4234,7 +3392,7 @@ function parseRelationshipElementFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.RelationshipElement>(
         `Unexpected end of token stream while parsing RelationshipElement`
       );
     }
@@ -4244,7 +3402,7 @@ function parseRelationshipElementFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.RelationshipElement>(
         "Expected an XML property start element or the closing element of " +
         `RelationshipElement, but got token kind: ${token.kind}`
       );
@@ -4252,7 +3410,7 @@ function parseRelationshipElementFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>(
         null,
         namespaceError
       );
@@ -4274,84 +3432,29 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4365,15 +3468,20 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -4391,15 +3499,20 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -4417,84 +3530,29 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4508,84 +3566,29 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4599,23 +3602,22 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -4629,84 +3631,29 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4720,84 +3667,29 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4811,84 +3703,29 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -4902,23 +3739,22 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "first" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theFirst = casted;
+        theFirst = classOrError.mustValue();
         break;
       }
 
@@ -4932,23 +3768,22 @@ function parseRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "second" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSecond = casted;
+        theSecond = classOrError.mustValue();
         break;
       }
 
@@ -4962,7 +3797,7 @@ function parseRelationshipElementFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>(
         null,
         propertyError
       );
@@ -4971,32 +3806,14 @@ function parseRelationshipElementFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `RelationshipElement, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theFirst === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.RelationshipElement>(
       "The required property 'first' is missing"
     );
   }
 
   if (theSecond === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.RelationshipElement>(
       "The required property 'second' is missing"
     );
   }
@@ -5014,17 +3831,23 @@ function parseRelationshipElementFromOpenTag(
     theQualifiers,
     theEmbeddedDataSpecifications
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseSubmodelElementListFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!SubmodelElementList}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseSubmodelElementListFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.SubmodelElementList, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -5045,7 +3868,7 @@ function parseSubmodelElementListFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.SubmodelElementList>(
         `Unexpected end of token stream while parsing SubmodelElementList`
       );
     }
@@ -5055,7 +3878,7 @@ function parseSubmodelElementListFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.SubmodelElementList>(
         "Expected an XML property start element or the closing element of " +
         `SubmodelElementList, but got token kind: ${token.kind}`
       );
@@ -5063,7 +3886,7 @@ function parseSubmodelElementListFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.SubmodelElementList, DeserializationError>(
         null,
         namespaceError
       );
@@ -5085,84 +3908,29 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5176,15 +3944,20 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -5202,15 +3975,20 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -5228,84 +4006,29 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5319,84 +4042,29 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5410,23 +4078,22 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -5440,84 +4107,29 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5531,84 +4143,29 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5622,84 +4179,29 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5713,15 +4215,20 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBooleanText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBooleanText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -5739,23 +4246,22 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticIdListElement" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticIdListElement = casted;
+        theSemanticIdListElement = classOrError.mustValue();
         break;
       }
 
@@ -5769,15 +4275,20 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseAasSubmodelElementsText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseAasSubmodelElementsText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -5795,15 +4306,20 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDataTypeDefXsdText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDataTypeDefXsdText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -5821,84 +4337,25 @@ function parseSubmodelElementListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.ISubmodelElement>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSubmodelElement(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISubmodelElement"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.ISubmodelElement>(
+          cursor,
+          dispatchParseSubmodelElementElement
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theValue = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theValue = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -5912,7 +4369,7 @@ function parseSubmodelElementListFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.SubmodelElementList, DeserializationError>(
         null,
         propertyError
       );
@@ -5921,26 +4378,8 @@ function parseSubmodelElementListFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `SubmodelElementList, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theTypeValueListElement === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.SubmodelElementList>(
       "The required property 'typeValueListElement' is missing"
     );
   }
@@ -5961,17 +4400,23 @@ function parseSubmodelElementListFromOpenTag(
     theValueTypeListElement,
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.SubmodelElementList, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseSubmodelElementCollectionFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!SubmodelElementCollection}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseSubmodelElementCollectionFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.SubmodelElementCollection, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -5988,7 +4433,7 @@ function parseSubmodelElementCollectionFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.SubmodelElementCollection>(
         `Unexpected end of token stream while parsing SubmodelElementCollection`
       );
     }
@@ -5998,7 +4443,7 @@ function parseSubmodelElementCollectionFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.SubmodelElementCollection>(
         "Expected an XML property start element or the closing element of " +
         `SubmodelElementCollection, but got token kind: ${token.kind}`
       );
@@ -6006,7 +4451,7 @@ function parseSubmodelElementCollectionFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.SubmodelElementCollection, DeserializationError>(
         null,
         namespaceError
       );
@@ -6028,84 +4473,29 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6119,15 +4509,20 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -6145,15 +4540,20 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -6171,84 +4571,29 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6262,84 +4607,29 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6353,23 +4643,22 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -6383,84 +4672,29 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6474,84 +4708,29 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6565,84 +4744,29 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6656,84 +4780,25 @@ function parseSubmodelElementCollectionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.ISubmodelElement>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSubmodelElement(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISubmodelElement"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.ISubmodelElement>(
+          cursor,
+          dispatchParseSubmodelElementElement
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theValue = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theValue = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6747,7 +4812,7 @@ function parseSubmodelElementCollectionFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.SubmodelElementCollection, DeserializationError>(
         null,
         propertyError
       );
@@ -6755,24 +4820,6 @@ function parseSubmodelElementCollectionFromOpenTag(
 
     cursor.skipIgnorable();
   }
-
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `SubmodelElementCollection, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
 
   // No required properties
 
@@ -6788,17 +4835,23 @@ function parseSubmodelElementCollectionFromOpenTag(
     theEmbeddedDataSpecifications,
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.SubmodelElementCollection, DeserializationError>(
     instance,
     null
   );
 }
 
-function parsePropertyFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Property}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parsePropertyFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Property, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -6817,7 +4870,7 @@ function parsePropertyFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Property>(
         `Unexpected end of token stream while parsing Property`
       );
     }
@@ -6827,7 +4880,7 @@ function parsePropertyFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Property>(
         "Expected an XML property start element or the closing element of " +
         `Property, but got token kind: ${token.kind}`
       );
@@ -6835,7 +4888,7 @@ function parsePropertyFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Property, DeserializationError>(
         null,
         namespaceError
       );
@@ -6857,84 +4910,29 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -6948,15 +4946,20 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -6974,15 +4977,20 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -7000,84 +5008,29 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7091,84 +5044,29 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7182,23 +5080,22 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -7212,84 +5109,29 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7303,84 +5145,29 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7394,84 +5181,29 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7485,15 +5217,20 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDataTypeDefXsdText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDataTypeDefXsdText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -7511,15 +5248,20 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -7537,23 +5279,22 @@ function parsePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "valueId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValueId = casted;
+        theValueId = classOrError.mustValue();
         break;
       }
 
@@ -7567,7 +5308,7 @@ function parsePropertyFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Property, DeserializationError>(
         null,
         propertyError
       );
@@ -7576,26 +5317,8 @@ function parsePropertyFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Property, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theValueType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Property>(
       "The required property 'valueType' is missing"
     );
   }
@@ -7614,17 +5337,23 @@ function parsePropertyFromOpenTag(
     theValue,
     theValueId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Property, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseMultiLanguagePropertyFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!MultiLanguageProperty}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseMultiLanguagePropertyFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.MultiLanguageProperty, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -7642,7 +5371,7 @@ function parseMultiLanguagePropertyFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.MultiLanguageProperty>(
         `Unexpected end of token stream while parsing MultiLanguageProperty`
       );
     }
@@ -7652,7 +5381,7 @@ function parseMultiLanguagePropertyFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.MultiLanguageProperty>(
         "Expected an XML property start element or the closing element of " +
         `MultiLanguageProperty, but got token kind: ${token.kind}`
       );
@@ -7660,7 +5389,7 @@ function parseMultiLanguagePropertyFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.MultiLanguageProperty, DeserializationError>(
         null,
         namespaceError
       );
@@ -7682,84 +5411,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7773,15 +5447,20 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -7799,15 +5478,20 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -7825,84 +5509,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -7916,84 +5545,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8007,23 +5581,22 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -8037,84 +5610,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8128,84 +5646,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8219,84 +5682,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8310,84 +5718,29 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theValue = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theValue = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8401,23 +5754,22 @@ function parseMultiLanguagePropertyFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "valueId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValueId = casted;
+        theValueId = classOrError.mustValue();
         break;
       }
 
@@ -8431,7 +5783,7 @@ function parseMultiLanguagePropertyFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.MultiLanguageProperty, DeserializationError>(
         null,
         propertyError
       );
@@ -8439,24 +5791,6 @@ function parseMultiLanguagePropertyFromOpenTag(
 
     cursor.skipIgnorable();
   }
-
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `MultiLanguageProperty, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
 
   // No required properties
 
@@ -8473,17 +5807,23 @@ function parseMultiLanguagePropertyFromOpenTag(
     theValue,
     theValueId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.MultiLanguageProperty, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseRangeFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Range}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseRangeFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Range, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -8502,7 +5842,7 @@ function parseRangeFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Range>(
         `Unexpected end of token stream while parsing Range`
       );
     }
@@ -8512,7 +5852,7 @@ function parseRangeFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Range>(
         "Expected an XML property start element or the closing element of " +
         `Range, but got token kind: ${token.kind}`
       );
@@ -8520,7 +5860,7 @@ function parseRangeFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Range, DeserializationError>(
         null,
         namespaceError
       );
@@ -8542,84 +5882,29 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8633,15 +5918,20 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -8659,15 +5949,20 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -8685,84 +5980,29 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8776,84 +6016,29 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8867,23 +6052,22 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -8897,84 +6081,29 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -8988,84 +6117,29 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9079,84 +6153,29 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9170,15 +6189,20 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDataTypeDefXsdText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDataTypeDefXsdText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -9196,15 +6220,20 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -9222,15 +6251,20 @@ function parseRangeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -9248,7 +6282,7 @@ function parseRangeFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Range, DeserializationError>(
         null,
         propertyError
       );
@@ -9257,26 +6291,8 @@ function parseRangeFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Range, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theValueType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Range>(
       "The required property 'valueType' is missing"
     );
   }
@@ -9295,17 +6311,23 @@ function parseRangeFromOpenTag(
     theMin,
     theMax
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Range, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseReferenceElementFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!ReferenceElement}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseReferenceElementFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ReferenceElement, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -9322,7 +6344,7 @@ function parseReferenceElementFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ReferenceElement>(
         `Unexpected end of token stream while parsing ReferenceElement`
       );
     }
@@ -9332,7 +6354,7 @@ function parseReferenceElementFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ReferenceElement>(
         "Expected an XML property start element or the closing element of " +
         `ReferenceElement, but got token kind: ${token.kind}`
       );
@@ -9340,7 +6362,7 @@ function parseReferenceElementFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ReferenceElement, DeserializationError>(
         null,
         namespaceError
       );
@@ -9362,84 +6384,29 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9453,15 +6420,20 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -9479,15 +6451,20 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -9505,84 +6482,29 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9596,84 +6518,29 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9687,23 +6554,22 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -9717,84 +6583,29 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9808,84 +6619,29 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9899,84 +6655,29 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -9990,23 +6691,22 @@ function parseReferenceElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "value" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValue = casted;
+        theValue = classOrError.mustValue();
         break;
       }
 
@@ -10020,7 +6720,7 @@ function parseReferenceElementFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ReferenceElement, DeserializationError>(
         null,
         propertyError
       );
@@ -10028,24 +6728,6 @@ function parseReferenceElementFromOpenTag(
 
     cursor.skipIgnorable();
   }
-
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `ReferenceElement, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
 
   // No required properties
 
@@ -10061,17 +6743,23 @@ function parseReferenceElementFromOpenTag(
     theEmbeddedDataSpecifications,
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.ReferenceElement, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseBlobFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Blob}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseBlobFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Blob, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -10089,7 +6777,7 @@ function parseBlobFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Blob>(
         `Unexpected end of token stream while parsing Blob`
       );
     }
@@ -10099,7 +6787,7 @@ function parseBlobFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Blob>(
         "Expected an XML property start element or the closing element of " +
         `Blob, but got token kind: ${token.kind}`
       );
@@ -10107,7 +6795,7 @@ function parseBlobFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Blob, DeserializationError>(
         null,
         namespaceError
       );
@@ -10129,84 +6817,29 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -10220,15 +6853,20 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -10246,15 +6884,20 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -10272,84 +6915,29 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -10363,84 +6951,29 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -10454,23 +6987,22 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -10484,84 +7016,29 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -10575,84 +7052,29 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -10666,84 +7088,29 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -10757,15 +7124,20 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBase64EncodedBytesText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBase64EncodedBytesText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -10783,15 +7155,20 @@ function parseBlobFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -10809,7 +7186,7 @@ function parseBlobFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Blob, DeserializationError>(
         null,
         propertyError
       );
@@ -10818,26 +7195,8 @@ function parseBlobFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Blob, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theContentType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Blob>(
       "The required property 'contentType' is missing"
     );
   }
@@ -10855,17 +7214,23 @@ function parseBlobFromOpenTag(
     theEmbeddedDataSpecifications,
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Blob, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseFileFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!File}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseFileFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.File, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -10883,7 +7248,7 @@ function parseFileFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.File>(
         `Unexpected end of token stream while parsing File`
       );
     }
@@ -10893,7 +7258,7 @@ function parseFileFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.File>(
         "Expected an XML property start element or the closing element of " +
         `File, but got token kind: ${token.kind}`
       );
@@ -10901,7 +7266,7 @@ function parseFileFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.File, DeserializationError>(
         null,
         namespaceError
       );
@@ -10923,84 +7288,29 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11014,15 +7324,20 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -11040,15 +7355,20 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -11066,84 +7386,29 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11157,84 +7422,29 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11248,23 +7458,22 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -11278,84 +7487,29 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11369,84 +7523,29 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11460,84 +7559,29 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11551,15 +7595,20 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -11577,15 +7626,20 @@ function parseFileFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -11603,7 +7657,7 @@ function parseFileFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.File, DeserializationError>(
         null,
         propertyError
       );
@@ -11612,26 +7666,8 @@ function parseFileFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `File, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theContentType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.File>(
       "The required property 'contentType' is missing"
     );
   }
@@ -11649,17 +7685,23 @@ function parseFileFromOpenTag(
     theEmbeddedDataSpecifications,
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.File, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseAnnotatedRelationshipElementFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!AnnotatedRelationshipElement}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseAnnotatedRelationshipElementFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.AnnotatedRelationshipElement, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -11678,7 +7720,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AnnotatedRelationshipElement>(
         `Unexpected end of token stream while parsing AnnotatedRelationshipElement`
       );
     }
@@ -11688,7 +7730,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.AnnotatedRelationshipElement>(
         "Expected an XML property start element or the closing element of " +
         `AnnotatedRelationshipElement, but got token kind: ${token.kind}`
       );
@@ -11696,7 +7738,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AnnotatedRelationshipElement, DeserializationError>(
         null,
         namespaceError
       );
@@ -11718,84 +7760,29 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11809,15 +7796,20 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -11835,15 +7827,20 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -11861,84 +7858,29 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -11952,84 +7894,29 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12043,23 +7930,22 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -12073,84 +7959,29 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12164,84 +7995,29 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12255,84 +8031,29 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12346,23 +8067,22 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "first" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theFirst = casted;
+        theFirst = classOrError.mustValue();
         break;
       }
 
@@ -12376,23 +8096,22 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "second" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSecond = casted;
+        theSecond = classOrError.mustValue();
         break;
       }
 
@@ -12406,84 +8125,25 @@ function parseAnnotatedRelationshipElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.IDataElement>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asDataElement(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IDataElement"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.IDataElement>(
+          cursor,
+          dispatchParseDataElementElement
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theAnnotations = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theAnnotations = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12497,7 +8157,7 @@ function parseAnnotatedRelationshipElementFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.AnnotatedRelationshipElement, DeserializationError>(
         null,
         propertyError
       );
@@ -12506,32 +8166,14 @@ function parseAnnotatedRelationshipElementFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `AnnotatedRelationshipElement, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theFirst === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.AnnotatedRelationshipElement>(
       "The required property 'first' is missing"
     );
   }
 
   if (theSecond === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.AnnotatedRelationshipElement>(
       "The required property 'second' is missing"
     );
   }
@@ -12550,17 +8192,23 @@ function parseAnnotatedRelationshipElementFromOpenTag(
     theEmbeddedDataSpecifications,
     theAnnotations
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.AnnotatedRelationshipElement, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseEntityFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Entity}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseEntityFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Entity, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -12580,7 +8228,7 @@ function parseEntityFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Entity>(
         `Unexpected end of token stream while parsing Entity`
       );
     }
@@ -12590,7 +8238,7 @@ function parseEntityFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Entity>(
         "Expected an XML property start element or the closing element of " +
         `Entity, but got token kind: ${token.kind}`
       );
@@ -12598,7 +8246,7 @@ function parseEntityFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Entity, DeserializationError>(
         null,
         namespaceError
       );
@@ -12620,84 +8268,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12711,15 +8304,20 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -12737,15 +8335,20 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -12763,84 +8366,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12854,84 +8402,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -12945,23 +8438,22 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -12975,84 +8467,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -13066,84 +8503,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -13157,84 +8539,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -13248,84 +8575,25 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.ISubmodelElement>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSubmodelElement(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISubmodelElement"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.ISubmodelElement>(
+          cursor,
+          dispatchParseSubmodelElementElement
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theStatements = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theStatements = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -13339,15 +8607,20 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseEntityTypeText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseEntityTypeText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -13365,15 +8638,20 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -13391,84 +8669,29 @@ function parseEntityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.SpecificAssetId>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSpecificAssetId(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISpecificAssetId"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.SpecificAssetId>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "specificAssetId",
+            parseSpecificAssetIdFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSpecificAssetIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSpecificAssetIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -13482,7 +8705,7 @@ function parseEntityFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Entity, DeserializationError>(
         null,
         propertyError
       );
@@ -13491,26 +8714,8 @@ function parseEntityFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Entity, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theEntityType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Entity>(
       "The required property 'entityType' is missing"
     );
   }
@@ -13530,17 +8735,23 @@ function parseEntityFromOpenTag(
     theGlobalAssetId,
     theSpecificAssetIds
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Entity, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseEventPayloadFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!EventPayload}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseEventPayloadFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.EventPayload, DeserializationError> {
   let theSource: AasTypes.Reference | null = null;
   let theSourceSemanticId: AasTypes.Reference | null = null;
   let theObservableReference: AasTypes.Reference | null = null;
@@ -13555,7 +8766,7 @@ function parseEventPayloadFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.EventPayload>(
         `Unexpected end of token stream while parsing EventPayload`
       );
     }
@@ -13565,7 +8776,7 @@ function parseEventPayloadFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.EventPayload>(
         "Expected an XML property start element or the closing element of " +
         `EventPayload, but got token kind: ${token.kind}`
       );
@@ -13573,7 +8784,7 @@ function parseEventPayloadFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.EventPayload, DeserializationError>(
         null,
         namespaceError
       );
@@ -13595,23 +8806,22 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "source" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSource = casted;
+        theSource = classOrError.mustValue();
         break;
       }
 
@@ -13625,23 +8835,22 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "sourceSemanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSourceSemanticId = casted;
+        theSourceSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -13655,23 +8864,22 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "observableReference" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theObservableReference = casted;
+        theObservableReference = classOrError.mustValue();
         break;
       }
 
@@ -13685,23 +8893,22 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "observableSemanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theObservableSemanticId = casted;
+        theObservableSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -13715,15 +8922,20 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -13741,23 +8953,22 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "subjectId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSubjectId = casted;
+        theSubjectId = classOrError.mustValue();
         break;
       }
 
@@ -13771,15 +8982,20 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -13797,15 +9013,20 @@ function parseEventPayloadFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBase64EncodedBytesText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBase64EncodedBytesText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -13823,7 +9044,7 @@ function parseEventPayloadFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.EventPayload, DeserializationError>(
         null,
         propertyError
       );
@@ -13832,38 +9053,20 @@ function parseEventPayloadFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `EventPayload, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theSource === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.EventPayload>(
       "The required property 'source' is missing"
     );
   }
 
   if (theObservableReference === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.EventPayload>(
       "The required property 'observableReference' is missing"
     );
   }
 
   if (theTimeStamp === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.EventPayload>(
       "The required property 'timeStamp' is missing"
     );
   }
@@ -13878,17 +9081,23 @@ function parseEventPayloadFromOpenTag(
     theSubjectId,
     thePayload
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.EventPayload, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseBasicEventElementFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!BasicEventElement}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseBasicEventElementFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.BasicEventElement, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -13912,7 +9121,7 @@ function parseBasicEventElementFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.BasicEventElement>(
         `Unexpected end of token stream while parsing BasicEventElement`
       );
     }
@@ -13922,7 +9131,7 @@ function parseBasicEventElementFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.BasicEventElement>(
         "Expected an XML property start element or the closing element of " +
         `BasicEventElement, but got token kind: ${token.kind}`
       );
@@ -13930,7 +9139,7 @@ function parseBasicEventElementFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.BasicEventElement, DeserializationError>(
         null,
         namespaceError
       );
@@ -13952,84 +9161,29 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -14043,15 +9197,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14069,15 +9228,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14095,84 +9259,29 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -14186,84 +9295,29 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -14277,23 +9331,22 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -14307,84 +9360,29 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -14398,84 +9396,29 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -14489,84 +9432,29 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -14580,23 +9468,22 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "observed" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theObserved = casted;
+        theObserved = classOrError.mustValue();
         break;
       }
 
@@ -14610,15 +9497,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDirectionText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDirectionText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14636,15 +9528,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStateOfEventText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStateOfEventText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14662,15 +9559,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14688,23 +9590,22 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "messageBroker" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theMessageBroker = casted;
+        theMessageBroker = classOrError.mustValue();
         break;
       }
 
@@ -14718,15 +9619,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14744,15 +9650,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14770,15 +9681,20 @@ function parseBasicEventElementFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -14796,7 +9712,7 @@ function parseBasicEventElementFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.BasicEventElement, DeserializationError>(
         null,
         propertyError
       );
@@ -14805,38 +9721,20 @@ function parseBasicEventElementFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `BasicEventElement, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theObserved === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.BasicEventElement>(
       "The required property 'observed' is missing"
     );
   }
 
   if (theDirection === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.BasicEventElement>(
       "The required property 'direction' is missing"
     );
   }
 
   if (theState === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.BasicEventElement>(
       "The required property 'state' is missing"
     );
   }
@@ -14860,17 +9758,23 @@ function parseBasicEventElementFromOpenTag(
     theMinInterval,
     theMaxInterval
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.BasicEventElement, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseOperationFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Operation}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseOperationFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Operation, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -14889,7 +9793,7 @@ function parseOperationFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Operation>(
         `Unexpected end of token stream while parsing Operation`
       );
     }
@@ -14899,7 +9803,7 @@ function parseOperationFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Operation>(
         "Expected an XML property start element or the closing element of " +
         `Operation, but got token kind: ${token.kind}`
       );
@@ -14907,7 +9811,7 @@ function parseOperationFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Operation, DeserializationError>(
         null,
         namespaceError
       );
@@ -14929,84 +9833,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15020,15 +9869,20 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -15046,15 +9900,20 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -15072,84 +9931,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15163,84 +9967,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15254,23 +10003,22 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -15284,84 +10032,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15375,84 +10068,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15466,84 +10104,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15557,84 +10140,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.OperationVariable>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asOperationVariable(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IOperationVariable"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.OperationVariable>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "operationVariable",
+            parseOperationVariableFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theInputVariables = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theInputVariables = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15648,84 +10176,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.OperationVariable>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asOperationVariable(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IOperationVariable"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.OperationVariable>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "operationVariable",
+            parseOperationVariableFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theOutputVariables = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theOutputVariables = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15739,84 +10212,29 @@ function parseOperationFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.OperationVariable>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asOperationVariable(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IOperationVariable"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.OperationVariable>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "operationVariable",
+            parseOperationVariableFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theInoutputVariables = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theInoutputVariables = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -15830,7 +10248,7 @@ function parseOperationFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Operation, DeserializationError>(
         null,
         propertyError
       );
@@ -15838,24 +10256,6 @@ function parseOperationFromOpenTag(
 
     cursor.skipIgnorable();
   }
-
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Operation, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
 
   // No required properties
 
@@ -15873,17 +10273,23 @@ function parseOperationFromOpenTag(
     theOutputVariables,
     theInoutputVariables
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Operation, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseOperationVariableFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!OperationVariable}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseOperationVariableFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.OperationVariable, DeserializationError> {
   let theValue: AasTypes.ISubmodelElement | null = null;
 
   cursor.skipIgnorable();
@@ -15891,7 +10297,7 @@ function parseOperationVariableFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.OperationVariable>(
         `Unexpected end of token stream while parsing OperationVariable`
       );
     }
@@ -15901,7 +10307,7 @@ function parseOperationVariableFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.OperationVariable>(
         "Expected an XML property start element or the closing element of " +
         `OperationVariable, but got token kind: ${token.kind}`
       );
@@ -15909,7 +10315,7 @@ function parseOperationVariableFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.OperationVariable, DeserializationError>(
         null,
         namespaceError
       );
@@ -15931,23 +10337,22 @@ function parseOperationVariableFromOpenTag(
           break;
         }
 
-        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
-        if (classOrError.error !== null) {
-          propertyError = classOrError.error;
+        const instanceOrError = dispatchParseSubmodelElementElement(cursor);
+        if (instanceOrError.error !== null) {
+          propertyError = instanceOrError.error;
           break;
         }
 
-        const casted = AasTypes.asSubmodelElement(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "value" +
-              " to contain an instance of ISubmodelElement"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValue = casted;
+        theValue = instanceOrError.mustValue();
         break;
       }
 
@@ -15961,7 +10366,7 @@ function parseOperationVariableFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.OperationVariable, DeserializationError>(
         null,
         propertyError
       );
@@ -15970,26 +10375,8 @@ function parseOperationVariableFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `OperationVariable, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theValue === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.OperationVariable>(
       "The required property 'value' is missing"
     );
   }
@@ -15997,17 +10384,23 @@ function parseOperationVariableFromOpenTag(
   const instance = new AasTypes.OperationVariable(
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.OperationVariable, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseCapabilityFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Capability}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseCapabilityFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Capability, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -16023,7 +10416,7 @@ function parseCapabilityFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Capability>(
         `Unexpected end of token stream while parsing Capability`
       );
     }
@@ -16033,7 +10426,7 @@ function parseCapabilityFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Capability>(
         "Expected an XML property start element or the closing element of " +
         `Capability, but got token kind: ${token.kind}`
       );
@@ -16041,7 +10434,7 @@ function parseCapabilityFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Capability, DeserializationError>(
         null,
         namespaceError
       );
@@ -16063,84 +10456,29 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16154,15 +10492,20 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -16180,15 +10523,20 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -16206,84 +10554,29 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16297,84 +10590,29 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16388,23 +10626,22 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "semanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theSemanticId = casted;
+        theSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -16418,84 +10655,29 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSupplementalSemanticIds = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSupplementalSemanticIds = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16509,84 +10691,29 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Qualifier>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asQualifier(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IQualifier"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Qualifier>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "qualifier",
+            parseQualifierFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theQualifiers = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theQualifiers = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16600,84 +10727,29 @@ function parseCapabilityFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16691,7 +10763,7 @@ function parseCapabilityFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Capability, DeserializationError>(
         null,
         propertyError
       );
@@ -16699,24 +10771,6 @@ function parseCapabilityFromOpenTag(
 
     cursor.skipIgnorable();
   }
-
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Capability, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
 
   // No required properties
 
@@ -16731,17 +10785,23 @@ function parseCapabilityFromOpenTag(
     theQualifiers,
     theEmbeddedDataSpecifications
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Capability, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseConceptDescriptionFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!ConceptDescription}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseConceptDescriptionFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ConceptDescription, DeserializationError> {
   let theExtensions: Array<AasTypes.Extension> | null = null;
   let theCategory: string | null = null;
   let theIdShort: string | null = null;
@@ -16757,7 +10817,7 @@ function parseConceptDescriptionFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ConceptDescription>(
         `Unexpected end of token stream while parsing ConceptDescription`
       );
     }
@@ -16767,7 +10827,7 @@ function parseConceptDescriptionFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ConceptDescription>(
         "Expected an XML property start element or the closing element of " +
         `ConceptDescription, but got token kind: ${token.kind}`
       );
@@ -16775,7 +10835,7 @@ function parseConceptDescriptionFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ConceptDescription, DeserializationError>(
         null,
         namespaceError
       );
@@ -16797,84 +10857,29 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Extension>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asExtension(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IExtension"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Extension>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "extension",
+            parseExtensionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theExtensions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theExtensions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -16888,15 +10893,20 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -16914,15 +10924,20 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -16940,84 +10955,29 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringNameType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringNameType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringNameType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringNameType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringNameType",
+            parseLangStringNameTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDisplayName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDisplayName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -17031,84 +10991,29 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringTextType>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringTextType(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringTextType"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringTextType>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringTextType",
+            parseLangStringTextTypeFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDescription = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDescription = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -17122,23 +11027,22 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const classOrError = parseAdministrativeInformationFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseAdministrativeInformationFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asAdministrativeInformation(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "administration" +
-              " to contain an instance of IAdministrativeInformation"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theAdministration = casted;
+        theAdministration = classOrError.mustValue();
         break;
       }
 
@@ -17152,15 +11056,20 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -17178,84 +11087,29 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.EmbeddedDataSpecification>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asEmbeddedDataSpecification(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IEmbeddedDataSpecification"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.EmbeddedDataSpecification>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "embeddedDataSpecification",
+            parseEmbeddedDataSpecificationFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theEmbeddedDataSpecifications = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theEmbeddedDataSpecifications = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -17269,84 +11123,29 @@ function parseConceptDescriptionFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Reference>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asReference(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IReference"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Reference>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "reference",
+            parseReferenceFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theIsCaseOf = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theIsCaseOf = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -17360,7 +11159,7 @@ function parseConceptDescriptionFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ConceptDescription, DeserializationError>(
         null,
         propertyError
       );
@@ -17369,26 +11168,8 @@ function parseConceptDescriptionFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `ConceptDescription, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theId === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.ConceptDescription>(
       "The required property 'id' is missing"
     );
   }
@@ -17404,17 +11185,23 @@ function parseConceptDescriptionFromOpenTag(
     theEmbeddedDataSpecifications,
     theIsCaseOf
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.ConceptDescription, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseReferenceFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Reference}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseReferenceFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Reference, DeserializationError> {
   let theType: AasTypes.ReferenceTypes | null = null;
   let theReferredSemanticId: AasTypes.Reference | null = null;
   let theKeys: Array<AasTypes.Key> | null = null;
@@ -17424,7 +11211,7 @@ function parseReferenceFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Reference>(
         `Unexpected end of token stream while parsing Reference`
       );
     }
@@ -17434,7 +11221,7 @@ function parseReferenceFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Reference>(
         "Expected an XML property start element or the closing element of " +
         `Reference, but got token kind: ${token.kind}`
       );
@@ -17442,7 +11229,7 @@ function parseReferenceFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Reference, DeserializationError>(
         null,
         namespaceError
       );
@@ -17464,15 +11251,20 @@ function parseReferenceFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseReferenceTypesText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseReferenceTypesText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -17490,23 +11282,22 @@ function parseReferenceFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "referredSemanticId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theReferredSemanticId = casted;
+        theReferredSemanticId = classOrError.mustValue();
         break;
       }
 
@@ -17520,84 +11311,29 @@ function parseReferenceFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Key>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asKey(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IKey"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Key>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "key",
+            parseKeyFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theKeys = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theKeys = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -17611,7 +11347,7 @@ function parseReferenceFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Reference, DeserializationError>(
         null,
         propertyError
       );
@@ -17620,32 +11356,14 @@ function parseReferenceFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Reference, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Reference>(
       "The required property 'type' is missing"
     );
   }
 
   if (theKeys === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Reference>(
       "The required property 'keys' is missing"
     );
   }
@@ -17655,17 +11373,23 @@ function parseReferenceFromOpenTag(
     theKeys,
     theReferredSemanticId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Reference, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseKeyFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Key}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseKeyFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Key, DeserializationError> {
   let theType: AasTypes.KeyTypes | null = null;
   let theValue: string | null = null;
 
@@ -17674,7 +11398,7 @@ function parseKeyFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Key>(
         `Unexpected end of token stream while parsing Key`
       );
     }
@@ -17684,7 +11408,7 @@ function parseKeyFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Key>(
         "Expected an XML property start element or the closing element of " +
         `Key, but got token kind: ${token.kind}`
       );
@@ -17692,7 +11416,7 @@ function parseKeyFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Key, DeserializationError>(
         null,
         namespaceError
       );
@@ -17714,15 +11438,20 @@ function parseKeyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseKeyTypesText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseKeyTypesText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -17740,15 +11469,20 @@ function parseKeyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -17766,7 +11500,7 @@ function parseKeyFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Key, DeserializationError>(
         null,
         propertyError
       );
@@ -17775,32 +11509,14 @@ function parseKeyFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Key, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theType === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Key>(
       "The required property 'type' is missing"
     );
   }
 
   if (theValue === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Key>(
       "The required property 'value' is missing"
     );
   }
@@ -17809,17 +11525,23 @@ function parseKeyFromOpenTag(
     theType,
     theValue
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Key, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseLangStringNameTypeFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!LangStringNameType}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseLangStringNameTypeFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.LangStringNameType, DeserializationError> {
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -17828,7 +11550,7 @@ function parseLangStringNameTypeFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringNameType>(
         `Unexpected end of token stream while parsing LangStringNameType`
       );
     }
@@ -17838,7 +11560,7 @@ function parseLangStringNameTypeFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringNameType>(
         "Expected an XML property start element or the closing element of " +
         `LangStringNameType, but got token kind: ${token.kind}`
       );
@@ -17846,7 +11568,7 @@ function parseLangStringNameTypeFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringNameType, DeserializationError>(
         null,
         namespaceError
       );
@@ -17868,15 +11590,20 @@ function parseLangStringNameTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -17894,15 +11621,20 @@ function parseLangStringNameTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -17920,7 +11652,7 @@ function parseLangStringNameTypeFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringNameType, DeserializationError>(
         null,
         propertyError
       );
@@ -17929,32 +11661,14 @@ function parseLangStringNameTypeFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `LangStringNameType, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theLanguage === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringNameType>(
       "The required property 'language' is missing"
     );
   }
 
   if (theText === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringNameType>(
       "The required property 'text' is missing"
     );
   }
@@ -17963,17 +11677,23 @@ function parseLangStringNameTypeFromOpenTag(
     theLanguage,
     theText
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.LangStringNameType, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseLangStringTextTypeFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!LangStringTextType}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseLangStringTextTypeFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.LangStringTextType, DeserializationError> {
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -17982,7 +11702,7 @@ function parseLangStringTextTypeFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringTextType>(
         `Unexpected end of token stream while parsing LangStringTextType`
       );
     }
@@ -17992,7 +11712,7 @@ function parseLangStringTextTypeFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringTextType>(
         "Expected an XML property start element or the closing element of " +
         `LangStringTextType, but got token kind: ${token.kind}`
       );
@@ -18000,7 +11720,7 @@ function parseLangStringTextTypeFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringTextType, DeserializationError>(
         null,
         namespaceError
       );
@@ -18022,15 +11742,20 @@ function parseLangStringTextTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18048,15 +11773,20 @@ function parseLangStringTextTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18074,7 +11804,7 @@ function parseLangStringTextTypeFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringTextType, DeserializationError>(
         null,
         propertyError
       );
@@ -18083,32 +11813,14 @@ function parseLangStringTextTypeFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `LangStringTextType, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theLanguage === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringTextType>(
       "The required property 'language' is missing"
     );
   }
 
   if (theText === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringTextType>(
       "The required property 'text' is missing"
     );
   }
@@ -18117,17 +11829,23 @@ function parseLangStringTextTypeFromOpenTag(
     theLanguage,
     theText
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.LangStringTextType, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseEnvironmentFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Environment}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseEnvironmentFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Environment, DeserializationError> {
   let theAssetAdministrationShells: Array<AasTypes.AssetAdministrationShell> | null = null;
   let theSubmodels: Array<AasTypes.Submodel> | null = null;
   let theConceptDescriptions: Array<AasTypes.ConceptDescription> | null = null;
@@ -18137,7 +11855,7 @@ function parseEnvironmentFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Environment>(
         `Unexpected end of token stream while parsing Environment`
       );
     }
@@ -18147,7 +11865,7 @@ function parseEnvironmentFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Environment>(
         "Expected an XML property start element or the closing element of " +
         `Environment, but got token kind: ${token.kind}`
       );
@@ -18155,7 +11873,7 @@ function parseEnvironmentFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Environment, DeserializationError>(
         null,
         namespaceError
       );
@@ -18177,84 +11895,29 @@ function parseEnvironmentFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.AssetAdministrationShell>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asAssetAdministrationShell(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IAssetAdministrationShell"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.AssetAdministrationShell>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "assetAdministrationShell",
+            parseAssetAdministrationShellFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theAssetAdministrationShells = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theAssetAdministrationShells = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -18268,84 +11931,29 @@ function parseEnvironmentFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.Submodel>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asSubmodel(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ISubmodel"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.Submodel>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "submodel",
+            parseSubmodelFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theSubmodels = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theSubmodels = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -18359,84 +11967,29 @@ function parseEnvironmentFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.ConceptDescription>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asConceptDescription(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IConceptDescription"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.ConceptDescription>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "conceptDescription",
+            parseConceptDescriptionFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theConceptDescriptions = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theConceptDescriptions = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -18450,7 +12003,7 @@ function parseEnvironmentFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Environment, DeserializationError>(
         null,
         propertyError
       );
@@ -18459,24 +12012,6 @@ function parseEnvironmentFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Environment, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   // No required properties
 
   const instance = new AasTypes.Environment(
@@ -18484,17 +12019,23 @@ function parseEnvironmentFromOpenTag(
     theSubmodels,
     theConceptDescriptions
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Environment, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseEmbeddedDataSpecificationFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!EmbeddedDataSpecification}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseEmbeddedDataSpecificationFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.EmbeddedDataSpecification, DeserializationError> {
   let theDataSpecification: AasTypes.Reference | null = null;
   let theDataSpecificationContent: AasTypes.IDataSpecificationContent | null = null;
 
@@ -18503,7 +12044,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.EmbeddedDataSpecification>(
         `Unexpected end of token stream while parsing EmbeddedDataSpecification`
       );
     }
@@ -18513,7 +12054,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.EmbeddedDataSpecification>(
         "Expected an XML property start element or the closing element of " +
         `EmbeddedDataSpecification, but got token kind: ${token.kind}`
       );
@@ -18521,7 +12062,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.EmbeddedDataSpecification, DeserializationError>(
         null,
         namespaceError
       );
@@ -18543,23 +12084,22 @@ function parseEmbeddedDataSpecificationFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "dataSpecification" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theDataSpecification = casted;
+        theDataSpecification = classOrError.mustValue();
         break;
       }
 
@@ -18573,23 +12113,22 @@ function parseEmbeddedDataSpecificationFromOpenTag(
           break;
         }
 
-        const classOrError = parsePropertyAsClassInstance(cursor, propertyStartTag);
-        if (classOrError.error !== null) {
-          propertyError = classOrError.error;
+        const instanceOrError = dispatchParseDataSpecificationContentElement(cursor);
+        if (instanceOrError.error !== null) {
+          propertyError = instanceOrError.error;
           break;
         }
 
-        const casted = AasTypes.asDataSpecificationContent(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "dataSpecificationContent" +
-              " to contain an instance of IDataSpecificationContent"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theDataSpecificationContent = casted;
+        theDataSpecificationContent = instanceOrError.mustValue();
         break;
       }
 
@@ -18603,7 +12142,7 @@ function parseEmbeddedDataSpecificationFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.EmbeddedDataSpecification, DeserializationError>(
         null,
         propertyError
       );
@@ -18612,32 +12151,14 @@ function parseEmbeddedDataSpecificationFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `EmbeddedDataSpecification, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theDataSpecification === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.EmbeddedDataSpecification>(
       "The required property 'dataSpecification' is missing"
     );
   }
 
   if (theDataSpecificationContent === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.EmbeddedDataSpecification>(
       "The required property 'dataSpecificationContent' is missing"
     );
   }
@@ -18646,17 +12167,23 @@ function parseEmbeddedDataSpecificationFromOpenTag(
     theDataSpecification,
     theDataSpecificationContent
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.EmbeddedDataSpecification, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseLevelTypeFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!LevelType}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseLevelTypeFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.LevelType, DeserializationError> {
   let theMin: boolean | null = null;
   let theNom: boolean | null = null;
   let theTyp: boolean | null = null;
@@ -18667,7 +12194,7 @@ function parseLevelTypeFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LevelType>(
         `Unexpected end of token stream while parsing LevelType`
       );
     }
@@ -18677,7 +12204,7 @@ function parseLevelTypeFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LevelType>(
         "Expected an XML property start element or the closing element of " +
         `LevelType, but got token kind: ${token.kind}`
       );
@@ -18685,7 +12212,7 @@ function parseLevelTypeFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LevelType, DeserializationError>(
         null,
         namespaceError
       );
@@ -18707,15 +12234,20 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBooleanText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBooleanText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18733,15 +12265,20 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBooleanText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBooleanText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18759,15 +12296,20 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBooleanText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBooleanText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18785,15 +12327,20 @@ function parseLevelTypeFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseBooleanText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseBooleanText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18811,7 +12358,7 @@ function parseLevelTypeFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LevelType, DeserializationError>(
         null,
         propertyError
       );
@@ -18820,44 +12367,26 @@ function parseLevelTypeFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `LevelType, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theMin === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LevelType>(
       "The required property 'min' is missing"
     );
   }
 
   if (theNom === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LevelType>(
       "The required property 'nom' is missing"
     );
   }
 
   if (theTyp === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LevelType>(
       "The required property 'typ' is missing"
     );
   }
 
   if (theMax === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LevelType>(
       "The required property 'max' is missing"
     );
   }
@@ -18868,17 +12397,23 @@ function parseLevelTypeFromOpenTag(
     theTyp,
     theMax
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.LevelType, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseValueReferencePairFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!ValueReferencePair}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseValueReferencePairFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ValueReferencePair, DeserializationError> {
   let theValue: string | null = null;
   let theValueId: AasTypes.Reference | null = null;
 
@@ -18887,7 +12422,7 @@ function parseValueReferencePairFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ValueReferencePair>(
         `Unexpected end of token stream while parsing ValueReferencePair`
       );
     }
@@ -18897,7 +12432,7 @@ function parseValueReferencePairFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ValueReferencePair>(
         "Expected an XML property start element or the closing element of " +
         `ValueReferencePair, but got token kind: ${token.kind}`
       );
@@ -18905,7 +12440,7 @@ function parseValueReferencePairFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ValueReferencePair, DeserializationError>(
         null,
         namespaceError
       );
@@ -18927,15 +12462,20 @@ function parseValueReferencePairFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -18953,23 +12493,22 @@ function parseValueReferencePairFromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "valueId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValueId = casted;
+        theValueId = classOrError.mustValue();
         break;
       }
 
@@ -18983,7 +12522,7 @@ function parseValueReferencePairFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ValueReferencePair, DeserializationError>(
         null,
         propertyError
       );
@@ -18992,32 +12531,14 @@ function parseValueReferencePairFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `ValueReferencePair, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theValue === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.ValueReferencePair>(
       "The required property 'value' is missing"
     );
   }
 
   if (theValueId === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.ValueReferencePair>(
       "The required property 'valueId' is missing"
     );
   }
@@ -19026,17 +12547,23 @@ function parseValueReferencePairFromOpenTag(
     theValue,
     theValueId
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.ValueReferencePair, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseValueListFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!ValueList}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseValueListFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ValueList, DeserializationError> {
   let theValueReferencePairs: Array<AasTypes.ValueReferencePair> | null = null;
 
   cursor.skipIgnorable();
@@ -19044,7 +12571,7 @@ function parseValueListFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ValueList>(
         `Unexpected end of token stream while parsing ValueList`
       );
     }
@@ -19054,7 +12581,7 @@ function parseValueListFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ValueList>(
         "Expected an XML property start element or the closing element of " +
         `ValueList, but got token kind: ${token.kind}`
       );
@@ -19062,7 +12589,7 @@ function parseValueListFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ValueList, DeserializationError>(
         null,
         namespaceError
       );
@@ -19084,84 +12611,29 @@ function parseValueListFromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.ValueReferencePair>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asValueReferencePair(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of IValueReferencePair"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.ValueReferencePair>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "valueReferencePair",
+            parseValueReferencePairFromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theValueReferencePairs = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theValueReferencePairs = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -19175,7 +12647,7 @@ function parseValueListFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ValueList, DeserializationError>(
         null,
         propertyError
       );
@@ -19184,26 +12656,8 @@ function parseValueListFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `ValueList, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theValueReferencePairs === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.ValueList>(
       "The required property 'valueReferencePairs' is missing"
     );
   }
@@ -19211,17 +12665,23 @@ function parseValueListFromOpenTag(
   const instance = new AasTypes.ValueList(
     theValueReferencePairs
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.ValueList, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseLangStringPreferredNameTypeIec61360FromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!LangStringPreferredNameTypeIec61360}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseLangStringPreferredNameTypeIec61360FromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.LangStringPreferredNameTypeIec61360, DeserializationError> {
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -19230,7 +12690,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringPreferredNameTypeIec61360>(
         `Unexpected end of token stream while parsing LangStringPreferredNameTypeIec61360`
       );
     }
@@ -19240,7 +12700,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringPreferredNameTypeIec61360>(
         "Expected an XML property start element or the closing element of " +
         `LangStringPreferredNameTypeIec61360, but got token kind: ${token.kind}`
       );
@@ -19248,7 +12708,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringPreferredNameTypeIec61360, DeserializationError>(
         null,
         namespaceError
       );
@@ -19270,15 +12730,20 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19296,15 +12761,20 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19322,7 +12792,7 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringPreferredNameTypeIec61360, DeserializationError>(
         null,
         propertyError
       );
@@ -19331,32 +12801,14 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `LangStringPreferredNameTypeIec61360, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theLanguage === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringPreferredNameTypeIec61360>(
       "The required property 'language' is missing"
     );
   }
 
   if (theText === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringPreferredNameTypeIec61360>(
       "The required property 'text' is missing"
     );
   }
@@ -19365,17 +12817,23 @@ function parseLangStringPreferredNameTypeIec61360FromOpenTag(
     theLanguage,
     theText
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.LangStringPreferredNameTypeIec61360, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseLangStringShortNameTypeIec61360FromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!LangStringShortNameTypeIec61360}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseLangStringShortNameTypeIec61360FromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.LangStringShortNameTypeIec61360, DeserializationError> {
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -19384,7 +12842,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringShortNameTypeIec61360>(
         `Unexpected end of token stream while parsing LangStringShortNameTypeIec61360`
       );
     }
@@ -19394,7 +12852,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringShortNameTypeIec61360>(
         "Expected an XML property start element or the closing element of " +
         `LangStringShortNameTypeIec61360, but got token kind: ${token.kind}`
       );
@@ -19402,7 +12860,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringShortNameTypeIec61360, DeserializationError>(
         null,
         namespaceError
       );
@@ -19424,15 +12882,20 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19450,15 +12913,20 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19476,7 +12944,7 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringShortNameTypeIec61360, DeserializationError>(
         null,
         propertyError
       );
@@ -19485,32 +12953,14 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `LangStringShortNameTypeIec61360, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theLanguage === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringShortNameTypeIec61360>(
       "The required property 'language' is missing"
     );
   }
 
   if (theText === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringShortNameTypeIec61360>(
       "The required property 'text' is missing"
     );
   }
@@ -19519,17 +12969,23 @@ function parseLangStringShortNameTypeIec61360FromOpenTag(
     theLanguage,
     theText
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.LangStringShortNameTypeIec61360, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseLangStringDefinitionTypeIec61360FromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!LangStringDefinitionTypeIec61360}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseLangStringDefinitionTypeIec61360FromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.LangStringDefinitionTypeIec61360, DeserializationError> {
   let theLanguage: string | null = null;
   let theText: string | null = null;
 
@@ -19538,7 +12994,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringDefinitionTypeIec61360>(
         `Unexpected end of token stream while parsing LangStringDefinitionTypeIec61360`
       );
     }
@@ -19548,7 +13004,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.LangStringDefinitionTypeIec61360>(
         "Expected an XML property start element or the closing element of " +
         `LangStringDefinitionTypeIec61360, but got token kind: ${token.kind}`
       );
@@ -19556,7 +13012,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringDefinitionTypeIec61360, DeserializationError>(
         null,
         namespaceError
       );
@@ -19578,15 +13034,20 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19604,15 +13065,20 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19630,7 +13096,7 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.LangStringDefinitionTypeIec61360, DeserializationError>(
         null,
         propertyError
       );
@@ -19639,32 +13105,14 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `LangStringDefinitionTypeIec61360, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theLanguage === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringDefinitionTypeIec61360>(
       "The required property 'language' is missing"
     );
   }
 
   if (theText === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.LangStringDefinitionTypeIec61360>(
       "The required property 'text' is missing"
     );
   }
@@ -19673,17 +13121,23 @@ function parseLangStringDefinitionTypeIec61360FromOpenTag(
     theLanguage,
     theText
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.LangStringDefinitionTypeIec61360, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseDataSpecificationIec61360FromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!DataSpecificationIec61360}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseDataSpecificationIec61360FromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.DataSpecificationIec61360, DeserializationError> {
   let thePreferredName: Array<AasTypes.LangStringPreferredNameTypeIec61360> | null = null;
   let theShortName: Array<AasTypes.LangStringShortNameTypeIec61360> | null = null;
   let theUnit: string | null = null;
@@ -19702,7 +13156,7 @@ function parseDataSpecificationIec61360FromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.DataSpecificationIec61360>(
         `Unexpected end of token stream while parsing DataSpecificationIec61360`
       );
     }
@@ -19712,7 +13166,7 @@ function parseDataSpecificationIec61360FromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.DataSpecificationIec61360>(
         "Expected an XML property start element or the closing element of " +
         `DataSpecificationIec61360, but got token kind: ${token.kind}`
       );
@@ -19720,7 +13174,7 @@ function parseDataSpecificationIec61360FromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.DataSpecificationIec61360, DeserializationError>(
         null,
         namespaceError
       );
@@ -19742,84 +13196,29 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringPreferredNameTypeIec61360>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringPreferredNameTypeIec61360(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringPreferredNameTypeIec61360"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringPreferredNameTypeIec61360>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringPreferredNameTypeIec61360",
+            parseLangStringPreferredNameTypeIec61360FromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          thePreferredName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        thePreferredName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -19833,84 +13232,29 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringShortNameTypeIec61360>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringShortNameTypeIec61360(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringShortNameTypeIec61360"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringShortNameTypeIec61360>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringShortNameTypeIec61360",
+            parseLangStringShortNameTypeIec61360FromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theShortName = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theShortName = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -19924,15 +13268,20 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -19950,23 +13299,22 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const classOrError = parseReferenceFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReferenceFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReference(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "unitId" +
-              " to contain an instance of IReference"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theUnitId = casted;
+        theUnitId = classOrError.mustValue();
         break;
       }
 
@@ -19980,15 +13328,20 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -20006,15 +13359,20 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -20032,15 +13390,20 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseDataTypeIec61360Text(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseDataTypeIec61360Text(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -20058,84 +13421,29 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const parsedItems = new Array<AasTypes.LangStringDefinitionTypeIec61360>();
-        let itemIndex = 0;
-
-        cursor.skipIgnorable();
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const itemOrClose = cursor.current();
-          if (itemOrClose === null) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                "or property closing element, but got end of token stream"
-            );
-            break;
-          }
-
-          if (itemOrClose instanceof CloseTagToken) {
-            const propertyCloseError = checkExpectedCloseTag(
-              itemOrClose,
-              localNameOfTag(propertyStartTag.tag)
-            );
-            if (propertyCloseError !== null) {
-              propertyError = propertyCloseError;
-              break;
-            }
-
-            cursor.advance();
-            break;
-          }
-
-          if (!(itemOrClose instanceof OpenTagToken)) {
-            propertyError = new DeserializationError(
-              "Expected an XML element corresponding to a list item " +
-                `or property closing element, but got token kind: ${itemOrClose.kind}`
-            );
-            break;
-          }
-
-          const itemStartTag = itemOrClose;
-          const itemNamespaceError = checkExpectedOpenTagNamespace(itemStartTag);
-          if (itemNamespaceError !== null) {
-            propertyError = itemNamespaceError;
-            break;
-          }
-
-          const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localNameOfTag(itemStartTag.tag));
-          if (dispatch === undefined) {
-            propertyError = new DeserializationError(
-              `Unexpected XML element in list property: ${localNameOfTag(itemStartTag.tag)}`
-            );
-            break;
-          }
-
-          cursor.advance();
-
-          const itemOrError = dispatch(cursor, itemStartTag);
-          if (itemOrError.error !== null) {
-            propertyError = itemOrError.error;
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          const casted = AasTypes.asLangStringDefinitionTypeIec61360(itemOrError.mustValue());
-          if (casted === null) {
-            propertyError = new DeserializationError(
-              "Expected a list item instance of ILangStringDefinitionTypeIec61360"
-            );
-            propertyError.path.prepend(new IndexSegment(itemIndex));
-            break;
-          }
-
-          parsedItems.push(casted);
-          itemIndex++;
-          cursor.skipIgnorable();
+        const parsedItemsOrError = parseList<AasTypes.LangStringDefinitionTypeIec61360>(
+          cursor,
+          (aCursor) => parseNamedClassElement(
+            aCursor,
+            "langStringDefinitionTypeIec61360",
+            parseLangStringDefinitionTypeIec61360FromSequence
+          )
+        );
+        if (parsedItemsOrError.error !== null) {
+          propertyError = parsedItemsOrError.error;
+          break;
         }
 
-        if (propertyError === null) {
-          theDefinition = parsedItems;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
+          break;
         }
+
+        theDefinition = parsedItemsOrError.mustValue();
         break;
       }
 
@@ -20149,15 +13457,20 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -20175,23 +13488,22 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const classOrError = parseValueListFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseValueListFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asValueList(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "valueList" +
-              " to contain an instance of IValueList"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theValueList = casted;
+        theValueList = classOrError.mustValue();
         break;
       }
 
@@ -20205,15 +13517,20 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -20231,23 +13548,22 @@ function parseDataSpecificationIec61360FromOpenTag(
           break;
         }
 
-        const classOrError = parseLevelTypeFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseLevelTypeFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asLevelType(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "levelType" +
-              " to contain an instance of ILevelType"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theLevelType = casted;
+        theLevelType = classOrError.mustValue();
         break;
       }
 
@@ -20261,7 +13577,7 @@ function parseDataSpecificationIec61360FromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.DataSpecificationIec61360, DeserializationError>(
         null,
         propertyError
       );
@@ -20270,26 +13586,8 @@ function parseDataSpecificationIec61360FromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `DataSpecificationIec61360, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (thePreferredName === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.DataSpecificationIec61360>(
       "The required property 'preferredName' is missing"
     );
   }
@@ -20308,171 +13606,1666 @@ function parseDataSpecificationIec61360FromOpenTag(
     theValue,
     theLevelType
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.DataSpecificationIec61360, DeserializationError>(
     instance,
     null
   );
 }
 
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IHasSemantics} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseHasSemanticsElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IHasSemantics, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasSemantics, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IHasSemantics, DeserializationError>;
+  switch (localName) {
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "capability":
+      instanceOrError = parseCapabilityFromSequence(cursor);
+      break;
+    case "entity":
+      instanceOrError = parseEntityFromSequence(cursor);
+      break;
+    case "extension":
+      instanceOrError = parseExtensionFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "operation":
+      instanceOrError = parseOperationFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "qualifier":
+      instanceOrError = parseQualifierFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    case "specificAssetId":
+      instanceOrError = parseSpecificAssetIdFromSequence(cursor);
+      break;
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    case "submodelElementCollection":
+      instanceOrError = parseSubmodelElementCollectionFromSequence(cursor);
+      break;
+    case "submodelElementList":
+      instanceOrError = parseSubmodelElementListFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IHasSemantics>(
+        `Expected an instance of IHasSemantics, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IHasSemantics, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IHasSemantics}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function hasSemanticsFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IHasSemantics, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IHasSemantics>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasSemantics, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseHasSemanticsElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IHasSemantics>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IHasExtensions} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseHasExtensionsElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IHasExtensions, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasExtensions, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IHasExtensions, DeserializationError>;
+  switch (localName) {
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "assetAdministrationShell":
+      instanceOrError = parseAssetAdministrationShellFromSequence(cursor);
+      break;
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "capability":
+      instanceOrError = parseCapabilityFromSequence(cursor);
+      break;
+    case "conceptDescription":
+      instanceOrError = parseConceptDescriptionFromSequence(cursor);
+      break;
+    case "entity":
+      instanceOrError = parseEntityFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "operation":
+      instanceOrError = parseOperationFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    case "submodelElementCollection":
+      instanceOrError = parseSubmodelElementCollectionFromSequence(cursor);
+      break;
+    case "submodelElementList":
+      instanceOrError = parseSubmodelElementListFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IHasExtensions>(
+        `Expected an instance of IHasExtensions, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IHasExtensions, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IHasExtensions}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function hasExtensionsFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IHasExtensions, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IHasExtensions>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasExtensions, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseHasExtensionsElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IHasExtensions>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IReferable} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseReferableElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IReferable, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IReferable, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IReferable, DeserializationError>;
+  switch (localName) {
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "assetAdministrationShell":
+      instanceOrError = parseAssetAdministrationShellFromSequence(cursor);
+      break;
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "capability":
+      instanceOrError = parseCapabilityFromSequence(cursor);
+      break;
+    case "conceptDescription":
+      instanceOrError = parseConceptDescriptionFromSequence(cursor);
+      break;
+    case "entity":
+      instanceOrError = parseEntityFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "operation":
+      instanceOrError = parseOperationFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    case "submodelElementCollection":
+      instanceOrError = parseSubmodelElementCollectionFromSequence(cursor);
+      break;
+    case "submodelElementList":
+      instanceOrError = parseSubmodelElementListFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IReferable>(
+        `Expected an instance of IReferable, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IReferable, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IReferable}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function referableFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IReferable, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IReferable>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IReferable, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseReferableElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IReferable>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IIdentifiable} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseIdentifiableElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IIdentifiable, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IIdentifiable, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IIdentifiable, DeserializationError>;
+  switch (localName) {
+    case "assetAdministrationShell":
+      instanceOrError = parseAssetAdministrationShellFromSequence(cursor);
+      break;
+    case "conceptDescription":
+      instanceOrError = parseConceptDescriptionFromSequence(cursor);
+      break;
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IIdentifiable>(
+        `Expected an instance of IIdentifiable, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IIdentifiable, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IIdentifiable}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function identifiableFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IIdentifiable, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IIdentifiable>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IIdentifiable, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseIdentifiableElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IIdentifiable>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IHasKind} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseHasKindElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IHasKind, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasKind, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IHasKind, DeserializationError>;
+  switch (localName) {
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IHasKind>(
+        `Expected an instance of IHasKind, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IHasKind, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IHasKind}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function hasKindFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IHasKind, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IHasKind>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasKind, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseHasKindElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IHasKind>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IHasDataSpecification} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseHasDataSpecificationElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IHasDataSpecification, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasDataSpecification, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IHasDataSpecification, DeserializationError>;
+  switch (localName) {
+    case "administrativeInformation":
+      instanceOrError = parseAdministrativeInformationFromSequence(cursor);
+      break;
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "assetAdministrationShell":
+      instanceOrError = parseAssetAdministrationShellFromSequence(cursor);
+      break;
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "capability":
+      instanceOrError = parseCapabilityFromSequence(cursor);
+      break;
+    case "conceptDescription":
+      instanceOrError = parseConceptDescriptionFromSequence(cursor);
+      break;
+    case "entity":
+      instanceOrError = parseEntityFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "operation":
+      instanceOrError = parseOperationFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    case "submodelElementCollection":
+      instanceOrError = parseSubmodelElementCollectionFromSequence(cursor);
+      break;
+    case "submodelElementList":
+      instanceOrError = parseSubmodelElementListFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IHasDataSpecification>(
+        `Expected an instance of IHasDataSpecification, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IHasDataSpecification, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IHasDataSpecification}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function hasDataSpecificationFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IHasDataSpecification, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IHasDataSpecification>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IHasDataSpecification, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseHasDataSpecificationElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IHasDataSpecification>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IQualifiable} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseQualifiableElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IQualifiable, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IQualifiable, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IQualifiable, DeserializationError>;
+  switch (localName) {
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "capability":
+      instanceOrError = parseCapabilityFromSequence(cursor);
+      break;
+    case "entity":
+      instanceOrError = parseEntityFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "operation":
+      instanceOrError = parseOperationFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    case "submodel":
+      instanceOrError = parseSubmodelFromSequence(cursor);
+      break;
+    case "submodelElementCollection":
+      instanceOrError = parseSubmodelElementCollectionFromSequence(cursor);
+      break;
+    case "submodelElementList":
+      instanceOrError = parseSubmodelElementListFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IQualifiable>(
+        `Expected an instance of IQualifiable, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IQualifiable, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IQualifiable}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function qualifiableFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IQualifiable, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IQualifiable>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IQualifiable, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseQualifiableElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IQualifiable>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!ISubmodelElement} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseSubmodelElementElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ISubmodelElement, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.ISubmodelElement, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.ISubmodelElement, DeserializationError>;
+  switch (localName) {
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "capability":
+      instanceOrError = parseCapabilityFromSequence(cursor);
+      break;
+    case "entity":
+      instanceOrError = parseEntityFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "operation":
+      instanceOrError = parseOperationFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    case "submodelElementCollection":
+      instanceOrError = parseSubmodelElementCollectionFromSequence(cursor);
+      break;
+    case "submodelElementList":
+      instanceOrError = parseSubmodelElementListFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.ISubmodelElement>(
+        `Expected an instance of ISubmodelElement, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.ISubmodelElement, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!ISubmodelElement}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function submodelElementFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.ISubmodelElement, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.ISubmodelElement>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.ISubmodelElement, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseSubmodelElementElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.ISubmodelElement>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!RelationshipElement} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseRelationshipElementElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.RelationshipElement, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>;
+  switch (localName) {
+    case "annotatedRelationshipElement":
+      instanceOrError = parseAnnotatedRelationshipElementFromSequence(cursor);
+      break;
+    case "relationshipElement":
+      instanceOrError = parseRelationshipElementFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.RelationshipElement>(
+        `Expected an instance of RelationshipElement, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!RelationshipElement}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function relationshipElementFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.RelationshipElement, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.RelationshipElement>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.RelationshipElement, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseRelationshipElementElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.RelationshipElement>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IDataElement} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseDataElementElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IDataElement, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IDataElement, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IDataElement, DeserializationError>;
+  switch (localName) {
+    case "blob":
+      instanceOrError = parseBlobFromSequence(cursor);
+      break;
+    case "file":
+      instanceOrError = parseFileFromSequence(cursor);
+      break;
+    case "multiLanguageProperty":
+      instanceOrError = parseMultiLanguagePropertyFromSequence(cursor);
+      break;
+    case "property":
+      instanceOrError = parsePropertyFromSequence(cursor);
+      break;
+    case "range":
+      instanceOrError = parseRangeFromSequence(cursor);
+      break;
+    case "referenceElement":
+      instanceOrError = parseReferenceElementFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IDataElement>(
+        `Expected an instance of IDataElement, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IDataElement, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IDataElement}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function dataElementFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IDataElement, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IDataElement>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IDataElement, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseDataElementElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IDataElement>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IEventElement} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseEventElementElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IEventElement, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IEventElement, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IEventElement, DeserializationError>;
+  switch (localName) {
+    case "basicEventElement":
+      instanceOrError = parseBasicEventElementFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IEventElement>(
+        `Expected an instance of IEventElement, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IEventElement, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IEventElement}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function eventElementFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IEventElement, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IEventElement>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IEventElement, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseEventElementElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IEventElement>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IAbstractLangString} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseAbstractLangStringElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IAbstractLangString, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IAbstractLangString, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IAbstractLangString, DeserializationError>;
+  switch (localName) {
+    case "langStringDefinitionTypeIec61360":
+      instanceOrError = parseLangStringDefinitionTypeIec61360FromSequence(cursor);
+      break;
+    case "langStringNameType":
+      instanceOrError = parseLangStringNameTypeFromSequence(cursor);
+      break;
+    case "langStringPreferredNameTypeIec61360":
+      instanceOrError = parseLangStringPreferredNameTypeIec61360FromSequence(cursor);
+      break;
+    case "langStringShortNameTypeIec61360":
+      instanceOrError = parseLangStringShortNameTypeIec61360FromSequence(cursor);
+      break;
+    case "langStringTextType":
+      instanceOrError = parseLangStringTextTypeFromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IAbstractLangString>(
+        `Expected an instance of IAbstractLangString, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IAbstractLangString, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IAbstractLangString}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function abstractLangStringFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IAbstractLangString, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IAbstractLangString>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IAbstractLangString, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseAbstractLangStringElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IAbstractLangString>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IDataSpecificationContent} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseDataSpecificationContentElement(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.IDataSpecificationContent, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IDataSpecificationContent, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const localName = localNameOfTag(startTag.tag);
+  cursor.advance();
+
+  let instanceOrError: AasCommon.Either<AasTypes.IDataSpecificationContent, DeserializationError>;
+  switch (localName) {
+    case "dataSpecificationIec61360":
+      instanceOrError = parseDataSpecificationIec61360FromSequence(cursor);
+      break;
+    default:
+      return newDeserializationError<AasTypes.IDataSpecificationContent>(
+        `Expected an instance of IDataSpecificationContent, but got: ${localName}`
+      );
+  }
+
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, localName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.IDataSpecificationContent, DeserializationError>(
+      null,
+      closeError
+    );
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IDataSpecificationContent}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function dataSpecificationContentFromXmlString(
+  xml: string
+): AasCommon.Either<AasTypes.IDataSpecificationContent, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<AasTypes.IDataSpecificationContent>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new AasCommon.Either<AasTypes.IDataSpecificationContent, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseDataSpecificationContentElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<AasTypes.IDataSpecificationContent>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
 const ROOT_DISPATCH_BY_LOCAL_NAME =
   new Map<
     string,
-    (
-      cursor: XmlCursor,
-      startTag: OpenTagToken
-    ) => AasCommon.Either<AasTypes.Class, DeserializationError>
+    (cursor: XmlCursor) => AasCommon.Either<AasTypes.Class, DeserializationError>
   >([
     [
       "extension",
-      parseExtensionFromOpenTag
+      parseExtensionFromSequence
     ],
     [
       "administrativeInformation",
-      parseAdministrativeInformationFromOpenTag
+      parseAdministrativeInformationFromSequence
     ],
     [
       "qualifier",
-      parseQualifierFromOpenTag
+      parseQualifierFromSequence
     ],
     [
       "assetAdministrationShell",
-      parseAssetAdministrationShellFromOpenTag
+      parseAssetAdministrationShellFromSequence
     ],
     [
       "assetInformation",
-      parseAssetInformationFromOpenTag
+      parseAssetInformationFromSequence
     ],
     [
       "resource",
-      parseResourceFromOpenTag
+      parseResourceFromSequence
     ],
     [
       "specificAssetId",
-      parseSpecificAssetIdFromOpenTag
+      parseSpecificAssetIdFromSequence
     ],
     [
       "submodel",
-      parseSubmodelFromOpenTag
+      parseSubmodelFromSequence
     ],
     [
       "relationshipElement",
-      parseRelationshipElementFromOpenTag
+      parseRelationshipElementFromSequence
     ],
     [
       "submodelElementList",
-      parseSubmodelElementListFromOpenTag
+      parseSubmodelElementListFromSequence
     ],
     [
       "submodelElementCollection",
-      parseSubmodelElementCollectionFromOpenTag
+      parseSubmodelElementCollectionFromSequence
     ],
     [
       "property",
-      parsePropertyFromOpenTag
+      parsePropertyFromSequence
     ],
     [
       "multiLanguageProperty",
-      parseMultiLanguagePropertyFromOpenTag
+      parseMultiLanguagePropertyFromSequence
     ],
     [
       "range",
-      parseRangeFromOpenTag
+      parseRangeFromSequence
     ],
     [
       "referenceElement",
-      parseReferenceElementFromOpenTag
+      parseReferenceElementFromSequence
     ],
     [
       "blob",
-      parseBlobFromOpenTag
+      parseBlobFromSequence
     ],
     [
       "file",
-      parseFileFromOpenTag
+      parseFileFromSequence
     ],
     [
       "annotatedRelationshipElement",
-      parseAnnotatedRelationshipElementFromOpenTag
+      parseAnnotatedRelationshipElementFromSequence
     ],
     [
       "entity",
-      parseEntityFromOpenTag
+      parseEntityFromSequence
     ],
     [
       "eventPayload",
-      parseEventPayloadFromOpenTag
+      parseEventPayloadFromSequence
     ],
     [
       "basicEventElement",
-      parseBasicEventElementFromOpenTag
+      parseBasicEventElementFromSequence
     ],
     [
       "operation",
-      parseOperationFromOpenTag
+      parseOperationFromSequence
     ],
     [
       "operationVariable",
-      parseOperationVariableFromOpenTag
+      parseOperationVariableFromSequence
     ],
     [
       "capability",
-      parseCapabilityFromOpenTag
+      parseCapabilityFromSequence
     ],
     [
       "conceptDescription",
-      parseConceptDescriptionFromOpenTag
+      parseConceptDescriptionFromSequence
     ],
     [
       "reference",
-      parseReferenceFromOpenTag
+      parseReferenceFromSequence
     ],
     [
       "key",
-      parseKeyFromOpenTag
+      parseKeyFromSequence
     ],
     [
       "langStringNameType",
-      parseLangStringNameTypeFromOpenTag
+      parseLangStringNameTypeFromSequence
     ],
     [
       "langStringTextType",
-      parseLangStringTextTypeFromOpenTag
+      parseLangStringTextTypeFromSequence
     ],
     [
       "environment",
-      parseEnvironmentFromOpenTag
+      parseEnvironmentFromSequence
     ],
     [
       "embeddedDataSpecification",
-      parseEmbeddedDataSpecificationFromOpenTag
+      parseEmbeddedDataSpecificationFromSequence
     ],
     [
       "levelType",
-      parseLevelTypeFromOpenTag
+      parseLevelTypeFromSequence
     ],
     [
       "valueReferencePair",
-      parseValueReferencePairFromOpenTag
+      parseValueReferencePairFromSequence
     ],
     [
       "valueList",
-      parseValueListFromOpenTag
+      parseValueListFromSequence
     ],
     [
       "langStringPreferredNameTypeIec61360",
-      parseLangStringPreferredNameTypeIec61360FromOpenTag
+      parseLangStringPreferredNameTypeIec61360FromSequence
     ],
     [
       "langStringShortNameTypeIec61360",
-      parseLangStringShortNameTypeIec61360FromOpenTag
+      parseLangStringShortNameTypeIec61360FromSequence
     ],
     [
       "langStringDefinitionTypeIec61360",
-      parseLangStringDefinitionTypeIec61360FromOpenTag
+      parseLangStringDefinitionTypeIec61360FromSequence
     ],
     [
       "dataSpecificationIec61360",
-      parseDataSpecificationIec61360FromOpenTag
+      parseDataSpecificationIec61360FromSequence
     ]
   ]);
 
@@ -20519,33 +15312,17 @@ export function fromXmlString(
     );
   }
 
-  const instanceOrError = dispatch(cursor, rootOpenTag);
+  const instanceOrError = dispatch(cursor);
   if (instanceOrError.error !== null) {
     return instanceOrError;
   }
 
-  cursor.skipIgnorable();
-  const tokenAfterInstance = cursor.current();
-  if (tokenAfterInstance !== null) {
-    if (!(tokenAfterInstance instanceof CloseTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
-        "Expected root closing XML element, but got token kind: " +
-        currentTokenKind(cursor)
-      );
-    }
-
-    const closeError = checkExpectedCloseTag(
-      tokenAfterInstance,
-      rootLocalName
+  const closeError = consumeCloseTag(cursor, rootLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      closeError
     );
-    if (closeError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-        null,
-        closeError
-      );
-    }
-
-    cursor.advance();
   }
 
   cursor.skipIgnorable();
@@ -22831,11 +17608,11 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
   ): SerializedElement {
   const parts = new Array<string>();
 
-  const serializedValue = this.transform(that.value);
-    parts.push(openTag("value"));
-    parts.push(openTag(serializedValue.localName));
-    parts.push(serializedValue.innerXml);
-    parts.push(closeTag(serializedValue.localName));
+  parts.push(openTag("value"));
+    const serializedValue = this.transform(that.value);
+      parts.push(openTag(serializedValue.localName));
+      parts.push(serializedValue.innerXml);
+      parts.push(closeTag(serializedValue.localName));
     parts.push(closeTag("value"));
 
   return {
@@ -23219,11 +17996,11 @@ class Serializer extends AasTypes.AbstractTransformer<SerializedElement> {
     parts.push(serializedDataSpecification.innerXml);
     parts.push(closeTag("dataSpecification"));
 
-  const serializedDataSpecificationContent = this.transform(that.dataSpecificationContent);
-    parts.push(openTag("dataSpecificationContent"));
-    parts.push(openTag(serializedDataSpecificationContent.localName));
-    parts.push(serializedDataSpecificationContent.innerXml);
-    parts.push(closeTag(serializedDataSpecificationContent.localName));
+  parts.push(openTag("dataSpecificationContent"));
+    const serializedDataSpecificationContent = this.transform(that.dataSpecificationContent);
+      parts.push(openTag(serializedDataSpecificationContent.localName));
+      parts.push(serializedDataSpecificationContent.innerXml);
+      parts.push(closeTag(serializedDataSpecificationContent.localName));
     parts.push(closeTag("dataSpecificationContent"));
 
   return {

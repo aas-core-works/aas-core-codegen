@@ -201,6 +201,221 @@ function checkExpectedCloseTag(
 }
 
 /**
+ * Read the next token from `cursor`, expecting it to be the closing XML
+ * element named `expectedLocalName`, and consume it.
+ */
+function consumeCloseTag(
+  cursor: XmlCursor,
+  expectedLocalName: string
+): DeserializationError | null {
+  const closeTag = cursor.current();
+  if (!(closeTag instanceof CloseTagToken)) {
+    return new DeserializationError(
+      `Expected a closing element '${expectedLocalName}', ` +
+      `but got token kind: ${currentTokenKind(cursor)}`
+    );
+  }
+
+  const closeError = checkExpectedCloseTag(closeTag, expectedLocalName);
+  if (closeError !== null) {
+    return closeError;
+  }
+
+  cursor.advance();
+  return null;
+}
+
+/**
+ * Read the next non-ignorable token from `cursor`, expecting it to be
+ * an opening XML element in the expected namespace.
+ *
+ * This is shared by the parsing of a single list item, a single tuple
+ * item, and the dispatch-parsing of an interface.
+ *
+ * @param cursor - to read from
+ * @returns the opening tag, or an error
+ */
+function readNextOpenTag(
+  cursor: XmlCursor
+): AasCommon.Either<OpenTagToken, DeserializationError> {
+  cursor.skipIgnorable();
+  const token = cursor.current();
+  if (token === null) {
+    return newDeserializationError<OpenTagToken>(
+      "Expected an XML element, but got end of token stream"
+    );
+  }
+  if (!(token instanceof OpenTagToken)) {
+    return newDeserializationError<OpenTagToken>(
+      `Expected an XML element, but got token kind: ${token.kind}`
+    );
+  }
+
+  const namespaceError = checkExpectedOpenTagNamespace(token);
+  if (namespaceError !== null) {
+    return new AasCommon.Either<OpenTagToken, DeserializationError>(
+      null,
+      namespaceError
+    );
+  }
+
+  return new AasCommon.Either<OpenTagToken, DeserializationError>(token, null);
+}
+
+/**
+ * Read the next XML element from `cursor`, expecting it to be named
+ * `expectedLocalName`, parse its text content with `parseTextFn` and
+ * consume the matching closing element.
+ *
+ * This is shared by the parsing of a single list item (with a fixed
+ * local name, *e.g.*, `"v"`) and the parsing of a single tuple item (with
+ * a positional local name, *e.g.*, `"v1"`).
+ *
+ * @param cursor - to read from
+ * @param expectedLocalName - the expected local name of the element
+ * @param parseTextFn - parses the text content of the element
+ * @returns parsed value, or an error
+ * @typeParam T - type of the parsed value
+ */
+function parseNamedVElement<T>(
+  cursor: XmlCursor,
+  expectedLocalName: string,
+  parseTextFn: (text: string) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<T, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<T, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const observedLocalName = localNameOfTag(startTag.tag);
+  if (observedLocalName !== expectedLocalName) {
+    return newDeserializationError<T>(
+      `Expected the element '${expectedLocalName}', ` +
+        `but got '${observedLocalName}'`
+    );
+  }
+
+  cursor.advance();
+
+  const text = parseTextContent(cursor);
+
+  const closeError = consumeCloseTag(cursor, expectedLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<T, DeserializationError>(null, closeError);
+  }
+
+  return parseTextFn(text);
+}
+
+/**
+ * Read the next XML element from `cursor`, expecting it to be named
+ * `expectedLocalName`, parse its content with `parseFn` and consume the
+ * matching closing element.
+ *
+ * This is used for a list or a tuple item whose concrete type is statically
+ * known (*i.e.*, it has no further descendants), so we can reject
+ * an unexpected element based on its local name alone, without wastefully
+ * parsing its full (possibly deeply nested) content.
+ *
+ * @param cursor - to read from
+ * @param expectedLocalName - the expected local name of the element
+ * @param parseFn - parses the sequence of properties of the class instance
+ * @returns the parsed instance, or an error
+ * @typeParam T - type of the parsed instance
+ */
+function parseNamedClassElement<T>(
+  cursor: XmlCursor,
+  expectedLocalName: string,
+  parseFn: (cursor: XmlCursor) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<T, DeserializationError> {
+  const startTagOrError = readNextOpenTag(cursor);
+  if (startTagOrError.error !== null) {
+    return new AasCommon.Either<T, DeserializationError>(
+      null,
+      startTagOrError.error
+    );
+  }
+  const startTag = startTagOrError.mustValue();
+
+  const observedLocalName = localNameOfTag(startTag.tag);
+  if (observedLocalName !== expectedLocalName) {
+    return newDeserializationError<T>(
+      `Expected the element '${expectedLocalName}', ` +
+        `but got '${observedLocalName}'`
+    );
+  }
+
+  cursor.advance();
+
+  const instanceOrError = parseFn(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  const closeError = consumeCloseTag(cursor, expectedLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<T, DeserializationError>(null, closeError);
+  }
+
+  return instanceOrError;
+}
+
+/**
+ * Parse a sequence of list items from `cursor`, stopping (without consuming)
+ * at the first closing element.
+ *
+ * The caller is expected to read and verify the property's own closing
+ * element afterwards.
+ *
+ * @param cursor - to read from
+ * @param parseItem - parses a single list item
+ * @returns the parsed items, or an error
+ * @typeParam T - type of a single list item
+ */
+function parseList<T>(
+  cursor: XmlCursor,
+  parseItem: (cursor: XmlCursor) => AasCommon.Either<T, DeserializationError>
+): AasCommon.Either<Array<T>, DeserializationError> {
+  const items = new Array<T>();
+  let itemIndex = 0;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const maybeClose = cursor.current();
+    if (maybeClose === null) {
+      return newDeserializationError<Array<T>>(
+        "Expected an XML element corresponding to a list item " +
+          "or property closing element, but got end of token stream"
+      );
+    }
+
+    if (maybeClose instanceof CloseTagToken) {
+      break;
+    }
+
+    const itemOrError = parseItem(cursor);
+    if (itemOrError.error !== null) {
+      itemOrError.error.path.prepend(new IndexSegment(itemIndex));
+      return new AasCommon.Either<Array<T>, DeserializationError>(
+        null,
+        itemOrError.error
+      );
+    }
+
+    items.push(itemOrError.mustValue());
+    itemIndex++;
+    cursor.skipIgnorable();
+  }
+
+  return new AasCommon.Either<Array<T>, DeserializationError>(items, null);
+}
+
+/**
  * Cursor over parsed XML SAX tokens.
  */
 class XmlCursor {
@@ -310,10 +525,13 @@ function readRequiredRootOpenTag(
   );
 }
 
-function parseTextContentAndConsumeEndTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<string, DeserializationError> {
+/**
+ * Consume the text (or CDATA) content at `cursor`, if any.
+ *
+ * The caller is responsible for reading and verifying the closing element
+ * afterwards.
+ */
+function parseTextContent(cursor: XmlCursor): string {
   cursor.skipIgnorable();
 
   let text = "";
@@ -324,91 +542,7 @@ function parseTextContentAndConsumeEndTag(
     cursor.skipIgnorable();
   }
 
-  const closeToken = cursor.current();
-  if (!(closeToken instanceof CloseTagToken)) {
-    return newDeserializationError<string>(
-      "Expected property closing XML element, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const localName = localNameOfTag(startTag.tag);
-  const closeError = checkExpectedCloseTag(closeToken, localName);
-  if (closeError !== null) {
-    return new AasCommon.Either<string, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
-  return new AasCommon.Either<string, DeserializationError>(
-    text,
-    null
-  );
-}
-
-function parsePropertyAsClassInstance(
-  cursor: XmlCursor,
-  propertyStartTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  cursor.skipIgnorable();
-
-  const token = cursor.current();
-  if (!(token instanceof OpenTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected nested class element in XML property, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const namespaceError = checkExpectedOpenTagNamespace(token);
-  if (namespaceError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      namespaceError
-    );
-  }
-
-  const localName = localNameOfTag(token.tag);
-  const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(localName);
-  if (dispatch === undefined) {
-    return newDeserializationError<AasTypes.Class>(
-      `Unexpected nested class XML element: ${localName}`
-    );
-  }
-
-  cursor.advance();
-  const instanceOrError = dispatch(cursor, token);
-  if (instanceOrError.error !== null) {
-    return instanceOrError;
-  }
-
-  cursor.skipIgnorable();
-  const propertyCloseToken = cursor.current();
-  if (!(propertyCloseToken instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected property closing XML element after nested class, but got token kind: " +
-        currentTokenKind(cursor)
-    );
-  }
-
-  const expectedPropertyLocalName = localNameOfTag(propertyStartTag.tag);
-  const propertyCloseError = checkExpectedCloseTag(
-    propertyCloseToken,
-    expectedPropertyLocalName
-  );
-  if (propertyCloseError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      propertyCloseError
-    );
-  }
-
-  cursor.advance();
-
-  return instanceOrError;
+  return text;
 }
 
 function parseBooleanText(
@@ -512,11 +646,17 @@ function serializeRecordText(
   return escapeXmlText(AasStringification.mustRecordToString(value));
 }
 
-function parseReadonlyFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!ReadonlY}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseReadonlyFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.ReadonlY, DeserializationError> {
   let theSomething: string | null = null;
 
   cursor.skipIgnorable();
@@ -524,7 +664,7 @@ function parseReadonlyFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ReadonlY>(
         `Unexpected end of token stream while parsing ReadonlY`
       );
     }
@@ -534,7 +674,7 @@ function parseReadonlyFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.ReadonlY>(
         "Expected an XML property start element or the closing element of " +
         `ReadonlY, but got token kind: ${token.kind}`
       );
@@ -542,7 +682,7 @@ function parseReadonlyFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ReadonlY, DeserializationError>(
         null,
         namespaceError
       );
@@ -564,15 +704,20 @@ function parseReadonlyFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseStringText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseStringText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -590,7 +735,7 @@ function parseReadonlyFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.ReadonlY, DeserializationError>(
         null,
         propertyError
       );
@@ -599,26 +744,8 @@ function parseReadonlyFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `ReadonlY, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theSomething === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.ReadonlY>(
       "The required property 'something' is missing"
     );
   }
@@ -626,17 +753,23 @@ function parseReadonlyFromOpenTag(
   const instance = new AasTypes.ReadonlY(
     theSomething
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.ReadonlY, DeserializationError>(
     instance,
     null
   );
 }
 
-function parseSomethingFromOpenTag(
-  cursor: XmlCursor,
-  startTag: OpenTagToken
-): AasCommon.Either<AasTypes.Class, DeserializationError> {
-  const observedLocalName = localNameOfTag(startTag.tag);
+/**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Something}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully.
+ */
+function parseSomethingFromSequence(
+  cursor: XmlCursor
+): AasCommon.Either<AasTypes.Something, DeserializationError> {
   let theAReadonly: AasTypes.ReadonlY | null = null;
   let theARecord: AasTypes.RecorD | null = null;
 
@@ -645,7 +778,7 @@ function parseSomethingFromOpenTag(
   while (true) {
     const token = cursor.current();
     if (token === null) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Something>(
         `Unexpected end of token stream while parsing Something`
       );
     }
@@ -655,7 +788,7 @@ function parseSomethingFromOpenTag(
     }
 
     if (!(token instanceof OpenTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
+      return newDeserializationError<AasTypes.Something>(
         "Expected an XML property start element or the closing element of " +
         `Something, but got token kind: ${token.kind}`
       );
@@ -663,7 +796,7 @@ function parseSomethingFromOpenTag(
 
     const namespaceError = checkExpectedOpenTagNamespace(token);
     if (namespaceError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Something, DeserializationError>(
         null,
         namespaceError
       );
@@ -685,23 +818,22 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const classOrError = parseReadonlyFromOpenTag(cursor, propertyStartTag);
+        const classOrError = parseReadonlyFromSequence(cursor);
         if (classOrError.error !== null) {
           propertyError = classOrError.error;
           break;
         }
 
-        const casted = AasTypes.asReadonly(classOrError.mustValue());
-        if (casted === null) {
-          propertyError = new DeserializationError(
-            "Expected property " +
-              "aReadonly" +
-              " to contain an instance of IReadonly"
-          );
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
-        theAReadonly = casted;
+        theAReadonly = classOrError.mustValue();
         break;
       }
 
@@ -715,15 +847,20 @@ function parseSomethingFromOpenTag(
           break;
         }
 
-        const textOrError = parseTextContentAndConsumeEndTag(cursor, propertyStartTag);
-        if (textOrError.error !== null) {
-          propertyError = textOrError.error;
+        const text = parseTextContent(cursor);
+
+        const parsedOrError = parseRecordText(text);
+        if (parsedOrError.error !== null) {
+          propertyError = parsedOrError.error;
           break;
         }
 
-        const parsedOrError = parseRecordText(textOrError.mustValue());
-        if (parsedOrError.error !== null) {
-          propertyError = parsedOrError.error;
+        const propertyCloseError = consumeCloseTag(
+          cursor,
+          localNameOfTag(propertyStartTag.tag)
+        );
+        if (propertyCloseError !== null) {
+          propertyError = propertyCloseError;
           break;
         }
 
@@ -741,7 +878,7 @@ function parseSomethingFromOpenTag(
 
     if (propertyError !== null) {
       propertyError.path.prepend(new NameSegment(propertyLocalName));
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      return new AasCommon.Either<AasTypes.Something, DeserializationError>(
         null,
         propertyError
       );
@@ -750,32 +887,14 @@ function parseSomethingFromOpenTag(
     cursor.skipIgnorable();
   }
 
-  const closeTag = cursor.current();
-  if (!(closeTag instanceof CloseTagToken)) {
-    return newDeserializationError<AasTypes.Class>(
-      "Expected closing element of " +
-        `Something, but got token kind: ${currentTokenKind(cursor)}`
-    );
-  }
-
-  const closeError = checkExpectedCloseTag(closeTag, observedLocalName);
-  if (closeError !== null) {
-    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-      null,
-      closeError
-    );
-  }
-
-  cursor.advance();
-
   if (theAReadonly === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Something>(
       "The required property 'aReadonly' is missing"
     );
   }
 
   if (theARecord === null) {
-    return newDeserializationError<AasTypes.Class>(
+    return newDeserializationError<AasTypes.Something>(
       "The required property 'aRecord' is missing"
     );
   }
@@ -784,7 +903,7 @@ function parseSomethingFromOpenTag(
     theAReadonly,
     theARecord
   );
-  return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+  return new AasCommon.Either<AasTypes.Something, DeserializationError>(
     instance,
     null
   );
@@ -793,18 +912,15 @@ function parseSomethingFromOpenTag(
 const ROOT_DISPATCH_BY_LOCAL_NAME =
   new Map<
     string,
-    (
-      cursor: XmlCursor,
-      startTag: OpenTagToken
-    ) => AasCommon.Either<AasTypes.Class, DeserializationError>
+    (cursor: XmlCursor) => AasCommon.Either<AasTypes.Class, DeserializationError>
   >([
     [
       "readonly",
-      parseReadonlyFromOpenTag
+      parseReadonlyFromSequence
     ],
     [
       "something",
-      parseSomethingFromOpenTag
+      parseSomethingFromSequence
     ]
   ]);
 
@@ -851,33 +967,17 @@ export function fromXmlString(
     );
   }
 
-  const instanceOrError = dispatch(cursor, rootOpenTag);
+  const instanceOrError = dispatch(cursor);
   if (instanceOrError.error !== null) {
     return instanceOrError;
   }
 
-  cursor.skipIgnorable();
-  const tokenAfterInstance = cursor.current();
-  if (tokenAfterInstance !== null) {
-    if (!(tokenAfterInstance instanceof CloseTagToken)) {
-      return newDeserializationError<AasTypes.Class>(
-        "Expected root closing XML element, but got token kind: " +
-        currentTokenKind(cursor)
-      );
-    }
-
-    const closeError = checkExpectedCloseTag(
-      tokenAfterInstance,
-      rootLocalName
+  const closeError = consumeCloseTag(cursor, rootLocalName);
+  if (closeError !== null) {
+    return new AasCommon.Either<AasTypes.Class, DeserializationError>(
+      null,
+      closeError
     );
-    if (closeError !== null) {
-      return new AasCommon.Either<AasTypes.Class, DeserializationError>(
-        null,
-        closeError
-      );
-    }
-
-    cursor.advance();
   }
 
   cursor.skipIgnorable();
