@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.List;
 import java.util.Optional;
@@ -200,12 +201,6 @@ public class Xmlization {
       return currentEvent(reader).isEndElement();
     }
 
-    private static boolean isWrongClosingTag(
-      _Result<String> tryElementName,
-      _Result<String> tryEndElementName) {
-      return !tryElementName.getResult().equals(tryEndElementName.getResult());
-    }
-
     private static _Result<XMLEvent> verifyClosingTagForClass(
       String className,
       XMLEventReader reader,
@@ -231,7 +226,7 @@ public class Xmlization {
       if (tryEndElementName.isError()) {
         return tryEndElementName.castTo(XMLEvent.class);
       }
-      if (isWrongClosingTag(tryElementName, tryEndElementName)) {
+      if (!tryElementName.getResult().equals(tryEndElementName.getResult())) {
         final Reporting.Error error = new Reporting.Error(
             "Expected an XML end element to conclude a property of class " + className
                 + " with the element name " + tryElementName.getResult() + ", "
@@ -245,6 +240,57 @@ public class Xmlization {
           "Failed in method verifyClosingTagForClass because of: " +
           xmlStreamException.getMessage());
       }
+    }
+
+    /**
+     * Deserialize an instance of {@code T} from an XML element.
+     *
+     * <p>{@code parseAsSequence} is given the element's local name and whether
+     * the element is self-closing, and is expected to consume the properties of
+     * the instance, but not the element's closing tag.
+     */
+    private static <T> _Result<? extends T> parseInstanceFromElement(
+      XMLEventReader reader,
+      Class<T> type,
+      BiFunction<String, Boolean, _Result<? extends T>> parseAsSequence) {
+      skipWhitespaceAndComments(reader);
+
+      final XMLEvent currentEvent = currentEvent(reader);
+      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
+        return _Result.failure(new Reporting.Error(
+          "Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
+            "but reached the end-of-file"));
+      }
+
+      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
+        return _Result.failure(new Reporting.Error(
+          "Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
+            "but got a node of type " + getEventTypeAsString(currentEvent) +
+            " with value " + currentEvent));
+      }
+
+      final _Result<String> tryElementName = tryElementName(reader);
+      if (tryElementName.isError()) {
+        return _Result.failure(tryElementName.getError());
+      }
+
+      final String elementName = tryElementName.getResult();
+      final boolean isEmptyElement = isEmptyElement(reader);
+
+      final _Result<? extends T> result = parseAsSequence.apply(elementName, isEmptyElement);
+      if (result.isError()) {
+        return result;
+      }
+
+      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+        type.getSimpleName(),
+        reader,
+        tryElementName);
+      if (checkEndElement.isError()) {
+        return _Result.failure(checkEndElement.getError());
+      }
+
+      return result;
     }
 
     private static void skipWhitespaceAndComments(XMLEventReader reader) {
@@ -629,46 +675,70 @@ public class Xmlization {
     }
 
     /**
+     * Parse a list of items, each de-serialized by {@code parseItem}.
+     *
+     * <p>Every start element is considered to mark the start of an item. Parsing
+     * stops as soon as a non-start element is encountered.
+     */
+    private static <T> _Result<List<T>> parseList(
+      XMLEventReader reader,
+      boolean isEmptyProperty,
+      Class<T> itemType,
+      Function<XMLEventReader, _Result<? extends T>> parseItem) {
+      final List<T> result = new ArrayList<>();
+      if (isEmptyProperty) {
+        return _Result.success(result);
+      }
+
+      skipWhitespaceAndComments(reader);
+      int index = 0;
+      if (!currentEvent(reader).isStartElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a start element opening an instance of " + itemType.getSimpleName() +
+            ", but got an XML " + getEventTypeAsString(currentEvent(reader)));
+        error.prependSegment(new Reporting.IndexSegment(index));
+        return _Result.failure(error);
+      }
+
+      while (currentEvent(reader).isStartElement()) {
+        final _Result<? extends T> itemResult = parseItem.apply(reader);
+        if (itemResult.isError()) {
+          itemResult.getError()
+            .prependSegment(
+              new Reporting.IndexSegment(index));
+          return _Result.failure(itemResult.getError());
+        }
+
+        result.add(itemResult.getResult());
+        index++;
+        skipWhitespaceAndComments(reader);
+      }
+
+      return _Result.success(result);
+    }
+
+    /**
      * Deserialize an instance of INode from an XML element.
      */
     private static _Result<? extends INode> tryINodeFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element, but reached end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class INode, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      _Result<String> tryElementName = tryElementName(
-        reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(INode.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      switch (elementName) {
-        case "branch":
-          return tryBranchFromElement(reader);
-        case "leaf":
-          return tryLeafFromElement(reader);
-        case "blossom":
-          return tryBlossomFromElement(reader);
-        default:
-          final Reporting.Error error = new Reporting.Error(
-            "Unexpected element with the name " + getEventTypeAsString(currentEvent));
-          return _Result.failure(error);
-      }
+      return parseInstanceFromElement(
+        reader,
+        INode.class,
+        (elementName, isEmptyElement) -> {
+          switch (elementName) {
+            case "branch":
+              return tryBranchFromSequence(reader, isEmptyElement);
+            case "leaf":
+              return tryLeafFromSequence(reader, isEmptyElement);
+            case "blossom":
+              return tryBlossomFromSequence(reader, isEmptyElement);
+            default:
+              final Reporting.Error error = new Reporting.Error(
+                "Unexpected element with the name " + elementName);
+              return _Result.failure(error);
+          }
+        });
     }
 
     /**
@@ -818,96 +888,43 @@ public class Xmlization {
      */
     private static _Result<? extends IBranch> tryIBranchFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element, but reached end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class IBranch, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      _Result<String> tryElementName = tryElementName(
-        reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(IBranch.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      switch (elementName) {
-        case "leaf":
-          return tryLeafFromElement(reader);
-        case "blossom":
-          return tryBlossomFromElement(reader);
-        case "branch":
-          return tryBranchFromElement(reader);
-        default:
-          final Reporting.Error error = new Reporting.Error(
-            "Unexpected element with the name " + getEventTypeAsString(currentEvent));
-          return _Result.failure(error);
-      }
+      return parseInstanceFromElement(
+        reader,
+        IBranch.class,
+        (elementName, isEmptyElement) -> {
+          switch (elementName) {
+            case "leaf":
+              return tryLeafFromSequence(reader, isEmptyElement);
+            case "blossom":
+              return tryBlossomFromSequence(reader, isEmptyElement);
+            case "branch":
+              return tryBranchFromSequence(reader, isEmptyElement);
+            default:
+              final Reporting.Error error = new Reporting.Error(
+                "Unexpected element with the name " + elementName);
+              return _Result.failure(error);
+          }
+        });
     }
 
     /**
      * Deserialize an instance of class Branch from an XML element.
      */
-    private static _Result<Branch> tryBranchFromElement(
+    private static _Result<? extends Branch> tryBranchFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Branch, " +
-          "but reached the end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Branch, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      final _Result<String> tryElementName = tryElementName(reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(Branch.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      if (!"branch".equals(tryElementName.getResult())) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an element representing an instance of class Branch " +
-          "with element name branch, but got: " + elementName);
-        return _Result.failure(error);
-      }
-
-      final boolean isEmptyElement = isEmptyElement(reader);
-
-      _Result<Branch> result = tryBranchFromSequence(
+      return parseInstanceFromElement(
         reader,
-        isEmptyElement);
-      if (result.isError()) return result.castTo(Branch.class);
+        Branch.class,
+        (elementName, isEmptyElement) -> {
+          if (!"branch".equals(elementName)) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected an element representing an instance of class Branch " +
+              "with element name branch, but got: " + elementName);
+            return _Result.failure(error);
+          }
 
-
-      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-        "Branch",
-        reader,
-        tryElementName);
-      if (checkEndElement.isError()) return checkEndElement.castTo(Branch.class);
-
-
-      return result;
+          return tryBranchFromSequence(reader, isEmptyElement);
+        });
     }
 
     /**
@@ -1101,94 +1118,41 @@ public class Xmlization {
      */
     private static _Result<? extends ILeaf> tryILeafFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element, but reached end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class ILeaf, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      _Result<String> tryElementName = tryElementName(
-        reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(ILeaf.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      switch (elementName) {
-        case "blossom":
-          return tryBlossomFromElement(reader);
-        case "leaf":
-          return tryLeafFromElement(reader);
-        default:
-          final Reporting.Error error = new Reporting.Error(
-            "Unexpected element with the name " + getEventTypeAsString(currentEvent));
-          return _Result.failure(error);
-      }
+      return parseInstanceFromElement(
+        reader,
+        ILeaf.class,
+        (elementName, isEmptyElement) -> {
+          switch (elementName) {
+            case "blossom":
+              return tryBlossomFromSequence(reader, isEmptyElement);
+            case "leaf":
+              return tryLeafFromSequence(reader, isEmptyElement);
+            default:
+              final Reporting.Error error = new Reporting.Error(
+                "Unexpected element with the name " + elementName);
+              return _Result.failure(error);
+          }
+        });
     }
 
     /**
      * Deserialize an instance of class Leaf from an XML element.
      */
-    private static _Result<Leaf> tryLeafFromElement(
+    private static _Result<? extends Leaf> tryLeafFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Leaf, " +
-          "but reached the end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Leaf, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      final _Result<String> tryElementName = tryElementName(reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(Leaf.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      if (!"leaf".equals(tryElementName.getResult())) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an element representing an instance of class Leaf " +
-          "with element name leaf, but got: " + elementName);
-        return _Result.failure(error);
-      }
-
-      final boolean isEmptyElement = isEmptyElement(reader);
-
-      _Result<Leaf> result = tryLeafFromSequence(
+      return parseInstanceFromElement(
         reader,
-        isEmptyElement);
-      if (result.isError()) return result.castTo(Leaf.class);
+        Leaf.class,
+        (elementName, isEmptyElement) -> {
+          if (!"leaf".equals(elementName)) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected an element representing an instance of class Leaf " +
+              "with element name leaf, but got: " + elementName);
+            return _Result.failure(error);
+          }
 
-
-      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-        "Leaf",
-        reader,
-        tryElementName);
-      if (checkEndElement.isError()) return checkEndElement.castTo(Leaf.class);
-
-
-      return result;
+          return tryLeafFromSequence(reader, isEmptyElement);
+        });
     }
 
     /**
@@ -1417,55 +1381,21 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Blossom from an XML element.
      */
-    private static _Result<Blossom> tryBlossomFromElement(
+    private static _Result<? extends Blossom> tryBlossomFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Blossom, " +
-          "but reached the end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Blossom, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      final _Result<String> tryElementName = tryElementName(reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(Blossom.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      if (!"blossom".equals(tryElementName.getResult())) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an element representing an instance of class Blossom " +
-          "with element name blossom, but got: " + elementName);
-        return _Result.failure(error);
-      }
-
-      final boolean isEmptyElement = isEmptyElement(reader);
-
-      _Result<Blossom> result = tryBlossomFromSequence(
+      return parseInstanceFromElement(
         reader,
-        isEmptyElement);
-      if (result.isError()) return result.castTo(Blossom.class);
+        Blossom.class,
+        (elementName, isEmptyElement) -> {
+          if (!"blossom".equals(elementName)) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected an element representing an instance of class Blossom " +
+              "with element name blossom, but got: " + elementName);
+            return _Result.failure(error);
+          }
 
-
-      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-        "Blossom",
-        reader,
-        tryElementName);
-      if (checkEndElement.isError()) return checkEndElement.castTo(Blossom.class);
-
-
-      return result;
+          return tryBlossomFromSequence(reader, isEmptyElement);
+        });
     }
 
     /**
@@ -1663,55 +1593,21 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Something from an XML element.
      */
-    private static _Result<Something> trySomethingFromElement(
+    private static _Result<? extends Something> trySomethingFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Something, " +
-          "but reached the end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Something, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      final _Result<String> tryElementName = tryElementName(reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(Something.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      if (!"something".equals(tryElementName.getResult())) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an element representing an instance of class Something " +
-          "with element name something, but got: " + elementName);
-        return _Result.failure(error);
-      }
-
-      final boolean isEmptyElement = isEmptyElement(reader);
-
-      _Result<Something> result = trySomethingFromSequence(
+      return parseInstanceFromElement(
         reader,
-        isEmptyElement);
-      if (result.isError()) return result.castTo(Something.class);
+        Something.class,
+        (elementName, isEmptyElement) -> {
+          if (!"something".equals(elementName)) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected an element representing an instance of class Something " +
+              "with element name something, but got: " + elementName);
+            return _Result.failure(error);
+          }
 
-
-      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-        "Something",
-        reader,
-        tryElementName);
-      if (checkEndElement.isError()) return checkEndElement.castTo(Something.class);
-
-
-      return result;
+          return trySomethingFromSequence(reader, isEmptyElement);
+        });
     }
 
     /**
@@ -1872,55 +1768,21 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Container from an XML element.
      */
-    private static _Result<Container> tryContainerFromElement(
+    private static _Result<? extends Container> tryContainerFromElement(
       XMLEventReader reader) {
-      skipWhitespaceAndComments(reader);
-
-      final XMLEvent currentEvent = currentEvent(reader);
-      if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Container, " +
-          "but reached the end-of-file");
-        return _Result.failure(error);
-      }
-
-      if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an XML element representing an instance of class Container, " +
-          "but got a node of type " + getEventTypeAsString(currentEvent) +
-          " with value " + currentEvent);
-        return _Result.failure(error);
-      }
-
-      final _Result<String> tryElementName = tryElementName(reader);
-      if (tryElementName.isError()) {
-        return tryElementName.castTo(Container.class);
-      }
-
-      final String elementName = tryElementName.getResult();
-      if (!"container".equals(tryElementName.getResult())) {
-        final Reporting.Error error = new Reporting.Error(
-          "Expected an element representing an instance of class Container " +
-          "with element name container, but got: " + elementName);
-        return _Result.failure(error);
-      }
-
-      final boolean isEmptyElement = isEmptyElement(reader);
-
-      _Result<Container> result = tryContainerFromSequence(
+      return parseInstanceFromElement(
         reader,
-        isEmptyElement);
-      if (result.isError()) return result.castTo(Container.class);
+        Container.class,
+        (elementName, isEmptyElement) -> {
+          if (!"container".equals(elementName)) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected an element representing an instance of class Container " +
+              "with element name container, but got: " + elementName);
+            return _Result.failure(error);
+          }
 
-
-      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-        "Container",
-        reader,
-        tryElementName);
-      if (checkEndElement.isError()) return checkEndElement.castTo(Container.class);
-
-
-      return result;
+          return tryContainerFromSequence(reader, isEmptyElement);
+        });
     }
   }
 
