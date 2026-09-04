@@ -451,6 +451,55 @@ private static _Result<{enum_name}> tryVElementAs{enum_name}(XMLEventReader read
     )
 
 
+def _generate_parse_list() -> Stripped:
+    """Generate the generic function to de-serialize a list of items."""
+    return Stripped(
+        f"""\
+/**
+ * Parse a list of items, each de-serialized by {{@code parseItem}}.
+ *
+ * <p>Every start element is considered to mark the start of an item. Parsing
+ * stops as soon as a non-start element is encountered.
+ */
+private static <T> _Result<List<T>> parseList(
+{I}XMLEventReader reader,
+{I}boolean isEmptyProperty,
+{I}Class<T> itemType,
+{I}Function<XMLEventReader, _Result<? extends T>> parseItem) {{
+{I}final List<T> result = new ArrayList<>();
+{I}if (isEmptyProperty) {{
+{II}return _Result.success(result);
+{I}}}
+
+{I}skipWhitespaceAndComments(reader);
+{I}int index = 0;
+{I}if (!currentEvent(reader).isStartElement()) {{
+{II}final Reporting.Error error = new Reporting.Error(
+{III}"Expected a start element opening an instance of " + itemType.getSimpleName() +
+{IIII}", but got an XML " + getEventTypeAsString(currentEvent(reader)));
+{II}error.prependSegment(new Reporting.IndexSegment(index));
+{II}return _Result.failure(error);
+{I}}}
+
+{I}while (currentEvent(reader).isStartElement()) {{
+{II}final _Result<? extends T> itemResult = parseItem.apply(reader);
+{II}if (itemResult.isError()) {{
+{III}itemResult.getError()
+{IIII}.prependSegment(
+{IIIII}new Reporting.IndexSegment(index));
+{III}return _Result.failure(itemResult.getError());
+{II}}}
+
+{II}result.add(itemResult.getResult());
+{II}index++;
+{II}skipWhitespaceAndComments(reader);
+{I}}}
+
+{I}return _Result.success(result);
+}}"""
+    )
+
+
 def _generate_skip_whitespace_and_comments() -> Stripped:
     """Generate the function to skip whitespace text and XML comments."""
     return Stripped(
@@ -654,12 +703,6 @@ private static _Result<String> tryElementName(XMLEventReader reader) {{
 def _generate_verify_closing_tag_for_class() -> Stripped:
     return Stripped(
         f"""\
-private static boolean isWrongClosingTag(
-{I}_Result<String> tryElementName,
-{I}_Result<String> tryEndElementName) {{
-{I}return !tryElementName.getResult().equals(tryEndElementName.getResult());
-}}
-
 private static _Result<XMLEvent> verifyClosingTagForClass(
 {I}String className,
 {I}XMLEventReader reader,
@@ -685,7 +728,7 @@ private static _Result<XMLEvent> verifyClosingTagForClass(
 {I}if (tryEndElementName.isError()) {{
 {II}return tryEndElementName.castTo(XMLEvent.class);
 {I}}}
-{I}if (isWrongClosingTag(tryElementName, tryEndElementName)) {{
+{I}if (!tryElementName.getResult().equals(tryEndElementName.getResult())) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {IIII}"Expected an XML end element to conclude a property of class " + className
 {IIIIII}+ " with the element name " + tryElementName.getResult() + ", "
@@ -699,6 +742,63 @@ private static _Result<XMLEvent> verifyClosingTagForClass(
 {III}"Failed in method verifyClosingTagForClass because of: " +
 {III}xmlStreamException.getMessage());
 {I}}}
+}}"""
+    )
+
+
+def _generate_parse_instance_from_element_generic() -> Stripped:
+    """Generate the generic function to de-serialize an instance from an element."""
+    return Stripped(
+        f"""\
+/**
+ * Deserialize an instance of {{@code T}} from an XML element.
+ *
+ * <p>{{@code parseAsSequence}} is given the element's local name and whether
+ * the element is self-closing, and is expected to consume the properties of
+ * the instance, but not the element's closing tag.
+ */
+private static <T> _Result<? extends T> parseInstanceFromElement(
+{I}XMLEventReader reader,
+{I}Class<T> type,
+{I}BiFunction<String, Boolean, _Result<? extends T>> parseAsSequence) {{
+{I}skipWhitespaceAndComments(reader);
+
+{I}final XMLEvent currentEvent = currentEvent(reader);
+{I}if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {{
+{II}return _Result.failure(new Reporting.Error(
+{III}"Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
+{IIII}"but reached the end-of-file"));
+{I}}}
+
+{I}if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
+{II}return _Result.failure(new Reporting.Error(
+{III}"Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
+{IIII}"but got a node of type " + getEventTypeAsString(currentEvent) +
+{IIII}" with value " + currentEvent));
+{I}}}
+
+{I}final _Result<String> tryElementName = tryElementName(reader);
+{I}if (tryElementName.isError()) {{
+{II}return _Result.failure(tryElementName.getError());
+{I}}}
+
+{I}final String elementName = tryElementName.getResult();
+{I}final boolean isEmptyElement = isEmptyElement(reader);
+
+{I}final _Result<? extends T> result = parseAsSequence.apply(elementName, isEmptyElement);
+{I}if (result.isError()) {{
+{II}return result;
+{I}}}
+
+{I}final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+{II}type.getSimpleName(),
+{II}reader,
+{II}tryElementName);
+{I}if (checkEndElement.isError()) {{
+{II}return _Result.failure(checkEndElement.getError());
+{I}}}
+
+{I}return result;
 }}"""
     )
 
@@ -960,41 +1060,27 @@ def _generate_deserialize_list_property(
 
     cls_name = java_naming.class_name(cls.name)
 
+    try_target_var = java_naming.variable_name(Identifier(f"try_{prop.name}"))
+
     xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
     return Stripped(
         f"""\
-{target_var} = new ArrayList<>();
-if (!isEmptyProperty) {{
-{I}skipWhitespaceAndComments(reader);
-{I}int index = 0;
-{I}if(!currentEvent(reader).isStartElement()){{
-{II}final Reporting.Error error = new Reporting.Error(
-{II}"Expected a start element opening an instance of {item_type}, but got an XML "
-{III}+ getEventTypeAsString(currentEvent(reader)));
-{II}error.prependSegment(new Reporting.IndexSegment(index));
-{II}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
-{II}return _Result.failure(error);
-{I}}}
-{I}while (currentEvent(reader).isStartElement()) {{
+final _Result<List<{item_type}>> {try_target_var} = parseList(
+{I}reader,
+{I}isEmptyProperty,
+{I}{item_type}.class,
+{I}_DeserializeImplementation::try{deserialize_method});
 
-{II}_Result<? extends {item_type}> itemResult = try{deserialize_method}(reader);
+if ({try_target_var}.isError()) {{
+{I}{try_target_var}.getError()
+{II}.prependSegment(
+{III}new Reporting.NameSegment(
+{IIII}{xml_prop_name_literal}));
+{I}return {try_target_var}.castTo({cls_name}.class);
+}}
 
-{II}if (itemResult.isError()) {{
-{III}itemResult.getError()
-{IIII}.prependSegment(
-{IIIII}new Reporting.IndexSegment(index));
-{III}itemResult.getError()
-{IIII}.prependSegment(
-{IIIII}new Reporting.NameSegment({xml_prop_name_literal}));
-{III}return itemResult.castTo({cls_name}.class);
-{II}}}
-
-{II}{target_var}.add(itemResult.getResult());
-{II}index++;
-{II}skipWhitespaceAndComments(reader);
-{I}}}
-}}"""
+{target_var} = {try_target_var}.getResult();"""
     )
 
 
@@ -1328,65 +1414,26 @@ def _generate_deserialize_impl_concrete_cls_from_element(
     xml_name = naming.xml_class_name(cls.name)
     xml_name_literal = java_common.string_literal(xml_name)
 
-    body = Stripped(
-        f"""\
-skipWhitespaceAndComments(reader);
-
-final XMLEvent currentEvent = currentEvent(reader);
-if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {{
-{I}final Reporting.Error error = new Reporting.Error(
-{II}"Expected an XML element representing an instance of class {name}, " +
-{II}"but reached the end-of-file");
-{I}return _Result.failure(error);
-}}
-
-if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
-{I}final Reporting.Error error = new Reporting.Error(
-{II}"Expected an XML element representing an instance of class {name}, " +
-{II}"but got a node of type " + getEventTypeAsString(currentEvent) +
-{II}" with value " + currentEvent);
-{I}return _Result.failure(error);
-}}
-
-final _Result<String> tryElementName = tryElementName(reader);
-if (tryElementName.isError()) {{
-{I}return tryElementName.castTo({name}.class);
-}}
-
-final String elementName = tryElementName.getResult();
-if (!{xml_name_literal}.equals(tryElementName.getResult())) {{
-{I}final Reporting.Error error = new Reporting.Error(
-{II}"Expected an element representing an instance of class {name} " +
-{II}"with element name {xml_name}, but got: " + elementName);
-{I}return _Result.failure(error);
-}}
-
-final boolean isEmptyElement = isEmptyElement(reader);
-
-_Result<{name}> result = try{name}FromSequence(
-{I}reader,
-{I}isEmptyElement);
-if (result.isError()) return result.castTo({name}.class);
-
-
-final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-{I}"{name}",
-{I}reader,
-{I}tryElementName);
-if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
-
-
-return result;"""
-    )
-
     return Stripped(
         f"""\
 /**
  * Deserialize an instance of class {name} from an XML element.
  */
-private static _Result<{name}> try{name}FromElement(
+private static _Result<? extends {name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
-{I}{indent_but_first_line(body, I)}
+{I}return parseInstanceFromElement(
+{II}reader,
+{II}{name}.class,
+{II}(elementName, isEmptyElement) -> {{
+{III}if (!{xml_name_literal}.equals(elementName)) {{
+{IIII}final Reporting.Error error = new Reporting.Error(
+{IIIII}"Expected an element representing an instance of class {name} " +
+{IIIII}"with element name {xml_name}, but got: " + elementName);
+{IIII}return _Result.failure(error);
+{III}}}
+
+{III}return try{name}FromSequence(reader, isEmptyElement);
+{II}}});
 }}"""
     )
 
@@ -1396,28 +1443,6 @@ def _generate_deserialize_impl_interface_from_element(
 ) -> Stripped:
     """Generate the function to de-serialize an ``interface`` from an XML element."""
     name = java_naming.interface_name(interface.name)
-
-    blocks = [
-        Stripped(
-            f"""\
-skipWhitespaceAndComments(reader);
-
-final XMLEvent currentEvent = currentEvent(reader);
-if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {{
-{I}final Reporting.Error error = new Reporting.Error(
-{II}"Expected an XML element, but reached end-of-file");
-{I}return _Result.failure(error);
-}}
-
-if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
-{I}final Reporting.Error error = new Reporting.Error(
-{II}"Expected an XML element representing an instance of class {name}, " +
-{II}"but got a node of type " + getEventTypeAsString(currentEvent) +
-{II}" with value " + currentEvent);
-{I}return _Result.failure(error);
-}}"""
-        )
-    ]  # type: List[Stripped]
 
     case_stmts = []  # type: List[Stripped]
     for implementer in interface.implementers:
@@ -1431,7 +1456,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
             Stripped(
                 f"""\
 case {implementer_xml_name_literal}:
-{I}return try{implementer_name}FromElement(reader);"""
+{I}return try{implementer_name}FromSequence(reader, isEmptyElement);"""
             )
         )
 
@@ -1440,52 +1465,30 @@ case {implementer_xml_name_literal}:
             f"""\
 default:
 {I}final Reporting.Error error = new Reporting.Error(
-{II}"Unexpected element with the name " + getEventTypeAsString(currentEvent));
+{II}"Unexpected element with the name " + elementName);
 {I}return _Result.failure(error);"""
         )
     )
 
-    switch_writer = io.StringIO()
-    switch_writer.write(
-        f"""\
-_Result<String> tryElementName = tryElementName(
-{I}reader);
-if (tryElementName.isError()) {{
-{I}return tryElementName.castTo({name}.class);
-}}
+    case_stmts_joined = "\n".join(case_stmts)
 
-final String elementName = tryElementName.getResult();
-switch (elementName) {{
-"""
-    )
-    for i, case_stmt in enumerate(case_stmts):
-        if i > 0:
-            switch_writer.write("\n")
-        switch_writer.write(textwrap.indent(case_stmt, I))
-
-    switch_writer.write("\n}")
-
-    blocks.append(Stripped(switch_writer.getvalue()))
-
-    writer = io.StringIO()
-    writer.write(
+    return Stripped(
         f"""\
 /**
  * Deserialize an instance of {name} from an XML element.
  */
 private static _Result<? extends {name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
-"""
+{I}return parseInstanceFromElement(
+{II}reader,
+{II}{name}.class,
+{II}(elementName, isEmptyElement) -> {{
+{III}switch (elementName) {{
+{IIII}{indent_but_first_line(case_stmts_joined, IIII)}
+{III}}}
+{II}}});
+}}"""
     )
-
-    for i, block in enumerate(blocks):
-        if i > 0:
-            writer.write("\n\n")
-        writer.write(textwrap.indent(block, I))
-
-    writer.write("\n}")
-
-    return Stripped(writer.getvalue())
 
 
 def _generate_deserialize_impl(
@@ -1498,6 +1501,7 @@ def _generate_deserialize_impl(
         _generate_get_event_type_as_string(),
         _generate_is_empty_element(),
         _generate_verify_closing_tag_for_class(),
+        _generate_parse_instance_from_element_generic(),
         _generate_skip_whitespace_and_comments(),
         _generate_skip_start_document(),
         _generate_try_element_name(),
@@ -1505,6 +1509,7 @@ def _generate_deserialize_impl(
         _generate_try_v_start_element(),
         _generate_try_v_end_element(),
         *_generate_try_v_element_as_primitive_functions(),
+        _generate_parse_list(),
     ]  # type: List[Stripped]
 
     for enumeration in symbol_table.enumerations:
@@ -2485,6 +2490,7 @@ def generate(
         Stripped("import javax.xml.stream.XMLStreamWriter;"),
         Stripped("import java.util.ArrayList;"),
         Stripped("import java.util.Base64;"),
+        Stripped("import java.util.function.BiFunction;"),
         Stripped("import java.util.function.Function;"),
         Stripped("import java.util.List;"),
         Stripped("import java.util.Optional;"),
