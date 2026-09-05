@@ -6,10 +6,9 @@
 #include "aas_core/aas_3_0/wstringification.hpp"
 
 #pragma warning(push, 0)
-#include <functional>
-#include <map>
 #include <set>
 #include <sstream>
+#include <unordered_map>
 #pragma warning(pop)
 
 namespace aas_core {
@@ -490,6 +489,178 @@ std::pair<
     model_type,
     common::nullopt
   );
+}
+
+/**
+ * Map JSON \c modelType strings to model types.
+ */
+const std::unordered_map<
+  std::string,
+  types::ModelType
+> kModelTypeStringToModelType = {
+  {
+    "Extension",
+    types::ModelType::kExtension
+  },
+  {
+    "AdministrativeInformation",
+    types::ModelType::kAdministrativeInformation
+  },
+  {
+    "Qualifier",
+    types::ModelType::kQualifier
+  },
+  {
+    "AssetAdministrationShell",
+    types::ModelType::kAssetAdministrationShell
+  },
+  {
+    "AssetInformation",
+    types::ModelType::kAssetInformation
+  },
+  {
+    "Resource",
+    types::ModelType::kResource
+  },
+  {
+    "SpecificAssetId",
+    types::ModelType::kSpecificAssetId
+  },
+  {
+    "Submodel",
+    types::ModelType::kSubmodel
+  },
+  {
+    "RelationshipElement",
+    types::ModelType::kRelationshipElement
+  },
+  {
+    "SubmodelElementList",
+    types::ModelType::kSubmodelElementList
+  },
+  {
+    "SubmodelElementCollection",
+    types::ModelType::kSubmodelElementCollection
+  },
+  {
+    "Property",
+    types::ModelType::kProperty
+  },
+  {
+    "MultiLanguageProperty",
+    types::ModelType::kMultiLanguageProperty
+  },
+  {
+    "Range",
+    types::ModelType::kRange
+  },
+  {
+    "ReferenceElement",
+    types::ModelType::kReferenceElement
+  },
+  {
+    "Blob",
+    types::ModelType::kBlob
+  },
+  {
+    "File",
+    types::ModelType::kFile
+  },
+  {
+    "AnnotatedRelationshipElement",
+    types::ModelType::kAnnotatedRelationshipElement
+  },
+  {
+    "Entity",
+    types::ModelType::kEntity
+  },
+  {
+    "EventPayload",
+    types::ModelType::kEventPayload
+  },
+  {
+    "BasicEventElement",
+    types::ModelType::kBasicEventElement
+  },
+  {
+    "Operation",
+    types::ModelType::kOperation
+  },
+  {
+    "OperationVariable",
+    types::ModelType::kOperationVariable
+  },
+  {
+    "Capability",
+    types::ModelType::kCapability
+  },
+  {
+    "ConceptDescription",
+    types::ModelType::kConceptDescription
+  },
+  {
+    "Reference",
+    types::ModelType::kReference
+  },
+  {
+    "Key",
+    types::ModelType::kKey
+  },
+  {
+    "LangStringNameType",
+    types::ModelType::kLangStringNameType
+  },
+  {
+    "LangStringTextType",
+    types::ModelType::kLangStringTextType
+  },
+  {
+    "Environment",
+    types::ModelType::kEnvironment
+  },
+  {
+    "EmbeddedDataSpecification",
+    types::ModelType::kEmbeddedDataSpecification
+  },
+  {
+    "LevelType",
+    types::ModelType::kLevelType
+  },
+  {
+    "ValueReferencePair",
+    types::ModelType::kValueReferencePair
+  },
+  {
+    "ValueList",
+    types::ModelType::kValueList
+  },
+  {
+    "LangStringPreferredNameTypeIec61360",
+    types::ModelType::kLangStringPreferredNameTypeIec61360
+  },
+  {
+    "LangStringShortNameTypeIec61360",
+    types::ModelType::kLangStringShortNameTypeIec61360
+  },
+  {
+    "LangStringDefinitionTypeIec61360",
+    types::ModelType::kLangStringDefinitionTypeIec61360
+  },
+  {
+    "DataSpecificationIec61360",
+    types::ModelType::kDataSpecificationIec61360
+  }
+};
+
+common::optional<types::ModelType> ModelTypeFromModelTypeString(
+  const std::string& model_type_str
+) {
+  auto it = kModelTypeStringToModelType.find(model_type_str);
+  if (it == kModelTypeStringToModelType.end()) {
+    return common::nullopt;
+  }
+
+  return it->second;
 }
 
 template <typename T, typename DeserializeItemT>
@@ -2297,125 +2468,6 @@ std::pair<
   bool additional_properties
 );
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IHasSemantics> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeHasSemanticsByModelType = {
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::IHasSemantics
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::IHasSemantics
-    >
-  },
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Blob",
-    DeserializeBlob<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Capability",
-    DeserializeCapability<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Entity",
-    DeserializeEntity<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Extension",
-    DeserializeExtension<
-      types::IHasSemantics
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::IHasSemantics
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Operation",
-    DeserializeOperation<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Qualifier",
-    DeserializeQualifier<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::IHasSemantics
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::IHasSemantics
-    >
-  },
-  {
-    "SpecificAssetId",
-    DeserializeSpecificAssetId<
-      types::IHasSemantics
-    >
-  },
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IHasSemantics
-    >
-  },
-  {
-    "SubmodelElementCollection",
-    DeserializeSubmodelElementCollection<
-      types::IHasSemantics
-    >
-  },
-  {
-    "SubmodelElementList",
-    DeserializeSubmodelElementList<
-      types::IHasSemantics
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IHasSemantics>
@@ -2425,11 +2477,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -2443,13 +2495,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeHasSemanticsByModelType.find(*model_type);
-  if (it == kDeserializeHasSemanticsByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IHasSemantics "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -2463,7 +2516,98 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kCapability:
+      return DeserializeCapability<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kEntity:
+      return DeserializeEntity<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kExtension:
+      return DeserializeExtension<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kOperation:
+      return DeserializeOperation<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kQualifier:
+      return DeserializeQualifier<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kSpecificAssetId:
+      return DeserializeSpecificAssetId<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementCollection:
+      return DeserializeSubmodelElementCollection<
+        types::IHasSemantics
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementList:
+      return DeserializeSubmodelElementList<
+        types::IHasSemantics
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IHasSemantics "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IHasSemantics> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInExtension = {
@@ -2772,119 +2916,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IHasExtensions> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeHasExtensionsByModelType = {
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::IHasExtensions
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::IHasExtensions
-    >
-  },
-  {
-    "AssetAdministrationShell",
-    DeserializeAssetAdministrationShell<
-      types::IHasExtensions
-    >
-  },
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Blob",
-    DeserializeBlob<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Capability",
-    DeserializeCapability<
-      types::IHasExtensions
-    >
-  },
-  {
-    "ConceptDescription",
-    DeserializeConceptDescription<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Entity",
-    DeserializeEntity<
-      types::IHasExtensions
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::IHasExtensions
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Operation",
-    DeserializeOperation<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::IHasExtensions
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::IHasExtensions
-    >
-  },
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IHasExtensions
-    >
-  },
-  {
-    "SubmodelElementCollection",
-    DeserializeSubmodelElementCollection<
-      types::IHasExtensions
-    >
-  },
-  {
-    "SubmodelElementList",
-    DeserializeSubmodelElementList<
-      types::IHasExtensions
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IHasExtensions>
@@ -2894,11 +2925,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -2912,13 +2943,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeHasExtensionsByModelType.find(*model_type);
-  if (it == kDeserializeHasExtensionsByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IHasExtensions "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -2932,121 +2964,95 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
-}
+  switch (*model_type) {
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kAssetAdministrationShell:
+      return DeserializeAssetAdministrationShell<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kCapability:
+      return DeserializeCapability<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kConceptDescription:
+      return DeserializeConceptDescription<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kEntity:
+      return DeserializeEntity<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kOperation:
+      return DeserializeOperation<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementCollection:
+      return DeserializeSubmodelElementCollection<
+        types::IHasExtensions
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementList:
+      return DeserializeSubmodelElementList<
+        types::IHasExtensions
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IHasExtensions "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IReferable> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeReferableByModelType = {
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::IReferable
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::IReferable
-    >
-  },
-  {
-    "AssetAdministrationShell",
-    DeserializeAssetAdministrationShell<
-      types::IReferable
-    >
-  },
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::IReferable
-    >
-  },
-  {
-    "Blob",
-    DeserializeBlob<
-      types::IReferable
-    >
-  },
-  {
-    "Capability",
-    DeserializeCapability<
-      types::IReferable
-    >
-  },
-  {
-    "ConceptDescription",
-    DeserializeConceptDescription<
-      types::IReferable
-    >
-  },
-  {
-    "Entity",
-    DeserializeEntity<
-      types::IReferable
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::IReferable
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::IReferable
-    >
-  },
-  {
-    "Operation",
-    DeserializeOperation<
-      types::IReferable
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::IReferable
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::IReferable
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::IReferable
-    >
-  },
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IReferable
-    >
-  },
-  {
-    "SubmodelElementCollection",
-    DeserializeSubmodelElementCollection<
-      types::IReferable
-    >
-  },
-  {
-    "SubmodelElementList",
-    DeserializeSubmodelElementList<
-      types::IReferable
-    >
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IHasExtensions> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
   }
-};
+}
 
 std::pair<
   common::optional<
@@ -3057,11 +3063,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -3075,13 +3081,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeReferableByModelType.find(*model_type);
-  if (it == kDeserializeReferableByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IReferable "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -3095,37 +3102,95 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
-}
+  switch (*model_type) {
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kAssetAdministrationShell:
+      return DeserializeAssetAdministrationShell<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kCapability:
+      return DeserializeCapability<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kConceptDescription:
+      return DeserializeConceptDescription<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kEntity:
+      return DeserializeEntity<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kOperation:
+      return DeserializeOperation<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementCollection:
+      return DeserializeSubmodelElementCollection<
+        types::IReferable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementList:
+      return DeserializeSubmodelElementList<
+        types::IReferable
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IReferable "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IIdentifiable> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeIdentifiableByModelType = {
-  {
-    "AssetAdministrationShell",
-    DeserializeAssetAdministrationShell<
-      types::IIdentifiable
-    >
-  },
-  {
-    "ConceptDescription",
-    DeserializeConceptDescription<
-      types::IIdentifiable
-    >
-  },
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IIdentifiable
-    >
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IReferable> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
   }
-};
+}
 
 std::pair<
   common::optional<
@@ -3136,11 +3201,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -3154,13 +3219,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeIdentifiableByModelType.find(*model_type);
-  if (it == kDeserializeIdentifiableByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IIdentifiable "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -3174,25 +3240,39 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
-}
+  switch (*model_type) {
+    case types::ModelType::kAssetAdministrationShell:
+      return DeserializeAssetAdministrationShell<
+        types::IIdentifiable
+      >(json, additional_properties);
+    case types::ModelType::kConceptDescription:
+      return DeserializeConceptDescription<
+        types::IIdentifiable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IIdentifiable
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IIdentifiable "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IHasKind> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeHasKindByModelType = {
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IHasKind
-    >
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IIdentifiable> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
   }
-};
+}
 
 std::pair<
   common::optional<
@@ -3203,11 +3283,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -3221,13 +3301,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeHasKindByModelType.find(*model_type);
-  if (it == kDeserializeHasKindByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IHasKind "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -3241,127 +3322,31 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
-}
+  switch (*model_type) {
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IHasKind
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IHasKind "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IHasDataSpecification> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeHasDataSpecificationByModelType = {
-  {
-    "AdministrativeInformation",
-    DeserializeAdministrativeInformation<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "AssetAdministrationShell",
-    DeserializeAssetAdministrationShell<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Blob",
-    DeserializeBlob<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Capability",
-    DeserializeCapability<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "ConceptDescription",
-    DeserializeConceptDescription<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Entity",
-    DeserializeEntity<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Operation",
-    DeserializeOperation<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "SubmodelElementCollection",
-    DeserializeSubmodelElementCollection<
-      types::IHasDataSpecification
-    >
-  },
-  {
-    "SubmodelElementList",
-    DeserializeSubmodelElementList<
-      types::IHasDataSpecification
-    >
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IHasKind> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
   }
-};
+}
 
 std::pair<
   common::optional<
@@ -3372,11 +3357,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -3390,13 +3375,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeHasDataSpecificationByModelType.find(*model_type);
-  if (it == kDeserializeHasDataSpecificationByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IHasDataSpecification "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -3410,7 +3396,98 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kAdministrativeInformation:
+      return DeserializeAdministrativeInformation<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kAssetAdministrationShell:
+      return DeserializeAssetAdministrationShell<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kCapability:
+      return DeserializeCapability<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kConceptDescription:
+      return DeserializeConceptDescription<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kEntity:
+      return DeserializeEntity<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kOperation:
+      return DeserializeOperation<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementCollection:
+      return DeserializeSubmodelElementCollection<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementList:
+      return DeserializeSubmodelElementList<
+        types::IHasDataSpecification
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IHasDataSpecification "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IHasDataSpecification> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInAdministrativeInformation = {
@@ -3665,107 +3742,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IQualifiable> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeQualifiableByModelType = {
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::IQualifiable
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::IQualifiable
-    >
-  },
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::IQualifiable
-    >
-  },
-  {
-    "Blob",
-    DeserializeBlob<
-      types::IQualifiable
-    >
-  },
-  {
-    "Capability",
-    DeserializeCapability<
-      types::IQualifiable
-    >
-  },
-  {
-    "Entity",
-    DeserializeEntity<
-      types::IQualifiable
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::IQualifiable
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::IQualifiable
-    >
-  },
-  {
-    "Operation",
-    DeserializeOperation<
-      types::IQualifiable
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::IQualifiable
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::IQualifiable
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::IQualifiable
-    >
-  },
-  {
-    "Submodel",
-    DeserializeSubmodel<
-      types::IQualifiable
-    >
-  },
-  {
-    "SubmodelElementCollection",
-    DeserializeSubmodelElementCollection<
-      types::IQualifiable
-    >
-  },
-  {
-    "SubmodelElementList",
-    DeserializeSubmodelElementList<
-      types::IQualifiable
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IQualifiable>
@@ -3775,11 +3751,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -3793,13 +3769,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeQualifiableByModelType.find(*model_type);
-  if (it == kDeserializeQualifiableByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IQualifiable "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -3813,7 +3790,86 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kCapability:
+      return DeserializeCapability<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kEntity:
+      return DeserializeEntity<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kOperation:
+      return DeserializeOperation<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodel:
+      return DeserializeSubmodel<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementCollection:
+      return DeserializeSubmodelElementCollection<
+        types::IQualifiable
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementList:
+      return DeserializeSubmodelElementList<
+        types::IQualifiable
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IQualifiable "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IQualifiable> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInQualifier = {
@@ -6086,101 +6142,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::ISubmodelElement> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeSubmodelElementByModelType = {
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "Blob",
-    DeserializeBlob<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "Capability",
-    DeserializeCapability<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "Entity",
-    DeserializeEntity<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "Operation",
-    DeserializeOperation<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "SubmodelElementCollection",
-    DeserializeSubmodelElementCollection<
-      types::ISubmodelElement
-    >
-  },
-  {
-    "SubmodelElementList",
-    DeserializeSubmodelElementList<
-      types::ISubmodelElement
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::ISubmodelElement>
@@ -6190,11 +6151,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -6208,13 +6169,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeSubmodelElementByModelType.find(*model_type);
-  if (it == kDeserializeSubmodelElementByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::ISubmodelElement "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -6228,7 +6190,82 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kCapability:
+      return DeserializeCapability<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kEntity:
+      return DeserializeEntity<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kOperation:
+      return DeserializeOperation<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementCollection:
+      return DeserializeSubmodelElementCollection<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    case types::ModelType::kSubmodelElementList:
+      return DeserializeSubmodelElementList<
+        types::ISubmodelElement
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::ISubmodelElement "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::ISubmodelElement> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInRelationshipElement = {
@@ -6815,29 +6852,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IRelationshipElement> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeRelationshipElementByModelType = {
-  {
-    "RelationshipElement",
-    ConcretelyDeserializeRelationshipElement<
-      types::IRelationshipElement
-    >
-  },
-  {
-    "AnnotatedRelationshipElement",
-    DeserializeAnnotatedRelationshipElement<
-      types::IRelationshipElement
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IRelationshipElement>
@@ -6847,11 +6861,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -6865,13 +6879,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeRelationshipElementByModelType.find(*model_type);
-  if (it == kDeserializeRelationshipElementByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IRelationshipElement "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -6885,7 +6900,34 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kRelationshipElement:
+      return ConcretelyDeserializeRelationshipElement<
+        types::IRelationshipElement
+      >(json, additional_properties);
+    case types::ModelType::kAnnotatedRelationshipElement:
+      return DeserializeAnnotatedRelationshipElement<
+        types::IRelationshipElement
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IRelationshipElement "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IRelationshipElement> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInSubmodelElementList = {
@@ -8105,53 +8147,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IDataElement> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeDataElementByModelType = {
-  {
-    "Blob",
-    DeserializeBlob<
-      types::IDataElement
-    >
-  },
-  {
-    "File",
-    DeserializeFile<
-      types::IDataElement
-    >
-  },
-  {
-    "MultiLanguageProperty",
-    DeserializeMultiLanguageProperty<
-      types::IDataElement
-    >
-  },
-  {
-    "Property",
-    DeserializeProperty<
-      types::IDataElement
-    >
-  },
-  {
-    "Range",
-    DeserializeRange<
-      types::IDataElement
-    >
-  },
-  {
-    "ReferenceElement",
-    DeserializeReferenceElement<
-      types::IDataElement
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IDataElement>
@@ -8161,11 +8156,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -8179,13 +8174,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeDataElementByModelType.find(*model_type);
-  if (it == kDeserializeDataElementByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IDataElement "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -8199,7 +8195,50 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kBlob:
+      return DeserializeBlob<
+        types::IDataElement
+      >(json, additional_properties);
+    case types::ModelType::kFile:
+      return DeserializeFile<
+        types::IDataElement
+      >(json, additional_properties);
+    case types::ModelType::kMultiLanguageProperty:
+      return DeserializeMultiLanguageProperty<
+        types::IDataElement
+      >(json, additional_properties);
+    case types::ModelType::kProperty:
+      return DeserializeProperty<
+        types::IDataElement
+      >(json, additional_properties);
+    case types::ModelType::kRange:
+      return DeserializeRange<
+        types::IDataElement
+      >(json, additional_properties);
+    case types::ModelType::kReferenceElement:
+      return DeserializeReferenceElement<
+        types::IDataElement
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IDataElement "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IDataElement> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInProperty = {
@@ -13329,23 +13368,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IEventElement> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeEventElementByModelType = {
-  {
-    "BasicEventElement",
-    DeserializeBasicEventElement<
-      types::IEventElement
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IEventElement>
@@ -13355,11 +13377,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -13373,13 +13395,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeEventElementByModelType.find(*model_type);
-  if (it == kDeserializeEventElementByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IEventElement "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -13393,7 +13416,30 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kBasicEventElement:
+      return DeserializeBasicEventElement<
+        types::IEventElement
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IEventElement "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IEventElement> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInBasicEventElement = {
@@ -16291,47 +16337,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IAbstractLangString> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeAbstractLangStringByModelType = {
-  {
-    "LangStringDefinitionTypeIec61360",
-    DeserializeLangStringDefinitionTypeIec61360<
-      types::IAbstractLangString
-    >
-  },
-  {
-    "LangStringNameType",
-    DeserializeLangStringNameType<
-      types::IAbstractLangString
-    >
-  },
-  {
-    "LangStringPreferredNameTypeIec61360",
-    DeserializeLangStringPreferredNameTypeIec61360<
-      types::IAbstractLangString
-    >
-  },
-  {
-    "LangStringShortNameTypeIec61360",
-    DeserializeLangStringShortNameTypeIec61360<
-      types::IAbstractLangString
-    >
-  },
-  {
-    "LangStringTextType",
-    DeserializeLangStringTextType<
-      types::IAbstractLangString
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IAbstractLangString>
@@ -16341,11 +16346,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -16359,13 +16364,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeAbstractLangStringByModelType.find(*model_type);
-  if (it == kDeserializeAbstractLangStringByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IAbstractLangString "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -16379,7 +16385,46 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kLangStringDefinitionTypeIec61360:
+      return DeserializeLangStringDefinitionTypeIec61360<
+        types::IAbstractLangString
+      >(json, additional_properties);
+    case types::ModelType::kLangStringNameType:
+      return DeserializeLangStringNameType<
+        types::IAbstractLangString
+      >(json, additional_properties);
+    case types::ModelType::kLangStringPreferredNameTypeIec61360:
+      return DeserializeLangStringPreferredNameTypeIec61360<
+        types::IAbstractLangString
+      >(json, additional_properties);
+    case types::ModelType::kLangStringShortNameTypeIec61360:
+      return DeserializeLangStringShortNameTypeIec61360<
+        types::IAbstractLangString
+      >(json, additional_properties);
+    case types::ModelType::kLangStringTextType:
+      return DeserializeLangStringTextType<
+        types::IAbstractLangString
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IAbstractLangString "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IAbstractLangString> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInLangStringNameType = {
@@ -16915,23 +16960,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IDataSpecificationContent> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeDataSpecificationContentByModelType = {
-  {
-    "DataSpecificationIec61360",
-    DeserializeDataSpecificationIec61360<
-      types::IDataSpecificationContent
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IDataSpecificationContent>
@@ -16941,11 +16969,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -16959,13 +16987,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeDataSpecificationContentByModelType.find(*model_type);
-  if (it == kDeserializeDataSpecificationContentByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IDataSpecificationContent "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -16979,7 +17008,30 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kDataSpecificationIec61360:
+      return DeserializeDataSpecificationIec61360<
+        types::IDataSpecificationContent
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IDataSpecificationContent "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IDataSpecificationContent> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInEmbeddedDataSpecification = {
@@ -20648,6 +20700,15 @@ const iteration::Path& SerializationException::path() const noexcept {
 // endregion SerializationException
 
 /**
+ * Serialize the given boolean to a JSON value.
+ */
+nlohmann::json SerializeBool(
+  bool value
+) {
+  return value;
+}
+
+/**
  * \brief Serialize the given number to a JSON value.
  *
  * We verify that the integer is within the range representable by 64-bit floats
@@ -20687,6 +20748,15 @@ std::pair<
     common::make_optional<nlohmann::json>(value),
     common::nullopt
   );
+}
+
+/**
+ * Serialize the given floating-point number to a JSON value.
+ */
+nlohmann::json SerializeDouble(
+  double value
+) {
+  return value;
 }
 
 /**
@@ -20791,14 +20861,6 @@ nlohmann::json SerializeListWithInfallible(
   }
 
   return serialized;
-}
-
-/**
- * Just forward the value as it is.
- */
-template<typename T>
-const T& Identity(const T& value) {
-  return value;
 }
 
 std::pair<
@@ -22846,7 +22908,9 @@ std::pair<
     that.order_relevant()
   );
   if (that.order_relevant().has_value()) {
-    result["orderRelevant"] = *maybe_order_relevant;
+    result["orderRelevant"] = SerializeBool(
+      *maybe_order_relevant
+    );
   }
 
   const common::optional<
@@ -28001,13 +28065,21 @@ std::pair<
 ) {
   nlohmann::json result = nlohmann::json::object();
 
-  result["min"] = that.min();
+  result["min"] = SerializeBool(
+    that.min()
+  );
 
-  result["nom"] = that.nom();
+  result["nom"] = SerializeBool(
+    that.nom()
+  );
 
-  result["typ"] = that.typ();
+  result["typ"] = SerializeBool(
+    that.typ()
+  );
 
-  result["max"] = that.max();
+  result["max"] = SerializeBool(
+    that.max()
+  );
 
   return std::make_pair<
     common::optional<nlohmann::json>,

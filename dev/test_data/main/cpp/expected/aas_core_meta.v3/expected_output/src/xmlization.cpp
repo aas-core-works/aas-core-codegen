@@ -8333,7 +8333,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfExtension::kSemanticId:
+      case properties::OfExtension::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -8341,7 +8341,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfExtension::kSupplementalSemanticIds:
+      }
+      case properties::OfExtension::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -8352,25 +8353,29 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfExtension::kName:
+      }
+      case properties::OfExtension::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfExtension::kValueType:
+      }
+      case properties::OfExtension::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfExtension::kValue:
+      }
+      case properties::OfExtension::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfExtension::kRefersTo:
+      }
+      case properties::OfExtension::kRefersTo: {
         std::tie(
           the_refers_to,
           error
@@ -8381,6 +8386,7 @@ std::pair<
           ReferenceFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -8622,7 +8628,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications:
+      case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -8633,19 +8639,22 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfAdministrativeInformation::kVersion:
+      }
+      case properties::OfAdministrativeInformation::kVersion: {
         std::tie(
           the_version,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAdministrativeInformation::kRevision:
+      }
+      case properties::OfAdministrativeInformation::kRevision: {
         std::tie(
           the_revision,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAdministrativeInformation::kCreator:
+      }
+      case properties::OfAdministrativeInformation::kCreator: {
         std::tie(
           the_creator,
           error
@@ -8653,12 +8662,14 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAdministrativeInformation::kTemplateId:
+      }
+      case properties::OfAdministrativeInformation::kTemplateId: {
         std::tie(
           the_template_id,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -8893,7 +8904,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfQualifier::kSemanticId:
+      case properties::OfQualifier::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -8901,7 +8912,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfQualifier::kSupplementalSemanticIds:
+      }
+      case properties::OfQualifier::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -8912,31 +8924,36 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfQualifier::kKind:
+      }
+      case properties::OfQualifier::kKind: {
         std::tie(
           the_kind,
           error
         ) = DeserializeQualifierKind(reader);
         break;
-      case properties::OfQualifier::kType:
+      }
+      case properties::OfQualifier::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQualifier::kValueType:
+      }
+      case properties::OfQualifier::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfQualifier::kValue:
+      }
+      case properties::OfQualifier::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQualifier::kValueId:
+      }
+      case properties::OfQualifier::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -8944,6 +8961,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -9224,7 +9242,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAssetAdministrationShell::kExtensions:
+      case properties::OfAssetAdministrationShell::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -9235,19 +9253,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kCategory:
+      }
+      case properties::OfAssetAdministrationShell::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kIdShort:
+      }
+      case properties::OfAssetAdministrationShell::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kDisplayName:
+      }
+      case properties::OfAssetAdministrationShell::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -9258,7 +9279,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kDescription:
+      }
+      case properties::OfAssetAdministrationShell::kDescription: {
         std::tie(
           the_description,
           error
@@ -9269,7 +9291,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kAdministration:
+      }
+      case properties::OfAssetAdministrationShell::kAdministration: {
         std::tie(
           the_administration,
           error
@@ -9277,13 +9300,15 @@ std::pair<
           types::IAdministrativeInformation
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kId:
+      }
+      case properties::OfAssetAdministrationShell::kId: {
         std::tie(
           the_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications:
+      }
+      case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -9294,7 +9319,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfAssetAdministrationShell::kDerivedFrom:
+      }
+      case properties::OfAssetAdministrationShell::kDerivedFrom: {
         std::tie(
           the_derived_from,
           error
@@ -9302,7 +9328,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kAssetInformation:
+      }
+      case properties::OfAssetAdministrationShell::kAssetInformation: {
         std::tie(
           the_asset_information,
           error
@@ -9310,7 +9337,8 @@ std::pair<
           types::IAssetInformation
         >(reader);
         break;
-      case properties::OfAssetAdministrationShell::kSubmodels:
+      }
+      case properties::OfAssetAdministrationShell::kSubmodels: {
         std::tie(
           the_submodels,
           error
@@ -9321,6 +9349,7 @@ std::pair<
           ReferenceFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -9575,19 +9604,21 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAssetInformation::kAssetKind:
+      case properties::OfAssetInformation::kAssetKind: {
         std::tie(
           the_asset_kind,
           error
         ) = DeserializeAssetKind(reader);
         break;
-      case properties::OfAssetInformation::kGlobalAssetId:
+      }
+      case properties::OfAssetInformation::kGlobalAssetId: {
         std::tie(
           the_global_asset_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetInformation::kSpecificAssetIds:
+      }
+      case properties::OfAssetInformation::kSpecificAssetIds: {
         std::tie(
           the_specific_asset_ids,
           error
@@ -9598,13 +9629,15 @@ std::pair<
           SpecificAssetIdFromElement
         );
         break;
-      case properties::OfAssetInformation::kAssetType:
+      }
+      case properties::OfAssetInformation::kAssetType: {
         std::tie(
           the_asset_type,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAssetInformation::kDefaultThumbnail:
+      }
+      case properties::OfAssetInformation::kDefaultThumbnail: {
         std::tie(
           the_default_thumbnail,
           error
@@ -9612,6 +9645,7 @@ std::pair<
           types::IResource
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -9840,18 +9874,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfResource::kPath:
+      case properties::OfResource::kPath: {
         std::tie(
           the_path,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfResource::kContentType:
+      }
+      case properties::OfResource::kContentType: {
         std::tie(
           the_content_type,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -10091,7 +10127,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSpecificAssetId::kSemanticId:
+      case properties::OfSpecificAssetId::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -10099,7 +10135,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSpecificAssetId::kSupplementalSemanticIds:
+      }
+      case properties::OfSpecificAssetId::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -10110,19 +10147,22 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSpecificAssetId::kName:
+      }
+      case properties::OfSpecificAssetId::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSpecificAssetId::kValue:
+      }
+      case properties::OfSpecificAssetId::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSpecificAssetId::kExternalSubjectId:
+      }
+      case properties::OfSpecificAssetId::kExternalSubjectId: {
         std::tie(
           the_external_subject_id,
           error
@@ -10130,6 +10170,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -10420,7 +10461,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodel::kExtensions:
+      case properties::OfSubmodel::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -10431,19 +10472,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfSubmodel::kCategory:
+      }
+      case properties::OfSubmodel::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kIdShort:
+      }
+      case properties::OfSubmodel::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kDisplayName:
+      }
+      case properties::OfSubmodel::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -10454,7 +10498,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfSubmodel::kDescription:
+      }
+      case properties::OfSubmodel::kDescription: {
         std::tie(
           the_description,
           error
@@ -10465,7 +10510,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfSubmodel::kAdministration:
+      }
+      case properties::OfSubmodel::kAdministration: {
         std::tie(
           the_administration,
           error
@@ -10473,19 +10519,22 @@ std::pair<
           types::IAdministrativeInformation
         >(reader);
         break;
-      case properties::OfSubmodel::kId:
+      }
+      case properties::OfSubmodel::kId: {
         std::tie(
           the_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodel::kKind:
+      }
+      case properties::OfSubmodel::kKind: {
         std::tie(
           the_kind,
           error
         ) = DeserializeModellingKind(reader);
         break;
-      case properties::OfSubmodel::kSemanticId:
+      }
+      case properties::OfSubmodel::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -10493,7 +10542,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodel::kSupplementalSemanticIds:
+      }
+      case properties::OfSubmodel::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -10504,7 +10554,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSubmodel::kQualifiers:
+      }
+      case properties::OfSubmodel::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -10515,7 +10566,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfSubmodel::kEmbeddedDataSpecifications:
+      }
+      case properties::OfSubmodel::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -10526,7 +10578,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfSubmodel::kSubmodelElements:
+      }
+      case properties::OfSubmodel::kSubmodelElements: {
         std::tie(
           the_submodel_elements,
           error
@@ -10537,6 +10590,7 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -10817,7 +10871,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfRelationshipElement::kExtensions:
+      case properties::OfRelationshipElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -10828,19 +10882,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfRelationshipElement::kCategory:
+      }
+      case properties::OfRelationshipElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRelationshipElement::kIdShort:
+      }
+      case properties::OfRelationshipElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRelationshipElement::kDisplayName:
+      }
+      case properties::OfRelationshipElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -10851,7 +10908,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfRelationshipElement::kDescription:
+      }
+      case properties::OfRelationshipElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -10862,7 +10920,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfRelationshipElement::kSemanticId:
+      }
+      case properties::OfRelationshipElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -10870,7 +10929,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRelationshipElement::kSupplementalSemanticIds:
+      }
+      case properties::OfRelationshipElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -10881,7 +10941,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfRelationshipElement::kQualifiers:
+      }
+      case properties::OfRelationshipElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -10892,7 +10953,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfRelationshipElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfRelationshipElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -10903,7 +10965,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfRelationshipElement::kFirst:
+      }
+      case properties::OfRelationshipElement::kFirst: {
         std::tie(
           the_first,
           error
@@ -10911,7 +10974,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRelationshipElement::kSecond:
+      }
+      case properties::OfRelationshipElement::kSecond: {
         std::tie(
           the_second,
           error
@@ -10919,6 +10983,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -11217,7 +11282,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodelElementList::kExtensions:
+      case properties::OfSubmodelElementList::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -11228,19 +11293,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kCategory:
+      }
+      case properties::OfSubmodelElementList::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementList::kIdShort:
+      }
+      case properties::OfSubmodelElementList::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementList::kDisplayName:
+      }
+      case properties::OfSubmodelElementList::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -11251,7 +11319,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kDescription:
+      }
+      case properties::OfSubmodelElementList::kDescription: {
         std::tie(
           the_description,
           error
@@ -11262,7 +11331,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kSemanticId:
+      }
+      case properties::OfSubmodelElementList::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -11270,7 +11340,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementList::kSupplementalSemanticIds:
+      }
+      case properties::OfSubmodelElementList::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -11281,7 +11352,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kQualifiers:
+      }
+      case properties::OfSubmodelElementList::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -11292,7 +11364,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kEmbeddedDataSpecifications:
+      }
+      case properties::OfSubmodelElementList::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -11303,13 +11376,15 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfSubmodelElementList::kOrderRelevant:
+      }
+      case properties::OfSubmodelElementList::kOrderRelevant: {
         std::tie(
           the_order_relevant,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfSubmodelElementList::kSemanticIdListElement:
+      }
+      case properties::OfSubmodelElementList::kSemanticIdListElement: {
         std::tie(
           the_semantic_id_list_element,
           error
@@ -11317,19 +11392,22 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementList::kTypeValueListElement:
+      }
+      case properties::OfSubmodelElementList::kTypeValueListElement: {
         std::tie(
           the_type_value_list_element,
           error
         ) = DeserializeAasSubmodelElements(reader);
         break;
-      case properties::OfSubmodelElementList::kValueTypeListElement:
+      }
+      case properties::OfSubmodelElementList::kValueTypeListElement: {
         std::tie(
           the_value_type_list_element,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfSubmodelElementList::kValue:
+      }
+      case properties::OfSubmodelElementList::kValue: {
         std::tie(
           the_value,
           error
@@ -11340,6 +11418,7 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -11623,7 +11702,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSubmodelElementCollection::kExtensions:
+      case properties::OfSubmodelElementCollection::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -11634,19 +11713,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kCategory:
+      }
+      case properties::OfSubmodelElementCollection::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementCollection::kIdShort:
+      }
+      case properties::OfSubmodelElementCollection::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSubmodelElementCollection::kDisplayName:
+      }
+      case properties::OfSubmodelElementCollection::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -11657,7 +11739,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kDescription:
+      }
+      case properties::OfSubmodelElementCollection::kDescription: {
         std::tie(
           the_description,
           error
@@ -11668,7 +11751,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kSemanticId:
+      }
+      case properties::OfSubmodelElementCollection::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -11676,7 +11760,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfSubmodelElementCollection::kSupplementalSemanticIds:
+      }
+      case properties::OfSubmodelElementCollection::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -11687,7 +11772,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kQualifiers:
+      }
+      case properties::OfSubmodelElementCollection::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -11698,7 +11784,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications:
+      }
+      case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -11709,7 +11796,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfSubmodelElementCollection::kValue:
+      }
+      case properties::OfSubmodelElementCollection::kValue: {
         std::tie(
           the_value,
           error
@@ -11720,6 +11808,7 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -11989,7 +12078,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfProperty::kExtensions:
+      case properties::OfProperty::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -12000,19 +12089,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfProperty::kCategory:
+      }
+      case properties::OfProperty::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kIdShort:
+      }
+      case properties::OfProperty::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kDisplayName:
+      }
+      case properties::OfProperty::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -12023,7 +12115,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfProperty::kDescription:
+      }
+      case properties::OfProperty::kDescription: {
         std::tie(
           the_description,
           error
@@ -12034,7 +12127,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfProperty::kSemanticId:
+      }
+      case properties::OfProperty::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -12042,7 +12136,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfProperty::kSupplementalSemanticIds:
+      }
+      case properties::OfProperty::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -12053,7 +12148,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfProperty::kQualifiers:
+      }
+      case properties::OfProperty::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -12064,7 +12160,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfProperty::kEmbeddedDataSpecifications:
+      }
+      case properties::OfProperty::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -12075,19 +12172,22 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfProperty::kValueType:
+      }
+      case properties::OfProperty::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfProperty::kValue:
+      }
+      case properties::OfProperty::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfProperty::kValueId:
+      }
+      case properties::OfProperty::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -12095,6 +12195,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -12380,7 +12481,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfMultiLanguageProperty::kExtensions:
+      case properties::OfMultiLanguageProperty::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -12391,19 +12492,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kCategory:
+      }
+      case properties::OfMultiLanguageProperty::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfMultiLanguageProperty::kIdShort:
+      }
+      case properties::OfMultiLanguageProperty::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfMultiLanguageProperty::kDisplayName:
+      }
+      case properties::OfMultiLanguageProperty::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -12414,7 +12518,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kDescription:
+      }
+      case properties::OfMultiLanguageProperty::kDescription: {
         std::tie(
           the_description,
           error
@@ -12425,7 +12530,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kSemanticId:
+      }
+      case properties::OfMultiLanguageProperty::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -12433,7 +12539,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfMultiLanguageProperty::kSupplementalSemanticIds:
+      }
+      case properties::OfMultiLanguageProperty::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -12444,7 +12551,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kQualifiers:
+      }
+      case properties::OfMultiLanguageProperty::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -12455,7 +12563,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications:
+      }
+      case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -12466,7 +12575,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kValue:
+      }
+      case properties::OfMultiLanguageProperty::kValue: {
         std::tie(
           the_value,
           error
@@ -12477,7 +12587,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfMultiLanguageProperty::kValueId:
+      }
+      case properties::OfMultiLanguageProperty::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -12485,6 +12596,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -12753,7 +12865,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfRange::kExtensions:
+      case properties::OfRange::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -12764,19 +12876,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfRange::kCategory:
+      }
+      case properties::OfRange::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kIdShort:
+      }
+      case properties::OfRange::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kDisplayName:
+      }
+      case properties::OfRange::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -12787,7 +12902,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfRange::kDescription:
+      }
+      case properties::OfRange::kDescription: {
         std::tie(
           the_description,
           error
@@ -12798,7 +12914,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfRange::kSemanticId:
+      }
+      case properties::OfRange::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -12806,7 +12923,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfRange::kSupplementalSemanticIds:
+      }
+      case properties::OfRange::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -12817,7 +12935,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfRange::kQualifiers:
+      }
+      case properties::OfRange::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -12828,7 +12947,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfRange::kEmbeddedDataSpecifications:
+      }
+      case properties::OfRange::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -12839,24 +12959,28 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfRange::kValueType:
+      }
+      case properties::OfRange::kValueType: {
         std::tie(
           the_value_type,
           error
         ) = DeserializeDataTypeDefXsd(reader);
         break;
-      case properties::OfRange::kMin:
+      }
+      case properties::OfRange::kMin: {
         std::tie(
           the_min,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfRange::kMax:
+      }
+      case properties::OfRange::kMax: {
         std::tie(
           the_max,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -13136,7 +13260,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfReferenceElement::kExtensions:
+      case properties::OfReferenceElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -13147,19 +13271,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfReferenceElement::kCategory:
+      }
+      case properties::OfReferenceElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfReferenceElement::kIdShort:
+      }
+      case properties::OfReferenceElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfReferenceElement::kDisplayName:
+      }
+      case properties::OfReferenceElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -13170,7 +13297,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfReferenceElement::kDescription:
+      }
+      case properties::OfReferenceElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -13181,7 +13309,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfReferenceElement::kSemanticId:
+      }
+      case properties::OfReferenceElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -13189,7 +13318,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfReferenceElement::kSupplementalSemanticIds:
+      }
+      case properties::OfReferenceElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -13200,7 +13330,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfReferenceElement::kQualifiers:
+      }
+      case properties::OfReferenceElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -13211,7 +13342,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfReferenceElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfReferenceElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -13222,7 +13354,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfReferenceElement::kValue:
+      }
+      case properties::OfReferenceElement::kValue: {
         std::tie(
           the_value,
           error
@@ -13230,6 +13363,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -13497,7 +13631,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBlob::kExtensions:
+      case properties::OfBlob::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -13508,19 +13642,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfBlob::kCategory:
+      }
+      case properties::OfBlob::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlob::kIdShort:
+      }
+      case properties::OfBlob::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlob::kDisplayName:
+      }
+      case properties::OfBlob::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -13531,7 +13668,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfBlob::kDescription:
+      }
+      case properties::OfBlob::kDescription: {
         std::tie(
           the_description,
           error
@@ -13542,7 +13680,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfBlob::kSemanticId:
+      }
+      case properties::OfBlob::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -13550,7 +13689,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBlob::kSupplementalSemanticIds:
+      }
+      case properties::OfBlob::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -13561,7 +13701,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfBlob::kQualifiers:
+      }
+      case properties::OfBlob::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -13572,7 +13713,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfBlob::kEmbeddedDataSpecifications:
+      }
+      case properties::OfBlob::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -13583,18 +13725,21 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfBlob::kValue:
+      }
+      case properties::OfBlob::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeByteArray(reader);
         break;
-      case properties::OfBlob::kContentType:
+      }
+      case properties::OfBlob::kContentType: {
         std::tie(
           the_content_type,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -13873,7 +14018,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfFile::kExtensions:
+      case properties::OfFile::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -13884,19 +14029,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfFile::kCategory:
+      }
+      case properties::OfFile::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kIdShort:
+      }
+      case properties::OfFile::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kDisplayName:
+      }
+      case properties::OfFile::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -13907,7 +14055,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfFile::kDescription:
+      }
+      case properties::OfFile::kDescription: {
         std::tie(
           the_description,
           error
@@ -13918,7 +14067,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfFile::kSemanticId:
+      }
+      case properties::OfFile::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -13926,7 +14076,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfFile::kSupplementalSemanticIds:
+      }
+      case properties::OfFile::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -13937,7 +14088,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfFile::kQualifiers:
+      }
+      case properties::OfFile::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -13948,7 +14100,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfFile::kEmbeddedDataSpecifications:
+      }
+      case properties::OfFile::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -13959,18 +14112,21 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfFile::kValue:
+      }
+      case properties::OfFile::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfFile::kContentType:
+      }
+      case properties::OfFile::kContentType: {
         std::tie(
           the_content_type,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -14255,7 +14411,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAnnotatedRelationshipElement::kExtensions:
+      case properties::OfAnnotatedRelationshipElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -14266,19 +14422,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kCategory:
+      }
+      case properties::OfAnnotatedRelationshipElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kIdShort:
+      }
+      case properties::OfAnnotatedRelationshipElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kDisplayName:
+      }
+      case properties::OfAnnotatedRelationshipElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -14289,7 +14448,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kDescription:
+      }
+      case properties::OfAnnotatedRelationshipElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -14300,7 +14460,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kSemanticId:
+      }
+      case properties::OfAnnotatedRelationshipElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -14308,7 +14469,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds:
+      }
+      case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -14319,7 +14481,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kQualifiers:
+      }
+      case properties::OfAnnotatedRelationshipElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -14330,7 +14493,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -14341,7 +14505,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfAnnotatedRelationshipElement::kFirst:
+      }
+      case properties::OfAnnotatedRelationshipElement::kFirst: {
         std::tie(
           the_first,
           error
@@ -14349,7 +14514,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kSecond:
+      }
+      case properties::OfAnnotatedRelationshipElement::kSecond: {
         std::tie(
           the_second,
           error
@@ -14357,7 +14523,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfAnnotatedRelationshipElement::kAnnotations:
+      }
+      case properties::OfAnnotatedRelationshipElement::kAnnotations: {
         std::tie(
           the_annotations,
           error
@@ -14368,6 +14535,7 @@ std::pair<
           DataElementFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -14667,7 +14835,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEntity::kExtensions:
+      case properties::OfEntity::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -14678,19 +14846,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfEntity::kCategory:
+      }
+      case properties::OfEntity::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kIdShort:
+      }
+      case properties::OfEntity::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kDisplayName:
+      }
+      case properties::OfEntity::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -14701,7 +14872,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfEntity::kDescription:
+      }
+      case properties::OfEntity::kDescription: {
         std::tie(
           the_description,
           error
@@ -14712,7 +14884,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfEntity::kSemanticId:
+      }
+      case properties::OfEntity::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -14720,7 +14893,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEntity::kSupplementalSemanticIds:
+      }
+      case properties::OfEntity::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -14731,7 +14905,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfEntity::kQualifiers:
+      }
+      case properties::OfEntity::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -14742,7 +14917,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfEntity::kEmbeddedDataSpecifications:
+      }
+      case properties::OfEntity::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -14753,7 +14929,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfEntity::kStatements:
+      }
+      case properties::OfEntity::kStatements: {
         std::tie(
           the_statements,
           error
@@ -14764,19 +14941,22 @@ std::pair<
           SubmodelElementFromElement
         );
         break;
-      case properties::OfEntity::kEntityType:
+      }
+      case properties::OfEntity::kEntityType: {
         std::tie(
           the_entity_type,
           error
         ) = DeserializeEntityType(reader);
         break;
-      case properties::OfEntity::kGlobalAssetId:
+      }
+      case properties::OfEntity::kGlobalAssetId: {
         std::tie(
           the_global_asset_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEntity::kSpecificAssetIds:
+      }
+      case properties::OfEntity::kSpecificAssetIds: {
         std::tie(
           the_specific_asset_ids,
           error
@@ -14787,6 +14967,7 @@ std::pair<
           SpecificAssetIdFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -15043,7 +15224,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEventPayload::kSource:
+      case properties::OfEventPayload::kSource: {
         std::tie(
           the_source,
           error
@@ -15051,7 +15232,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kSourceSemanticId:
+      }
+      case properties::OfEventPayload::kSourceSemanticId: {
         std::tie(
           the_source_semantic_id,
           error
@@ -15059,7 +15241,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kObservableReference:
+      }
+      case properties::OfEventPayload::kObservableReference: {
         std::tie(
           the_observable_reference,
           error
@@ -15067,7 +15250,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kObservableSemanticId:
+      }
+      case properties::OfEventPayload::kObservableSemanticId: {
         std::tie(
           the_observable_semantic_id,
           error
@@ -15075,13 +15259,15 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kTopic:
+      }
+      case properties::OfEventPayload::kTopic: {
         std::tie(
           the_topic,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEventPayload::kSubjectId:
+      }
+      case properties::OfEventPayload::kSubjectId: {
         std::tie(
           the_subject_id,
           error
@@ -15089,18 +15275,21 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEventPayload::kTimeStamp:
+      }
+      case properties::OfEventPayload::kTimeStamp: {
         std::tie(
           the_time_stamp,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfEventPayload::kPayload:
+      }
+      case properties::OfEventPayload::kPayload: {
         std::tie(
           the_payload,
           error
         ) = DeserializeByteArray(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -15406,7 +15595,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBasicEventElement::kExtensions:
+      case properties::OfBasicEventElement::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -15417,19 +15606,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfBasicEventElement::kCategory:
+      }
+      case properties::OfBasicEventElement::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kIdShort:
+      }
+      case properties::OfBasicEventElement::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kDisplayName:
+      }
+      case properties::OfBasicEventElement::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -15440,7 +15632,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfBasicEventElement::kDescription:
+      }
+      case properties::OfBasicEventElement::kDescription: {
         std::tie(
           the_description,
           error
@@ -15451,7 +15644,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfBasicEventElement::kSemanticId:
+      }
+      case properties::OfBasicEventElement::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -15459,7 +15653,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kSupplementalSemanticIds:
+      }
+      case properties::OfBasicEventElement::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -15470,7 +15665,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfBasicEventElement::kQualifiers:
+      }
+      case properties::OfBasicEventElement::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -15481,7 +15677,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfBasicEventElement::kEmbeddedDataSpecifications:
+      }
+      case properties::OfBasicEventElement::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -15492,7 +15689,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfBasicEventElement::kObserved:
+      }
+      case properties::OfBasicEventElement::kObserved: {
         std::tie(
           the_observed,
           error
@@ -15500,25 +15698,29 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kDirection:
+      }
+      case properties::OfBasicEventElement::kDirection: {
         std::tie(
           the_direction,
           error
         ) = DeserializeDirection(reader);
         break;
-      case properties::OfBasicEventElement::kState:
+      }
+      case properties::OfBasicEventElement::kState: {
         std::tie(
           the_state,
           error
         ) = DeserializeStateOfEvent(reader);
         break;
-      case properties::OfBasicEventElement::kMessageTopic:
+      }
+      case properties::OfBasicEventElement::kMessageTopic: {
         std::tie(
           the_message_topic,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kMessageBroker:
+      }
+      case properties::OfBasicEventElement::kMessageBroker: {
         std::tie(
           the_message_broker,
           error
@@ -15526,24 +15728,28 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfBasicEventElement::kLastUpdate:
+      }
+      case properties::OfBasicEventElement::kLastUpdate: {
         std::tie(
           the_last_update,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kMinInterval:
+      }
+      case properties::OfBasicEventElement::kMinInterval: {
         std::tie(
           the_min_interval,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBasicEventElement::kMaxInterval:
+      }
+      case properties::OfBasicEventElement::kMaxInterval: {
         std::tie(
           the_max_interval,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -15858,7 +16064,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfOperation::kExtensions:
+      case properties::OfOperation::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -15869,19 +16075,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfOperation::kCategory:
+      }
+      case properties::OfOperation::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfOperation::kIdShort:
+      }
+      case properties::OfOperation::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfOperation::kDisplayName:
+      }
+      case properties::OfOperation::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -15892,7 +16101,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfOperation::kDescription:
+      }
+      case properties::OfOperation::kDescription: {
         std::tie(
           the_description,
           error
@@ -15903,7 +16113,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfOperation::kSemanticId:
+      }
+      case properties::OfOperation::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -15911,7 +16122,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfOperation::kSupplementalSemanticIds:
+      }
+      case properties::OfOperation::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -15922,7 +16134,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfOperation::kQualifiers:
+      }
+      case properties::OfOperation::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -15933,7 +16146,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfOperation::kEmbeddedDataSpecifications:
+      }
+      case properties::OfOperation::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -15944,7 +16158,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfOperation::kInputVariables:
+      }
+      case properties::OfOperation::kInputVariables: {
         std::tie(
           the_input_variables,
           error
@@ -15955,7 +16170,8 @@ std::pair<
           OperationVariableFromElement
         );
         break;
-      case properties::OfOperation::kOutputVariables:
+      }
+      case properties::OfOperation::kOutputVariables: {
         std::tie(
           the_output_variables,
           error
@@ -15966,7 +16182,8 @@ std::pair<
           OperationVariableFromElement
         );
         break;
-      case properties::OfOperation::kInoutputVariables:
+      }
+      case properties::OfOperation::kInoutputVariables: {
         std::tie(
           the_inoutput_variables,
           error
@@ -15977,6 +16194,7 @@ std::pair<
           OperationVariableFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16198,12 +16416,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfOperationVariable::kValue:
+      case properties::OfOperationVariable::kValue: {
         std::tie(
           the_value,
           error
         ) = SubmodelElementFromElement(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16468,7 +16687,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfCapability::kExtensions:
+      case properties::OfCapability::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -16479,19 +16698,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfCapability::kCategory:
+      }
+      case properties::OfCapability::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfCapability::kIdShort:
+      }
+      case properties::OfCapability::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfCapability::kDisplayName:
+      }
+      case properties::OfCapability::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -16502,7 +16724,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfCapability::kDescription:
+      }
+      case properties::OfCapability::kDescription: {
         std::tie(
           the_description,
           error
@@ -16513,7 +16736,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfCapability::kSemanticId:
+      }
+      case properties::OfCapability::kSemanticId: {
         std::tie(
           the_semantic_id,
           error
@@ -16521,7 +16745,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfCapability::kSupplementalSemanticIds:
+      }
+      case properties::OfCapability::kSupplementalSemanticIds: {
         std::tie(
           the_supplemental_semantic_ids,
           error
@@ -16532,7 +16757,8 @@ std::pair<
           ReferenceFromElement
         );
         break;
-      case properties::OfCapability::kQualifiers:
+      }
+      case properties::OfCapability::kQualifiers: {
         std::tie(
           the_qualifiers,
           error
@@ -16543,7 +16769,8 @@ std::pair<
           QualifierFromElement
         );
         break;
-      case properties::OfCapability::kEmbeddedDataSpecifications:
+      }
+      case properties::OfCapability::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -16554,6 +16781,7 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -16810,7 +17038,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfConceptDescription::kExtensions:
+      case properties::OfConceptDescription::kExtensions: {
         std::tie(
           the_extensions,
           error
@@ -16821,19 +17049,22 @@ std::pair<
           ExtensionFromElement
         );
         break;
-      case properties::OfConceptDescription::kCategory:
+      }
+      case properties::OfConceptDescription::kCategory: {
         std::tie(
           the_category,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kIdShort:
+      }
+      case properties::OfConceptDescription::kIdShort: {
         std::tie(
           the_id_short,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kDisplayName:
+      }
+      case properties::OfConceptDescription::kDisplayName: {
         std::tie(
           the_display_name,
           error
@@ -16844,7 +17075,8 @@ std::pair<
           LangStringNameTypeFromElement
         );
         break;
-      case properties::OfConceptDescription::kDescription:
+      }
+      case properties::OfConceptDescription::kDescription: {
         std::tie(
           the_description,
           error
@@ -16855,7 +17087,8 @@ std::pair<
           LangStringTextTypeFromElement
         );
         break;
-      case properties::OfConceptDescription::kAdministration:
+      }
+      case properties::OfConceptDescription::kAdministration: {
         std::tie(
           the_administration,
           error
@@ -16863,13 +17096,15 @@ std::pair<
           types::IAdministrativeInformation
         >(reader);
         break;
-      case properties::OfConceptDescription::kId:
+      }
+      case properties::OfConceptDescription::kId: {
         std::tie(
           the_id,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfConceptDescription::kEmbeddedDataSpecifications:
+      }
+      case properties::OfConceptDescription::kEmbeddedDataSpecifications: {
         std::tie(
           the_embedded_data_specifications,
           error
@@ -16880,7 +17115,8 @@ std::pair<
           EmbeddedDataSpecificationFromElement
         );
         break;
-      case properties::OfConceptDescription::kIsCaseOf:
+      }
+      case properties::OfConceptDescription::kIsCaseOf: {
         std::tie(
           the_is_case_of,
           error
@@ -16891,6 +17127,7 @@ std::pair<
           ReferenceFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17131,13 +17368,14 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfReference::kType:
+      case properties::OfReference::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeReferenceTypes(reader);
         break;
-      case properties::OfReference::kReferredSemanticId:
+      }
+      case properties::OfReference::kReferredSemanticId: {
         std::tie(
           the_referred_semantic_id,
           error
@@ -17145,7 +17383,8 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfReference::kKeys:
+      }
+      case properties::OfReference::kKeys: {
         std::tie(
           the_keys,
           error
@@ -17156,6 +17395,7 @@ std::pair<
           KeyFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17390,18 +17630,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfKey::kType:
+      case properties::OfKey::kType: {
         std::tie(
           the_type,
           error
         ) = DeserializeKeyTypes(reader);
         break;
-      case properties::OfKey::kValue:
+      }
+      case properties::OfKey::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17635,18 +17877,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringNameType::kLanguage:
+      case properties::OfLangStringNameType::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringNameType::kText:
+      }
+      case properties::OfLangStringNameType::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -17880,18 +18124,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringTextType::kLanguage:
+      case properties::OfLangStringTextType::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringTextType::kText:
+      }
+      case properties::OfLangStringTextType::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18139,7 +18385,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEnvironment::kAssetAdministrationShells:
+      case properties::OfEnvironment::kAssetAdministrationShells: {
         std::tie(
           the_asset_administration_shells,
           error
@@ -18150,7 +18396,8 @@ std::pair<
           AssetAdministrationShellFromElement
         );
         break;
-      case properties::OfEnvironment::kSubmodels:
+      }
+      case properties::OfEnvironment::kSubmodels: {
         std::tie(
           the_submodels,
           error
@@ -18161,7 +18408,8 @@ std::pair<
           SubmodelFromElement
         );
         break;
-      case properties::OfEnvironment::kConceptDescriptions:
+      }
+      case properties::OfEnvironment::kConceptDescriptions: {
         std::tie(
           the_concept_descriptions,
           error
@@ -18172,6 +18420,7 @@ std::pair<
           ConceptDescriptionFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18386,7 +18635,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfEmbeddedDataSpecification::kDataSpecification:
+      case properties::OfEmbeddedDataSpecification::kDataSpecification: {
         std::tie(
           the_data_specification,
           error
@@ -18394,12 +18643,14 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfEmbeddedDataSpecification::kDataSpecificationContent:
+      }
+      case properties::OfEmbeddedDataSpecification::kDataSpecificationContent: {
         std::tie(
           the_data_specification_content,
           error
         ) = DataSpecificationContentFromElement(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18637,30 +18888,34 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLevelType::kMin:
+      case properties::OfLevelType::kMin: {
         std::tie(
           the_min,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfLevelType::kNom:
+      }
+      case properties::OfLevelType::kNom: {
         std::tie(
           the_nom,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfLevelType::kTyp:
+      }
+      case properties::OfLevelType::kTyp: {
         std::tie(
           the_typ,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfLevelType::kMax:
+      }
+      case properties::OfLevelType::kMax: {
         std::tie(
           the_max,
           error
         ) = DeserializeBool(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -18912,13 +19167,14 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfValueReferencePair::kValue:
+      case properties::OfValueReferencePair::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfValueReferencePair::kValueId:
+      }
+      case properties::OfValueReferencePair::kValueId: {
         std::tie(
           the_value_id,
           error
@@ -18926,6 +19182,7 @@ std::pair<
           types::IReference
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19161,7 +19418,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfValueList::kValueReferencePairs:
+      case properties::OfValueList::kValueReferencePairs: {
         std::tie(
           the_value_reference_pairs,
           error
@@ -19172,6 +19429,7 @@ std::pair<
           ValueReferencePairFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19396,18 +19654,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringPreferredNameTypeIec61360::kLanguage:
+      case properties::OfLangStringPreferredNameTypeIec61360::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringPreferredNameTypeIec61360::kText:
+      }
+      case properties::OfLangStringPreferredNameTypeIec61360::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19641,18 +19901,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringShortNameTypeIec61360::kLanguage:
+      case properties::OfLangStringShortNameTypeIec61360::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringShortNameTypeIec61360::kText:
+      }
+      case properties::OfLangStringShortNameTypeIec61360::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -19886,18 +20148,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLangStringDefinitionTypeIec61360::kLanguage:
+      case properties::OfLangStringDefinitionTypeIec61360::kLanguage: {
         std::tie(
           the_language,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLangStringDefinitionTypeIec61360::kText:
+      }
+      case properties::OfLangStringDefinitionTypeIec61360::kText: {
         std::tie(
           the_text,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -20169,7 +20433,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfDataSpecificationIec61360::kPreferredName:
+      case properties::OfDataSpecificationIec61360::kPreferredName: {
         std::tie(
           the_preferred_name,
           error
@@ -20180,7 +20444,8 @@ std::pair<
           LangStringPreferredNameTypeIec61360FromElement
         );
         break;
-      case properties::OfDataSpecificationIec61360::kShortName:
+      }
+      case properties::OfDataSpecificationIec61360::kShortName: {
         std::tie(
           the_short_name,
           error
@@ -20191,13 +20456,15 @@ std::pair<
           LangStringShortNameTypeIec61360FromElement
         );
         break;
-      case properties::OfDataSpecificationIec61360::kUnit:
+      }
+      case properties::OfDataSpecificationIec61360::kUnit: {
         std::tie(
           the_unit,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kUnitId:
+      }
+      case properties::OfDataSpecificationIec61360::kUnitId: {
         std::tie(
           the_unit_id,
           error
@@ -20205,25 +20472,29 @@ std::pair<
           types::IReference
         >(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kSourceOfDefinition:
+      }
+      case properties::OfDataSpecificationIec61360::kSourceOfDefinition: {
         std::tie(
           the_source_of_definition,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kSymbol:
+      }
+      case properties::OfDataSpecificationIec61360::kSymbol: {
         std::tie(
           the_symbol,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kDataType:
+      }
+      case properties::OfDataSpecificationIec61360::kDataType: {
         std::tie(
           the_data_type,
           error
         ) = DeserializeDataTypeIec61360(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kDefinition:
+      }
+      case properties::OfDataSpecificationIec61360::kDefinition: {
         std::tie(
           the_definition,
           error
@@ -20234,13 +20505,15 @@ std::pair<
           LangStringDefinitionTypeIec61360FromElement
         );
         break;
-      case properties::OfDataSpecificationIec61360::kValueFormat:
+      }
+      case properties::OfDataSpecificationIec61360::kValueFormat: {
         std::tie(
           the_value_format,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kValueList:
+      }
+      case properties::OfDataSpecificationIec61360::kValueList: {
         std::tie(
           the_value_list,
           error
@@ -20248,13 +20521,15 @@ std::pair<
           types::IValueList
         >(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kValue:
+      }
+      case properties::OfDataSpecificationIec61360::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfDataSpecificationIec61360::kLevelType:
+      }
+      case properties::OfDataSpecificationIec61360::kLevelType: {
         std::tie(
           the_level_type,
           error
@@ -20262,6 +20537,7 @@ std::pair<
           types::ILevelType
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -23758,6 +24034,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * Serialize a list of instances.
  */
 template <typename T, typename SerializeT>
@@ -25617,217 +25929,87 @@ common::optional<SerializationError> SerializeExtensionAsSequence(
   common::optional<SerializationError> error;
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "name",
     that.name(),
-    writer
+    writer,
+    iteration::Property::kName,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
     return error;
   }
 
   if (that.value_type().has_value()) {
-    writer.StartElement(
-      "valueType"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeDataTypeDefXsd(
+    error = SerializePropertyAsElement(
+      "valueType",
       *(that.value_type()),
-      writer
+      writer,
+      iteration::Property::kValueType,
+      SerializeDataTypeDefXsd
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueType
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueType"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueType
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
   if (that.refers_to().has_value()) {
-    writer.StartElement(
-      "refersTo"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "refersTo",
       *(that.refers_to()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kRefersTo,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kRefersTo
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "refersTo"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kRefersTo
-        )
-      );
-
       return error;
     }
   }
@@ -26421,182 +26603,71 @@ common::optional<SerializationError> SerializeAdministrativeInformationAsSequenc
   common::optional<SerializationError> error;
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.version().has_value()) {
-    writer.StartElement(
-      "version"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "version",
       *(that.version()),
-      writer
+      writer,
+      iteration::Property::kVersion,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kVersion
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "version"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kVersion
-        )
-      );
-
       return error;
     }
   }
 
   if (that.revision().has_value()) {
-    writer.StartElement(
-      "revision"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "revision",
       *(that.revision()),
-      writer
+      writer,
+      iteration::Property::kRevision,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kRevision
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "revision"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kRevision
-        )
-      );
-
       return error;
     }
   }
 
   if (that.creator().has_value()) {
-    writer.StartElement(
-      "creator"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "creator",
       *(*(that.creator())),
-      writer
+      writer,
+      iteration::Property::kCreator,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCreator
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "creator"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCreator
-        )
-      );
-
       return error;
     }
   }
 
   if (that.template_id().has_value()) {
-    writer.StartElement(
-      "templateId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "templateId",
       *(that.template_id()),
-      writer
+      writer,
+      iteration::Property::kTemplateId,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kTemplateId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "templateId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kTemplateId
-        )
-      );
-
       return error;
     }
   }
@@ -26799,250 +26870,93 @@ common::optional<SerializationError> SerializeQualifierAsSequence(
   common::optional<SerializationError> error;
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.kind().has_value()) {
-    writer.StartElement(
-      "kind"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeQualifierKind(
+    error = SerializePropertyAsElement(
+      "kind",
       *(that.kind()),
-      writer
+      writer,
+      iteration::Property::kKind,
+      SerializeQualifierKind
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kKind
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "kind"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kKind
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "type"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "type",
     that.type(),
-    writer
+    writer,
+    iteration::Property::kType,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "type"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kType
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "valueType"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeDataTypeDefXsd(
+  error = SerializePropertyAsElement(
+    "valueType",
     that.value_type(),
-    writer
+    writer,
+    iteration::Property::kValueType,
+    SerializeDataTypeDefXsd
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "valueType"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueType
-      )
-    );
-
     return error;
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value_id().has_value()) {
-    writer.StartElement(
-      "valueId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "valueId",
       *(*(that.value_id())),
-      writer
+      writer,
+      iteration::Property::kValueId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueId
-        )
-      );
-
       return error;
     }
   }
@@ -27114,398 +27028,165 @@ common::optional<SerializationError> SerializeAssetAdministrationShellAsSequence
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.administration().has_value()) {
-    writer.StartElement(
-      "administration"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeAdministrativeInformationAsSequence(
+    error = SerializePropertyAsElement(
+      "administration",
       *(*(that.administration())),
-      writer
+      writer,
+      iteration::Property::kAdministration,
+      SerializeAdministrativeInformationAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAdministration
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "administration"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAdministration
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "id"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "id",
     that.id(),
-    writer
+    writer,
+    iteration::Property::kId,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kId
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "id"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kId
-      )
-    );
-
     return error;
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.derived_from().has_value()) {
-    writer.StartElement(
-      "derivedFrom"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "derivedFrom",
       *(*(that.derived_from())),
-      writer
+      writer,
+      iteration::Property::kDerivedFrom,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDerivedFrom
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "derivedFrom"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDerivedFrom
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "assetInformation"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeAssetInformationAsSequence(
+  error = SerializePropertyAsElement(
+    "assetInformation",
     *(that.asset_information()),
-    writer
+    writer,
+    iteration::Property::kAssetInformation,
+    SerializeAssetInformationAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kAssetInformation
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "assetInformation"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kAssetInformation
-      )
-    );
-
     return error;
   }
 
   if (that.submodels().has_value()) {
-    writer.StartElement(
-      "submodels"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "submodels",
       *(that.submodels()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSubmodels,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubmodels
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "submodels"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubmodels
-        )
-      );
-
       return error;
     }
   }
@@ -27576,181 +27257,70 @@ common::optional<SerializationError> SerializeAssetInformationAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "assetKind"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeAssetKind(
+  error = SerializePropertyAsElement(
+    "assetKind",
     that.asset_kind(),
-    writer
+    writer,
+    iteration::Property::kAssetKind,
+    SerializeAssetKind
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kAssetKind
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "assetKind"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kAssetKind
-      )
-    );
-
     return error;
   }
 
   if (that.global_asset_id().has_value()) {
-    writer.StartElement(
-      "globalAssetId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "globalAssetId",
       *(that.global_asset_id()),
-      writer
+      writer,
+      iteration::Property::kGlobalAssetId,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kGlobalAssetId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "globalAssetId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kGlobalAssetId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.specific_asset_ids().has_value()) {
-    writer.StartElement(
-      "specificAssetIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "specificAssetIds",
       *(that.specific_asset_ids()),
       writer,
-      SerializeSpecificAssetIdPtrAsElement
+      iteration::Property::kSpecificAssetIds,
+      [](
+        const std::vector<std::shared_ptr<types::ISpecificAssetId>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSpecificAssetIdPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSpecificAssetIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "specificAssetIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSpecificAssetIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.asset_type().has_value()) {
-    writer.StartElement(
-      "assetType"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "assetType",
       *(that.asset_type()),
-      writer
+      writer,
+      iteration::Property::kAssetType,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAssetType
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "assetType"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAssetType
-        )
-      );
-
       return error;
     }
   }
 
   if (that.default_thumbnail().has_value()) {
-    writer.StartElement(
-      "defaultThumbnail"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeResourceAsSequence(
+    error = SerializePropertyAsElement(
+      "defaultThumbnail",
       *(*(that.default_thumbnail())),
-      writer
+      writer,
+      iteration::Property::kDefaultThumbnail,
+      SerializeResourceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDefaultThumbnail
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "defaultThumbnail"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDefaultThumbnail
-        )
-      );
-
       return error;
     }
   }
@@ -27821,72 +27391,26 @@ common::optional<SerializationError> SerializeResourceAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "path"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "path",
     that.path(),
-    writer
+    writer,
+    iteration::Property::kPath,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kPath
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "path"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kPath
-      )
-    );
-
     return error;
   }
 
   if (that.content_type().has_value()) {
-    writer.StartElement(
-      "contentType"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "contentType",
       *(that.content_type()),
-      writer
+      writer,
+      iteration::Property::kContentType,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kContentType
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "contentType"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kContentType
-        )
-      );
-
       return error;
     }
   }
@@ -27958,178 +27482,67 @@ common::optional<SerializationError> SerializeSpecificAssetIdAsSequence(
   common::optional<SerializationError> error;
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "name",
     that.name(),
-    writer
+    writer,
+    iteration::Property::kName,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "value",
     that.value(),
-    writer
+    writer,
+    iteration::Property::kValue,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
     return error;
   }
 
   if (that.external_subject_id().has_value()) {
-    writer.StartElement(
-      "externalSubjectId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "externalSubjectId",
       *(*(that.external_subject_id())),
-      writer
+      writer,
+      iteration::Property::kExternalSubjectId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExternalSubjectId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "externalSubjectId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExternalSubjectId
-        )
-      );
-
       return error;
     }
   }
@@ -28201,474 +27614,203 @@ common::optional<SerializationError> SerializeSubmodelAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.administration().has_value()) {
-    writer.StartElement(
-      "administration"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeAdministrativeInformationAsSequence(
+    error = SerializePropertyAsElement(
+      "administration",
       *(*(that.administration())),
-      writer
+      writer,
+      iteration::Property::kAdministration,
+      SerializeAdministrativeInformationAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAdministration
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "administration"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAdministration
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "id"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "id",
     that.id(),
-    writer
+    writer,
+    iteration::Property::kId,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kId
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "id"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kId
-      )
-    );
-
     return error;
   }
 
   if (that.kind().has_value()) {
-    writer.StartElement(
-      "kind"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeModellingKind(
+    error = SerializePropertyAsElement(
+      "kind",
       *(that.kind()),
-      writer
+      writer,
+      iteration::Property::kKind,
+      SerializeModellingKind
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kKind
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "kind"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kKind
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.submodel_elements().has_value()) {
-    writer.StartElement(
-      "submodelElements"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "submodelElements",
       *(that.submodel_elements()),
       writer,
-      SerializeSubmodelElementPtrAsElement
+      iteration::Property::kSubmodelElements,
+      [](
+        const std::vector<std::shared_ptr<types::ISubmodelElement>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSubmodelElementPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubmodelElements
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "submodelElements"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubmodelElements
-        )
-      );
-
       return error;
     }
   }
@@ -28864,400 +28006,171 @@ common::optional<SerializationError> SerializeRelationshipElementAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "first"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "first",
     *(that.first()),
-    writer
+    writer,
+    iteration::Property::kFirst,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kFirst
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "first"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kFirst
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "second"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "second",
     *(that.second()),
-    writer
+    writer,
+    iteration::Property::kSecond,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSecond
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "second"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSecond
-      )
-    );
-
     return error;
   }
 
@@ -29370,510 +28283,216 @@ common::optional<SerializationError> SerializeSubmodelElementListAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.order_relevant().has_value()) {
-    writer.StartElement(
-      "orderRelevant"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeBool(
+    error = SerializePropertyAsElement(
+      "orderRelevant",
       *(that.order_relevant()),
-      writer
+      writer,
+      iteration::Property::kOrderRelevant,
+      SerializeBool
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kOrderRelevant
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "orderRelevant"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kOrderRelevant
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id_list_element().has_value()) {
-    writer.StartElement(
-      "semanticIdListElement"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticIdListElement",
       *(*(that.semantic_id_list_element())),
-      writer
+      writer,
+      iteration::Property::kSemanticIdListElement,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticIdListElement
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticIdListElement"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticIdListElement
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "typeValueListElement"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeAasSubmodelElements(
+  error = SerializePropertyAsElement(
+    "typeValueListElement",
     that.type_value_list_element(),
-    writer
+    writer,
+    iteration::Property::kTypeValueListElement,
+    SerializeAasSubmodelElements
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kTypeValueListElement
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "typeValueListElement"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kTypeValueListElement
-      )
-    );
-
     return error;
   }
 
   if (that.value_type_list_element().has_value()) {
-    writer.StartElement(
-      "valueTypeListElement"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeDataTypeDefXsd(
+    error = SerializePropertyAsElement(
+      "valueTypeListElement",
       *(that.value_type_list_element()),
-      writer
+      writer,
+      iteration::Property::kValueTypeListElement,
+      SerializeDataTypeDefXsd
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueTypeListElement
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueTypeListElement"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueTypeListElement
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
       writer,
-      SerializeSubmodelElementPtrAsElement
+      iteration::Property::kValue,
+      [](
+        const std::vector<std::shared_ptr<types::ISubmodelElement>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSubmodelElementPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
@@ -29945,368 +28564,166 @@ common::optional<SerializationError> SerializeSubmodelElementCollectionAsSequenc
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
       writer,
-      SerializeSubmodelElementPtrAsElement
+      iteration::Property::kValue,
+      [](
+        const std::vector<std::shared_ptr<types::ISubmodelElement>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSubmodelElementPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
@@ -30446,437 +28863,185 @@ common::optional<SerializationError> SerializePropertyAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "valueType"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeDataTypeDefXsd(
+  error = SerializePropertyAsElement(
+    "valueType",
     that.value_type(),
-    writer
+    writer,
+    iteration::Property::kValueType,
+    SerializeDataTypeDefXsd
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "valueType"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueType
-      )
-    );
-
     return error;
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value_id().has_value()) {
-    writer.StartElement(
-      "valueId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "valueId",
       *(*(that.value_id())),
-      writer
+      writer,
+      iteration::Property::kValueId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueId
-        )
-      );
-
       return error;
     }
   }
@@ -30948,404 +29113,179 @@ common::optional<SerializationError> SerializeMultiLanguagePropertyAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kValue,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value_id().has_value()) {
-    writer.StartElement(
-      "valueId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "valueId",
       *(*(that.value_id())),
-      writer
+      writer,
+      iteration::Property::kValueId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueId
-        )
-      );
-
       return error;
     }
   }
@@ -31417,437 +29357,185 @@ common::optional<SerializationError> SerializeRangeAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "valueType"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeDataTypeDefXsd(
+  error = SerializePropertyAsElement(
+    "valueType",
     that.value_type(),
-    writer
+    writer,
+    iteration::Property::kValueType,
+    SerializeDataTypeDefXsd
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "valueType"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueType
-      )
-    );
-
     return error;
   }
 
   if (that.min().has_value()) {
-    writer.StartElement(
-      "min"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "min",
       *(that.min()),
-      writer
+      writer,
+      iteration::Property::kMin,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMin
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "min"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMin
-        )
-      );
-
       return error;
     }
   }
 
   if (that.max().has_value()) {
-    writer.StartElement(
-      "max"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "max",
       *(that.max()),
-      writer
+      writer,
+      iteration::Property::kMax,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMax
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "max"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMax
-        )
-      );
-
       return error;
     }
   }
@@ -31919,367 +29607,161 @@ common::optional<SerializationError> SerializeReferenceElementAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "value",
       *(*(that.value())),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
@@ -32351,402 +29833,173 @@ common::optional<SerializationError> SerializeBlobAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeByteArray(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeByteArray
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "contentType"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "contentType",
     that.content_type(),
-    writer
+    writer,
+    iteration::Property::kContentType,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kContentType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "contentType"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kContentType
-      )
-    );
-
     return error;
   }
 
@@ -32817,402 +30070,173 @@ common::optional<SerializationError> SerializeFileAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "contentType"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "contentType",
     that.content_type(),
-    writer
+    writer,
+    iteration::Property::kContentType,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kContentType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "contentType"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kContentType
-      )
-    );
-
     return error;
   }
 
@@ -33283,436 +30307,188 @@ common::optional<SerializationError> SerializeAnnotatedRelationshipElementAsSequ
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "first"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "first",
     *(that.first()),
-    writer
+    writer,
+    iteration::Property::kFirst,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kFirst
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "first"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kFirst
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "second"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "second",
     *(that.second()),
-    writer
+    writer,
+    iteration::Property::kSecond,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSecond
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "second"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSecond
-      )
-    );
-
     return error;
   }
 
   if (that.annotations().has_value()) {
-    writer.StartElement(
-      "annotations"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "annotations",
       *(that.annotations()),
       writer,
-      SerializeDataElementPtrAsElement
+      iteration::Property::kAnnotations,
+      [](
+        const std::vector<std::shared_ptr<types::IDataElement>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeDataElementPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAnnotations
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "annotations"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAnnotations
-        )
-      );
-
       return error;
     }
   }
@@ -33784,475 +30560,208 @@ common::optional<SerializationError> SerializeEntityAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.statements().has_value()) {
-    writer.StartElement(
-      "statements"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "statements",
       *(that.statements()),
       writer,
-      SerializeSubmodelElementPtrAsElement
+      iteration::Property::kStatements,
+      [](
+        const std::vector<std::shared_ptr<types::ISubmodelElement>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSubmodelElementPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kStatements
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "statements"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kStatements
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "entityType"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeEntityType(
+  error = SerializePropertyAsElement(
+    "entityType",
     that.entity_type(),
-    writer
+    writer,
+    iteration::Property::kEntityType,
+    SerializeEntityType
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kEntityType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "entityType"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kEntityType
-      )
-    );
-
     return error;
   }
 
   if (that.global_asset_id().has_value()) {
-    writer.StartElement(
-      "globalAssetId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "globalAssetId",
       *(that.global_asset_id()),
-      writer
+      writer,
+      iteration::Property::kGlobalAssetId,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kGlobalAssetId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "globalAssetId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kGlobalAssetId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.specific_asset_ids().has_value()) {
-    writer.StartElement(
-      "specificAssetIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "specificAssetIds",
       *(that.specific_asset_ids()),
       writer,
-      SerializeSpecificAssetIdPtrAsElement
+      iteration::Property::kSpecificAssetIds,
+      [](
+        const std::vector<std::shared_ptr<types::ISpecificAssetId>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSpecificAssetIdPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSpecificAssetIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "specificAssetIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSpecificAssetIds
-        )
-      );
-
       return error;
     }
   }
@@ -34323,284 +30832,100 @@ common::optional<SerializationError> SerializeEventPayloadAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "source"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "source",
     *(that.source()),
-    writer
+    writer,
+    iteration::Property::kSource,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSource
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "source"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSource
-      )
-    );
-
     return error;
   }
 
   if (that.source_semantic_id().has_value()) {
-    writer.StartElement(
-      "sourceSemanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "sourceSemanticId",
       *(*(that.source_semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSourceSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSourceSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "sourceSemanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSourceSemanticId
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "observableReference"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "observableReference",
     *(that.observable_reference()),
-    writer
+    writer,
+    iteration::Property::kObservableReference,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kObservableReference
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "observableReference"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kObservableReference
-      )
-    );
-
     return error;
   }
 
   if (that.observable_semantic_id().has_value()) {
-    writer.StartElement(
-      "observableSemanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "observableSemanticId",
       *(*(that.observable_semantic_id())),
-      writer
+      writer,
+      iteration::Property::kObservableSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kObservableSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "observableSemanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kObservableSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.topic().has_value()) {
-    writer.StartElement(
-      "topic"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "topic",
       *(that.topic()),
-      writer
+      writer,
+      iteration::Property::kTopic,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kTopic
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "topic"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kTopic
-        )
-      );
-
       return error;
     }
   }
 
   if (that.subject_id().has_value()) {
-    writer.StartElement(
-      "subjectId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "subjectId",
       *(*(that.subject_id())),
-      writer
+      writer,
+      iteration::Property::kSubjectId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubjectId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "subjectId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubjectId
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "timeStamp"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "timeStamp",
     that.time_stamp(),
-    writer
+    writer,
+    iteration::Property::kTimeStamp,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kTimeStamp
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "timeStamp"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kTimeStamp
-      )
-    );
-
     return error;
   }
 
   if (that.payload().has_value()) {
-    writer.StartElement(
-      "payload"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeByteArray(
+    error = SerializePropertyAsElement(
+      "payload",
       *(that.payload()),
-      writer
+      writer,
+      iteration::Property::kPayload,
+      SerializeByteArray
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kPayload
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "payload"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kPayload
-        )
-      );
-
       return error;
     }
   }
@@ -34705,613 +31030,246 @@ common::optional<SerializationError> SerializeBasicEventElementAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "observed"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "observed",
     *(that.observed()),
-    writer
+    writer,
+    iteration::Property::kObserved,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kObserved
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "observed"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kObserved
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "direction"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeDirection(
+  error = SerializePropertyAsElement(
+    "direction",
     that.direction(),
-    writer
+    writer,
+    iteration::Property::kDirection,
+    SerializeDirection
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDirection
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "direction"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDirection
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "state"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeStateOfEvent(
+  error = SerializePropertyAsElement(
+    "state",
     that.state(),
-    writer
+    writer,
+    iteration::Property::kState,
+    SerializeStateOfEvent
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kState
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "state"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kState
-      )
-    );
-
     return error;
   }
 
   if (that.message_topic().has_value()) {
-    writer.StartElement(
-      "messageTopic"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "messageTopic",
       *(that.message_topic()),
-      writer
+      writer,
+      iteration::Property::kMessageTopic,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMessageTopic
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "messageTopic"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMessageTopic
-        )
-      );
-
       return error;
     }
   }
 
   if (that.message_broker().has_value()) {
-    writer.StartElement(
-      "messageBroker"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "messageBroker",
       *(*(that.message_broker())),
-      writer
+      writer,
+      iteration::Property::kMessageBroker,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMessageBroker
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "messageBroker"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMessageBroker
-        )
-      );
-
       return error;
     }
   }
 
   if (that.last_update().has_value()) {
-    writer.StartElement(
-      "lastUpdate"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "lastUpdate",
       *(that.last_update()),
-      writer
+      writer,
+      iteration::Property::kLastUpdate,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kLastUpdate
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "lastUpdate"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kLastUpdate
-        )
-      );
-
       return error;
     }
   }
 
   if (that.min_interval().has_value()) {
-    writer.StartElement(
-      "minInterval"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "minInterval",
       *(that.min_interval()),
-      writer
+      writer,
+      iteration::Property::kMinInterval,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMinInterval
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "minInterval"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMinInterval
-        )
-      );
-
       return error;
     }
   }
 
   if (that.max_interval().has_value()) {
-    writer.StartElement(
-      "maxInterval"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "maxInterval",
       *(that.max_interval()),
-      writer
+      writer,
+      iteration::Property::kMaxInterval,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMaxInterval
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "maxInterval"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kMaxInterval
-        )
-      );
-
       return error;
     }
   }
@@ -35383,442 +31341,202 @@ common::optional<SerializationError> SerializeOperationAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.input_variables().has_value()) {
-    writer.StartElement(
-      "inputVariables"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "inputVariables",
       *(that.input_variables()),
       writer,
-      SerializeOperationVariablePtrAsElement
+      iteration::Property::kInputVariables,
+      [](
+        const std::vector<std::shared_ptr<types::IOperationVariable>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeOperationVariablePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kInputVariables
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "inputVariables"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kInputVariables
-        )
-      );
-
       return error;
     }
   }
 
   if (that.output_variables().has_value()) {
-    writer.StartElement(
-      "outputVariables"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "outputVariables",
       *(that.output_variables()),
       writer,
-      SerializeOperationVariablePtrAsElement
+      iteration::Property::kOutputVariables,
+      [](
+        const std::vector<std::shared_ptr<types::IOperationVariable>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeOperationVariablePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kOutputVariables
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "outputVariables"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kOutputVariables
-        )
-      );
-
       return error;
     }
   }
 
   if (that.inoutput_variables().has_value()) {
-    writer.StartElement(
-      "inoutputVariables"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "inoutputVariables",
       *(that.inoutput_variables()),
       writer,
-      SerializeOperationVariablePtrAsElement
+      iteration::Property::kInoutputVariables,
+      [](
+        const std::vector<std::shared_ptr<types::IOperationVariable>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeOperationVariablePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kInoutputVariables
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "inoutputVariables"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kInoutputVariables
-        )
-      );
-
       return error;
     }
   }
@@ -35889,37 +31607,14 @@ common::optional<SerializationError> SerializeOperationVariableAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeSubmodelElementAsElement(
+  error = SerializePropertyAsElement(
+    "value",
     *(that.value()),
-    writer
+    writer,
+    iteration::Property::kValue,
+    SerializeSubmodelElementAsElement
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
     return error;
   }
 
@@ -35990,331 +31685,148 @@ common::optional<SerializationError> SerializeCapabilityAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.semantic_id().has_value()) {
-    writer.StartElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "semanticId",
       *(*(that.semantic_id())),
-      writer
+      writer,
+      iteration::Property::kSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "semanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSemanticId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.supplemental_semantic_ids().has_value()) {
-    writer.StartElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "supplementalSemanticIds",
       *(that.supplemental_semantic_ids()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kSupplementalSemanticIds,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "supplementalSemanticIds"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSupplementalSemanticIds
-        )
-      );
-
       return error;
     }
   }
 
   if (that.qualifiers().has_value()) {
-    writer.StartElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "qualifiers",
       *(that.qualifiers()),
       writer,
-      SerializeQualifierPtrAsElement
+      iteration::Property::kQualifiers,
+      [](
+        const std::vector<std::shared_ptr<types::IQualifier>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeQualifierPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "qualifiers"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kQualifiers
-        )
-      );
-
       return error;
     }
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
@@ -36386,328 +31898,141 @@ common::optional<SerializationError> SerializeConceptDescriptionAsSequence(
   common::optional<SerializationError> error;
 
   if (that.extensions().has_value()) {
-    writer.StartElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "extensions",
       *(that.extensions()),
       writer,
-      SerializeExtensionPtrAsElement
+      iteration::Property::kExtensions,
+      [](
+        const std::vector<std::shared_ptr<types::IExtension>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeExtensionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "extensions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kExtensions
-        )
-      );
-
       return error;
     }
   }
 
   if (that.category().has_value()) {
-    writer.StartElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "category",
       *(that.category()),
-      writer
+      writer,
+      iteration::Property::kCategory,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "category"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kCategory
-        )
-      );
-
       return error;
     }
   }
 
   if (that.id_short().has_value()) {
-    writer.StartElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "idShort",
       *(that.id_short()),
-      writer
+      writer,
+      iteration::Property::kIdShort,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "idShort"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIdShort
-        )
-      );
-
       return error;
     }
   }
 
   if (that.display_name().has_value()) {
-    writer.StartElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "displayName",
       *(that.display_name()),
       writer,
-      SerializeLangStringNameTypePtrAsElement
+      iteration::Property::kDisplayName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringNameType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringNameTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "displayName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDisplayName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.description().has_value()) {
-    writer.StartElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "description",
       *(that.description()),
       writer,
-      SerializeLangStringTextTypePtrAsElement
+      iteration::Property::kDescription,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringTextType>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringTextTypePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "description"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDescription
-        )
-      );
-
       return error;
     }
   }
 
   if (that.administration().has_value()) {
-    writer.StartElement(
-      "administration"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeAdministrativeInformationAsSequence(
+    error = SerializePropertyAsElement(
+      "administration",
       *(*(that.administration())),
-      writer
+      writer,
+      iteration::Property::kAdministration,
+      SerializeAdministrativeInformationAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAdministration
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "administration"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAdministration
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "id"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "id",
     that.id(),
-    writer
+    writer,
+    iteration::Property::kId,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kId
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "id"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kId
-      )
-    );
-
     return error;
   }
 
   if (that.embedded_data_specifications().has_value()) {
-    writer.StartElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "embeddedDataSpecifications",
       *(that.embedded_data_specifications()),
       writer,
-      SerializeEmbeddedDataSpecificationPtrAsElement
+      iteration::Property::kEmbeddedDataSpecifications,
+      [](
+        const std::vector<std::shared_ptr<types::IEmbeddedDataSpecification>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeEmbeddedDataSpecificationPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "embeddedDataSpecifications"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEmbeddedDataSpecifications
-        )
-      );
-
       return error;
     }
   }
 
   if (that.is_case_of().has_value()) {
-    writer.StartElement(
-      "isCaseOf"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "isCaseOf",
       *(that.is_case_of()),
       writer,
-      SerializeReferencePtrAsElement
+      iteration::Property::kIsCaseOf,
+      [](
+        const std::vector<std::shared_ptr<types::IReference>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeReferencePtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIsCaseOf
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "isCaseOf"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kIsCaseOf
-        )
-      );
-
       return error;
     }
   }
@@ -36778,108 +32103,43 @@ common::optional<SerializationError> SerializeReferenceAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "type"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceTypes(
+  error = SerializePropertyAsElement(
+    "type",
     that.type(),
-    writer
+    writer,
+    iteration::Property::kType,
+    SerializeReferenceTypes
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "type"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kType
-      )
-    );
-
     return error;
   }
 
   if (that.referred_semantic_id().has_value()) {
-    writer.StartElement(
-      "referredSemanticId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "referredSemanticId",
       *(*(that.referred_semantic_id())),
-      writer
+      writer,
+      iteration::Property::kReferredSemanticId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kReferredSemanticId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "referredSemanticId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kReferredSemanticId
-        )
-      );
-
       return error;
     }
   }
 
-  writer.StartElement(
-    "keys"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeListOfInstances(
+  error = SerializePropertyAsElement(
+    "keys",
     that.keys(),
     writer,
-    SerializeKeyPtrAsElement
+    iteration::Property::kKeys,
+    [](
+      const std::vector<std::shared_ptr<types::IKey>>& a_list,
+      SelfClosingWriter& a_writer
+    ) {
+      return SerializeListOfInstances(a_list, a_writer, SerializeKeyPtrAsElement);
+    }
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kKeys
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "keys"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kKeys
-      )
-    );
-
     return error;
   }
 
@@ -36949,71 +32209,25 @@ common::optional<SerializationError> SerializeKeyAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "type"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeKeyTypes(
+  error = SerializePropertyAsElement(
+    "type",
     that.type(),
-    writer
+    writer,
+    iteration::Property::kType,
+    SerializeKeyTypes
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kType
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "type"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kType
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "value",
     that.value(),
-    writer
+    writer,
+    iteration::Property::kValue,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
     return error;
   }
 
@@ -37144,71 +32358,25 @@ common::optional<SerializationError> SerializeLangStringNameTypeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "language",
     that.language(),
-    writer
+    writer,
+    iteration::Property::kLanguage,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "text",
     that.text(),
-    writer
+    writer,
+    iteration::Property::kText,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
     return error;
   }
 
@@ -37278,71 +32446,25 @@ common::optional<SerializationError> SerializeLangStringTextTypeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "language",
     that.language(),
-    writer
+    writer,
+    iteration::Property::kLanguage,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "text",
     that.text(),
-    writer
+    writer,
+    iteration::Property::kText,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
     return error;
   }
 
@@ -37413,112 +32535,55 @@ common::optional<SerializationError> SerializeEnvironmentAsSequence(
   common::optional<SerializationError> error;
 
   if (that.asset_administration_shells().has_value()) {
-    writer.StartElement(
-      "assetAdministrationShells"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "assetAdministrationShells",
       *(that.asset_administration_shells()),
       writer,
-      SerializeAssetAdministrationShellPtrAsElement
+      iteration::Property::kAssetAdministrationShells,
+      [](
+        const std::vector<std::shared_ptr<types::IAssetAdministrationShell>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeAssetAdministrationShellPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAssetAdministrationShells
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "assetAdministrationShells"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kAssetAdministrationShells
-        )
-      );
-
       return error;
     }
   }
 
   if (that.submodels().has_value()) {
-    writer.StartElement(
-      "submodels"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "submodels",
       *(that.submodels()),
       writer,
-      SerializeSubmodelPtrAsElement
+      iteration::Property::kSubmodels,
+      [](
+        const std::vector<std::shared_ptr<types::ISubmodel>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeSubmodelPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubmodels
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "submodels"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSubmodels
-        )
-      );
-
       return error;
     }
   }
 
   if (that.concept_descriptions().has_value()) {
-    writer.StartElement(
-      "conceptDescriptions"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "conceptDescriptions",
       *(that.concept_descriptions()),
       writer,
-      SerializeConceptDescriptionPtrAsElement
+      iteration::Property::kConceptDescriptions,
+      [](
+        const std::vector<std::shared_ptr<types::IConceptDescription>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeConceptDescriptionPtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kConceptDescriptions
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "conceptDescriptions"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kConceptDescriptions
-        )
-      );
-
       return error;
     }
   }
@@ -37622,71 +32687,25 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "dataSpecification"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "dataSpecification",
     *(that.data_specification()),
-    writer
+    writer,
+    iteration::Property::kDataSpecification,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecification
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "dataSpecification"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecification
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "dataSpecificationContent"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeDataSpecificationContentAsElement(
+  error = SerializePropertyAsElement(
+    "dataSpecificationContent",
     *(that.data_specification_content()),
-    writer
+    writer,
+    iteration::Property::kDataSpecificationContent,
+    SerializeDataSpecificationContentAsElement
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecificationContent
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "dataSpecificationContent"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecificationContent
-      )
-    );
-
     return error;
   }
 
@@ -37756,139 +32775,47 @@ common::optional<SerializationError> SerializeLevelTypeAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "min"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeBool(
+  error = SerializePropertyAsElement(
+    "min",
     that.min(),
-    writer
+    writer,
+    iteration::Property::kMin,
+    SerializeBool
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kMin
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "min"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kMin
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "nom"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeBool(
+  error = SerializePropertyAsElement(
+    "nom",
     that.nom(),
-    writer
+    writer,
+    iteration::Property::kNom,
+    SerializeBool
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kNom
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "nom"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kNom
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "typ"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeBool(
+  error = SerializePropertyAsElement(
+    "typ",
     that.typ(),
-    writer
+    writer,
+    iteration::Property::kTyp,
+    SerializeBool
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kTyp
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "typ"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kTyp
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "max"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeBool(
+  error = SerializePropertyAsElement(
+    "max",
     that.max(),
-    writer
+    writer,
+    iteration::Property::kMax,
+    SerializeBool
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kMax
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "max"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kMax
-      )
-    );
-
     return error;
   }
 
@@ -37958,71 +32885,25 @@ common::optional<SerializationError> SerializeValueReferencePairAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "value",
     that.value(),
-    writer
+    writer,
+    iteration::Property::kValue,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "valueId"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
+  error = SerializePropertyAsElement(
+    "valueId",
     *(that.value_id()),
-    writer
+    writer,
+    iteration::Property::kValueId,
+    SerializeReferenceAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueId
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "valueId"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueId
-      )
-    );
-
     return error;
   }
 
@@ -38092,38 +32973,19 @@ common::optional<SerializationError> SerializeValueListAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "valueReferencePairs"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeListOfInstances(
+  error = SerializePropertyAsElement(
+    "valueReferencePairs",
     that.value_reference_pairs(),
     writer,
-    SerializeValueReferencePairPtrAsElement
+    iteration::Property::kValueReferencePairs,
+    [](
+      const std::vector<std::shared_ptr<types::IValueReferencePair>>& a_list,
+      SelfClosingWriter& a_writer
+    ) {
+      return SerializeListOfInstances(a_list, a_writer, SerializeValueReferencePairPtrAsElement);
+    }
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueReferencePairs
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "valueReferencePairs"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValueReferencePairs
-      )
-    );
-
     return error;
   }
 
@@ -38193,71 +33055,25 @@ common::optional<SerializationError> SerializeLangStringPreferredNameTypeIec6136
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "language",
     that.language(),
-    writer
+    writer,
+    iteration::Property::kLanguage,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "text",
     that.text(),
-    writer
+    writer,
+    iteration::Property::kText,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
     return error;
   }
 
@@ -38327,71 +33143,25 @@ common::optional<SerializationError> SerializeLangStringShortNameTypeIec61360AsS
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "language",
     that.language(),
-    writer
+    writer,
+    iteration::Property::kLanguage,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "text",
     that.text(),
-    writer
+    writer,
+    iteration::Property::kText,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
     return error;
   }
 
@@ -38461,71 +33231,25 @@ common::optional<SerializationError> SerializeLangStringDefinitionTypeIec61360As
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "language",
     that.language(),
-    writer
+    writer,
+    iteration::Property::kLanguage,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "language"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kLanguage
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "text",
     that.text(),
-    writer
+    writer,
+    iteration::Property::kText,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "text"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kText
-      )
-    );
-
     return error;
   }
 
@@ -38595,435 +33319,171 @@ common::optional<SerializationError> SerializeDataSpecificationIec61360AsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "preferredName"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeListOfInstances(
+  error = SerializePropertyAsElement(
+    "preferredName",
     that.preferred_name(),
     writer,
-    SerializeLangStringPreferredNameTypeIec61360PtrAsElement
+    iteration::Property::kPreferredName,
+    [](
+      const std::vector<std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>>& a_list,
+      SelfClosingWriter& a_writer
+    ) {
+      return SerializeListOfInstances(a_list, a_writer, SerializeLangStringPreferredNameTypeIec61360PtrAsElement);
+    }
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kPreferredName
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "preferredName"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kPreferredName
-      )
-    );
-
     return error;
   }
 
   if (that.short_name().has_value()) {
-    writer.StartElement(
-      "shortName"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "shortName",
       *(that.short_name()),
       writer,
-      SerializeLangStringShortNameTypeIec61360PtrAsElement
+      iteration::Property::kShortName,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringShortNameTypeIec61360>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringShortNameTypeIec61360PtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kShortName
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "shortName"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kShortName
-        )
-      );
-
       return error;
     }
   }
 
   if (that.unit().has_value()) {
-    writer.StartElement(
-      "unit"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "unit",
       *(that.unit()),
-      writer
+      writer,
+      iteration::Property::kUnit,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kUnit
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "unit"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kUnit
-        )
-      );
-
       return error;
     }
   }
 
   if (that.unit_id().has_value()) {
-    writer.StartElement(
-      "unitId"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeReferenceAsSequence(
+    error = SerializePropertyAsElement(
+      "unitId",
       *(*(that.unit_id())),
-      writer
+      writer,
+      iteration::Property::kUnitId,
+      SerializeReferenceAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kUnitId
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "unitId"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kUnitId
-        )
-      );
-
       return error;
     }
   }
 
   if (that.source_of_definition().has_value()) {
-    writer.StartElement(
-      "sourceOfDefinition"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "sourceOfDefinition",
       *(that.source_of_definition()),
-      writer
+      writer,
+      iteration::Property::kSourceOfDefinition,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSourceOfDefinition
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "sourceOfDefinition"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSourceOfDefinition
-        )
-      );
-
       return error;
     }
   }
 
   if (that.symbol().has_value()) {
-    writer.StartElement(
-      "symbol"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "symbol",
       *(that.symbol()),
-      writer
+      writer,
+      iteration::Property::kSymbol,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSymbol
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "symbol"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kSymbol
-        )
-      );
-
       return error;
     }
   }
 
   if (that.data_type().has_value()) {
-    writer.StartElement(
-      "dataType"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeDataTypeIec61360(
+    error = SerializePropertyAsElement(
+      "dataType",
       *(that.data_type()),
-      writer
+      writer,
+      iteration::Property::kDataType,
+      SerializeDataTypeIec61360
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDataType
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "dataType"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDataType
-        )
-      );
-
       return error;
     }
   }
 
   if (that.definition().has_value()) {
-    writer.StartElement(
-      "definition"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeListOfInstances(
+    error = SerializePropertyAsElement(
+      "definition",
       *(that.definition()),
       writer,
-      SerializeLangStringDefinitionTypeIec61360PtrAsElement
+      iteration::Property::kDefinition,
+      [](
+        const std::vector<std::shared_ptr<types::ILangStringDefinitionTypeIec61360>>& a_list,
+        SelfClosingWriter& a_writer
+      ) {
+        return SerializeListOfInstances(a_list, a_writer, SerializeLangStringDefinitionTypeIec61360PtrAsElement);
+      }
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDefinition
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "definition"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kDefinition
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value_format().has_value()) {
-    writer.StartElement(
-      "valueFormat"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "valueFormat",
       *(that.value_format()),
-      writer
+      writer,
+      iteration::Property::kValueFormat,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueFormat
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueFormat"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueFormat
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value_list().has_value()) {
-    writer.StartElement(
-      "valueList"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeValueListAsSequence(
+    error = SerializePropertyAsElement(
+      "valueList",
       *(*(that.value_list())),
-      writer
+      writer,
+      iteration::Property::kValueList,
+      SerializeValueListAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueList
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "valueList"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValueList
-        )
-      );
-
       return error;
     }
   }
 
   if (that.value().has_value()) {
-    writer.StartElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "value",
       *(that.value()),
-      writer
+      writer,
+      iteration::Property::kValue,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "value"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kValue
-        )
-      );
-
       return error;
     }
   }
 
   if (that.level_type().has_value()) {
-    writer.StartElement(
-      "levelType"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeLevelTypeAsSequence(
+    error = SerializePropertyAsElement(
+      "levelType",
       *(*(that.level_type())),
-      writer
+      writer,
+      iteration::Property::kLevelType,
+      SerializeLevelTypeAsSequence
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kLevelType
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "levelType"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kLevelType
-        )
-      );
-
       return error;
     }
   }

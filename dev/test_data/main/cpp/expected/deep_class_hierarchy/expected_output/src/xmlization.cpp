@@ -2761,18 +2761,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBranch::kIdentifier:
+      case properties::OfBranch::kIdentifier: {
         std::tie(
           the_identifier,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBranch::kDescription:
+      }
+      case properties::OfBranch::kDescription: {
         std::tie(
           the_description,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3008,24 +3010,27 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfLeaf::kIdentifier:
+      case properties::OfLeaf::kIdentifier: {
         std::tie(
           the_identifier,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLeaf::kDescription:
+      }
+      case properties::OfLeaf::kDescription: {
         std::tie(
           the_description,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfLeaf::kValue:
+      }
+      case properties::OfLeaf::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeInt64(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3272,30 +3277,34 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfBlossom::kIdentifier:
+      case properties::OfBlossom::kIdentifier: {
         std::tie(
           the_identifier,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlossom::kDescription:
+      }
+      case properties::OfBlossom::kDescription: {
         std::tie(
           the_description,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfBlossom::kValue:
+      }
+      case properties::OfBlossom::kValue: {
         std::tie(
           the_value,
           error
         ) = DeserializeInt64(reader);
         break;
-      case properties::OfBlossom::kDetails:
+      }
+      case properties::OfBlossom::kDetails: {
         std::tie(
           the_details,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3547,18 +3556,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeChoice:
+      case properties::OfSomething::kSomeChoice: {
         std::tie(
           the_some_choice,
           error
         ) = NodeFromElement(reader);
         break;
-      case properties::OfSomething::kSomethingWithoutChoice:
+      }
+      case properties::OfSomething::kSomethingWithoutChoice: {
         std::tie(
           the_something_without_choice,
           error
         ) = BranchFromElement(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3792,13 +3803,14 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfContainer::kNode:
+      case properties::OfContainer::kNode: {
         std::tie(
           the_node,
           error
         ) = NodeFromElement(reader);
         break;
-      case properties::OfContainer::kSomething:
+      }
+      case properties::OfContainer::kSomething: {
         std::tie(
           the_something,
           error
@@ -3806,6 +3818,7 @@ std::pair<
           types::ISomething
         >(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -5100,6 +5113,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * \brief Serialize \p that instance by dispatching to the appropriate concrete
  * serialization function.
  *
@@ -5342,71 +5391,25 @@ common::optional<SerializationError> SerializeBranchAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "identifier"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "identifier",
     that.identifier(),
-    writer
+    writer,
+    iteration::Property::kIdentifier,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kIdentifier
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "identifier"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kIdentifier
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "description"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "description",
     that.description(),
-    writer
+    writer,
+    iteration::Property::kDescription,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDescription
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "description"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDescription
-      )
-    );
-
     return error;
   }
 
@@ -5525,105 +5528,36 @@ common::optional<SerializationError> SerializeLeafAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "identifier"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "identifier",
     that.identifier(),
-    writer
+    writer,
+    iteration::Property::kIdentifier,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kIdentifier
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "identifier"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kIdentifier
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "description"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "description",
     that.description(),
-    writer
+    writer,
+    iteration::Property::kDescription,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDescription
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "description"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDescription
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeInt64(
+  error = SerializePropertyAsElement(
+    "value",
     that.value(),
-    writer
+    writer,
+    iteration::Property::kValue,
+    SerializeInt64
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
     return error;
   }
 
@@ -5735,139 +5669,47 @@ common::optional<SerializationError> SerializeBlossomAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "identifier"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "identifier",
     that.identifier(),
-    writer
+    writer,
+    iteration::Property::kIdentifier,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kIdentifier
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "identifier"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kIdentifier
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "description"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "description",
     that.description(),
-    writer
+    writer,
+    iteration::Property::kDescription,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDescription
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "description"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDescription
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeInt64(
+  error = SerializePropertyAsElement(
+    "value",
     that.value(),
-    writer
+    writer,
+    iteration::Property::kValue,
+    SerializeInt64
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "value"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kValue
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "details"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "details",
     that.details(),
-    writer
+    writer,
+    iteration::Property::kDetails,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDetails
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "details"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDetails
-      )
-    );
-
     return error;
   }
 
@@ -5937,71 +5779,25 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "someChoice"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeNodeAsElement(
+  error = SerializePropertyAsElement(
+    "someChoice",
     *(that.some_choice()),
-    writer
+    writer,
+    iteration::Property::kSomeChoice,
+    SerializeNodeAsElement
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeChoice
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someChoice"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeChoice
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "somethingWithoutChoice"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeBranchAsElement(
+  error = SerializePropertyAsElement(
+    "somethingWithoutChoice",
     *(that.something_without_choice()),
-    writer
+    writer,
+    iteration::Property::kSomethingWithoutChoice,
+    SerializeBranchAsElement
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomethingWithoutChoice
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "somethingWithoutChoice"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomethingWithoutChoice
-      )
-    );
-
     return error;
   }
 
@@ -6071,71 +5867,25 @@ common::optional<SerializationError> SerializeContainerAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "node"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeNodeAsElement(
+  error = SerializePropertyAsElement(
+    "node",
     *(that.node()),
-    writer
+    writer,
+    iteration::Property::kNode,
+    SerializeNodeAsElement
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kNode
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "node"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kNode
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "something"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeSomethingAsSequence(
+  error = SerializePropertyAsElement(
+    "something",
     *(that.something()),
-    writer
+    writer,
+    iteration::Property::kSomething,
+    SerializeSomethingAsSequence
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomething
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "something"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomething
-      )
-    );
-
     return error;
   }
 

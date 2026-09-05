@@ -2368,12 +2368,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeResult:
+      case properties::OfSomething::kSomeResult: {
         std::tie(
           the_some_result,
           error
         ) = DeserializeResult(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3409,6 +3410,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * Serialize the literal of Result
  * to XML text.
  */
@@ -3475,37 +3512,14 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "someResult"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeResult(
+  error = SerializePropertyAsElement(
+    "someResult",
     that.some_result(),
-    writer
+    writer,
+    iteration::Property::kSomeResult,
+    SerializeResult
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeResult
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someResult"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeResult
-      )
-    );
-
     return error;
   }
 
