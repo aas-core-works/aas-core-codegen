@@ -911,6 +911,72 @@ std::pair<
     )
 
 
+def _generate_model_type_string_to_model_type(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Stripped]:
+    """
+    Generate the mapping of the JSON ``modelType`` string to the model type.
+
+    This mirrors ``model_type_from_element_name`` on the XML side: a single
+    lookup covering *every* concrete class in the meta-model, generated once,
+    so that dispatch functions can convert the ``modelType`` string to a
+    ``types::ModelType`` and then ``switch`` on it (instead of routing through
+    a ``std::map<std::string, std::function<...>>`` keyed by string per
+    abstract class).
+    """
+    items = []  # type: List[Stripped]
+    for cls in symbol_table.concrete_classes:
+        literal_name = cpp_naming.enum_literal_name(cls.name)
+
+        model_type = naming.json_model_type(cls.name)
+
+        items.append(
+            Stripped(
+                f"""\
+{{
+{I}{cpp_common.string_literal(model_type)},
+{I}types::ModelType::{literal_name}
+}}"""
+            )
+        )
+
+    map_name = cpp_naming.constant_name(Identifier("model_type_string_to_model_type"))
+
+    items_joined = ",\n".join(items)
+
+    function_name = cpp_naming.function_name(
+        Identifier("model_type_from_model_type_string")
+    )
+
+    return [
+        Stripped(
+            f"""\
+/**
+ * Map JSON \\c modelType strings to model types.
+ */
+const std::unordered_map<
+{I}std::string,
+{I}types::ModelType
+> {map_name} = {{
+{I}{indent_but_first_line(items_joined, I)}
+}};"""
+        ),
+        Stripped(
+            f"""\
+common::optional<types::ModelType> {function_name}(
+{I}const std::string& model_type_str
+) {{
+{I}auto it = {map_name}.find(model_type_str);
+{I}if (it == {map_name}.end()) {{
+{II}return common::nullopt;
+{I}}}
+
+{I}return it->second;
+}}"""
+        ),
+    ]
+
+
 def _generate_deserialize_enumeration(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
@@ -1811,7 +1877,22 @@ std::set<std::string> {expected_properties} = {{
 def _generate_dispatch_deserialize_implementation(
     cls: intermediate.ClassUnion,
 ) -> List[Stripped]:
-    """Generate the impl. of the dispatching deserialization function for ``cls``."""
+    """
+    Generate the impl. of the dispatching deserialization function for ``cls``.
+
+    We convert the JSON ``modelType`` string to a ``types::ModelType`` via the
+    single, file-wide ``ModelTypeFromModelTypeString`` lookup (see
+    :py:func:`_generate_model_type_string_to_model_type`) and then ``switch``
+    on it -- mirroring how the XML side dispatches
+    (``model_type_from_element_name`` + a per-interface ``switch`` in
+    ``_generate_class_from_element``) -- instead of routing through a
+    ``std::map<std::string, std::function<...>>`` built fresh for every
+    abstract class. This lets us abort immediately either because the model
+    type is not recognized at all (the global lookup fails) or because it is
+    recognized but is not one of this interface's own concrete descendants
+    (the ``switch`` falls through to ``default``), without any runtime
+    indirection through ``std::function``.
+    """
     targets: Iterable[intermediate.ConcreteClass]
 
     if isinstance(cls, intermediate.ConcreteClass):
@@ -1823,61 +1904,34 @@ def _generate_dispatch_deserialize_implementation(
 
     interface_name = cpp_naming.interface_name(cls.name)
 
-    entries = []  # type: List[Stripped]
+    case_blocks = []  # type: List[Stripped]
     for target_cls in targets:
-        model_type = naming.json_model_type(target_cls.name)
+        literal_name = cpp_naming.enum_literal_name(target_cls.name)
 
         if len(target_cls.concrete_descendants) > 0:
-            target_function = Stripped(
-                cpp_naming.function_name(
-                    Identifier(f"concretely_deserialize_{target_cls.name}")
-                )
+            target_function = cpp_naming.function_name(
+                Identifier(f"concretely_deserialize_{target_cls.name}")
             )
         else:
-            target_function = Stripped(
-                cpp_naming.function_name(Identifier(f"deserialize_{target_cls.name}"))
+            target_function = cpp_naming.function_name(
+                Identifier(f"deserialize_{target_cls.name}")
             )
 
-        target_function = Stripped(
-            f"""\
-{target_function}<
-{I}types::{interface_name}
->"""
-        )
-
-        entries.append(
+        case_blocks.append(
             Stripped(
                 f"""\
-{{
-{I}{indent_but_first_line(cpp_common.string_literal(model_type), I)},
-{I}{indent_but_first_line(target_function, I)}
-}}"""
+case types::ModelType::{literal_name}:
+{I}return {target_function}<
+{II}types::{interface_name}
+{I}>(json, additional_properties);"""
             )
         )
 
-    entries_joined = ",\n".join(entries)
-
-    dispatch_name = cpp_naming.constant_name(
-        Identifier(f"deserialize_{cls.name}_by_model_type")
-    )
+    case_blocks_joined = "\n".join(case_blocks)
 
     function_name = cpp_naming.function_name(Identifier(f"deserialize_{cls.name}"))
 
     return [
-        Stripped(
-            f"""\
-std::map<
-{I}std::string,
-{I}std::function<
-{II}std::pair<
-{III}common::optional<std::shared_ptr<types::{interface_name}> >,
-{III}common::optional<DeserializationError>
-{II}>(const nlohmann::json&, bool)
-{I}>
-> {dispatch_name} = {{
-{I}{indent_but_first_line(entries_joined, I)}
-}};"""
-        ),
         Stripped(
             f"""\
 std::pair<
@@ -1889,11 +1943,11 @@ std::pair<
 {I}const nlohmann::json& json,
 {I}bool additional_properties
 ) {{
-{I}const std::string* model_type;
+{I}const std::string* model_type_str;
 {I}common::optional<DeserializationError> error;
 
 {I}std::tie(
-{II}model_type,
+{II}model_type_str,
 {II}error
 {I}) = GetModelTypeFrom(json);
 
@@ -1907,13 +1961,14 @@ std::pair<
 {II});
 {I}}}
 
-{I}const auto it = {dispatch_name}.find(*model_type);
-{I}if (it == {dispatch_name}.end()) {{
+{I}common::optional<types::ModelType> model_type(
+{II}ModelTypeFromModelTypeString(*model_type_str)
+{I});
+
+{I}if (!model_type.has_value()) {{
 {II}std::wstring message = common::Concat(
-{III}L"The dispatch to the JSON de-serialization of "
-{III}L"types::{interface_name} "
-{III}L"is not defined for model type: ",
-{III}common::Utf8ToWstring(*model_type)
+{III}L"The model type does not correspond to any known class: ",
+{III}common::Utf8ToWstring(*model_type_str)
 {II});
 
 {II}return std::make_pair<
@@ -1927,7 +1982,27 @@ std::pair<
 {II});
 {I}}}
 
-{I}return (it->second)(json, additional_properties);
+{I}switch (*model_type) {{
+{II}{indent_but_first_line(case_blocks_joined, II)}
+{II}default: {{
+{III}std::wstring message = common::Concat(
+{IIII}L"The dispatch to the JSON de-serialization of "
+{IIII}L"types::{interface_name} "
+{IIII}L"is not defined for model type: ",
+{IIII}common::Utf8ToWstring(*model_type_str)
+{III});
+
+{III}return std::make_pair<
+{IIII}common::optional<std::shared_ptr<types::{interface_name}> >,
+{IIII}common::optional<DeserializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}common::make_optional<DeserializationError>(
+{IIIII}message
+{IIII})
+{III});
+{II}}}
+{I}}}
 }}"""
         ),
     ]
@@ -2082,6 +2157,46 @@ std::pair<
     )
 
 
+def _generate_serialize_bool() -> Stripped:
+    """
+    Generate the function to serialize a boolean to a JSON value.
+
+    Named to match ``DeserializeBool``, even though converting a C++ ``bool``
+    to a JSON value can not actually fail.
+    """
+    return Stripped(
+        f"""\
+/**
+ * Serialize the given boolean to a JSON value.
+ */
+nlohmann::json SerializeBool(
+{I}bool value
+) {{
+{I}return value;
+}}"""
+    )
+
+
+def _generate_serialize_double() -> Stripped:
+    """
+    Generate the function to serialize a double to a JSON value.
+
+    Named to match ``DeserializeDouble``, even though converting a C++
+    ``double`` to a JSON value can not actually fail.
+    """
+    return Stripped(
+        f"""\
+/**
+ * Serialize the given floating-point number to a JSON value.
+ */
+nlohmann::json SerializeDouble(
+{I}double value
+) {{
+{I}return value;
+}}"""
+    )
+
+
 def _generate_serialize_str() -> Stripped:
     """Generate the function to serialize a wide string to a JSON value."""
     return Stripped(
@@ -2210,20 +2325,6 @@ nlohmann::json SerializeListWithInfallible(
     )
 
 
-def _generate_identity() -> Stripped:
-    """Generate the function for identity serialization which we can pass to list serialization."""
-    return Stripped(
-        f"""\
-/**
- * Just forward the value as it is.
- */
-template<typename T>
-const T& Identity(const T& value) {{
-{I}return value;
-}}"""
-    )
-
-
 def _generate_serialize_iclass_definition() -> List[Stripped]:
     """Generate the definition of the main dispatch for serializing ``IClass``."""
     return [
@@ -2266,7 +2367,12 @@ def _generate_serialize_primitive_property(
     json_prop_name_literal = cpp_common.string_literal(json_name)
 
     if primitive_type is intermediate.PrimitiveType.BOOL:
-        return Stripped(f"result[{json_prop_name_literal}] = {getter_expr};")
+        return Stripped(
+            f"""\
+result[{json_prop_name_literal}] = SerializeBool(
+{I}{getter_expr}
+);"""
+        )
 
     elif primitive_type is intermediate.PrimitiveType.INT:
         serialized_var = cpp_naming.variable_name(Identifier(f"json_{property_name}"))
@@ -2302,7 +2408,9 @@ result[{json_prop_name_literal}] = std::move(
     elif primitive_type is intermediate.PrimitiveType.FLOAT:
         return Stripped(
             f"""\
-result[{json_prop_name_literal}] = {getter_expr};"""
+result[{json_prop_name_literal}] = SerializeDouble(
+{I}{getter_expr}
+);"""
         )
 
     elif primitive_type is intermediate.PrimitiveType.STR:
@@ -2352,7 +2460,7 @@ def _generate_serialize_list_property(
         if items_primitive_type is intermediate.PrimitiveType.BOOL:
             serialize_list = "SerializeListWithInfallible"
 
-            serialize_item_expr = Stripped("Identity<bool>")
+            serialize_item_expr = Stripped("SerializeBool")
 
         elif items_primitive_type is intermediate.PrimitiveType.INT:
             serialize_list = "SerializeListWithFallible"
@@ -2362,7 +2470,7 @@ def _generate_serialize_list_property(
         elif items_primitive_type is intermediate.PrimitiveType.FLOAT:
             serialize_list = "SerializeListWithInfallible"
 
-            serialize_item_expr = Stripped("Identity<double>")
+            serialize_item_expr = Stripped("SerializeDouble")
 
         elif items_primitive_type is intermediate.PrimitiveType.STR:
             serialize_list = "SerializeListWithInfallible"
@@ -2830,10 +2938,9 @@ def generate_implementation(
 #include "{include_prefix_path}/wstringification.hpp"
 
 #pragma warning(push, 0)
-#include <functional>
-#include <map>
 #include <set>
 #include <sstream>
+#include <unordered_map>
 #pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(namespace),
@@ -2849,6 +2956,9 @@ def generate_implementation(
         _generate_deserialize_bytearray(),
         _generate_get_model_type(),
     ]
+
+    if any(len(cls.concrete_descendants) > 0 for cls in symbol_table.classes):
+        blocks.extend(_generate_model_type_string_to_model_type(symbol_table))
 
     if any(
         _type_annotation_contains_list(prop.type_annotation)
@@ -2927,12 +3037,13 @@ struct SerializationError {{
 }};  // struct SerializationError"""
             ),
             *_generate_serialization_exception_implementation(),
+            _generate_serialize_bool(),
             _generate_serialize_int(),
+            _generate_serialize_double(),
             _generate_serialize_str(),
             _generate_serialize_bytearray(),
             _generate_serialize_list_with_fallible_item_serialization(),
             _generate_serialize_list_with_infallible_item_serialization(),
-            _generate_identity(),
         ]
     )
 
