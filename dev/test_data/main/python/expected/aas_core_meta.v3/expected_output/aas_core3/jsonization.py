@@ -24,6 +24,7 @@ from typing import (
     MutableMapping,
     Optional,
     Sequence,
+    TypeVar,
     Union,
 )
 
@@ -165,6 +166,9 @@ MutableJsonable = Union[
 # region De-serialization
 
 
+_ItemT = TypeVar("_ItemT")
+
+
 def _bool_from_jsonable(
     jsonable: Jsonable
 ) -> bool:
@@ -304,6 +308,38 @@ def _try_to_cast_to_array_like(
     return None
 
 
+def _list_from_jsonable(
+    jsonable: Jsonable,
+    parse_item: Callable[[Jsonable], _ItemT]
+) -> List[_ItemT]:
+    """
+    Parse :paramref:`jsonable` as a list, applying :paramref:`parse_item` on
+    every item.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param parse_item: to parse a single item of the array
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    array_like = _try_to_cast_to_array_like(jsonable)
+    if array_like is None:
+        raise DeserializationException(
+            f"Expected something array-like, but got: {type(jsonable)}"
+        )
+
+    result = []  # type: List[_ItemT]
+    for i, jsonable_item in enumerate(array_like):
+        try:
+            item = parse_item(jsonable_item)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(array_like, i))
+            raise
+
+        result.append(item)
+
+    return result
+
+
 def has_semantics_from_jsonable(
         jsonable: Jsonable
 ) -> aas_types.HasSemantics:
@@ -378,32 +414,10 @@ class _SetterForExtension:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_name_from_jsonable(
             self,
@@ -453,32 +467,10 @@ class _SetterForExtension:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.refers_to = items
+        self.refers_to = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
 
 def extension_from_jsonable(
@@ -764,32 +756,10 @@ class _SetterForAdministrativeInformation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_version_from_jsonable(
             self,
@@ -992,32 +962,10 @@ class _SetterForQualifier:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_kind_from_jsonable(
             self,
@@ -1174,32 +1122,10 @@ class _SetterForAssetAdministrationShell:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -1236,32 +1162,10 @@ class _SetterForAssetAdministrationShell:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -1272,32 +1176,10 @@ class _SetterForAssetAdministrationShell:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_administration_from_jsonable(
             self,
@@ -1334,32 +1216,10 @@ class _SetterForAssetAdministrationShell:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_derived_from_from_jsonable(
             self,
@@ -1396,32 +1256,10 @@ class _SetterForAssetAdministrationShell:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.submodels = items
+        self.submodels = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
 
 def asset_administration_shell_from_jsonable(
@@ -1549,32 +1387,10 @@ class _SetterForAssetInformation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.SpecificAssetID
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = specific_asset_id_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.specific_asset_ids = items
+        self.specific_asset_ids = _list_from_jsonable(
+            jsonable,
+            specific_asset_id_from_jsonable
+        )
 
     def set_asset_type_from_jsonable(
             self,
@@ -1806,32 +1622,10 @@ class _SetterForSpecificAssetID:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_name_from_jsonable(
             self,
@@ -1962,32 +1756,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -2024,32 +1796,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -2060,32 +1810,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_administration_from_jsonable(
             self,
@@ -2148,32 +1876,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -2184,32 +1890,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -2220,32 +1904,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_submodel_elements_from_jsonable(
             self,
@@ -2256,32 +1918,10 @@ class _SetterForSubmodel:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.SubmodelElement
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = submodel_element_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.submodel_elements = items
+        self.submodel_elements = _list_from_jsonable(
+            jsonable,
+            submodel_element_from_jsonable
+        )
 
 
 def submodel_from_jsonable(
@@ -2458,32 +2098,10 @@ class _SetterForRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -2520,32 +2138,10 @@ class _SetterForRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -2556,32 +2152,10 @@ class _SetterForRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -2605,32 +2179,10 @@ class _SetterForRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -2641,32 +2193,10 @@ class _SetterForRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -2677,32 +2207,10 @@ class _SetterForRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_first_from_jsonable(
             self,
@@ -2860,32 +2368,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -2922,32 +2408,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -2958,32 +2422,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -3007,32 +2449,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -3043,32 +2463,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -3079,32 +2477,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_order_relevant_from_jsonable(
             self,
@@ -3167,32 +2543,10 @@ class _SetterForSubmodelElementList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.SubmodelElement
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = submodel_element_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.value = items
+        self.value = _list_from_jsonable(
+            jsonable,
+            submodel_element_from_jsonable
+        )
 
 
 def submodel_element_list_from_jsonable(
@@ -3297,32 +2651,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -3359,32 +2691,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -3395,32 +2705,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -3444,32 +2732,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -3480,32 +2746,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -3516,32 +2760,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_from_jsonable(
             self,
@@ -3552,32 +2774,10 @@ class _SetterForSubmodelElementCollection:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.SubmodelElement
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = submodel_element_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.value = items
+        self.value = _list_from_jsonable(
+            jsonable,
+            submodel_element_from_jsonable
+        )
 
 
 def submodel_element_collection_from_jsonable(
@@ -3711,32 +2911,10 @@ class _SetterForProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -3773,32 +2951,10 @@ class _SetterForProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -3809,32 +2965,10 @@ class _SetterForProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -3858,32 +2992,10 @@ class _SetterForProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -3894,32 +3006,10 @@ class _SetterForProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -3930,32 +3020,10 @@ class _SetterForProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_type_from_jsonable(
             self,
@@ -4098,32 +3166,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -4160,32 +3206,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -4196,32 +3220,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -4245,32 +3247,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -4281,32 +3261,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -4317,32 +3275,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_from_jsonable(
             self,
@@ -4353,32 +3289,10 @@ class _SetterForMultiLanguageProperty:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.value = items
+        self.value = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_value_id_from_jsonable(
             self,
@@ -4490,32 +3404,10 @@ class _SetterForRange:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -4552,32 +3444,10 @@ class _SetterForRange:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -4588,32 +3458,10 @@ class _SetterForRange:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -4637,32 +3485,10 @@ class _SetterForRange:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -4673,32 +3499,10 @@ class _SetterForRange:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -4709,32 +3513,10 @@ class _SetterForRange:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_type_from_jsonable(
             self,
@@ -4876,32 +3658,10 @@ class _SetterForReferenceElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -4938,32 +3698,10 @@ class _SetterForReferenceElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -4974,32 +3712,10 @@ class _SetterForReferenceElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -5023,32 +3739,10 @@ class _SetterForReferenceElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -5059,32 +3753,10 @@ class _SetterForReferenceElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -5095,32 +3767,10 @@ class _SetterForReferenceElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_from_jsonable(
             self,
@@ -5230,32 +3880,10 @@ class _SetterForBlob:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -5292,32 +3920,10 @@ class _SetterForBlob:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -5328,32 +3934,10 @@ class _SetterForBlob:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -5377,32 +3961,10 @@ class _SetterForBlob:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -5413,32 +3975,10 @@ class _SetterForBlob:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -5449,32 +3989,10 @@ class _SetterForBlob:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_from_jsonable(
             self,
@@ -5603,32 +4121,10 @@ class _SetterForFile:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -5665,32 +4161,10 @@ class _SetterForFile:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -5701,32 +4175,10 @@ class _SetterForFile:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -5750,32 +4202,10 @@ class _SetterForFile:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -5786,32 +4216,10 @@ class _SetterForFile:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -5822,32 +4230,10 @@ class _SetterForFile:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_value_from_jsonable(
             self,
@@ -5977,32 +4363,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -6039,32 +4403,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -6075,32 +4417,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -6124,32 +4444,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -6160,32 +4458,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -6196,32 +4472,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_first_from_jsonable(
             self,
@@ -6258,32 +4512,10 @@ class _SetterForAnnotatedRelationshipElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.DataElement
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = data_element_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.annotations = items
+        self.annotations = _list_from_jsonable(
+            jsonable,
+            data_element_from_jsonable
+        )
 
 
 def annotated_relationship_element_from_jsonable(
@@ -6394,32 +4626,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -6456,32 +4666,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -6492,32 +4680,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -6541,32 +4707,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -6577,32 +4721,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -6613,32 +4735,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_statements_from_jsonable(
             self,
@@ -6649,32 +4749,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.SubmodelElement
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = submodel_element_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.statements = items
+        self.statements = _list_from_jsonable(
+            jsonable,
+            submodel_element_from_jsonable
+        )
 
     def set_entity_type_from_jsonable(
             self,
@@ -6711,32 +4789,10 @@ class _SetterForEntity:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.SpecificAssetID
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = specific_asset_id_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.specific_asset_ids = items
+        self.specific_asset_ids = _list_from_jsonable(
+            jsonable,
+            specific_asset_id_from_jsonable
+        )
 
 
 def entity_from_jsonable(
@@ -7149,32 +5205,10 @@ class _SetterForBasicEventElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -7211,32 +5245,10 @@ class _SetterForBasicEventElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -7247,32 +5259,10 @@ class _SetterForBasicEventElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -7296,32 +5286,10 @@ class _SetterForBasicEventElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -7332,32 +5300,10 @@ class _SetterForBasicEventElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -7368,32 +5314,10 @@ class _SetterForBasicEventElement:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_observed_from_jsonable(
             self,
@@ -7617,32 +5541,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -7679,32 +5581,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -7715,32 +5595,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -7764,32 +5622,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -7800,32 +5636,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -7836,32 +5650,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_input_variables_from_jsonable(
             self,
@@ -7872,32 +5664,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.OperationVariable
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = operation_variable_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.input_variables = items
+        self.input_variables = _list_from_jsonable(
+            jsonable,
+            operation_variable_from_jsonable
+        )
 
     def set_output_variables_from_jsonable(
             self,
@@ -7908,32 +5678,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.OperationVariable
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = operation_variable_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.output_variables = items
+        self.output_variables = _list_from_jsonable(
+            jsonable,
+            operation_variable_from_jsonable
+        )
 
     def set_inoutput_variables_from_jsonable(
             self,
@@ -7944,32 +5692,10 @@ class _SetterForOperation:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.OperationVariable
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = operation_variable_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.inoutput_variables = items
+        self.inoutput_variables = _list_from_jsonable(
+            jsonable,
+            operation_variable_from_jsonable
+        )
 
 
 def operation_from_jsonable(
@@ -8139,32 +5865,10 @@ class _SetterForCapability:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -8201,32 +5905,10 @@ class _SetterForCapability:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -8237,32 +5919,10 @@ class _SetterForCapability:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_semantic_id_from_jsonable(
             self,
@@ -8286,32 +5946,10 @@ class _SetterForCapability:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.supplemental_semantic_ids = items
+        self.supplemental_semantic_ids = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
     def set_qualifiers_from_jsonable(
             self,
@@ -8322,32 +5960,10 @@ class _SetterForCapability:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Qualifier
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = qualifier_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.qualifiers = items
+        self.qualifiers = _list_from_jsonable(
+            jsonable,
+            qualifier_from_jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
             self,
@@ -8358,32 +5974,10 @@ class _SetterForCapability:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
 
 def capability_from_jsonable(
@@ -8477,32 +6071,10 @@ class _SetterForConceptDescription:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Extension
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = extension_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.extensions = items
+        self.extensions = _list_from_jsonable(
+            jsonable,
+            extension_from_jsonable
+        )
 
     def set_category_from_jsonable(
             self,
@@ -8539,32 +6111,10 @@ class _SetterForConceptDescription:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringNameType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_name_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.display_name = items
+        self.display_name = _list_from_jsonable(
+            jsonable,
+            lang_string_name_type_from_jsonable
+        )
 
     def set_description_from_jsonable(
             self,
@@ -8575,32 +6125,10 @@ class _SetterForConceptDescription:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringTextType
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_text_type_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.description = items
+        self.description = _list_from_jsonable(
+            jsonable,
+            lang_string_text_type_from_jsonable
+        )
 
     def set_administration_from_jsonable(
             self,
@@ -8637,32 +6165,10 @@ class _SetterForConceptDescription:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = embedded_data_specification_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.embedded_data_specifications = items
+        self.embedded_data_specifications = _list_from_jsonable(
+            jsonable,
+            embedded_data_specification_from_jsonable
+        )
 
     def set_is_case_of_from_jsonable(
             self,
@@ -8673,32 +6179,10 @@ class _SetterForConceptDescription:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Reference
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = reference_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.is_case_of = items
+        self.is_case_of = _list_from_jsonable(
+            jsonable,
+            reference_from_jsonable
+        )
 
 
 def concept_description_from_jsonable(
@@ -8843,32 +6327,10 @@ class _SetterForReference:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Key
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = key_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.keys = items
+        self.keys = _list_from_jsonable(
+            jsonable,
+            key_from_jsonable
+        )
 
 
 def reference_from_jsonable(
@@ -9315,32 +6777,10 @@ class _SetterForEnvironment:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.AssetAdministrationShell
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = asset_administration_shell_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.asset_administration_shells = items
+        self.asset_administration_shells = _list_from_jsonable(
+            jsonable,
+            asset_administration_shell_from_jsonable
+        )
 
     def set_submodels_from_jsonable(
             self,
@@ -9351,32 +6791,10 @@ class _SetterForEnvironment:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.Submodel
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = submodel_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.submodels = items
+        self.submodels = _list_from_jsonable(
+            jsonable,
+            submodel_from_jsonable
+        )
 
     def set_concept_descriptions_from_jsonable(
             self,
@@ -9387,32 +6805,10 @@ class _SetterForEnvironment:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.ConceptDescription
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = concept_description_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.concept_descriptions = items
+        self.concept_descriptions = _list_from_jsonable(
+            jsonable,
+            concept_description_from_jsonable
+        )
 
 
 def environment_from_jsonable(
@@ -9861,32 +7257,10 @@ class _SetterForValueList:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.ValueReferencePair
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = value_reference_pair_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.value_reference_pairs = items
+        self.value_reference_pairs = _list_from_jsonable(
+            jsonable,
+            value_reference_pair_from_jsonable
+        )
 
 
 def value_list_from_jsonable(
@@ -10247,32 +7621,10 @@ class _SetterForDataSpecificationIEC61360:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringPreferredNameTypeIEC61360
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_preferred_name_type_iec_61360_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.preferred_name = items
+        self.preferred_name = _list_from_jsonable(
+            jsonable,
+            lang_string_preferred_name_type_iec_61360_from_jsonable
+        )
 
     def set_short_name_from_jsonable(
             self,
@@ -10283,32 +7635,10 @@ class _SetterForDataSpecificationIEC61360:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringShortNameTypeIEC61360
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_short_name_type_iec_61360_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.short_name = items
+        self.short_name = _list_from_jsonable(
+            jsonable,
+            lang_string_short_name_type_iec_61360_from_jsonable
+        )
 
     def set_unit_from_jsonable(
             self,
@@ -10384,32 +7714,10 @@ class _SetterForDataSpecificationIEC61360:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            aas_types.LangStringDefinitionTypeIEC61360
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = lang_string_definition_type_iec_61360_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.definition = items
+        self.definition = _list_from_jsonable(
+            jsonable,
+            lang_string_definition_type_iec_61360_from_jsonable
+        )
 
     def set_value_format_from_jsonable(
             self,

@@ -24,6 +24,7 @@ from typing import (
     MutableMapping,
     Optional,
     Sequence,
+    TypeVar,
     Union,
 )
 
@@ -165,6 +166,9 @@ MutableJsonable = Union[
 # region De-serialization
 
 
+_ItemT = TypeVar("_ItemT")
+
+
 def _bool_from_jsonable(
     jsonable: Jsonable
 ) -> bool:
@@ -302,6 +306,38 @@ def _try_to_cast_to_array_like(
         return cast(Iterable[Any], jsonable)
 
     return None
+
+
+def _list_from_jsonable(
+    jsonable: Jsonable,
+    parse_item: Callable[[Jsonable], _ItemT]
+) -> List[_ItemT]:
+    """
+    Parse :paramref:`jsonable` as a list, applying :paramref:`parse_item` on
+    every item.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param parse_item: to parse a single item of the array
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    array_like = _try_to_cast_to_array_like(jsonable)
+    if array_like is None:
+        raise DeserializationException(
+            f"Expected something array-like, but got: {type(jsonable)}"
+        )
+
+    result = []  # type: List[_ItemT]
+    for i, jsonable_item in enumerate(array_like):
+        try:
+            item = parse_item(jsonable_item)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(array_like, i))
+            raise
+
+        result.append(item)
+
+    return result
 
 
 def result_from_jsonable(

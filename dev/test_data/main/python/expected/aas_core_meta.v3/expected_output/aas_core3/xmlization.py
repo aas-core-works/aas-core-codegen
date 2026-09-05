@@ -83,6 +83,7 @@ from typing import (
     Sequence,
     TextIO,
     Tuple,
+    TypeVar,
     Union,
     TYPE_CHECKING
 )
@@ -10483,6 +10484,112 @@ def _read_end_element(
     return next_element
 
 
+_ItemT = TypeVar("_ItemT")
+
+
+def _read_v_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    expected_tag: str,
+    read_content: Callable[
+        [Element, Iterator[Tuple[str, Element]]],
+        _ItemT
+    ]
+) -> _ItemT:
+    """
+    Verify that :paramref:`element` bears the :paramref:`expected_tag`, and
+    delegate the reading of its content to :paramref:`read_content`.
+
+    This is used to read a single positional item wrapped in a named element,
+    such as ``<v>`` for a list item.
+
+    :param element: look-ahead element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param expected_tag: expected tag of :paramref:`element`
+    :param read_content: to read the content of :paramref:`element`
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed value
+    """
+    tag_wo_ns = _parse_element_tag(element)
+    if tag_wo_ns != expected_tag:
+        raise DeserializationException(
+            f"Expected an element with the tag {expected_tag!r}, "
+            f"but got an element with tag: {tag_wo_ns!r}"
+        )
+
+    return read_content(element, iterator)
+
+
+def _read_list_of_items(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_item: Callable[
+        [Element, Iterator[Tuple[str, Element]]],
+        _ItemT
+    ]
+) -> List[_ItemT]:
+    """
+    Read a list of items from :paramref:`iterator`.
+
+    :paramref:`read_item` is responsible for verifying the tag of each item
+    element itself -- *e.g.*, by wrapping a scalar/enumeration reader with
+    :py:func:`_read_v_element`, or by relying on a class's own dispatch by
+    its natural element tag.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the list
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_item: to read a single item, including its own end element
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed items
+    """
+    if element.text is not None and len(element.text.strip()) != 0:
+        raise DeserializationException(
+            f"Expected only item elements and whitespace text, "
+            f"but got text: {element.text!r}"
+        )
+
+    result = []  # type: List[_ItemT]
+    item_i = 0
+
+    while True:
+        next_event_element = next(iterator, None)
+        if next_event_element is None:
+            raise DeserializationException(
+                "Expected one or more items from a list or the end element, "
+                "but got end-of-input"
+            )
+
+        next_event, next_element = next_event_element
+        if next_event == 'end' and next_element.tag == element.tag:
+            # We reached the end of the list.
+            break
+
+        if next_event != 'start':
+            raise DeserializationException(
+                "Expected a start element corresponding to an item, "
+                f"but got event {next_event!r} and element {next_element.tag!r}"
+            )
+
+        try:
+            item = read_item(next_element, iterator)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(next_element, item_i))
+            raise
+
+        result.append(item)
+        item_i += 1
+
+    return result
+
+
 def _read_text_from_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -10787,50 +10894,11 @@ class _ReaderAndSetterForExtension:
         Read :paramref:`element` as the property
         :py:attr:`.types.Extension.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_name(
         self,
@@ -10883,50 +10951,11 @@ class _ReaderAndSetterForExtension:
         Read :paramref:`element` as the property
         :py:attr:`.types.Extension.refers_to` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.refers_to = result
+        self.refers_to = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
 
 def _read_extension_as_sequence(
@@ -11286,50 +11315,11 @@ class _ReaderAndSetterForAdministrativeInformation:
         Read :paramref:`element` as the property
         :py:attr:`.types.AdministrativeInformation.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_version(
         self,
@@ -11615,50 +11605,11 @@ class _ReaderAndSetterForQualifier:
         Read :paramref:`element` as the property
         :py:attr:`.types.Qualifier.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_kind(
         self,
@@ -11893,50 +11844,11 @@ class _ReaderAndSetterForAssetAdministrationShell:
         Read :paramref:`element` as the property
         :py:attr:`.types.AssetAdministrationShell.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -11975,50 +11887,11 @@ class _ReaderAndSetterForAssetAdministrationShell:
         Read :paramref:`element` as the property
         :py:attr:`.types.AssetAdministrationShell.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -12029,50 +11902,11 @@ class _ReaderAndSetterForAssetAdministrationShell:
         Read :paramref:`element` as the property
         :py:attr:`.types.AssetAdministrationShell.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_administration(
         self,
@@ -12111,50 +11945,11 @@ class _ReaderAndSetterForAssetAdministrationShell:
         Read :paramref:`element` as the property
         :py:attr:`.types.AssetAdministrationShell.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_derived_from(
         self,
@@ -12193,50 +11988,11 @@ class _ReaderAndSetterForAssetAdministrationShell:
         Read :paramref:`element` as the property
         :py:attr:`.types.AssetAdministrationShell.submodels` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.submodels = result
+        self.submodels = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
 
 def _read_asset_administration_shell_as_sequence(
@@ -12427,50 +12183,11 @@ class _ReaderAndSetterForAssetInformation:
         Read :paramref:`element` as the property
         :py:attr:`.types.AssetInformation.specific_asset_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.SpecificAssetID
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_specific_asset_id_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.specific_asset_ids = result
+        self.specific_asset_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_specific_asset_id_as_element
+        )
 
     def read_and_set_asset_type(
         self,
@@ -12859,50 +12576,11 @@ class _ReaderAndSetterForSpecificAssetID:
         Read :paramref:`element` as the property
         :py:attr:`.types.SpecificAssetID.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_name(
         self,
@@ -13109,50 +12787,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -13191,50 +12830,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -13245,50 +12845,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_administration(
         self,
@@ -13355,50 +12916,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -13409,50 +12931,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -13463,50 +12946,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_submodel_elements(
         self,
@@ -13517,50 +12961,11 @@ class _ReaderAndSetterForSubmodel:
         Read :paramref:`element` as the property
         :py:attr:`.types.Submodel.submodel_elements` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.SubmodelElement
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_submodel_element_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.submodel_elements = result
+        self.submodel_elements = _read_list_of_items(
+            element,
+            iterator,
+            _read_submodel_element_as_element
+        )
 
 
 def _read_submodel_as_sequence(
@@ -13761,50 +13166,11 @@ class _ReaderAndSetterForRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.RelationshipElement.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -13843,50 +13209,11 @@ class _ReaderAndSetterForRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.RelationshipElement.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -13897,50 +13224,11 @@ class _ReaderAndSetterForRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.RelationshipElement.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -13965,50 +13253,11 @@ class _ReaderAndSetterForRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.RelationshipElement.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -14019,50 +13268,11 @@ class _ReaderAndSetterForRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.RelationshipElement.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -14073,50 +13283,11 @@ class _ReaderAndSetterForRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.RelationshipElement.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_first(
         self,
@@ -14353,50 +13524,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -14435,50 +13567,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -14489,50 +13582,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -14557,50 +13611,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -14611,50 +13626,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -14665,50 +13641,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_order_relevant(
         self,
@@ -14775,50 +13712,11 @@ class _ReaderAndSetterForSubmodelElementList:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementList.value` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.SubmodelElement
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_submodel_element_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.value = result
+        self.value = _read_list_of_items(
+            element,
+            iterator,
+            _read_submodel_element_as_element
+        )
 
 
 def _read_submodel_element_list_as_sequence(
@@ -14984,50 +13882,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -15066,50 +13925,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -15120,50 +13940,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -15188,50 +13969,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -15242,50 +13984,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -15296,50 +13999,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value(
         self,
@@ -15350,50 +14014,11 @@ class _ReaderAndSetterForSubmodelElementCollection:
         Read :paramref:`element` as the property
         :py:attr:`.types.SubmodelElementCollection.value` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.SubmodelElement
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_submodel_element_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.value = result
+        self.value = _read_list_of_items(
+            element,
+            iterator,
+            _read_submodel_element_as_element
+        )
 
 
 def _read_submodel_element_collection_as_sequence(
@@ -15587,50 +14212,11 @@ class _ReaderAndSetterForProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.Property.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -15669,50 +14255,11 @@ class _ReaderAndSetterForProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.Property.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -15723,50 +14270,11 @@ class _ReaderAndSetterForProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.Property.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -15791,50 +14299,11 @@ class _ReaderAndSetterForProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.Property.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -15845,50 +14314,11 @@ class _ReaderAndSetterForProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.Property.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -15899,50 +14329,11 @@ class _ReaderAndSetterForProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.Property.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value_type(
         self,
@@ -16149,50 +14540,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -16231,50 +14583,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -16285,50 +14598,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -16353,50 +14627,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -16407,50 +14642,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -16461,50 +14657,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value(
         self,
@@ -16515,50 +14672,11 @@ class _ReaderAndSetterForMultiLanguageProperty:
         Read :paramref:`element` as the property
         :py:attr:`.types.MultiLanguageProperty.value` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.value = result
+        self.value = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_value_id(
         self,
@@ -16732,50 +14850,11 @@ class _ReaderAndSetterForRange:
         Read :paramref:`element` as the property
         :py:attr:`.types.Range.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -16814,50 +14893,11 @@ class _ReaderAndSetterForRange:
         Read :paramref:`element` as the property
         :py:attr:`.types.Range.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -16868,50 +14908,11 @@ class _ReaderAndSetterForRange:
         Read :paramref:`element` as the property
         :py:attr:`.types.Range.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -16936,50 +14937,11 @@ class _ReaderAndSetterForRange:
         Read :paramref:`element` as the property
         :py:attr:`.types.Range.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -16990,50 +14952,11 @@ class _ReaderAndSetterForRange:
         Read :paramref:`element` as the property
         :py:attr:`.types.Range.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -17044,50 +14967,11 @@ class _ReaderAndSetterForRange:
         Read :paramref:`element` as the property
         :py:attr:`.types.Range.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value_type(
         self,
@@ -17293,50 +15177,11 @@ class _ReaderAndSetterForReferenceElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.ReferenceElement.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -17375,50 +15220,11 @@ class _ReaderAndSetterForReferenceElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.ReferenceElement.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -17429,50 +15235,11 @@ class _ReaderAndSetterForReferenceElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.ReferenceElement.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -17497,50 +15264,11 @@ class _ReaderAndSetterForReferenceElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.ReferenceElement.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -17551,50 +15279,11 @@ class _ReaderAndSetterForReferenceElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.ReferenceElement.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -17605,50 +15294,11 @@ class _ReaderAndSetterForReferenceElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.ReferenceElement.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value(
         self,
@@ -17820,50 +15470,11 @@ class _ReaderAndSetterForBlob:
         Read :paramref:`element` as the property
         :py:attr:`.types.Blob.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -17902,50 +15513,11 @@ class _ReaderAndSetterForBlob:
         Read :paramref:`element` as the property
         :py:attr:`.types.Blob.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -17956,50 +15528,11 @@ class _ReaderAndSetterForBlob:
         Read :paramref:`element` as the property
         :py:attr:`.types.Blob.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -18024,50 +15557,11 @@ class _ReaderAndSetterForBlob:
         Read :paramref:`element` as the property
         :py:attr:`.types.Blob.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -18078,50 +15572,11 @@ class _ReaderAndSetterForBlob:
         Read :paramref:`element` as the property
         :py:attr:`.types.Blob.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -18132,50 +15587,11 @@ class _ReaderAndSetterForBlob:
         Read :paramref:`element` as the property
         :py:attr:`.types.Blob.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value(
         self,
@@ -18367,50 +15783,11 @@ class _ReaderAndSetterForFile:
         Read :paramref:`element` as the property
         :py:attr:`.types.File.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -18449,50 +15826,11 @@ class _ReaderAndSetterForFile:
         Read :paramref:`element` as the property
         :py:attr:`.types.File.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -18503,50 +15841,11 @@ class _ReaderAndSetterForFile:
         Read :paramref:`element` as the property
         :py:attr:`.types.File.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -18571,50 +15870,11 @@ class _ReaderAndSetterForFile:
         Read :paramref:`element` as the property
         :py:attr:`.types.File.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -18625,50 +15885,11 @@ class _ReaderAndSetterForFile:
         Read :paramref:`element` as the property
         :py:attr:`.types.File.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -18679,50 +15900,11 @@ class _ReaderAndSetterForFile:
         Read :paramref:`element` as the property
         :py:attr:`.types.File.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_value(
         self,
@@ -18915,50 +16097,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -18997,50 +16140,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -19051,50 +16155,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -19119,50 +16184,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -19173,50 +16199,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -19227,50 +16214,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_first(
         self,
@@ -19309,50 +16257,11 @@ class _ReaderAndSetterForAnnotatedRelationshipElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.AnnotatedRelationshipElement.annotations` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.DataElement
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_data_element_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.annotations = result
+        self.annotations = _read_list_of_items(
+            element,
+            iterator,
+            _read_data_element_as_element
+        )
 
 
 def _read_annotated_relationship_element_as_sequence(
@@ -19524,50 +16433,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -19606,50 +16476,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -19660,50 +16491,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -19728,50 +16520,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -19782,50 +16535,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -19836,50 +16550,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_statements(
         self,
@@ -19890,50 +16565,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.statements` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.SubmodelElement
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_submodel_element_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.statements = result
+        self.statements = _read_list_of_items(
+            element,
+            iterator,
+            _read_submodel_element_as_element
+        )
 
     def read_and_set_entity_type(
         self,
@@ -19972,50 +16608,11 @@ class _ReaderAndSetterForEntity:
         Read :paramref:`element` as the property
         :py:attr:`.types.Entity.specific_asset_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.SpecificAssetID
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_specific_asset_id_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.specific_asset_ids = result
+        self.specific_asset_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_specific_asset_id_as_element
+        )
 
 
 def _read_entity_as_sequence(
@@ -20587,50 +17184,11 @@ class _ReaderAndSetterForBasicEventElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.BasicEventElement.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -20669,50 +17227,11 @@ class _ReaderAndSetterForBasicEventElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.BasicEventElement.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -20723,50 +17242,11 @@ class _ReaderAndSetterForBasicEventElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.BasicEventElement.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -20791,50 +17271,11 @@ class _ReaderAndSetterForBasicEventElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.BasicEventElement.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -20845,50 +17286,11 @@ class _ReaderAndSetterForBasicEventElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.BasicEventElement.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -20899,50 +17301,11 @@ class _ReaderAndSetterForBasicEventElement:
         Read :paramref:`element` as the property
         :py:attr:`.types.BasicEventElement.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_observed(
         self,
@@ -21235,50 +17598,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -21317,50 +17641,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -21371,50 +17656,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -21439,50 +17685,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -21493,50 +17700,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -21547,50 +17715,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_input_variables(
         self,
@@ -21601,50 +17730,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.input_variables` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.OperationVariable
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_operation_variable_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.input_variables = result
+        self.input_variables = _read_list_of_items(
+            element,
+            iterator,
+            _read_operation_variable_as_element
+        )
 
     def read_and_set_output_variables(
         self,
@@ -21655,50 +17745,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.output_variables` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.OperationVariable
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_operation_variable_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.output_variables = result
+        self.output_variables = _read_list_of_items(
+            element,
+            iterator,
+            _read_operation_variable_as_element
+        )
 
     def read_and_set_inoutput_variables(
         self,
@@ -21709,50 +17760,11 @@ class _ReaderAndSetterForOperation:
         Read :paramref:`element` as the property
         :py:attr:`.types.Operation.inoutput_variables` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.OperationVariable
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_operation_variable_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.inoutput_variables = result
+        self.inoutput_variables = _read_list_of_items(
+            element,
+            iterator,
+            _read_operation_variable_as_element
+        )
 
 
 def _read_operation_as_sequence(
@@ -22080,50 +18092,11 @@ class _ReaderAndSetterForCapability:
         Read :paramref:`element` as the property
         :py:attr:`.types.Capability.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -22162,50 +18135,11 @@ class _ReaderAndSetterForCapability:
         Read :paramref:`element` as the property
         :py:attr:`.types.Capability.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -22216,50 +18150,11 @@ class _ReaderAndSetterForCapability:
         Read :paramref:`element` as the property
         :py:attr:`.types.Capability.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_semantic_id(
         self,
@@ -22284,50 +18179,11 @@ class _ReaderAndSetterForCapability:
         Read :paramref:`element` as the property
         :py:attr:`.types.Capability.supplemental_semantic_ids` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.supplemental_semantic_ids = result
+        self.supplemental_semantic_ids = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
     def read_and_set_qualifiers(
         self,
@@ -22338,50 +18194,11 @@ class _ReaderAndSetterForCapability:
         Read :paramref:`element` as the property
         :py:attr:`.types.Capability.qualifiers` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Qualifier
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_qualifier_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.qualifiers = result
+        self.qualifiers = _read_list_of_items(
+            element,
+            iterator,
+            _read_qualifier_as_element
+        )
 
     def read_and_set_embedded_data_specifications(
         self,
@@ -22392,50 +18209,11 @@ class _ReaderAndSetterForCapability:
         Read :paramref:`element` as the property
         :py:attr:`.types.Capability.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
 
 def _read_capability_as_sequence(
@@ -22590,50 +18368,11 @@ class _ReaderAndSetterForConceptDescription:
         Read :paramref:`element` as the property
         :py:attr:`.types.ConceptDescription.extensions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Extension
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_extension_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.extensions = result
+        self.extensions = _read_list_of_items(
+            element,
+            iterator,
+            _read_extension_as_element
+        )
 
     def read_and_set_category(
         self,
@@ -22672,50 +18411,11 @@ class _ReaderAndSetterForConceptDescription:
         Read :paramref:`element` as the property
         :py:attr:`.types.ConceptDescription.display_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringNameType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_name_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.display_name = result
+        self.display_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_name_type_as_element
+        )
 
     def read_and_set_description(
         self,
@@ -22726,50 +18426,11 @@ class _ReaderAndSetterForConceptDescription:
         Read :paramref:`element` as the property
         :py:attr:`.types.ConceptDescription.description` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringTextType
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_text_type_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.description = result
+        self.description = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_text_type_as_element
+        )
 
     def read_and_set_administration(
         self,
@@ -22808,50 +18469,11 @@ class _ReaderAndSetterForConceptDescription:
         Read :paramref:`element` as the property
         :py:attr:`.types.ConceptDescription.embedded_data_specifications` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.EmbeddedDataSpecification
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_embedded_data_specification_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.embedded_data_specifications = result
+        self.embedded_data_specifications = _read_list_of_items(
+            element,
+            iterator,
+            _read_embedded_data_specification_as_element
+        )
 
     def read_and_set_is_case_of(
         self,
@@ -22862,50 +18484,11 @@ class _ReaderAndSetterForConceptDescription:
         Read :paramref:`element` as the property
         :py:attr:`.types.ConceptDescription.is_case_of` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Reference
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_reference_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.is_case_of = result
+        self.is_case_of = _read_list_of_items(
+            element,
+            iterator,
+            _read_reference_as_element
+        )
 
 
 def _read_concept_description_as_sequence(
@@ -23119,50 +18702,11 @@ class _ReaderAndSetterForReference:
         Read :paramref:`element` as the property
         :py:attr:`.types.Reference.keys` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Key
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_key_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.keys = result
+        self.keys = _read_list_of_items(
+            element,
+            iterator,
+            _read_key_as_element
+        )
 
 
 def _read_reference_as_sequence(
@@ -23918,50 +19462,11 @@ class _ReaderAndSetterForEnvironment:
         Read :paramref:`element` as the property
         :py:attr:`.types.Environment.asset_administration_shells` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.AssetAdministrationShell
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_asset_administration_shell_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.asset_administration_shells = result
+        self.asset_administration_shells = _read_list_of_items(
+            element,
+            iterator,
+            _read_asset_administration_shell_as_element
+        )
 
     def read_and_set_submodels(
         self,
@@ -23972,50 +19477,11 @@ class _ReaderAndSetterForEnvironment:
         Read :paramref:`element` as the property
         :py:attr:`.types.Environment.submodels` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.Submodel
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_submodel_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.submodels = result
+        self.submodels = _read_list_of_items(
+            element,
+            iterator,
+            _read_submodel_as_element
+        )
 
     def read_and_set_concept_descriptions(
         self,
@@ -24026,50 +19492,11 @@ class _ReaderAndSetterForEnvironment:
         Read :paramref:`element` as the property
         :py:attr:`.types.Environment.concept_descriptions` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.ConceptDescription
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_concept_description_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.concept_descriptions = result
+        self.concept_descriptions = _read_list_of_items(
+            element,
+            iterator,
+            _read_concept_description_as_element
+        )
 
 
 def _read_environment_as_sequence(
@@ -24846,50 +20273,11 @@ class _ReaderAndSetterForValueList:
         Read :paramref:`element` as the property
         :py:attr:`.types.ValueList.value_reference_pairs` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.ValueReferencePair
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_value_reference_pair_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.value_reference_pairs = result
+        self.value_reference_pairs = _read_list_of_items(
+            element,
+            iterator,
+            _read_value_reference_pair_as_element
+        )
 
 
 def _read_value_list_as_sequence(
@@ -25548,50 +20936,11 @@ class _ReaderAndSetterForDataSpecificationIEC61360:
         Read :paramref:`element` as the property
         :py:attr:`.types.DataSpecificationIEC61360.preferred_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringPreferredNameTypeIEC61360
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_preferred_name_type_iec_61360_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.preferred_name = result
+        self.preferred_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_preferred_name_type_iec_61360_as_element
+        )
 
     def read_and_set_short_name(
         self,
@@ -25602,50 +20951,11 @@ class _ReaderAndSetterForDataSpecificationIEC61360:
         Read :paramref:`element` as the property
         :py:attr:`.types.DataSpecificationIEC61360.short_name` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringShortNameTypeIEC61360
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_short_name_type_iec_61360_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.short_name = result
+        self.short_name = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_short_name_type_iec_61360_as_element
+        )
 
     def read_and_set_unit(
         self,
@@ -25726,50 +21036,11 @@ class _ReaderAndSetterForDataSpecificationIEC61360:
         Read :paramref:`element` as the property
         :py:attr:`.types.DataSpecificationIEC61360.definition` and set it.
         """
-        if element.text is not None and len(element.text.strip()) != 0:
-            raise DeserializationException(
-                f"Expected only item elements and whitespace text, "
-                f"but got text: {element.text!r}"
-            )
-
-        result: List[
-            aas_types.LangStringDefinitionTypeIEC61360
-        ] = []
-
-        item_i = 0
-
-        while True:
-            next_event_element = next(iterator, None)
-            if next_event_element is None:
-                raise DeserializationException(
-                    "Expected one or more items from a list or the end element, "
-                    "but got end-of-input"
-                )
-
-            next_event, next_element = next_event_element
-            if next_event == 'end' and next_element.tag == element.tag:
-                # We reached the end of the list.
-                break
-
-            if next_event != 'start':
-                raise DeserializationException(
-                    "Expected a start element corresponding to an item, "
-                    f"but got event {next_event!r} and element {next_element.tag!r}"
-                )
-
-            try:
-                item = _read_lang_string_definition_type_iec_61360_as_element(
-                    next_element,
-                    iterator
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(next_element, item_i))
-                raise
-
-            result.append(item)
-            item_i += 1
-
-        self.definition = result
+        self.definition = _read_list_of_items(
+            element,
+            iterator,
+            _read_lang_string_definition_type_iec_61360_as_element
+        )
 
     def read_and_set_value_format(
         self,
@@ -27772,6 +23043,30 @@ class _Serializer(aas_types.AbstractVisitor):
         self.stream.write(encoded)
         self._write_end_element(name)
 
+    def _write_list_of_items(
+        self,
+        name: str,
+        items: Sequence[_ItemT],
+        write_item: Callable[[_ItemT], None]
+    ) -> None:
+        """
+        Write :paramref:`items` enclosed in the :paramref:`name` element.
+
+        :param name: of the enclosing element
+        :param items: to be written
+        :param write_item:
+            to write a single item of :paramref:`items` -- either into its own
+            ``v`` element (for scalars/enumerations) or its own natural class
+            element (for classes, via :py:meth:`~visit`)
+        """
+        if len(items) == 0:
+            self._write_empty_element(name)
+        else:
+            self._write_start_element(name)
+            for item in items:
+                write_item(item)
+            self._write_end_element(name)
+
     def __init__(
         self,
         stream: TextIO
@@ -27813,13 +23108,11 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for an_item in that.supplemental_semantic_ids:
-                    self.visit(an_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         self._write_str_as_element(
             'name',
@@ -27839,13 +23132,11 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.refers_to is not None:
-            if len(that.refers_to) == 0:
-                self._write_empty_element('refersTo')
-            else:
-                self._write_start_element('refersTo')
-                for another_item in that.refers_to:
-                    self.visit(another_item)
-                self._write_end_element('refersTo')
+            self._write_list_of_items(
+                'refersTo',
+                that.refers_to,
+                self.visit
+            )
 
     def visit_extension(
         self,
@@ -27879,13 +23170,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for an_item in that.embedded_data_specifications:
-                    self.visit(an_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.version is not None:
             self._write_str_as_element(
@@ -27964,13 +23253,11 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for an_item in that.supplemental_semantic_ids:
-                    self.visit(an_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.kind is not None:
             self._write_str_as_element(
@@ -28033,13 +23320,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -28054,22 +23339,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.administration is not None:
             the_administration = that.administration
@@ -28098,13 +23379,11 @@ class _Serializer(aas_types.AbstractVisitor):
         )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.derived_from is not None:
             self._write_start_element('derivedFrom')
@@ -28120,13 +23399,11 @@ class _Serializer(aas_types.AbstractVisitor):
         self._write_end_element('assetInformation')
 
         if that.submodels is not None:
-            if len(that.submodels) == 0:
-                self._write_empty_element('submodels')
-            else:
-                self._write_start_element('submodels')
-                for yet_yet_yet_another_item in that.submodels:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('submodels')
+            self._write_list_of_items(
+                'submodels',
+                that.submodels,
+                self.visit
+            )
 
     def visit_asset_administration_shell(
         self,
@@ -28171,13 +23448,11 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.specific_asset_ids is not None:
-            if len(that.specific_asset_ids) == 0:
-                self._write_empty_element('specificAssetIds')
-            else:
-                self._write_start_element('specificAssetIds')
-                for an_item in that.specific_asset_ids:
-                    self.visit(an_item)
-                self._write_end_element('specificAssetIds')
+            self._write_list_of_items(
+                'specificAssetIds',
+                that.specific_asset_ids,
+                self.visit
+            )
 
         if that.asset_type is not None:
             self._write_str_as_element(
@@ -28273,13 +23548,11 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for an_item in that.supplemental_semantic_ids:
-                    self.visit(an_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         self._write_str_as_element(
             'name',
@@ -28330,13 +23603,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -28351,22 +23622,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.administration is not None:
             the_administration = that.administration
@@ -28408,40 +23675,32 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.submodel_elements is not None:
-            if len(that.submodel_elements) == 0:
-                self._write_empty_element('submodelElements')
-            else:
-                self._write_start_element('submodelElements')
-                for yet_yet_yet_yet_yet_another_item in that.submodel_elements:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('submodelElements')
+            self._write_list_of_items(
+                'submodelElements',
+                that.submodel_elements,
+                self.visit
+            )
 
     def visit_submodel(
         self,
@@ -28475,13 +23734,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -28496,22 +23753,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -28521,31 +23774,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         self._write_start_element('first')
         self._write_reference_as_sequence(
@@ -28591,13 +23838,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -28612,22 +23857,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -28637,31 +23878,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.order_relevant is not None:
             self._write_bool_as_element(
@@ -28688,13 +23923,11 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.value is not None:
-            if len(that.value) == 0:
-                self._write_empty_element('value')
-            else:
-                self._write_start_element('value')
-                for yet_yet_yet_yet_yet_another_item in that.value:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('value')
+            self._write_list_of_items(
+                'value',
+                that.value,
+                self.visit
+            )
 
     def visit_submodel_element_list(
         self,
@@ -28728,13 +23961,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -28749,22 +23980,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -28774,40 +24001,32 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.value is not None:
-            if len(that.value) == 0:
-                self._write_empty_element('value')
-            else:
-                self._write_start_element('value')
-                for yet_yet_yet_yet_yet_another_item in that.value:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('value')
+            self._write_list_of_items(
+                'value',
+                that.value,
+                self.visit
+            )
 
     def visit_submodel_element_collection(
         self,
@@ -28859,13 +24078,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -28880,22 +24097,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -28905,31 +24118,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         self._write_str_as_element(
             'valueType',
@@ -28981,13 +24188,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29002,22 +24207,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29027,40 +24228,32 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.value is not None:
-            if len(that.value) == 0:
-                self._write_empty_element('value')
-            else:
-                self._write_start_element('value')
-                for yet_yet_yet_yet_yet_another_item in that.value:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('value')
+            self._write_list_of_items(
+                'value',
+                that.value,
+                self.visit
+            )
 
         if that.value_id is not None:
             self._write_start_element('valueId')
@@ -29120,13 +24313,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29141,22 +24332,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29166,31 +24353,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         self._write_str_as_element(
             'valueType',
@@ -29241,13 +24422,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29262,22 +24441,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29287,31 +24462,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.value is not None:
             self._write_start_element('value')
@@ -29370,13 +24539,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29391,22 +24558,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29416,31 +24579,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.value is not None:
             self._write_bytes_as_element(
@@ -29485,13 +24642,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29506,22 +24661,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29531,31 +24682,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.value is not None:
             self._write_str_as_element(
@@ -29600,13 +24745,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29621,22 +24764,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29646,31 +24785,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         self._write_start_element('first')
         self._write_reference_as_sequence(
@@ -29685,13 +24818,11 @@ class _Serializer(aas_types.AbstractVisitor):
         self._write_end_element('second')
 
         if that.annotations is not None:
-            if len(that.annotations) == 0:
-                self._write_empty_element('annotations')
-            else:
-                self._write_start_element('annotations')
-                for yet_yet_yet_yet_yet_another_item in that.annotations:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('annotations')
+            self._write_list_of_items(
+                'annotations',
+                that.annotations,
+                self.visit
+            )
 
     def visit_annotated_relationship_element(
         self,
@@ -29725,13 +24856,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29746,22 +24875,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29771,40 +24896,32 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.statements is not None:
-            if len(that.statements) == 0:
-                self._write_empty_element('statements')
-            else:
-                self._write_start_element('statements')
-                for yet_yet_yet_yet_yet_another_item in that.statements:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('statements')
+            self._write_list_of_items(
+                'statements',
+                that.statements,
+                self.visit
+            )
 
         self._write_str_as_element(
             'entityType',
@@ -29818,13 +24935,11 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.specific_asset_ids is not None:
-            if len(that.specific_asset_ids) == 0:
-                self._write_empty_element('specificAssetIds')
-            else:
-                self._write_start_element('specificAssetIds')
-                for yet_yet_yet_yet_yet_yet_another_item in that.specific_asset_ids:
-                    self.visit(yet_yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('specificAssetIds')
+            self._write_list_of_items(
+                'specificAssetIds',
+                that.specific_asset_ids,
+                self.visit
+            )
 
     def visit_entity(
         self,
@@ -29939,13 +25054,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -29960,22 +25073,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -29985,31 +25094,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         self._write_start_element('observed')
         self._write_reference_as_sequence(
@@ -30090,13 +25193,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -30111,22 +25212,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -30136,58 +25233,46 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.input_variables is not None:
-            if len(that.input_variables) == 0:
-                self._write_empty_element('inputVariables')
-            else:
-                self._write_start_element('inputVariables')
-                for yet_yet_yet_yet_yet_another_item in that.input_variables:
-                    self.visit(yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('inputVariables')
+            self._write_list_of_items(
+                'inputVariables',
+                that.input_variables,
+                self.visit
+            )
 
         if that.output_variables is not None:
-            if len(that.output_variables) == 0:
-                self._write_empty_element('outputVariables')
-            else:
-                self._write_start_element('outputVariables')
-                for yet_yet_yet_yet_yet_yet_another_item in that.output_variables:
-                    self.visit(yet_yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('outputVariables')
+            self._write_list_of_items(
+                'outputVariables',
+                that.output_variables,
+                self.visit
+            )
 
         if that.inoutput_variables is not None:
-            if len(that.inoutput_variables) == 0:
-                self._write_empty_element('inoutputVariables')
-            else:
-                self._write_start_element('inoutputVariables')
-                for yet_yet_yet_yet_yet_yet_yet_another_item in that.inoutput_variables:
-                    self.visit(yet_yet_yet_yet_yet_yet_yet_another_item)
-                self._write_end_element('inoutputVariables')
+            self._write_list_of_items(
+                'inoutputVariables',
+                that.inoutput_variables,
+                self.visit
+            )
 
     def visit_operation(
         self,
@@ -30276,13 +25361,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -30297,22 +25380,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.semantic_id is not None:
             self._write_start_element('semanticId')
@@ -30322,31 +25401,25 @@ class _Serializer(aas_types.AbstractVisitor):
             self._write_end_element('semanticId')
 
         if that.supplemental_semantic_ids is not None:
-            if len(that.supplemental_semantic_ids) == 0:
-                self._write_empty_element('supplementalSemanticIds')
-            else:
-                self._write_start_element('supplementalSemanticIds')
-                for yet_yet_another_item in that.supplemental_semantic_ids:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('supplementalSemanticIds')
+            self._write_list_of_items(
+                'supplementalSemanticIds',
+                that.supplemental_semantic_ids,
+                self.visit
+            )
 
         if that.qualifiers is not None:
-            if len(that.qualifiers) == 0:
-                self._write_empty_element('qualifiers')
-            else:
-                self._write_start_element('qualifiers')
-                for yet_yet_yet_another_item in that.qualifiers:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('qualifiers')
+            self._write_list_of_items(
+                'qualifiers',
+                that.qualifiers,
+                self.visit
+            )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
     def visit_capability(
         self,
@@ -30397,13 +25470,11 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.extensions is not None:
-            if len(that.extensions) == 0:
-                self._write_empty_element('extensions')
-            else:
-                self._write_start_element('extensions')
-                for an_item in that.extensions:
-                    self.visit(an_item)
-                self._write_end_element('extensions')
+            self._write_list_of_items(
+                'extensions',
+                that.extensions,
+                self.visit
+            )
 
         if that.category is not None:
             self._write_str_as_element(
@@ -30418,22 +25489,18 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.display_name is not None:
-            if len(that.display_name) == 0:
-                self._write_empty_element('displayName')
-            else:
-                self._write_start_element('displayName')
-                for another_item in that.display_name:
-                    self.visit(another_item)
-                self._write_end_element('displayName')
+            self._write_list_of_items(
+                'displayName',
+                that.display_name,
+                self.visit
+            )
 
         if that.description is not None:
-            if len(that.description) == 0:
-                self._write_empty_element('description')
-            else:
-                self._write_start_element('description')
-                for yet_another_item in that.description:
-                    self.visit(yet_another_item)
-                self._write_end_element('description')
+            self._write_list_of_items(
+                'description',
+                that.description,
+                self.visit
+            )
 
         if that.administration is not None:
             the_administration = that.administration
@@ -30462,22 +25529,18 @@ class _Serializer(aas_types.AbstractVisitor):
         )
 
         if that.embedded_data_specifications is not None:
-            if len(that.embedded_data_specifications) == 0:
-                self._write_empty_element('embeddedDataSpecifications')
-            else:
-                self._write_start_element('embeddedDataSpecifications')
-                for yet_yet_another_item in that.embedded_data_specifications:
-                    self.visit(yet_yet_another_item)
-                self._write_end_element('embeddedDataSpecifications')
+            self._write_list_of_items(
+                'embeddedDataSpecifications',
+                that.embedded_data_specifications,
+                self.visit
+            )
 
         if that.is_case_of is not None:
-            if len(that.is_case_of) == 0:
-                self._write_empty_element('isCaseOf')
-            else:
-                self._write_start_element('isCaseOf')
-                for yet_yet_yet_another_item in that.is_case_of:
-                    self.visit(yet_yet_yet_another_item)
-                self._write_end_element('isCaseOf')
+            self._write_list_of_items(
+                'isCaseOf',
+                that.is_case_of,
+                self.visit
+            )
 
     def visit_concept_description(
         self,
@@ -30522,13 +25585,11 @@ class _Serializer(aas_types.AbstractVisitor):
             )
             self._write_end_element('referredSemanticId')
 
-        if len(that.keys) == 0:
-            self._write_empty_element('keys')
-        else:
-            self._write_start_element('keys')
-            for an_item in that.keys:
-                self.visit(an_item)
-            self._write_end_element('keys')
+        self._write_list_of_items(
+            'keys',
+            that.keys,
+            self.visit
+        )
 
     def visit_reference(
         self,
@@ -30685,31 +25746,25 @@ class _Serializer(aas_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         if that.asset_administration_shells is not None:
-            if len(that.asset_administration_shells) == 0:
-                self._write_empty_element('assetAdministrationShells')
-            else:
-                self._write_start_element('assetAdministrationShells')
-                for an_item in that.asset_administration_shells:
-                    self.visit(an_item)
-                self._write_end_element('assetAdministrationShells')
+            self._write_list_of_items(
+                'assetAdministrationShells',
+                that.asset_administration_shells,
+                self.visit
+            )
 
         if that.submodels is not None:
-            if len(that.submodels) == 0:
-                self._write_empty_element('submodels')
-            else:
-                self._write_start_element('submodels')
-                for another_item in that.submodels:
-                    self.visit(another_item)
-                self._write_end_element('submodels')
+            self._write_list_of_items(
+                'submodels',
+                that.submodels,
+                self.visit
+            )
 
         if that.concept_descriptions is not None:
-            if len(that.concept_descriptions) == 0:
-                self._write_empty_element('conceptDescriptions')
-            else:
-                self._write_start_element('conceptDescriptions')
-                for yet_another_item in that.concept_descriptions:
-                    self.visit(yet_another_item)
-                self._write_end_element('conceptDescriptions')
+            self._write_list_of_items(
+                'conceptDescriptions',
+                that.concept_descriptions,
+                self.visit
+            )
 
     def visit_environment(
         self,
@@ -30887,13 +25942,11 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        if len(that.value_reference_pairs) == 0:
-            self._write_empty_element('valueReferencePairs')
-        else:
-            self._write_start_element('valueReferencePairs')
-            for an_item in that.value_reference_pairs:
-                self.visit(an_item)
-            self._write_end_element('valueReferencePairs')
+        self._write_list_of_items(
+            'valueReferencePairs',
+            that.value_reference_pairs,
+            self.visit
+        )
 
     def visit_value_list(
         self,
@@ -31049,22 +26102,18 @@ class _Serializer(aas_types.AbstractVisitor):
 
         :param that: instance to be serialized
         """
-        if len(that.preferred_name) == 0:
-            self._write_empty_element('preferredName')
-        else:
-            self._write_start_element('preferredName')
-            for an_item in that.preferred_name:
-                self.visit(an_item)
-            self._write_end_element('preferredName')
+        self._write_list_of_items(
+            'preferredName',
+            that.preferred_name,
+            self.visit
+        )
 
         if that.short_name is not None:
-            if len(that.short_name) == 0:
-                self._write_empty_element('shortName')
-            else:
-                self._write_start_element('shortName')
-                for another_item in that.short_name:
-                    self.visit(another_item)
-                self._write_end_element('shortName')
+            self._write_list_of_items(
+                'shortName',
+                that.short_name,
+                self.visit
+            )
 
         if that.unit is not None:
             self._write_str_as_element(
@@ -31098,13 +26147,11 @@ class _Serializer(aas_types.AbstractVisitor):
             )
 
         if that.definition is not None:
-            if len(that.definition) == 0:
-                self._write_empty_element('definition')
-            else:
-                self._write_start_element('definition')
-                for yet_another_item in that.definition:
-                    self.visit(yet_another_item)
-                self._write_end_element('definition')
+            self._write_list_of_items(
+                'definition',
+                that.definition,
+                self.visit
+            )
 
         if that.value_format is not None:
             self._write_str_as_element(

@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, TypeVar
 
 from icontract import ensure, require
 
@@ -238,6 +238,43 @@ def _try_to_cast_to_array_like(
 {II}return cast(Iterable[Any], jsonable)
 
 {I}return None'''
+    )
+
+
+def _generate_list_from_jsonable() -> Stripped:
+    """Generate the generic helper to parse a JSON array item-by-item."""
+    return Stripped(
+        f'''\
+def _list_from_jsonable(
+{I}jsonable: Jsonable,
+{I}parse_item: Callable[[Jsonable], _ItemT]
+) -> List[_ItemT]:
+{I}"""
+{I}Parse :paramref:`jsonable` as a list, applying :paramref:`parse_item` on
+{I}every item.
+
+{I}:param jsonable: JSON-able structure to be parsed
+{I}:param parse_item: to parse a single item of the array
+{I}:return: parsed list
+{I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+{I}"""
+{I}array_like = _try_to_cast_to_array_like(jsonable)
+{I}if array_like is None:
+{II}raise DeserializationException(
+{III}f"Expected something array-like, but got: {{type(jsonable)}}"
+{II})
+
+{I}result = []  # type: List[_ItemT]
+{I}for i, jsonable_item in enumerate(array_like):
+{II}try:
+{III}item = parse_item(jsonable_item)
+{II}except DeserializationException as exception:
+{III}exception.path._prepend(IndexSegment(array_like, i))
+{III}raise
+
+{II}result.append(item)
+
+{I}return result'''
     )
 
 
@@ -521,39 +558,14 @@ self.{prop_name} = {function_name}(
                 "see intermediate._translate_._verify_only_simple_type_patterns"
             )
 
-            items_type = python_common.generate_type(
-                type_anno.items, types_module=Identifier("aas_types")
-            )
             parse_function = _parse_function_for_atomic_value(type_anno.items)
 
             body = Stripped(
                 f"""\
-array_like = _try_to_cast_to_array_like(jsonable)
-if array_like is None:
-{I}raise DeserializationException(
-{II}f"Expected something array-like, but got: {{type(jsonable)}}"
-{I})
-
-items: List[
-{I}{items_type}
-] = []
-for i, jsonable_item in enumerate(array_like):
-{I}try:
-{II}item = {parse_function}(
-{III}jsonable_item
-{II})
-{I}except DeserializationException as exception:
-{II}exception.path._prepend(
-{III}IndexSegment(
-{IIII}array_like,
-{IIII}i
-{III})
-{II})
-{II}raise
-
-{I}items.append(item)
-
-self.{prop_name} = items"""
+self.{prop_name} = _list_from_jsonable(
+{I}jsonable,
+{I}{parse_function}
+)"""
             )
 
         else:
@@ -1154,6 +1166,7 @@ from typing import (
 {I}MutableMapping,
 {I}Optional,
 {I}Sequence,
+{I}TypeVar,
 {I}Union,
 )
 
@@ -1299,12 +1312,14 @@ MutableJsonable = Union[
 ]"""
         ),
         Stripped("# region De-serialization"),
+        Stripped('_ItemT = TypeVar("_ItemT")'),
         _generate_bool_from_jsonable(),
         _generate_int_from_jsonable(),
         _generate_float_from_jsonable(),
         _generate_str_from_jsonable(),
         _generate_bytes_from_jsonable(),
         _generate_is_array_like(),
+        _generate_list_from_jsonable(),
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
