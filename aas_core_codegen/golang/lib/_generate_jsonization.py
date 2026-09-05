@@ -231,6 +231,35 @@ func bytesFromJsonable(
     )
 
 
+def _generate_parse_array() -> Stripped:
+    """Generate the generic helper to parse a JSON array item-by-item."""
+    return Stripped(
+        f"""\
+// Parse `jsonableArray` into a slice of `T` by calling `parseItem` on every
+// item, or return an error.
+func parseArray[T any](
+{I}jsonableArray []interface{{}},
+{I}parseItem func(jsonable interface{{}}) (T, error),
+) (result []T, err error) {{
+{I}result = make([]T, len(jsonableArray))
+{I}for i, itemJsonable := range jsonableArray {{
+{II}var item T
+{II}item, err = parseItem(itemJsonable)
+{II}if err != nil {{
+{III}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{IIII}deseriaErr.Path.PrependIndex(
+{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIII})
+{III}}}
+{III}return
+{II}}}
+{II}result[i] = item
+{I}}}
+{I}return
+}}"""
+    )
+
+
 def _generate_enumeration_from_jsonable(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
@@ -636,14 +665,6 @@ if err != nil {{
 
             parse_function = _determine_parse_function_for_atomic_value(type_anno.items)
 
-            array_type = golang_common.generate_type(
-                type_annotation=type_anno, types_package=Identifier("aastypes")
-            )
-
-            item_type = golang_common.generate_type(
-                type_annotation=type_anno.items, types_package=Identifier("aastypes")
-            )
-
             case_body = Stripped(
                 f"""\
 jsonableArray, ok := v.([]interface{{}})
@@ -666,36 +687,21 @@ if !ok {{
 {I}return
 }}
 
-array := make(
-{I}{array_type},
-{I}len(jsonableArray),
+{prop_var}, err = parseArray(
+{I}jsonableArray,
+{I}{parse_function},
 )
-for i, itemJsonable := range jsonableArray {{
-{I}var item {item_type}
-{I}item, err = {parse_function}(
-{II}itemJsonable,
-{I})
-{I}if err != nil {{
-{II}if deseriaErr, ok := err.(*DeserializationError); ok {{
-{III}deseriaErr.Path.PrependIndex(
-{IIII}&aasreporting.IndexSegment{{
-{IIIII}Index: i,
-{IIII}}},
-{III})
-
-{III}deseriaErr.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{
-{IIIII}Name: {json_prop_literal},
-{IIII}}},
-{III})
-{II}}}
-
-{II}return
+if err != nil {{
+{I}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{II}deseriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {json_prop_literal},
+{III}}},
+{II})
 {I}}}
 
-{I}array[i] = item
-}}
-{prop_var} = array"""
+{I}return
+}}"""
             )
 
         else:
@@ -1086,6 +1092,35 @@ func bytesToJsonable(
     )
 
 
+def _generate_serialize_array() -> Stripped:
+    """Generate the generic helper to serialize a slice into a JSON array."""
+    return Stripped(
+        f"""\
+// Serialize every item of `items` with `serializeItem` into a JSON-able array,
+// or return an error.
+func serializeArray[T any](
+{I}items []T,
+{I}serializeItem func(item T) (interface{{}}, error),
+) (result []interface{{}}, err error) {{
+{I}result = make([]interface{{}}, len(items))
+{I}for i, item := range items {{
+{II}var jsonable interface{{}}
+{II}jsonable, err = serializeItem(item)
+{II}if err != nil {{
+{III}if seriaErr, ok := err.(*SerializationError); ok {{
+{IIII}seriaErr.Path.PrependIndex(
+{IIIII}&aasreporting.IndexSegment{{Index: i}},
+{IIII})
+{III}}}
+{III}return
+{II}}}
+{II}result[i] = jsonable
+{I}}}
+{I}return
+}}"""
+    )
+
+
 def _generate_enumeration_to_jsonable(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
@@ -1308,70 +1343,45 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
                 "the developers."
             )
 
-            statements = [
-                Stripped(
-                    f"""\
-{prop_jsonable_var} := make(
-{I}[]interface{{}},
-{I}len(that.{getter_name}()),
-)"""
-                )
-            ]  # type: List[Stripped]
+            item_type = golang_common.generate_type(
+                type_annotation=type_anno.items, types_package=Identifier("aastypes")
+            )
 
             # fmt: off
             serialize_expr, needs_error_checking = (
                 _generate_expression_to_serialize_atomic_value(
-                    access_expression="v", type_annotation=type_anno.items
+                    access_expression="item", type_annotation=type_anno.items
                 )
             )
             # fmt: on
 
             if needs_error_checking:
-                statements.append(
-                    Stripped(
-                        f"""\
-for i, v := range that.{getter_name}() {{
-{I}var jsonable interface{{}}
-{I}jsonable, err = {indent_but_first_line(serialize_expr, I)}
-{I}if err != nil {{
-{II}if seriaErr, ok := err.(*SerializationError); ok {{
-{III}seriaErr.Path.PrependIndex(
-{IIII}&aasreporting.IndexSegment{{
-{IIIII}Index: i,
-{IIII}}},
-{III})
-
-{III}seriaErr.Path.PrependName(
-{IIII}&aasreporting.NameSegment{{
-{IIIII}Name: {prop_literal},
-{IIII}}},
-{III})
-{II}}}
-
-{II}return
-{I}}}
-{I}{prop_jsonable_var}[i] = jsonable
-}}"""
-                    )
-                )
+                closure_body = Stripped(f"return {serialize_expr}")
             else:
-                statements.append(
-                    Stripped(
-                        f"""\
-for i, v := range that.{getter_name}() {{
-{I}{prop_jsonable_var}[i] = {indent_but_first_line(serialize_expr, II)}
-}}"""
-                    )
-                )
+                closure_body = Stripped(f"return {serialize_expr}, nil")
 
-            statements.append(
-                Stripped(
-                    f"""\
+            block = Stripped(
+                f"""\
+var {prop_jsonable_var} []interface{{}}
+{prop_jsonable_var}, err = serializeArray(
+{I}that.{getter_name}(),
+{I}func(item {item_type}) (interface{{}}, error) {{
+{II}{indent_but_first_line(closure_body, II)}
+{I}}},
+)
+if err != nil {{
+{I}if seriaErr, ok := err.(*SerializationError); ok {{
+{II}seriaErr.Path.PrependName(
+{III}&aasreporting.NameSegment{{
+{IIII}Name: {prop_literal},
+{III}}},
+{II})
+{I}}}
+
+{I}return
+}}
 result[{json_prop_literal}] = {prop_jsonable_var}"""
-                )
             )
-
-            block = Stripped("\n".join(statements))
         else:
             assert not isinstance(prop.type_annotation, intermediate.ListTypeAnnotation)
 
@@ -1604,6 +1614,7 @@ func (de *DeserializationError) PathString() string {{
         _generate_float64_from_jsonable(),
         _generate_string_from_jsonable(),
         _generate_bytes_from_jsonable(),
+        _generate_parse_array(),
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
@@ -1702,6 +1713,7 @@ func (se *SerializationError) PathString() string {{
 
     blocks.append(_generate_int64_to_jsonable())
     blocks.append(_generate_bytes_to_jsonable())
+    blocks.append(_generate_serialize_array())
 
     for enum in symbol_table.enumerations:
         blocks.append(_generate_enumeration_to_jsonable(enum))
