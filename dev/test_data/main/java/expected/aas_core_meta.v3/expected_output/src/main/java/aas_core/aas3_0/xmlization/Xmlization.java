@@ -79,61 +79,6 @@ public class Xmlization {
   public static final String AAS_NAME_SPACE =
     "https://admin-shell.io/aas/3/0";
 
-  private static class _Result<T> {
-    private final T result;
-    private final Reporting.Error error;
-    private final boolean success;
-
-    private _Result(T result, Reporting.Error error, boolean success) {
-      this.result = result;
-      this.error = error;
-      this.success = success;
-    }
-
-    public static <T> _Result<T> success(T result) {
-      if(result == null) throw new IllegalArgumentException("Result must not be null.");
-      return new _Result<>(result, null, true);
-    }
-
-    public static <T> _Result<T> failure(Reporting.Error error) {
-      if(error == null) throw new IllegalArgumentException("Error must not be null.");
-      return new _Result<>(null, error, false);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <I> _Result<I> castTo(Class<I> type){
-      if(isError() || type.isInstance(result)) return (_Result<I>) this;
-      throw new IllegalStateException("Result of type "
-        + result.getClass().getName()
-        + " is not an instance of "
-        + type.getName());
-    }
-
-    public T getResult() {
-      if (!isSuccess()) throw new IllegalStateException("Result is not present.");
-      return result;
-    }
-
-    public boolean isSuccess() {
-      return success;
-    }
-
-    public boolean isError(){return !success;}
-
-    public Reporting.Error getError() {
-      if (isSuccess()) throw new IllegalStateException("Result is present.");
-      return error;
-    }
-
-    public <R> R map(Function<T, R> successFunction, Function<Reporting.Error, R> errorFunction) {
-      return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
-    }
-
-    public T onError(Function<Reporting.Error, T>  errorFunction){
-      return map(Function.identity(), errorFunction);
-    }
-  }
-
   /**
    * Implement the deserialization of meta-model classes from XML.
    *
@@ -201,17 +146,17 @@ public class Xmlization {
       return currentEvent(reader).isEndElement();
     }
 
-    private static _Result<XMLEvent> verifyClosingTagForClass(
+    private static Reporting.Result<XMLEvent> verifyClosingTagForClass(
       String className,
       XMLEventReader reader,
-      _Result<String> tryElementName) {
+      Reporting.Result<String> tryElementName) {
       final XMLEvent currentEvent = currentEvent(reader);
       if (currentEvent.isEndDocument()) {
         final Reporting.Error error = new Reporting.Error(
             "Expected an XML end element to conclude a property of class " + className
                 + " with the element name " + tryElementName.getResult() + ", "
                 + "but got the end-of-file.");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (!currentEvent.isEndElement()) {
@@ -220,9 +165,9 @@ public class Xmlization {
                 + " with the element name " + tryElementName.getResult() + ", "
                 + "but got the node of type " + getEventTypeAsString(currentEvent)
                 + " with the value " + currentEvent);
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
-      final _Result<String> tryEndElementName = tryElementName(reader);
+      final Reporting.Result<String> tryEndElementName = tryElementName(reader);
       if (tryEndElementName.isError()) {
         return tryEndElementName.castTo(XMLEvent.class);
       }
@@ -231,10 +176,10 @@ public class Xmlization {
             "Expected an XML end element to conclude a property of class " + className
                 + " with the element name " + tryElementName.getResult() + ", "
                 + "but got the end element with the name " + tryEndElementName.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
       try {
-        return _Result.success(reader.nextEvent());
+        return Reporting.Result.success(reader.nextEvent());
       } catch (XMLStreamException xmlStreamException) {
         throw new Xmlization.DeserializeException("",
           "Failed in method verifyClosingTagForClass because of: " +
@@ -249,45 +194,45 @@ public class Xmlization {
      * the element is self-closing, and is expected to consume the properties of
      * the instance, but not the element's closing tag.
      */
-    private static <T> _Result<? extends T> parseInstanceFromElement(
+    private static <T> Reporting.Result<? extends T> parseInstanceFromElement(
       XMLEventReader reader,
       Class<T> type,
-      BiFunction<String, Boolean, _Result<? extends T>> parseAsSequence) {
+      BiFunction<String, Boolean, Reporting.Result<? extends T>> parseAsSequence) {
       skipWhitespaceAndComments(reader);
 
       final XMLEvent currentEvent = currentEvent(reader);
       if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {
-        return _Result.failure(new Reporting.Error(
+        return Reporting.Result.failure(new Reporting.Error(
           "Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
             "but reached the end-of-file"));
       }
 
       if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        return _Result.failure(new Reporting.Error(
+        return Reporting.Result.failure(new Reporting.Error(
           "Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
             "but got a node of type " + getEventTypeAsString(currentEvent) +
             " with value " + currentEvent));
       }
 
-      final _Result<String> tryElementName = tryElementName(reader);
+      final Reporting.Result<String> tryElementName = tryElementName(reader);
       if (tryElementName.isError()) {
-        return _Result.failure(tryElementName.getError());
+        return Reporting.Result.failure(tryElementName.getError());
       }
 
       final String elementName = tryElementName.getResult();
       final boolean isEmptyElement = isEmptyElement(reader);
 
-      final _Result<? extends T> result = parseAsSequence.apply(elementName, isEmptyElement);
+      final Reporting.Result<? extends T> result = parseAsSequence.apply(elementName, isEmptyElement);
       if (result.isError()) {
         return result;
       }
 
-      final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+      final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
         type.getSimpleName(),
         reader,
         tryElementName);
       if (checkEndElement.isError()) {
-        return _Result.failure(checkEndElement.getError());
+        return Reporting.Result.failure(checkEndElement.getError());
       }
 
       return result;
@@ -326,7 +271,7 @@ public class Xmlization {
     /**
      * Check the namespace and extract the element's name.
      */
-    private static _Result<String> tryElementName(XMLEventReader reader) {
+    private static Reporting.Result<String> tryElementName(XMLEventReader reader) {
       final XMLEvent currentEvent = currentEvent(reader);
       final boolean precondition = currentEvent.isStartElement() || currentEvent.isEndElement();
       if (!precondition) {
@@ -341,9 +286,9 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
             "Expected an element within a namespace " +
             AAS_NAME_SPACE + ", " + "but got: " + namespace);
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
-      return _Result.success(currentEvent.isStartElement()
+      return Reporting.Result.success(currentEvent.isStartElement()
           ? currentEvent.asStartElement().getName().getLocalPart()
           : currentEvent.asEndElement().getName().getLocalPart());
     }
@@ -434,21 +379,21 @@ public class Xmlization {
      * Consume a {@code <v>} element from the reader and return whether
      * it was a self-closing (empty) element.
      */
-    private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {
+    private static Reporting.Result<Boolean> tryVStartElement(XMLEventReader reader) {
       if (currentEvent(reader).isEndDocument()) {
         final Reporting.Error error = new Reporting.Error(
           "Expected a <v> element, but got an end-of-file.");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (!currentEvent(reader).isStartElement()) {
         final Reporting.Error error = new Reporting.Error(
           "Expected a <v> start element, but got the node of type "
             + getEventTypeAsString(currentEvent(reader)));
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      final _Result<String> tryElementName = tryElementName(reader);
+      final Reporting.Result<String> tryElementName = tryElementName(reader);
       if (tryElementName.isError()) {
         return tryElementName.castTo(Boolean.class);
       }
@@ -456,33 +401,33 @@ public class Xmlization {
       if (!"v".equals(tryElementName.getResult())) {
         final Reporting.Error error = new Reporting.Error(
           "Expected a <v> element, but got an element " + tryElementName.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       final boolean isEmpty = isEmptyElement(reader);
-      return _Result.success(isEmpty);
+      return Reporting.Result.success(isEmpty);
     }
 
     /**
      * Consume a {@code </v>} element from the reader.
      */
-    private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {
+    private static Reporting.Result<XMLEvent> tryVEndElement(XMLEventReader reader) {
       skipWhitespaceAndComments(reader);
 
       if (currentEvent(reader).isEndDocument()) {
         final Reporting.Error error = new Reporting.Error(
           "Expected a </v> element, but got an end-of-file.");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (!currentEvent(reader).isEndElement()) {
         final Reporting.Error error = new Reporting.Error(
           "Expected a </v> end element, but got the node of type "
             + getEventTypeAsString(currentEvent(reader)));
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      final _Result<String> tryElementName = tryElementName(reader);
+      final Reporting.Result<String> tryElementName = tryElementName(reader);
       if (tryElementName.isError()) {
         return tryElementName.castTo(XMLEvent.class);
       }
@@ -490,11 +435,11 @@ public class Xmlization {
       if (!"v".equals(tryElementName.getResult())) {
         final Reporting.Error error = new Reporting.Error(
           "Expected a </v> element, but got an end element " + tryElementName.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       try {
-        return _Result.success(reader.nextEvent());
+        return Reporting.Result.success(reader.nextEvent());
       } catch (XMLStreamException xmlStreamException) {
         throw new Xmlization.DeserializeException("",
           "Failed in method tryVEndElement because of: " +
@@ -505,8 +450,8 @@ public class Xmlization {
     /**
      * Read the content of a {@code <v>} element and parse it as Boolean.
      */
-    private static _Result<Boolean> tryVElementAsBoolean(XMLEventReader reader) {
-      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+    private static Reporting.Result<Boolean> tryVElementAsBoolean(XMLEventReader reader) {
+      final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
       if (tryVStart.isError()) {
         return tryVStart.castTo(Boolean.class);
       }
@@ -515,7 +460,7 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "Expected an XML content representing Boolean, " +
           "but got a self-closing <v /> element");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       final Boolean result;
@@ -525,22 +470,22 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The content of a <v> element could not be de-serialized " +
           "as Boolean: " + exception.getMessage());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
       if (tryVEnd.isError()) {
         return tryVEnd.castTo(Boolean.class);
       }
 
-      return _Result.success(result);
+      return Reporting.Result.success(result);
     }
 
     /**
      * Read the content of a {@code <v>} element and parse it as Long.
      */
-    private static _Result<Long> tryVElementAsLong(XMLEventReader reader) {
-      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+    private static Reporting.Result<Long> tryVElementAsLong(XMLEventReader reader) {
+      final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
       if (tryVStart.isError()) {
         return tryVStart.castTo(Long.class);
       }
@@ -549,7 +494,7 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "Expected an XML content representing Long, " +
           "but got a self-closing <v /> element");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       final Long result;
@@ -559,22 +504,22 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The content of a <v> element could not be de-serialized " +
           "as Long: " + exception.getMessage());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
       if (tryVEnd.isError()) {
         return tryVEnd.castTo(Long.class);
       }
 
-      return _Result.success(result);
+      return Reporting.Result.success(result);
     }
 
     /**
      * Read the content of a {@code <v>} element and parse it as Double.
      */
-    private static _Result<Double> tryVElementAsDouble(XMLEventReader reader) {
-      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+    private static Reporting.Result<Double> tryVElementAsDouble(XMLEventReader reader) {
+      final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
       if (tryVStart.isError()) {
         return tryVStart.castTo(Double.class);
       }
@@ -583,7 +528,7 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "Expected an XML content representing Double, " +
           "but got a self-closing <v /> element");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       final Double result;
@@ -593,22 +538,22 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The content of a <v> element could not be de-serialized " +
           "as Double: " + exception.getMessage());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
       if (tryVEnd.isError()) {
         return tryVEnd.castTo(Double.class);
       }
 
-      return _Result.success(result);
+      return Reporting.Result.success(result);
     }
 
     /**
      * Read the content of a {@code <v>} element and parse it as a string.
      */
-    private static _Result<String> tryVElementAsString(XMLEventReader reader) {
-      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+    private static Reporting.Result<String> tryVElementAsString(XMLEventReader reader) {
+      final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
       if (tryVStart.isError()) {
         return tryVStart.castTo(String.class);
       }
@@ -623,7 +568,7 @@ public class Xmlization {
           final Reporting.Error error = new Reporting.Error(
             "The content of a <v> element could not be de-serialized " +
             "as String: " + exception.getMessage());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
       }
 
@@ -631,19 +576,19 @@ public class Xmlization {
       // A self-closing <v /> is represented as a pair of start and end events
       // in StAX, so we need to consume the end element even if the <v /> was
       // empty.
-      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
       if (tryVEnd.isError()) {
         return tryVEnd.castTo(String.class);
       }
 
-      return _Result.success(result);
+      return Reporting.Result.success(result);
     }
 
     /**
      * Read a {@code <v>} element as base64-encoded bytes.
      */
-    private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {
-      final _Result<Boolean> tryVStart = tryVStartElement(reader);
+    private static Reporting.Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {
+      final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
       if (tryVStart.isError()) {
         return tryVStart.castTo(byte[].class);
       }
@@ -658,7 +603,7 @@ public class Xmlization {
           final Reporting.Error error = new Reporting.Error(
             "The content of a <v> element could not be de-serialized " +
             "as base64-encoded bytes: " + exception.getMessage());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
       }
 
@@ -666,12 +611,12 @@ public class Xmlization {
       // A self-closing <v /> is represented as a pair of start and end events
       // in StAX, so we need to consume the end element even if the <v /> was
       // empty.
-      final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+      final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
       if (tryVEnd.isError()) {
         return tryVEnd.castTo(byte[].class);
       }
 
-      return _Result.success(result);
+      return Reporting.Result.success(result);
     }
 
     /**
@@ -680,14 +625,14 @@ public class Xmlization {
      * <p>Every start element is considered to mark the start of an item. Parsing
      * stops as soon as a non-start element is encountered.
      */
-    private static <T> _Result<List<T>> parseList(
+    private static <T> Reporting.Result<List<T>> parseList(
       XMLEventReader reader,
       boolean isEmptyProperty,
       Class<T> itemType,
-      Function<XMLEventReader, _Result<? extends T>> parseItem) {
+      Function<XMLEventReader, Reporting.Result<? extends T>> parseItem) {
       final List<T> result = new ArrayList<>();
       if (isEmptyProperty) {
-        return _Result.success(result);
+        return Reporting.Result.success(result);
       }
 
       skipWhitespaceAndComments(reader);
@@ -697,16 +642,16 @@ public class Xmlization {
           "Expected a start element opening an instance of " + itemType.getSimpleName() +
             ", but got an XML " + getEventTypeAsString(currentEvent(reader)));
         error.prependSegment(new Reporting.IndexSegment(index));
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       while (currentEvent(reader).isStartElement()) {
-        final _Result<? extends T> itemResult = parseItem.apply(reader);
+        final Reporting.Result<? extends T> itemResult = parseItem.apply(reader);
         if (itemResult.isError()) {
           itemResult.getError()
             .prependSegment(
               new Reporting.IndexSegment(index));
-          return _Result.failure(itemResult.getError());
+          return Reporting.Result.failure(itemResult.getError());
         }
 
         result.add(itemResult.getResult());
@@ -714,15 +659,15 @@ public class Xmlization {
         skipWhitespaceAndComments(reader);
       }
 
-      return _Result.success(result);
+      return Reporting.Result.success(result);
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link ModellingKind}.
      */
-    private static _Result<ModellingKind> tryVElementAsModellingKind(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<ModellingKind> tryVElementAsModellingKind(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(ModellingKind.class);
       }
@@ -734,18 +679,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of ModellingKind: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link QualifierKind}.
      */
-    private static _Result<QualifierKind> tryVElementAsQualifierKind(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<QualifierKind> tryVElementAsQualifierKind(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(QualifierKind.class);
       }
@@ -757,18 +702,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of QualifierKind: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link AssetKind}.
      */
-    private static _Result<AssetKind> tryVElementAsAssetKind(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<AssetKind> tryVElementAsAssetKind(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(AssetKind.class);
       }
@@ -780,18 +725,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of AssetKind: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link AasSubmodelElements}.
      */
-    private static _Result<AasSubmodelElements> tryVElementAsAasSubmodelElements(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<AasSubmodelElements> tryVElementAsAasSubmodelElements(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(AasSubmodelElements.class);
       }
@@ -803,18 +748,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of AasSubmodelElements: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link EntityType}.
      */
-    private static _Result<EntityType> tryVElementAsEntityType(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<EntityType> tryVElementAsEntityType(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(EntityType.class);
       }
@@ -826,18 +771,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of EntityType: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link Direction}.
      */
-    private static _Result<Direction> tryVElementAsDirection(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<Direction> tryVElementAsDirection(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(Direction.class);
       }
@@ -849,18 +794,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of Direction: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link StateOfEvent}.
      */
-    private static _Result<StateOfEvent> tryVElementAsStateOfEvent(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<StateOfEvent> tryVElementAsStateOfEvent(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(StateOfEvent.class);
       }
@@ -872,18 +817,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of StateOfEvent: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link ReferenceTypes}.
      */
-    private static _Result<ReferenceTypes> tryVElementAsReferenceTypes(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<ReferenceTypes> tryVElementAsReferenceTypes(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(ReferenceTypes.class);
       }
@@ -895,18 +840,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of ReferenceTypes: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link KeyTypes}.
      */
-    private static _Result<KeyTypes> tryVElementAsKeyTypes(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<KeyTypes> tryVElementAsKeyTypes(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(KeyTypes.class);
       }
@@ -918,18 +863,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of KeyTypes: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link DataTypeDefXsd}.
      */
-    private static _Result<DataTypeDefXsd> tryVElementAsDataTypeDefXsd(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<DataTypeDefXsd> tryVElementAsDataTypeDefXsd(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(DataTypeDefXsd.class);
       }
@@ -941,18 +886,18 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of DataTypeDefXsd: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Read a {@code <v>} element and parse its content as a literal
      * of {@link DataTypeIec61360}.
      */
-    private static _Result<DataTypeIec61360> tryVElementAsDataTypeIec61360(XMLEventReader reader) {
-      final _Result<String> tryText = tryVElementAsString(reader);
+    private static Reporting.Result<DataTypeIec61360> tryVElementAsDataTypeIec61360(XMLEventReader reader) {
+      final Reporting.Result<String> tryText = tryVElementAsString(reader);
       if (tryText.isError()) {
         return tryText.castTo(DataTypeIec61360.class);
       }
@@ -964,16 +909,16 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The text could not be parsed as a literal of DataTypeIec61360: " +
           tryText.getResult());
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(result.get());
+      return Reporting.Result.success(result.get());
     }
 
     /**
      * Deserialize an instance of IHasSemantics from an XML element.
      */
-    private static _Result<? extends IHasSemantics> tryIHasSemanticsFromElement(
+    private static Reporting.Result<? extends IHasSemantics> tryIHasSemanticsFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1019,7 +964,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1031,7 +976,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Extension> tryExtensionFromSequence(
+    private static Reporting.Result<Extension> tryExtensionFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       IReference theSemanticId = null;
@@ -1048,7 +993,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Extension, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -1063,10 +1008,10 @@ public class Xmlization {
               "a property of an instance of class Extension, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Extension.class);
           }
@@ -1077,7 +1022,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -1093,7 +1038,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -1121,7 +1066,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property name of an instance of class Extension, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -1133,7 +1078,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "name"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -1148,7 +1093,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -1156,7 +1101,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property valueType of an instance of class Extension, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textValueType;
@@ -1169,7 +1114,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<DataTypeDefXsd> optionalValueType =
@@ -1186,7 +1131,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -1201,7 +1146,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class Extension, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -1213,14 +1158,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "refersTo":
             {
-              final _Result<List<IReference>> tryRefersTo = parseList(
+              final Reporting.Result<List<IReference>> tryRefersTo = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -1242,13 +1187,13 @@ public class Xmlization {
                 "We expected properties of the class Extension, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Extension",
             reader,
             tryElementName);
@@ -1261,10 +1206,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property name has not been given " +
           "in the XML representation of an instance of class Extension");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Extension(
+      return Reporting.Result.success(new Extension(
         theName,
         theSemanticId,
         theSupplementalSemanticIds,
@@ -1276,7 +1221,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Extension from an XML element.
      */
-    private static _Result<? extends Extension> tryExtensionFromElement(
+    private static Reporting.Result<? extends Extension> tryExtensionFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1286,7 +1231,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Extension " +
               "with element name extension, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryExtensionFromSequence(reader, isEmptyElement);
@@ -1296,7 +1241,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IHasExtensions from an XML element.
      */
-    private static _Result<? extends IHasExtensions> tryIHasExtensionsFromElement(
+    private static Reporting.Result<? extends IHasExtensions> tryIHasExtensionsFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1340,7 +1285,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1348,7 +1293,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IReferable from an XML element.
      */
-    private static _Result<? extends IReferable> tryIReferableFromElement(
+    private static Reporting.Result<? extends IReferable> tryIReferableFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1392,7 +1337,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1400,7 +1345,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IIdentifiable from an XML element.
      */
-    private static _Result<? extends IIdentifiable> tryIIdentifiableFromElement(
+    private static Reporting.Result<? extends IIdentifiable> tryIIdentifiableFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1416,7 +1361,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1424,7 +1369,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IHasKind from an XML element.
      */
-    private static _Result<? extends IHasKind> tryIHasKindFromElement(
+    private static Reporting.Result<? extends IHasKind> tryIHasKindFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1436,7 +1381,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1444,7 +1389,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IHasDataSpecification from an XML element.
      */
-    private static _Result<? extends IHasDataSpecification> tryIHasDataSpecificationFromElement(
+    private static Reporting.Result<? extends IHasDataSpecification> tryIHasDataSpecificationFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1490,7 +1435,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1502,7 +1447,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<AdministrativeInformation> tryAdministrativeInformationFromSequence(
+    private static Reporting.Result<AdministrativeInformation> tryAdministrativeInformationFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
@@ -1518,7 +1463,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class AdministrativeInformation, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -1533,10 +1478,10 @@ public class Xmlization {
               "a property of an instance of class AdministrativeInformation, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(AdministrativeInformation.class);
           }
@@ -1547,7 +1492,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -1575,7 +1520,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property version of an instance of class AdministrativeInformation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -1587,7 +1532,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "version"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -1603,7 +1548,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property revision of an instance of class AdministrativeInformation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -1615,14 +1560,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "revision"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "creator":
             {
-              _Result<Reference> tryCreator = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryCreator = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryCreator.isError()) {
@@ -1647,7 +1592,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property templateId of an instance of class AdministrativeInformation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -1659,7 +1604,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "templateId"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -1669,13 +1614,13 @@ public class Xmlization {
                 "We expected properties of the class AdministrativeInformation, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "AdministrativeInformation",
             reader,
             tryElementName);
@@ -1684,7 +1629,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new AdministrativeInformation(
+      return Reporting.Result.success(new AdministrativeInformation(
         theEmbeddedDataSpecifications,
         theVersion,
         theRevision,
@@ -1695,7 +1640,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class AdministrativeInformation from an XML element.
      */
-    private static _Result<? extends AdministrativeInformation> tryAdministrativeInformationFromElement(
+    private static Reporting.Result<? extends AdministrativeInformation> tryAdministrativeInformationFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1705,7 +1650,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class AdministrativeInformation " +
               "with element name administrativeInformation, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryAdministrativeInformationFromSequence(reader, isEmptyElement);
@@ -1715,7 +1660,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IQualifiable from an XML element.
      */
-    private static _Result<? extends IQualifiable> tryIQualifiableFromElement(
+    private static Reporting.Result<? extends IQualifiable> tryIQualifiableFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -1755,7 +1700,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -1767,7 +1712,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Qualifier> tryQualifierFromSequence(
+    private static Reporting.Result<Qualifier> tryQualifierFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       IReference theSemanticId = null;
@@ -1785,7 +1730,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Qualifier, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -1800,10 +1745,10 @@ public class Xmlization {
               "a property of an instance of class Qualifier, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Qualifier.class);
           }
@@ -1814,7 +1759,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -1830,7 +1775,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -1857,7 +1802,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "kind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -1865,7 +1810,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property kind of an instance of class Qualifier, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textKind;
@@ -1878,7 +1823,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "kind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<QualifierKind> optionalKind =
@@ -1895,7 +1840,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "kind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -1910,7 +1855,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property type of an instance of class Qualifier, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -1922,7 +1867,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "type"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -1937,7 +1882,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -1945,7 +1890,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property valueType of an instance of class Qualifier, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textValueType;
@@ -1958,7 +1903,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<DataTypeDefXsd> optionalValueType =
@@ -1975,7 +1920,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -1990,7 +1935,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class Qualifier, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2002,14 +1947,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "valueId":
             {
-              _Result<Reference> tryValueId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryValueId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryValueId.isError()) {
@@ -2028,13 +1973,13 @@ public class Xmlization {
                 "We expected properties of the class Qualifier, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Qualifier",
             reader,
             tryElementName);
@@ -2047,17 +1992,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property type has not been given " +
           "in the XML representation of an instance of class Qualifier");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theValueType == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property valueType has not been given " +
           "in the XML representation of an instance of class Qualifier");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Qualifier(
+      return Reporting.Result.success(new Qualifier(
         theType,
         theValueType,
         theSemanticId,
@@ -2070,7 +2015,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Qualifier from an XML element.
      */
-    private static _Result<? extends Qualifier> tryQualifierFromElement(
+    private static Reporting.Result<? extends Qualifier> tryQualifierFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -2080,7 +2025,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Qualifier " +
               "with element name qualifier, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryQualifierFromSequence(reader, isEmptyElement);
@@ -2094,7 +2039,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<AssetAdministrationShell> tryAssetAdministrationShellFromSequence(
+    private static Reporting.Result<AssetAdministrationShell> tryAssetAdministrationShellFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -2116,7 +2061,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class AssetAdministrationShell, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -2131,10 +2076,10 @@ public class Xmlization {
               "a property of an instance of class AssetAdministrationShell, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(AssetAdministrationShell.class);
           }
@@ -2145,7 +2090,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -2173,7 +2118,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class AssetAdministrationShell, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2185,7 +2130,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -2201,7 +2146,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class AssetAdministrationShell, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2213,14 +2158,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -2239,7 +2184,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -2258,7 +2203,7 @@ public class Xmlization {
             }
             case "administration":
             {
-              _Result<AdministrativeInformation> tryAdministration = tryAdministrativeInformationFromSequence(
+              Reporting.Result<AdministrativeInformation> tryAdministration = tryAdministrativeInformationFromSequence(
                 reader, isEmptyProperty);
 
               if (tryAdministration.isError()) {
@@ -2283,7 +2228,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property id of an instance of class AssetAdministrationShell, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2295,14 +2240,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "id"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -2321,7 +2266,7 @@ public class Xmlization {
             }
             case "derivedFrom":
             {
-              _Result<Reference> tryDerivedFrom = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryDerivedFrom = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryDerivedFrom.isError()) {
@@ -2337,7 +2282,7 @@ public class Xmlization {
             }
             case "assetInformation":
             {
-              _Result<AssetInformation> tryAssetInformation = tryAssetInformationFromSequence(
+              Reporting.Result<AssetInformation> tryAssetInformation = tryAssetInformationFromSequence(
                 reader, isEmptyProperty);
 
               if (tryAssetInformation.isError()) {
@@ -2353,7 +2298,7 @@ public class Xmlization {
             }
             case "submodels":
             {
-              final _Result<List<IReference>> trySubmodels = parseList(
+              final Reporting.Result<List<IReference>> trySubmodels = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -2375,13 +2320,13 @@ public class Xmlization {
                 "We expected properties of the class AssetAdministrationShell, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "AssetAdministrationShell",
             reader,
             tryElementName);
@@ -2394,17 +2339,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property id has not been given " +
           "in the XML representation of an instance of class AssetAdministrationShell");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theAssetInformation == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property assetInformation has not been given " +
           "in the XML representation of an instance of class AssetAdministrationShell");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new AssetAdministrationShell(
+      return Reporting.Result.success(new AssetAdministrationShell(
         theId,
         theAssetInformation,
         theExtensions,
@@ -2421,7 +2366,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class AssetAdministrationShell from an XML element.
      */
-    private static _Result<? extends AssetAdministrationShell> tryAssetAdministrationShellFromElement(
+    private static Reporting.Result<? extends AssetAdministrationShell> tryAssetAdministrationShellFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -2431,7 +2376,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class AssetAdministrationShell " +
               "with element name assetAdministrationShell, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryAssetAdministrationShellFromSequence(reader, isEmptyElement);
@@ -2445,7 +2390,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<AssetInformation> tryAssetInformationFromSequence(
+    private static Reporting.Result<AssetInformation> tryAssetInformationFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       AssetKind theAssetKind = null;
@@ -2461,7 +2406,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class AssetInformation, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -2476,10 +2421,10 @@ public class Xmlization {
               "a property of an instance of class AssetInformation, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(AssetInformation.class);
           }
@@ -2498,7 +2443,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "assetKind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -2506,7 +2451,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property assetKind of an instance of class AssetInformation, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textAssetKind;
@@ -2519,7 +2464,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "assetKind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<AssetKind> optionalAssetKind =
@@ -2536,7 +2481,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "assetKind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -2551,7 +2496,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property globalAssetId of an instance of class AssetInformation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2563,14 +2508,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "globalAssetId"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "specificAssetIds":
             {
-              final _Result<List<ISpecificAssetId>> trySpecificAssetIds = parseList(
+              final Reporting.Result<List<ISpecificAssetId>> trySpecificAssetIds = parseList(
                 reader,
                 isEmptyProperty,
                 ISpecificAssetId.class,
@@ -2598,7 +2543,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property assetType of an instance of class AssetInformation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2610,14 +2555,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "assetType"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "defaultThumbnail":
             {
-              _Result<Resource> tryDefaultThumbnail = tryResourceFromSequence(
+              Reporting.Result<Resource> tryDefaultThumbnail = tryResourceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryDefaultThumbnail.isError()) {
@@ -2636,13 +2581,13 @@ public class Xmlization {
                 "We expected properties of the class AssetInformation, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "AssetInformation",
             reader,
             tryElementName);
@@ -2655,10 +2600,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property assetKind has not been given " +
           "in the XML representation of an instance of class AssetInformation");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new AssetInformation(
+      return Reporting.Result.success(new AssetInformation(
         theAssetKind,
         theGlobalAssetId,
         theSpecificAssetIds,
@@ -2669,7 +2614,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class AssetInformation from an XML element.
      */
-    private static _Result<? extends AssetInformation> tryAssetInformationFromElement(
+    private static Reporting.Result<? extends AssetInformation> tryAssetInformationFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -2679,7 +2624,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class AssetInformation " +
               "with element name assetInformation, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryAssetInformationFromSequence(reader, isEmptyElement);
@@ -2693,7 +2638,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Resource> tryResourceFromSequence(
+    private static Reporting.Result<Resource> tryResourceFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String thePath = null;
@@ -2706,7 +2651,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Resource, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -2721,10 +2666,10 @@ public class Xmlization {
               "a property of an instance of class Resource, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Resource.class);
           }
@@ -2744,7 +2689,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property path of an instance of class Resource, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2756,7 +2701,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "path"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -2772,7 +2717,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property contentType of an instance of class Resource, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2784,7 +2729,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "contentType"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -2794,13 +2739,13 @@ public class Xmlization {
                 "We expected properties of the class Resource, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Resource",
             reader,
             tryElementName);
@@ -2813,10 +2758,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property path has not been given " +
           "in the XML representation of an instance of class Resource");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Resource(
+      return Reporting.Result.success(new Resource(
         thePath,
         theContentType));
     }
@@ -2824,7 +2769,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Resource from an XML element.
      */
-    private static _Result<? extends Resource> tryResourceFromElement(
+    private static Reporting.Result<? extends Resource> tryResourceFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -2834,7 +2779,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Resource " +
               "with element name resource, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryResourceFromSequence(reader, isEmptyElement);
@@ -2848,7 +2793,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<SpecificAssetId> trySpecificAssetIdFromSequence(
+    private static Reporting.Result<SpecificAssetId> trySpecificAssetIdFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       IReference theSemanticId = null;
@@ -2864,7 +2809,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class SpecificAssetId, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -2879,10 +2824,10 @@ public class Xmlization {
               "a property of an instance of class SpecificAssetId, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(SpecificAssetId.class);
           }
@@ -2893,7 +2838,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -2909,7 +2854,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -2937,7 +2882,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property name of an instance of class SpecificAssetId, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2949,7 +2894,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "name"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -2965,7 +2910,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class SpecificAssetId, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -2977,14 +2922,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "externalSubjectId":
             {
-              _Result<Reference> tryExternalSubjectId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryExternalSubjectId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryExternalSubjectId.isError()) {
@@ -3003,13 +2948,13 @@ public class Xmlization {
                 "We expected properties of the class SpecificAssetId, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "SpecificAssetId",
             reader,
             tryElementName);
@@ -3022,17 +2967,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property name has not been given " +
           "in the XML representation of an instance of class SpecificAssetId");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theValue == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property value has not been given " +
           "in the XML representation of an instance of class SpecificAssetId");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new SpecificAssetId(
+      return Reporting.Result.success(new SpecificAssetId(
         theName,
         theValue,
         theSemanticId,
@@ -3043,7 +2988,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class SpecificAssetId from an XML element.
      */
-    private static _Result<? extends SpecificAssetId> trySpecificAssetIdFromElement(
+    private static Reporting.Result<? extends SpecificAssetId> trySpecificAssetIdFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -3053,7 +2998,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class SpecificAssetId " +
               "with element name specificAssetId, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return trySpecificAssetIdFromSequence(reader, isEmptyElement);
@@ -3067,7 +3012,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Submodel> trySubmodelFromSequence(
+    private static Reporting.Result<Submodel> trySubmodelFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -3091,7 +3036,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Submodel, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -3106,10 +3051,10 @@ public class Xmlization {
               "a property of an instance of class Submodel, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Submodel.class);
           }
@@ -3120,7 +3065,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -3148,7 +3093,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Submodel, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -3160,7 +3105,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -3176,7 +3121,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Submodel, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -3188,14 +3133,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -3214,7 +3159,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -3233,7 +3178,7 @@ public class Xmlization {
             }
             case "administration":
             {
-              _Result<AdministrativeInformation> tryAdministration = tryAdministrativeInformationFromSequence(
+              Reporting.Result<AdministrativeInformation> tryAdministration = tryAdministrativeInformationFromSequence(
                 reader, isEmptyProperty);
 
               if (tryAdministration.isError()) {
@@ -3258,7 +3203,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property id of an instance of class Submodel, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -3270,7 +3215,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "id"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -3285,7 +3230,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "kind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -3293,7 +3238,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property kind of an instance of class Submodel, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textKind;
@@ -3306,7 +3251,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "kind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<ModellingKind> optionalKind =
@@ -3323,13 +3268,13 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "kind"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -3345,7 +3290,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -3364,7 +3309,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -3383,7 +3328,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -3402,7 +3347,7 @@ public class Xmlization {
             }
             case "submodelElements":
             {
-              final _Result<List<ISubmodelElement>> trySubmodelElements = parseList(
+              final Reporting.Result<List<ISubmodelElement>> trySubmodelElements = parseList(
                 reader,
                 isEmptyProperty,
                 ISubmodelElement.class,
@@ -3424,13 +3369,13 @@ public class Xmlization {
                 "We expected properties of the class Submodel, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Submodel",
             reader,
             tryElementName);
@@ -3443,10 +3388,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property id has not been given " +
           "in the XML representation of an instance of class Submodel");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Submodel(
+      return Reporting.Result.success(new Submodel(
         theId,
         theExtensions,
         theCategory,
@@ -3465,7 +3410,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Submodel from an XML element.
      */
-    private static _Result<? extends Submodel> trySubmodelFromElement(
+    private static Reporting.Result<? extends Submodel> trySubmodelFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -3475,7 +3420,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Submodel " +
               "with element name submodel, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return trySubmodelFromSequence(reader, isEmptyElement);
@@ -3485,7 +3430,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of ISubmodelElement from an XML element.
      */
-    private static _Result<? extends ISubmodelElement> tryISubmodelElementFromElement(
+    private static Reporting.Result<? extends ISubmodelElement> tryISubmodelElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -3523,7 +3468,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -3535,7 +3480,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<RelationshipElement> tryRelationshipElementFromSequence(
+    private static Reporting.Result<RelationshipElement> tryRelationshipElementFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -3557,7 +3502,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class RelationshipElement, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -3572,10 +3517,10 @@ public class Xmlization {
               "a property of an instance of class RelationshipElement, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(RelationshipElement.class);
           }
@@ -3586,7 +3531,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -3614,7 +3559,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class RelationshipElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -3626,7 +3571,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -3642,7 +3587,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class RelationshipElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -3654,14 +3599,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -3680,7 +3625,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -3699,7 +3644,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -3715,7 +3660,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -3734,7 +3679,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -3753,7 +3698,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -3772,7 +3717,7 @@ public class Xmlization {
             }
             case "first":
             {
-              _Result<Reference> tryFirst = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryFirst = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryFirst.isError()) {
@@ -3788,7 +3733,7 @@ public class Xmlization {
             }
             case "second":
             {
-              _Result<Reference> trySecond = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySecond = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySecond.isError()) {
@@ -3807,13 +3752,13 @@ public class Xmlization {
                 "We expected properties of the class RelationshipElement, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "RelationshipElement",
             reader,
             tryElementName);
@@ -3826,17 +3771,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property first has not been given " +
           "in the XML representation of an instance of class RelationshipElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theSecond == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property second has not been given " +
           "in the XML representation of an instance of class RelationshipElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new RelationshipElement(
+      return Reporting.Result.success(new RelationshipElement(
         theFirst,
         theSecond,
         theExtensions,
@@ -3853,7 +3798,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IRelationshipElement from an XML element.
      */
-    private static _Result<? extends IRelationshipElement> tryIRelationshipElementFromElement(
+    private static Reporting.Result<? extends IRelationshipElement> tryIRelationshipElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -3867,7 +3812,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -3875,7 +3820,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class RelationshipElement from an XML element.
      */
-    private static _Result<? extends RelationshipElement> tryRelationshipElementFromElement(
+    private static Reporting.Result<? extends RelationshipElement> tryRelationshipElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -3885,7 +3830,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class RelationshipElement " +
               "with element name relationshipElement, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryRelationshipElementFromSequence(reader, isEmptyElement);
@@ -3899,7 +3844,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<SubmodelElementList> trySubmodelElementListFromSequence(
+    private static Reporting.Result<SubmodelElementList> trySubmodelElementListFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -3924,7 +3869,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class SubmodelElementList, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -3939,10 +3884,10 @@ public class Xmlization {
               "a property of an instance of class SubmodelElementList, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(SubmodelElementList.class);
           }
@@ -3953,7 +3898,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -3981,7 +3926,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class SubmodelElementList, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -3993,7 +3938,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -4009,7 +3954,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class SubmodelElementList, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -4021,14 +3966,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -4047,7 +3992,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -4066,7 +4011,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -4082,7 +4027,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -4101,7 +4046,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -4120,7 +4065,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -4147,7 +4092,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "orderRelevant"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -4155,7 +4100,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property orderRelevant of an instance of class SubmodelElementList, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -4167,14 +4112,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "orderRelevant"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "semanticIdListElement":
             {
-              _Result<Reference> trySemanticIdListElement = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticIdListElement = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticIdListElement.isError()) {
@@ -4198,7 +4143,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "typeValueListElement"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -4206,7 +4151,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property typeValueListElement of an instance of class SubmodelElementList, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textTypeValueListElement;
@@ -4219,7 +4164,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "typeValueListElement"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<AasSubmodelElements> optionalTypeValueListElement =
@@ -4236,7 +4181,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "typeValueListElement"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -4250,7 +4195,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "valueTypeListElement"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -4258,7 +4203,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property valueTypeListElement of an instance of class SubmodelElementList, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textValueTypeListElement;
@@ -4271,7 +4216,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueTypeListElement"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<DataTypeDefXsd> optionalValueTypeListElement =
@@ -4288,13 +4233,13 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueTypeListElement"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
             case "value":
             {
-              final _Result<List<ISubmodelElement>> tryValue = parseList(
+              final Reporting.Result<List<ISubmodelElement>> tryValue = parseList(
                 reader,
                 isEmptyProperty,
                 ISubmodelElement.class,
@@ -4316,13 +4261,13 @@ public class Xmlization {
                 "We expected properties of the class SubmodelElementList, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "SubmodelElementList",
             reader,
             tryElementName);
@@ -4335,10 +4280,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property typeValueListElement has not been given " +
           "in the XML representation of an instance of class SubmodelElementList");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new SubmodelElementList(
+      return Reporting.Result.success(new SubmodelElementList(
         theTypeValueListElement,
         theExtensions,
         theCategory,
@@ -4358,7 +4303,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class SubmodelElementList from an XML element.
      */
-    private static _Result<? extends SubmodelElementList> trySubmodelElementListFromElement(
+    private static Reporting.Result<? extends SubmodelElementList> trySubmodelElementListFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -4368,7 +4313,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class SubmodelElementList " +
               "with element name submodelElementList, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return trySubmodelElementListFromSequence(reader, isEmptyElement);
@@ -4382,7 +4327,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<SubmodelElementCollection> trySubmodelElementCollectionFromSequence(
+    private static Reporting.Result<SubmodelElementCollection> trySubmodelElementCollectionFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -4403,7 +4348,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class SubmodelElementCollection, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -4418,10 +4363,10 @@ public class Xmlization {
               "a property of an instance of class SubmodelElementCollection, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(SubmodelElementCollection.class);
           }
@@ -4432,7 +4377,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -4460,7 +4405,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class SubmodelElementCollection, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -4472,7 +4417,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -4488,7 +4433,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class SubmodelElementCollection, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -4500,14 +4445,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -4526,7 +4471,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -4545,7 +4490,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -4561,7 +4506,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -4580,7 +4525,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -4599,7 +4544,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -4618,7 +4563,7 @@ public class Xmlization {
             }
             case "value":
             {
-              final _Result<List<ISubmodelElement>> tryValue = parseList(
+              final Reporting.Result<List<ISubmodelElement>> tryValue = parseList(
                 reader,
                 isEmptyProperty,
                 ISubmodelElement.class,
@@ -4640,13 +4585,13 @@ public class Xmlization {
                 "We expected properties of the class SubmodelElementCollection, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "SubmodelElementCollection",
             reader,
             tryElementName);
@@ -4655,7 +4600,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new SubmodelElementCollection(
+      return Reporting.Result.success(new SubmodelElementCollection(
         theExtensions,
         theCategory,
         theIdShort,
@@ -4671,7 +4616,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class SubmodelElementCollection from an XML element.
      */
-    private static _Result<? extends SubmodelElementCollection> trySubmodelElementCollectionFromElement(
+    private static Reporting.Result<? extends SubmodelElementCollection> trySubmodelElementCollectionFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -4681,7 +4626,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class SubmodelElementCollection " +
               "with element name submodelElementCollection, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return trySubmodelElementCollectionFromSequence(reader, isEmptyElement);
@@ -4691,7 +4636,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IDataElement from an XML element.
      */
-    private static _Result<? extends IDataElement> tryIDataElementFromElement(
+    private static Reporting.Result<? extends IDataElement> tryIDataElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -4713,7 +4658,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -4725,7 +4670,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Property> tryPropertyFromSequence(
+    private static Reporting.Result<Property> tryPropertyFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -4748,7 +4693,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Property, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -4763,10 +4708,10 @@ public class Xmlization {
               "a property of an instance of class Property, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Property.class);
           }
@@ -4777,7 +4722,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -4805,7 +4750,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Property, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -4817,7 +4762,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -4833,7 +4778,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Property, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -4845,14 +4790,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -4871,7 +4816,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -4890,7 +4835,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -4906,7 +4851,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -4925,7 +4870,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -4944,7 +4889,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -4971,7 +4916,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -4979,7 +4924,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property valueType of an instance of class Property, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textValueType;
@@ -4992,7 +4937,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<DataTypeDefXsd> optionalValueType =
@@ -5009,7 +4954,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -5024,7 +4969,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class Property, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5036,14 +4981,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "valueId":
             {
-              _Result<Reference> tryValueId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryValueId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryValueId.isError()) {
@@ -5062,13 +5007,13 @@ public class Xmlization {
                 "We expected properties of the class Property, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Property",
             reader,
             tryElementName);
@@ -5081,10 +5026,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property valueType has not been given " +
           "in the XML representation of an instance of class Property");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Property(
+      return Reporting.Result.success(new Property(
         theValueType,
         theExtensions,
         theCategory,
@@ -5102,7 +5047,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Property from an XML element.
      */
-    private static _Result<? extends Property> tryPropertyFromElement(
+    private static Reporting.Result<? extends Property> tryPropertyFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -5112,7 +5057,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Property " +
               "with element name property, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryPropertyFromSequence(reader, isEmptyElement);
@@ -5126,7 +5071,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<MultiLanguageProperty> tryMultiLanguagePropertyFromSequence(
+    private static Reporting.Result<MultiLanguageProperty> tryMultiLanguagePropertyFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -5148,7 +5093,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class MultiLanguageProperty, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -5163,10 +5108,10 @@ public class Xmlization {
               "a property of an instance of class MultiLanguageProperty, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(MultiLanguageProperty.class);
           }
@@ -5177,7 +5122,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -5205,7 +5150,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class MultiLanguageProperty, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5217,7 +5162,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -5233,7 +5178,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class MultiLanguageProperty, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5245,14 +5190,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -5271,7 +5216,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -5290,7 +5235,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -5306,7 +5251,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -5325,7 +5270,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -5344,7 +5289,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -5363,7 +5308,7 @@ public class Xmlization {
             }
             case "value":
             {
-              final _Result<List<ILangStringTextType>> tryValue = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryValue = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -5382,7 +5327,7 @@ public class Xmlization {
             }
             case "valueId":
             {
-              _Result<Reference> tryValueId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryValueId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryValueId.isError()) {
@@ -5401,13 +5346,13 @@ public class Xmlization {
                 "We expected properties of the class MultiLanguageProperty, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "MultiLanguageProperty",
             reader,
             tryElementName);
@@ -5416,7 +5361,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new MultiLanguageProperty(
+      return Reporting.Result.success(new MultiLanguageProperty(
         theExtensions,
         theCategory,
         theIdShort,
@@ -5433,7 +5378,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class MultiLanguageProperty from an XML element.
      */
-    private static _Result<? extends MultiLanguageProperty> tryMultiLanguagePropertyFromElement(
+    private static Reporting.Result<? extends MultiLanguageProperty> tryMultiLanguagePropertyFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -5443,7 +5388,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class MultiLanguageProperty " +
               "with element name multiLanguageProperty, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryMultiLanguagePropertyFromSequence(reader, isEmptyElement);
@@ -5457,7 +5402,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Range> tryRangeFromSequence(
+    private static Reporting.Result<Range> tryRangeFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -5480,7 +5425,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Range, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -5495,10 +5440,10 @@ public class Xmlization {
               "a property of an instance of class Range, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Range.class);
           }
@@ -5509,7 +5454,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -5537,7 +5482,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Range, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5549,7 +5494,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -5565,7 +5510,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Range, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5577,14 +5522,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -5603,7 +5548,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -5622,7 +5567,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -5638,7 +5583,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -5657,7 +5602,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -5676,7 +5621,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -5703,7 +5648,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -5711,7 +5656,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property valueType of an instance of class Range, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textValueType;
@@ -5724,7 +5669,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<DataTypeDefXsd> optionalValueType =
@@ -5741,7 +5686,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "valueType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -5756,7 +5701,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property min of an instance of class Range, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5768,7 +5713,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "min"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -5784,7 +5729,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property max of an instance of class Range, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5796,7 +5741,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "max"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -5806,13 +5751,13 @@ public class Xmlization {
                 "We expected properties of the class Range, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Range",
             reader,
             tryElementName);
@@ -5825,10 +5770,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property valueType has not been given " +
           "in the XML representation of an instance of class Range");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Range(
+      return Reporting.Result.success(new Range(
         theValueType,
         theExtensions,
         theCategory,
@@ -5846,7 +5791,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Range from an XML element.
      */
-    private static _Result<? extends Range> tryRangeFromElement(
+    private static Reporting.Result<? extends Range> tryRangeFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -5856,7 +5801,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Range " +
               "with element name range, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryRangeFromSequence(reader, isEmptyElement);
@@ -5870,7 +5815,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<ReferenceElement> tryReferenceElementFromSequence(
+    private static Reporting.Result<ReferenceElement> tryReferenceElementFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -5891,7 +5836,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class ReferenceElement, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -5906,10 +5851,10 @@ public class Xmlization {
               "a property of an instance of class ReferenceElement, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(ReferenceElement.class);
           }
@@ -5920,7 +5865,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -5948,7 +5893,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class ReferenceElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5960,7 +5905,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -5976,7 +5921,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class ReferenceElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -5988,14 +5933,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -6014,7 +5959,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -6033,7 +5978,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -6049,7 +5994,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -6068,7 +6013,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -6087,7 +6032,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -6106,7 +6051,7 @@ public class Xmlization {
             }
             case "value":
             {
-              _Result<Reference> tryValue = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryValue = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryValue.isError()) {
@@ -6125,13 +6070,13 @@ public class Xmlization {
                 "We expected properties of the class ReferenceElement, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "ReferenceElement",
             reader,
             tryElementName);
@@ -6140,7 +6085,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new ReferenceElement(
+      return Reporting.Result.success(new ReferenceElement(
         theExtensions,
         theCategory,
         theIdShort,
@@ -6156,7 +6101,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class ReferenceElement from an XML element.
      */
-    private static _Result<? extends ReferenceElement> tryReferenceElementFromElement(
+    private static Reporting.Result<? extends ReferenceElement> tryReferenceElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -6166,7 +6111,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class ReferenceElement " +
               "with element name referenceElement, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryReferenceElementFromSequence(reader, isEmptyElement);
@@ -6180,7 +6125,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Blob> tryBlobFromSequence(
+    private static Reporting.Result<Blob> tryBlobFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -6202,7 +6147,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Blob, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -6217,10 +6162,10 @@ public class Xmlization {
               "a property of an instance of class Blob, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Blob.class);
           }
@@ -6231,7 +6176,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -6259,7 +6204,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Blob, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6271,7 +6216,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -6287,7 +6232,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Blob, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6299,14 +6244,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -6325,7 +6270,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -6344,7 +6289,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -6360,7 +6305,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -6379,7 +6324,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -6398,7 +6343,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -6425,7 +6370,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "value"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -6433,7 +6378,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class Blob, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6445,7 +6390,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -6461,7 +6406,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property contentType of an instance of class Blob, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6473,7 +6418,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "contentType"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -6483,13 +6428,13 @@ public class Xmlization {
                 "We expected properties of the class Blob, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Blob",
             reader,
             tryElementName);
@@ -6502,10 +6447,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property contentType has not been given " +
           "in the XML representation of an instance of class Blob");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Blob(
+      return Reporting.Result.success(new Blob(
         theContentType,
         theExtensions,
         theCategory,
@@ -6522,7 +6467,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Blob from an XML element.
      */
-    private static _Result<? extends Blob> tryBlobFromElement(
+    private static Reporting.Result<? extends Blob> tryBlobFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -6532,7 +6477,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Blob " +
               "with element name blob, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryBlobFromSequence(reader, isEmptyElement);
@@ -6546,7 +6491,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<File> tryFileFromSequence(
+    private static Reporting.Result<File> tryFileFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -6568,7 +6513,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class File, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -6583,10 +6528,10 @@ public class Xmlization {
               "a property of an instance of class File, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(File.class);
           }
@@ -6597,7 +6542,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -6625,7 +6570,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class File, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6637,7 +6582,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -6653,7 +6598,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class File, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6665,14 +6610,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -6691,7 +6636,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -6710,7 +6655,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -6726,7 +6671,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -6745,7 +6690,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -6764,7 +6709,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -6792,7 +6737,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class File, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6804,7 +6749,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -6820,7 +6765,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property contentType of an instance of class File, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6832,7 +6777,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "contentType"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -6842,13 +6787,13 @@ public class Xmlization {
                 "We expected properties of the class File, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "File",
             reader,
             tryElementName);
@@ -6861,10 +6806,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property contentType has not been given " +
           "in the XML representation of an instance of class File");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new File(
+      return Reporting.Result.success(new File(
         theContentType,
         theExtensions,
         theCategory,
@@ -6881,7 +6826,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class File from an XML element.
      */
-    private static _Result<? extends File> tryFileFromElement(
+    private static Reporting.Result<? extends File> tryFileFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -6891,7 +6836,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class File " +
               "with element name file, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryFileFromSequence(reader, isEmptyElement);
@@ -6905,7 +6850,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<AnnotatedRelationshipElement> tryAnnotatedRelationshipElementFromSequence(
+    private static Reporting.Result<AnnotatedRelationshipElement> tryAnnotatedRelationshipElementFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -6928,7 +6873,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class AnnotatedRelationshipElement, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -6943,10 +6888,10 @@ public class Xmlization {
               "a property of an instance of class AnnotatedRelationshipElement, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(AnnotatedRelationshipElement.class);
           }
@@ -6957,7 +6902,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -6985,7 +6930,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class AnnotatedRelationshipElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -6997,7 +6942,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -7013,7 +6958,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class AnnotatedRelationshipElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7025,14 +6970,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -7051,7 +6996,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -7070,7 +7015,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -7086,7 +7031,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -7105,7 +7050,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -7124,7 +7069,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -7143,7 +7088,7 @@ public class Xmlization {
             }
             case "first":
             {
-              _Result<Reference> tryFirst = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryFirst = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryFirst.isError()) {
@@ -7159,7 +7104,7 @@ public class Xmlization {
             }
             case "second":
             {
-              _Result<Reference> trySecond = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySecond = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySecond.isError()) {
@@ -7175,7 +7120,7 @@ public class Xmlization {
             }
             case "annotations":
             {
-              final _Result<List<IDataElement>> tryAnnotations = parseList(
+              final Reporting.Result<List<IDataElement>> tryAnnotations = parseList(
                 reader,
                 isEmptyProperty,
                 IDataElement.class,
@@ -7197,13 +7142,13 @@ public class Xmlization {
                 "We expected properties of the class AnnotatedRelationshipElement, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "AnnotatedRelationshipElement",
             reader,
             tryElementName);
@@ -7216,17 +7161,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property first has not been given " +
           "in the XML representation of an instance of class AnnotatedRelationshipElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theSecond == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property second has not been given " +
           "in the XML representation of an instance of class AnnotatedRelationshipElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new AnnotatedRelationshipElement(
+      return Reporting.Result.success(new AnnotatedRelationshipElement(
         theFirst,
         theSecond,
         theExtensions,
@@ -7244,7 +7189,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class AnnotatedRelationshipElement from an XML element.
      */
-    private static _Result<? extends AnnotatedRelationshipElement> tryAnnotatedRelationshipElementFromElement(
+    private static Reporting.Result<? extends AnnotatedRelationshipElement> tryAnnotatedRelationshipElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -7254,7 +7199,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class AnnotatedRelationshipElement " +
               "with element name annotatedRelationshipElement, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryAnnotatedRelationshipElementFromSequence(reader, isEmptyElement);
@@ -7268,7 +7213,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Entity> tryEntityFromSequence(
+    private static Reporting.Result<Entity> tryEntityFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -7292,7 +7237,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Entity, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -7307,10 +7252,10 @@ public class Xmlization {
               "a property of an instance of class Entity, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Entity.class);
           }
@@ -7321,7 +7266,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -7349,7 +7294,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Entity, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7361,7 +7306,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -7377,7 +7322,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Entity, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7389,14 +7334,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -7415,7 +7360,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -7434,7 +7379,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -7450,7 +7395,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -7469,7 +7414,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -7488,7 +7433,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -7507,7 +7452,7 @@ public class Xmlization {
             }
             case "statements":
             {
-              final _Result<List<ISubmodelElement>> tryStatements = parseList(
+              final Reporting.Result<List<ISubmodelElement>> tryStatements = parseList(
                 reader,
                 isEmptyProperty,
                 ISubmodelElement.class,
@@ -7534,7 +7479,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "entityType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -7542,7 +7487,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property entityType of an instance of class Entity, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textEntityType;
@@ -7555,7 +7500,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "entityType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<EntityType> optionalEntityType =
@@ -7572,7 +7517,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "entityType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -7587,7 +7532,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property globalAssetId of an instance of class Entity, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7599,14 +7544,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "globalAssetId"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "specificAssetIds":
             {
-              final _Result<List<ISpecificAssetId>> trySpecificAssetIds = parseList(
+              final Reporting.Result<List<ISpecificAssetId>> trySpecificAssetIds = parseList(
                 reader,
                 isEmptyProperty,
                 ISpecificAssetId.class,
@@ -7628,13 +7573,13 @@ public class Xmlization {
                 "We expected properties of the class Entity, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Entity",
             reader,
             tryElementName);
@@ -7647,10 +7592,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property entityType has not been given " +
           "in the XML representation of an instance of class Entity");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Entity(
+      return Reporting.Result.success(new Entity(
         theEntityType,
         theExtensions,
         theCategory,
@@ -7669,7 +7614,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Entity from an XML element.
      */
-    private static _Result<? extends Entity> tryEntityFromElement(
+    private static Reporting.Result<? extends Entity> tryEntityFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -7679,7 +7624,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Entity " +
               "with element name entity, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryEntityFromSequence(reader, isEmptyElement);
@@ -7693,7 +7638,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<EventPayload> tryEventPayloadFromSequence(
+    private static Reporting.Result<EventPayload> tryEventPayloadFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       IReference theSource = null;
@@ -7712,7 +7657,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class EventPayload, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -7727,10 +7672,10 @@ public class Xmlization {
               "a property of an instance of class EventPayload, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(EventPayload.class);
           }
@@ -7741,7 +7686,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "source":
             {
-              _Result<Reference> trySource = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySource = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySource.isError()) {
@@ -7757,7 +7702,7 @@ public class Xmlization {
             }
             case "sourceSemanticId":
             {
-              _Result<Reference> trySourceSemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySourceSemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySourceSemanticId.isError()) {
@@ -7773,7 +7718,7 @@ public class Xmlization {
             }
             case "observableReference":
             {
-              _Result<Reference> tryObservableReference = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryObservableReference = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryObservableReference.isError()) {
@@ -7789,7 +7734,7 @@ public class Xmlization {
             }
             case "observableSemanticId":
             {
-              _Result<Reference> tryObservableSemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryObservableSemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryObservableSemanticId.isError()) {
@@ -7814,7 +7759,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property topic of an instance of class EventPayload, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7826,14 +7771,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "topic"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "subjectId":
             {
-              _Result<Reference> trySubjectId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySubjectId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySubjectId.isError()) {
@@ -7858,7 +7803,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property timeStamp of an instance of class EventPayload, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7870,7 +7815,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "timeStamp"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -7885,7 +7830,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "payload"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -7893,7 +7838,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property payload of an instance of class EventPayload, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -7905,7 +7850,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "payload"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -7915,13 +7860,13 @@ public class Xmlization {
                 "We expected properties of the class EventPayload, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "EventPayload",
             reader,
             tryElementName);
@@ -7934,24 +7879,24 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property source has not been given " +
           "in the XML representation of an instance of class EventPayload");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theObservableReference == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property observableReference has not been given " +
           "in the XML representation of an instance of class EventPayload");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theTimeStamp == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property timeStamp has not been given " +
           "in the XML representation of an instance of class EventPayload");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new EventPayload(
+      return Reporting.Result.success(new EventPayload(
         theSource,
         theObservableReference,
         theTimeStamp,
@@ -7965,7 +7910,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class EventPayload from an XML element.
      */
-    private static _Result<? extends EventPayload> tryEventPayloadFromElement(
+    private static Reporting.Result<? extends EventPayload> tryEventPayloadFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -7975,7 +7920,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class EventPayload " +
               "with element name eventPayload, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryEventPayloadFromSequence(reader, isEmptyElement);
@@ -7985,7 +7930,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IEventElement from an XML element.
      */
-    private static _Result<? extends IEventElement> tryIEventElementFromElement(
+    private static Reporting.Result<? extends IEventElement> tryIEventElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -7997,7 +7942,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -8009,7 +7954,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<BasicEventElement> tryBasicEventElementFromSequence(
+    private static Reporting.Result<BasicEventElement> tryBasicEventElementFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -8037,7 +7982,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class BasicEventElement, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -8052,10 +7997,10 @@ public class Xmlization {
               "a property of an instance of class BasicEventElement, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(BasicEventElement.class);
           }
@@ -8066,7 +8011,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -8094,7 +8039,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class BasicEventElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8106,7 +8051,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -8122,7 +8067,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class BasicEventElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8134,14 +8079,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -8160,7 +8105,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -8179,7 +8124,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -8195,7 +8140,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -8214,7 +8159,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -8233,7 +8178,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -8252,7 +8197,7 @@ public class Xmlization {
             }
             case "observed":
             {
-              _Result<Reference> tryObserved = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryObserved = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryObserved.isError()) {
@@ -8276,7 +8221,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "direction"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -8284,7 +8229,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property direction of an instance of class BasicEventElement, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textDirection;
@@ -8297,7 +8242,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "direction"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<Direction> optionalDirection =
@@ -8314,7 +8259,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "direction"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -8328,7 +8273,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "state"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -8336,7 +8281,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property state of an instance of class BasicEventElement, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textState;
@@ -8349,7 +8294,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "state"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<StateOfEvent> optionalState =
@@ -8366,7 +8311,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "state"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -8381,7 +8326,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property messageTopic of an instance of class BasicEventElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8393,14 +8338,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "messageTopic"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "messageBroker":
             {
-              _Result<Reference> tryMessageBroker = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryMessageBroker = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryMessageBroker.isError()) {
@@ -8425,7 +8370,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property lastUpdate of an instance of class BasicEventElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8437,7 +8382,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "lastUpdate"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -8453,7 +8398,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property minInterval of an instance of class BasicEventElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8465,7 +8410,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "minInterval"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -8481,7 +8426,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property maxInterval of an instance of class BasicEventElement, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8493,7 +8438,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "maxInterval"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -8503,13 +8448,13 @@ public class Xmlization {
                 "We expected properties of the class BasicEventElement, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "BasicEventElement",
             reader,
             tryElementName);
@@ -8522,24 +8467,24 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property observed has not been given " +
           "in the XML representation of an instance of class BasicEventElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theDirection == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property direction has not been given " +
           "in the XML representation of an instance of class BasicEventElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theState == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property state has not been given " +
           "in the XML representation of an instance of class BasicEventElement");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new BasicEventElement(
+      return Reporting.Result.success(new BasicEventElement(
         theObserved,
         theDirection,
         theState,
@@ -8562,7 +8507,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class BasicEventElement from an XML element.
      */
-    private static _Result<? extends BasicEventElement> tryBasicEventElementFromElement(
+    private static Reporting.Result<? extends BasicEventElement> tryBasicEventElementFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -8572,7 +8517,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class BasicEventElement " +
               "with element name basicEventElement, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryBasicEventElementFromSequence(reader, isEmptyElement);
@@ -8586,7 +8531,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Operation> tryOperationFromSequence(
+    private static Reporting.Result<Operation> tryOperationFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -8609,7 +8554,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Operation, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -8624,10 +8569,10 @@ public class Xmlization {
               "a property of an instance of class Operation, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Operation.class);
           }
@@ -8638,7 +8583,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -8666,7 +8611,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Operation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8678,7 +8623,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -8694,7 +8639,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Operation, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -8706,14 +8651,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -8732,7 +8677,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -8751,7 +8696,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -8767,7 +8712,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -8786,7 +8731,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -8805,7 +8750,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -8824,7 +8769,7 @@ public class Xmlization {
             }
             case "inputVariables":
             {
-              final _Result<List<IOperationVariable>> tryInputVariables = parseList(
+              final Reporting.Result<List<IOperationVariable>> tryInputVariables = parseList(
                 reader,
                 isEmptyProperty,
                 IOperationVariable.class,
@@ -8843,7 +8788,7 @@ public class Xmlization {
             }
             case "outputVariables":
             {
-              final _Result<List<IOperationVariable>> tryOutputVariables = parseList(
+              final Reporting.Result<List<IOperationVariable>> tryOutputVariables = parseList(
                 reader,
                 isEmptyProperty,
                 IOperationVariable.class,
@@ -8862,7 +8807,7 @@ public class Xmlization {
             }
             case "inoutputVariables":
             {
-              final _Result<List<IOperationVariable>> tryInoutputVariables = parseList(
+              final Reporting.Result<List<IOperationVariable>> tryInoutputVariables = parseList(
                 reader,
                 isEmptyProperty,
                 IOperationVariable.class,
@@ -8884,13 +8829,13 @@ public class Xmlization {
                 "We expected properties of the class Operation, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Operation",
             reader,
             tryElementName);
@@ -8899,7 +8844,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new Operation(
+      return Reporting.Result.success(new Operation(
         theExtensions,
         theCategory,
         theIdShort,
@@ -8917,7 +8862,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Operation from an XML element.
      */
-    private static _Result<? extends Operation> tryOperationFromElement(
+    private static Reporting.Result<? extends Operation> tryOperationFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -8927,7 +8872,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Operation " +
               "with element name operation, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryOperationFromSequence(reader, isEmptyElement);
@@ -8941,7 +8886,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<OperationVariable> tryOperationVariableFromSequence(
+    private static Reporting.Result<OperationVariable> tryOperationVariableFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       ISubmodelElement theValue = null;
@@ -8953,7 +8898,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class OperationVariable, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -8968,10 +8913,10 @@ public class Xmlization {
               "a property of an instance of class OperationVariable, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(OperationVariable.class);
           }
@@ -8987,7 +8932,7 @@ public class Xmlization {
                   "Expected an XML element within the element " + tryElementName.getResult() + " representing " +
                   "the property value of an instance of class OperationVariable, " +
                   "but encountered a self-closing element.");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               // We need to skip the whitespace here in order to be able to look ahead
@@ -8999,7 +8944,7 @@ public class Xmlization {
                   "Expected an XML element within the element " + tryElementName.getResult() + " representing " +
                   "the property value of an instance of class OperationVariable, " +
                   "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               // Try to look ahead the discriminator name;
@@ -9008,12 +8953,12 @@ public class Xmlization {
               // checks.
               String discriminatorElementName = null;
               if (currentEvent(reader).isStartElement()) {
-                _Result<String> tryDiscriminatorElementName = tryElementName(reader);
+                Reporting.Result<String> tryDiscriminatorElementName = tryElementName(reader);
                 assert(!tryDiscriminatorElementName.isError());
                 discriminatorElementName = tryDiscriminatorElementName.getResult();
               }
 
-              _Result<? extends ISubmodelElement> tryValue = tryISubmodelElementFromElement(reader);
+              Reporting.Result<? extends ISubmodelElement> tryValue = tryISubmodelElementFromElement(reader);
 
               if (tryValue.isError()) {
                 if (discriminatorElementName != null) {
@@ -9038,13 +8983,13 @@ public class Xmlization {
                 "We expected properties of the class OperationVariable, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "OperationVariable",
             reader,
             tryElementName);
@@ -9057,17 +9002,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property value has not been given " +
           "in the XML representation of an instance of class OperationVariable");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new OperationVariable(
+      return Reporting.Result.success(new OperationVariable(
         theValue));
     }
 
     /**
      * Deserialize an instance of class OperationVariable from an XML element.
      */
-    private static _Result<? extends OperationVariable> tryOperationVariableFromElement(
+    private static Reporting.Result<? extends OperationVariable> tryOperationVariableFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -9077,7 +9022,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class OperationVariable " +
               "with element name operationVariable, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryOperationVariableFromSequence(reader, isEmptyElement);
@@ -9091,7 +9036,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Capability> tryCapabilityFromSequence(
+    private static Reporting.Result<Capability> tryCapabilityFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -9111,7 +9056,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Capability, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -9126,10 +9071,10 @@ public class Xmlization {
               "a property of an instance of class Capability, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Capability.class);
           }
@@ -9140,7 +9085,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -9168,7 +9113,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class Capability, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -9180,7 +9125,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -9196,7 +9141,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class Capability, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -9208,14 +9153,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -9234,7 +9179,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -9253,7 +9198,7 @@ public class Xmlization {
             }
             case "semanticId":
             {
-              _Result<Reference> trySemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> trySemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (trySemanticId.isError()) {
@@ -9269,7 +9214,7 @@ public class Xmlization {
             }
             case "supplementalSemanticIds":
             {
-              final _Result<List<IReference>> trySupplementalSemanticIds = parseList(
+              final Reporting.Result<List<IReference>> trySupplementalSemanticIds = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -9288,7 +9233,7 @@ public class Xmlization {
             }
             case "qualifiers":
             {
-              final _Result<List<IQualifier>> tryQualifiers = parseList(
+              final Reporting.Result<List<IQualifier>> tryQualifiers = parseList(
                 reader,
                 isEmptyProperty,
                 IQualifier.class,
@@ -9307,7 +9252,7 @@ public class Xmlization {
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -9329,13 +9274,13 @@ public class Xmlization {
                 "We expected properties of the class Capability, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Capability",
             reader,
             tryElementName);
@@ -9344,7 +9289,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new Capability(
+      return Reporting.Result.success(new Capability(
         theExtensions,
         theCategory,
         theIdShort,
@@ -9359,7 +9304,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Capability from an XML element.
      */
-    private static _Result<? extends Capability> tryCapabilityFromElement(
+    private static Reporting.Result<? extends Capability> tryCapabilityFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -9369,7 +9314,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Capability " +
               "with element name capability, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryCapabilityFromSequence(reader, isEmptyElement);
@@ -9383,7 +9328,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<ConceptDescription> tryConceptDescriptionFromSequence(
+    private static Reporting.Result<ConceptDescription> tryConceptDescriptionFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IExtension> theExtensions = null;
@@ -9403,7 +9348,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class ConceptDescription, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -9418,10 +9363,10 @@ public class Xmlization {
               "a property of an instance of class ConceptDescription, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(ConceptDescription.class);
           }
@@ -9432,7 +9377,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "extensions":
             {
-              final _Result<List<IExtension>> tryExtensions = parseList(
+              final Reporting.Result<List<IExtension>> tryExtensions = parseList(
                 reader,
                 isEmptyProperty,
                 IExtension.class,
@@ -9460,7 +9405,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property category of an instance of class ConceptDescription, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -9472,7 +9417,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "category"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -9488,7 +9433,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property idShort of an instance of class ConceptDescription, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -9500,14 +9445,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "idShort"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "displayName":
             {
-              final _Result<List<ILangStringNameType>> tryDisplayName = parseList(
+              final Reporting.Result<List<ILangStringNameType>> tryDisplayName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringNameType.class,
@@ -9526,7 +9471,7 @@ public class Xmlization {
             }
             case "description":
             {
-              final _Result<List<ILangStringTextType>> tryDescription = parseList(
+              final Reporting.Result<List<ILangStringTextType>> tryDescription = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringTextType.class,
@@ -9545,7 +9490,7 @@ public class Xmlization {
             }
             case "administration":
             {
-              _Result<AdministrativeInformation> tryAdministration = tryAdministrativeInformationFromSequence(
+              Reporting.Result<AdministrativeInformation> tryAdministration = tryAdministrativeInformationFromSequence(
                 reader, isEmptyProperty);
 
               if (tryAdministration.isError()) {
@@ -9570,7 +9515,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property id of an instance of class ConceptDescription, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -9582,14 +9527,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "id"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "embeddedDataSpecifications":
             {
-              final _Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
+              final Reporting.Result<List<IEmbeddedDataSpecification>> tryEmbeddedDataSpecifications = parseList(
                 reader,
                 isEmptyProperty,
                 IEmbeddedDataSpecification.class,
@@ -9608,7 +9553,7 @@ public class Xmlization {
             }
             case "isCaseOf":
             {
-              final _Result<List<IReference>> tryIsCaseOf = parseList(
+              final Reporting.Result<List<IReference>> tryIsCaseOf = parseList(
                 reader,
                 isEmptyProperty,
                 IReference.class,
@@ -9630,13 +9575,13 @@ public class Xmlization {
                 "We expected properties of the class ConceptDescription, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "ConceptDescription",
             reader,
             tryElementName);
@@ -9649,10 +9594,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property id has not been given " +
           "in the XML representation of an instance of class ConceptDescription");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new ConceptDescription(
+      return Reporting.Result.success(new ConceptDescription(
         theId,
         theExtensions,
         theCategory,
@@ -9667,7 +9612,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class ConceptDescription from an XML element.
      */
-    private static _Result<? extends ConceptDescription> tryConceptDescriptionFromElement(
+    private static Reporting.Result<? extends ConceptDescription> tryConceptDescriptionFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -9677,7 +9622,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class ConceptDescription " +
               "with element name conceptDescription, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryConceptDescriptionFromSequence(reader, isEmptyElement);
@@ -9691,7 +9636,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Reference> tryReferenceFromSequence(
+    private static Reporting.Result<Reference> tryReferenceFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       ReferenceTypes theType = null;
@@ -9705,7 +9650,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Reference, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -9720,10 +9665,10 @@ public class Xmlization {
               "a property of an instance of class Reference, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Reference.class);
           }
@@ -9742,7 +9687,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "type"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -9750,7 +9695,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property type of an instance of class Reference, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textType;
@@ -9763,7 +9708,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "type"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<ReferenceTypes> optionalType =
@@ -9780,13 +9725,13 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "type"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
             case "referredSemanticId":
             {
-              _Result<Reference> tryReferredSemanticId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryReferredSemanticId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryReferredSemanticId.isError()) {
@@ -9802,7 +9747,7 @@ public class Xmlization {
             }
             case "keys":
             {
-              final _Result<List<IKey>> tryKeys = parseList(
+              final Reporting.Result<List<IKey>> tryKeys = parseList(
                 reader,
                 isEmptyProperty,
                 IKey.class,
@@ -9824,13 +9769,13 @@ public class Xmlization {
                 "We expected properties of the class Reference, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Reference",
             reader,
             tryElementName);
@@ -9843,17 +9788,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property type has not been given " +
           "in the XML representation of an instance of class Reference");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theKeys == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property keys has not been given " +
           "in the XML representation of an instance of class Reference");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Reference(
+      return Reporting.Result.success(new Reference(
         theType,
         theKeys,
         theReferredSemanticId));
@@ -9862,7 +9807,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Reference from an XML element.
      */
-    private static _Result<? extends Reference> tryReferenceFromElement(
+    private static Reporting.Result<? extends Reference> tryReferenceFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -9872,7 +9817,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Reference " +
               "with element name reference, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryReferenceFromSequence(reader, isEmptyElement);
@@ -9886,7 +9831,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Key> tryKeyFromSequence(
+    private static Reporting.Result<Key> tryKeyFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       KeyTypes theType = null;
@@ -9899,7 +9844,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Key, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -9914,10 +9859,10 @@ public class Xmlization {
               "a property of an instance of class Key, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Key.class);
           }
@@ -9936,7 +9881,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "type"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -9944,7 +9889,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property type of an instance of class Key, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textType;
@@ -9957,7 +9902,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "type"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<KeyTypes> optionalType =
@@ -9974,7 +9919,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "type"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
@@ -9989,7 +9934,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class Key, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10001,7 +9946,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10011,13 +9956,13 @@ public class Xmlization {
                 "We expected properties of the class Key, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Key",
             reader,
             tryElementName);
@@ -10030,17 +9975,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property type has not been given " +
           "in the XML representation of an instance of class Key");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theValue == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property value has not been given " +
           "in the XML representation of an instance of class Key");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new Key(
+      return Reporting.Result.success(new Key(
         theType,
         theValue));
     }
@@ -10048,7 +9993,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Key from an XML element.
      */
-    private static _Result<? extends Key> tryKeyFromElement(
+    private static Reporting.Result<? extends Key> tryKeyFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10058,7 +10003,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Key " +
               "with element name key, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryKeyFromSequence(reader, isEmptyElement);
@@ -10068,7 +10013,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IAbstractLangString from an XML element.
      */
-    private static _Result<? extends IAbstractLangString> tryIAbstractLangStringFromElement(
+    private static Reporting.Result<? extends IAbstractLangString> tryIAbstractLangStringFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10088,7 +10033,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -10100,7 +10045,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<LangStringNameType> tryLangStringNameTypeFromSequence(
+    private static Reporting.Result<LangStringNameType> tryLangStringNameTypeFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theLanguage = null;
@@ -10113,7 +10058,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class LangStringNameType, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -10128,10 +10073,10 @@ public class Xmlization {
               "a property of an instance of class LangStringNameType, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(LangStringNameType.class);
           }
@@ -10151,7 +10096,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property language of an instance of class LangStringNameType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10163,7 +10108,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "language"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10179,7 +10124,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property text of an instance of class LangStringNameType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10191,7 +10136,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "text"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10201,13 +10146,13 @@ public class Xmlization {
                 "We expected properties of the class LangStringNameType, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "LangStringNameType",
             reader,
             tryElementName);
@@ -10220,17 +10165,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property language has not been given " +
           "in the XML representation of an instance of class LangStringNameType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theText == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property text has not been given " +
           "in the XML representation of an instance of class LangStringNameType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new LangStringNameType(
+      return Reporting.Result.success(new LangStringNameType(
         theLanguage,
         theText));
     }
@@ -10238,7 +10183,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class LangStringNameType from an XML element.
      */
-    private static _Result<? extends LangStringNameType> tryLangStringNameTypeFromElement(
+    private static Reporting.Result<? extends LangStringNameType> tryLangStringNameTypeFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10248,7 +10193,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class LangStringNameType " +
               "with element name langStringNameType, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryLangStringNameTypeFromSequence(reader, isEmptyElement);
@@ -10262,7 +10207,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<LangStringTextType> tryLangStringTextTypeFromSequence(
+    private static Reporting.Result<LangStringTextType> tryLangStringTextTypeFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theLanguage = null;
@@ -10275,7 +10220,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class LangStringTextType, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -10290,10 +10235,10 @@ public class Xmlization {
               "a property of an instance of class LangStringTextType, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(LangStringTextType.class);
           }
@@ -10313,7 +10258,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property language of an instance of class LangStringTextType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10325,7 +10270,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "language"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10341,7 +10286,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property text of an instance of class LangStringTextType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10353,7 +10298,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "text"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10363,13 +10308,13 @@ public class Xmlization {
                 "We expected properties of the class LangStringTextType, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "LangStringTextType",
             reader,
             tryElementName);
@@ -10382,17 +10327,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property language has not been given " +
           "in the XML representation of an instance of class LangStringTextType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theText == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property text has not been given " +
           "in the XML representation of an instance of class LangStringTextType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new LangStringTextType(
+      return Reporting.Result.success(new LangStringTextType(
         theLanguage,
         theText));
     }
@@ -10400,7 +10345,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class LangStringTextType from an XML element.
      */
-    private static _Result<? extends LangStringTextType> tryLangStringTextTypeFromElement(
+    private static Reporting.Result<? extends LangStringTextType> tryLangStringTextTypeFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10410,7 +10355,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class LangStringTextType " +
               "with element name langStringTextType, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryLangStringTextTypeFromSequence(reader, isEmptyElement);
@@ -10424,7 +10369,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<Environment> tryEnvironmentFromSequence(
+    private static Reporting.Result<Environment> tryEnvironmentFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IAssetAdministrationShell> theAssetAdministrationShells = null;
@@ -10438,7 +10383,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class Environment, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -10453,10 +10398,10 @@ public class Xmlization {
               "a property of an instance of class Environment, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(Environment.class);
           }
@@ -10467,7 +10412,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "assetAdministrationShells":
             {
-              final _Result<List<IAssetAdministrationShell>> tryAssetAdministrationShells = parseList(
+              final Reporting.Result<List<IAssetAdministrationShell>> tryAssetAdministrationShells = parseList(
                 reader,
                 isEmptyProperty,
                 IAssetAdministrationShell.class,
@@ -10486,7 +10431,7 @@ public class Xmlization {
             }
             case "submodels":
             {
-              final _Result<List<ISubmodel>> trySubmodels = parseList(
+              final Reporting.Result<List<ISubmodel>> trySubmodels = parseList(
                 reader,
                 isEmptyProperty,
                 ISubmodel.class,
@@ -10505,7 +10450,7 @@ public class Xmlization {
             }
             case "conceptDescriptions":
             {
-              final _Result<List<IConceptDescription>> tryConceptDescriptions = parseList(
+              final Reporting.Result<List<IConceptDescription>> tryConceptDescriptions = parseList(
                 reader,
                 isEmptyProperty,
                 IConceptDescription.class,
@@ -10527,13 +10472,13 @@ public class Xmlization {
                 "We expected properties of the class Environment, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "Environment",
             reader,
             tryElementName);
@@ -10542,7 +10487,7 @@ public class Xmlization {
         }
       }
 
-      return _Result.success(new Environment(
+      return Reporting.Result.success(new Environment(
         theAssetAdministrationShells,
         theSubmodels,
         theConceptDescriptions));
@@ -10551,7 +10496,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class Environment from an XML element.
      */
-    private static _Result<? extends Environment> tryEnvironmentFromElement(
+    private static Reporting.Result<? extends Environment> tryEnvironmentFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10561,7 +10506,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class Environment " +
               "with element name environment, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryEnvironmentFromSequence(reader, isEmptyElement);
@@ -10571,7 +10516,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of IDataSpecificationContent from an XML element.
      */
-    private static _Result<? extends IDataSpecificationContent> tryIDataSpecificationContentFromElement(
+    private static Reporting.Result<? extends IDataSpecificationContent> tryIDataSpecificationContentFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10583,7 +10528,7 @@ public class Xmlization {
             default:
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected element with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
         });
     }
@@ -10595,7 +10540,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<EmbeddedDataSpecification> tryEmbeddedDataSpecificationFromSequence(
+    private static Reporting.Result<EmbeddedDataSpecification> tryEmbeddedDataSpecificationFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       IReference theDataSpecification = null;
@@ -10608,7 +10553,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class EmbeddedDataSpecification, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -10623,10 +10568,10 @@ public class Xmlization {
               "a property of an instance of class EmbeddedDataSpecification, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(EmbeddedDataSpecification.class);
           }
@@ -10637,7 +10582,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "dataSpecification":
             {
-              _Result<Reference> tryDataSpecification = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryDataSpecification = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryDataSpecification.isError()) {
@@ -10658,7 +10603,7 @@ public class Xmlization {
                   "Expected an XML element within the element " + tryElementName.getResult() + " representing " +
                   "the property dataSpecificationContent of an instance of class EmbeddedDataSpecification, " +
                   "but encountered a self-closing element.");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               // We need to skip the whitespace here in order to be able to look ahead
@@ -10670,7 +10615,7 @@ public class Xmlization {
                   "Expected an XML element within the element " + tryElementName.getResult() + " representing " +
                   "the property dataSpecificationContent of an instance of class EmbeddedDataSpecification, " +
                   "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               // Try to look ahead the discriminator name;
@@ -10679,12 +10624,12 @@ public class Xmlization {
               // checks.
               String discriminatorElementName = null;
               if (currentEvent(reader).isStartElement()) {
-                _Result<String> tryDiscriminatorElementName = tryElementName(reader);
+                Reporting.Result<String> tryDiscriminatorElementName = tryElementName(reader);
                 assert(!tryDiscriminatorElementName.isError());
                 discriminatorElementName = tryDiscriminatorElementName.getResult();
               }
 
-              _Result<? extends IDataSpecificationContent> tryDataSpecificationContent = tryIDataSpecificationContentFromElement(reader);
+              Reporting.Result<? extends IDataSpecificationContent> tryDataSpecificationContent = tryIDataSpecificationContentFromElement(reader);
 
               if (tryDataSpecificationContent.isError()) {
                 if (discriminatorElementName != null) {
@@ -10709,13 +10654,13 @@ public class Xmlization {
                 "We expected properties of the class EmbeddedDataSpecification, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "EmbeddedDataSpecification",
             reader,
             tryElementName);
@@ -10728,17 +10673,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property dataSpecification has not been given " +
           "in the XML representation of an instance of class EmbeddedDataSpecification");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theDataSpecificationContent == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property dataSpecificationContent has not been given " +
           "in the XML representation of an instance of class EmbeddedDataSpecification");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new EmbeddedDataSpecification(
+      return Reporting.Result.success(new EmbeddedDataSpecification(
         theDataSpecification,
         theDataSpecificationContent));
     }
@@ -10746,7 +10691,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class EmbeddedDataSpecification from an XML element.
      */
-    private static _Result<? extends EmbeddedDataSpecification> tryEmbeddedDataSpecificationFromElement(
+    private static Reporting.Result<? extends EmbeddedDataSpecification> tryEmbeddedDataSpecificationFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -10756,7 +10701,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class EmbeddedDataSpecification " +
               "with element name embeddedDataSpecification, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryEmbeddedDataSpecificationFromSequence(reader, isEmptyElement);
@@ -10770,7 +10715,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<LevelType> tryLevelTypeFromSequence(
+    private static Reporting.Result<LevelType> tryLevelTypeFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       Boolean theMin = null;
@@ -10785,7 +10730,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class LevelType, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -10800,10 +10745,10 @@ public class Xmlization {
               "a property of an instance of class LevelType, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(LevelType.class);
           }
@@ -10822,7 +10767,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "min"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -10830,7 +10775,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property min of an instance of class LevelType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10842,7 +10787,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "min"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10857,7 +10802,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "nom"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -10865,7 +10810,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property nom of an instance of class LevelType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10877,7 +10822,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "nom"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10892,7 +10837,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "typ"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -10900,7 +10845,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property typ of an instance of class LevelType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10912,7 +10857,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "typ"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10927,7 +10872,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "max"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               else {
                 if (currentEvent(reader).isEndDocument()) {
@@ -10935,7 +10880,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property max of an instance of class LevelType, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -10947,7 +10892,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "max"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -10957,13 +10902,13 @@ public class Xmlization {
                 "We expected properties of the class LevelType, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "LevelType",
             reader,
             tryElementName);
@@ -10976,31 +10921,31 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property min has not been given " +
           "in the XML representation of an instance of class LevelType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theNom == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property nom has not been given " +
           "in the XML representation of an instance of class LevelType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theTyp == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property typ has not been given " +
           "in the XML representation of an instance of class LevelType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theMax == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property max has not been given " +
           "in the XML representation of an instance of class LevelType");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new LevelType(
+      return Reporting.Result.success(new LevelType(
         theMin,
         theNom,
         theTyp,
@@ -11010,7 +10955,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class LevelType from an XML element.
      */
-    private static _Result<? extends LevelType> tryLevelTypeFromElement(
+    private static Reporting.Result<? extends LevelType> tryLevelTypeFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -11020,7 +10965,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class LevelType " +
               "with element name levelType, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryLevelTypeFromSequence(reader, isEmptyElement);
@@ -11034,7 +10979,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<ValueReferencePair> tryValueReferencePairFromSequence(
+    private static Reporting.Result<ValueReferencePair> tryValueReferencePairFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theValue = null;
@@ -11047,7 +10992,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class ValueReferencePair, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -11062,10 +11007,10 @@ public class Xmlization {
               "a property of an instance of class ValueReferencePair, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(ValueReferencePair.class);
           }
@@ -11085,7 +11030,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class ValueReferencePair, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11097,14 +11042,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "valueId":
             {
-              _Result<Reference> tryValueId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryValueId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryValueId.isError()) {
@@ -11123,13 +11068,13 @@ public class Xmlization {
                 "We expected properties of the class ValueReferencePair, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "ValueReferencePair",
             reader,
             tryElementName);
@@ -11142,17 +11087,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property value has not been given " +
           "in the XML representation of an instance of class ValueReferencePair");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theValueId == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property valueId has not been given " +
           "in the XML representation of an instance of class ValueReferencePair");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new ValueReferencePair(
+      return Reporting.Result.success(new ValueReferencePair(
         theValue,
         theValueId));
     }
@@ -11160,7 +11105,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class ValueReferencePair from an XML element.
      */
-    private static _Result<? extends ValueReferencePair> tryValueReferencePairFromElement(
+    private static Reporting.Result<? extends ValueReferencePair> tryValueReferencePairFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -11170,7 +11115,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class ValueReferencePair " +
               "with element name valueReferencePair, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryValueReferencePairFromSequence(reader, isEmptyElement);
@@ -11184,7 +11129,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<ValueList> tryValueListFromSequence(
+    private static Reporting.Result<ValueList> tryValueListFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<IValueReferencePair> theValueReferencePairs = null;
@@ -11196,7 +11141,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class ValueList, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -11211,10 +11156,10 @@ public class Xmlization {
               "a property of an instance of class ValueList, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(ValueList.class);
           }
@@ -11225,7 +11170,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "valueReferencePairs":
             {
-              final _Result<List<IValueReferencePair>> tryValueReferencePairs = parseList(
+              final Reporting.Result<List<IValueReferencePair>> tryValueReferencePairs = parseList(
                 reader,
                 isEmptyProperty,
                 IValueReferencePair.class,
@@ -11247,13 +11192,13 @@ public class Xmlization {
                 "We expected properties of the class ValueList, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "ValueList",
             reader,
             tryElementName);
@@ -11266,17 +11211,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property valueReferencePairs has not been given " +
           "in the XML representation of an instance of class ValueList");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new ValueList(
+      return Reporting.Result.success(new ValueList(
         theValueReferencePairs));
     }
 
     /**
      * Deserialize an instance of class ValueList from an XML element.
      */
-    private static _Result<? extends ValueList> tryValueListFromElement(
+    private static Reporting.Result<? extends ValueList> tryValueListFromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -11286,7 +11231,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class ValueList " +
               "with element name valueList, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryValueListFromSequence(reader, isEmptyElement);
@@ -11300,7 +11245,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<LangStringPreferredNameTypeIec61360> tryLangStringPreferredNameTypeIec61360FromSequence(
+    private static Reporting.Result<LangStringPreferredNameTypeIec61360> tryLangStringPreferredNameTypeIec61360FromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theLanguage = null;
@@ -11313,7 +11258,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class LangStringPreferredNameTypeIec61360, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -11328,10 +11273,10 @@ public class Xmlization {
               "a property of an instance of class LangStringPreferredNameTypeIec61360, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(LangStringPreferredNameTypeIec61360.class);
           }
@@ -11351,7 +11296,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property language of an instance of class LangStringPreferredNameTypeIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11363,7 +11308,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "language"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11379,7 +11324,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property text of an instance of class LangStringPreferredNameTypeIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11391,7 +11336,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "text"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11401,13 +11346,13 @@ public class Xmlization {
                 "We expected properties of the class LangStringPreferredNameTypeIec61360, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "LangStringPreferredNameTypeIec61360",
             reader,
             tryElementName);
@@ -11420,17 +11365,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property language has not been given " +
           "in the XML representation of an instance of class LangStringPreferredNameTypeIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theText == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property text has not been given " +
           "in the XML representation of an instance of class LangStringPreferredNameTypeIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new LangStringPreferredNameTypeIec61360(
+      return Reporting.Result.success(new LangStringPreferredNameTypeIec61360(
         theLanguage,
         theText));
     }
@@ -11438,7 +11383,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class LangStringPreferredNameTypeIec61360 from an XML element.
      */
-    private static _Result<? extends LangStringPreferredNameTypeIec61360> tryLangStringPreferredNameTypeIec61360FromElement(
+    private static Reporting.Result<? extends LangStringPreferredNameTypeIec61360> tryLangStringPreferredNameTypeIec61360FromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -11448,7 +11393,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class LangStringPreferredNameTypeIec61360 " +
               "with element name langStringPreferredNameTypeIec61360, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryLangStringPreferredNameTypeIec61360FromSequence(reader, isEmptyElement);
@@ -11462,7 +11407,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<LangStringShortNameTypeIec61360> tryLangStringShortNameTypeIec61360FromSequence(
+    private static Reporting.Result<LangStringShortNameTypeIec61360> tryLangStringShortNameTypeIec61360FromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theLanguage = null;
@@ -11475,7 +11420,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class LangStringShortNameTypeIec61360, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -11490,10 +11435,10 @@ public class Xmlization {
               "a property of an instance of class LangStringShortNameTypeIec61360, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(LangStringShortNameTypeIec61360.class);
           }
@@ -11513,7 +11458,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property language of an instance of class LangStringShortNameTypeIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11525,7 +11470,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "language"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11541,7 +11486,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property text of an instance of class LangStringShortNameTypeIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11553,7 +11498,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "text"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11563,13 +11508,13 @@ public class Xmlization {
                 "We expected properties of the class LangStringShortNameTypeIec61360, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "LangStringShortNameTypeIec61360",
             reader,
             tryElementName);
@@ -11582,17 +11527,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property language has not been given " +
           "in the XML representation of an instance of class LangStringShortNameTypeIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theText == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property text has not been given " +
           "in the XML representation of an instance of class LangStringShortNameTypeIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new LangStringShortNameTypeIec61360(
+      return Reporting.Result.success(new LangStringShortNameTypeIec61360(
         theLanguage,
         theText));
     }
@@ -11600,7 +11545,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class LangStringShortNameTypeIec61360 from an XML element.
      */
-    private static _Result<? extends LangStringShortNameTypeIec61360> tryLangStringShortNameTypeIec61360FromElement(
+    private static Reporting.Result<? extends LangStringShortNameTypeIec61360> tryLangStringShortNameTypeIec61360FromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -11610,7 +11555,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class LangStringShortNameTypeIec61360 " +
               "with element name langStringShortNameTypeIec61360, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryLangStringShortNameTypeIec61360FromSequence(reader, isEmptyElement);
@@ -11624,7 +11569,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<LangStringDefinitionTypeIec61360> tryLangStringDefinitionTypeIec61360FromSequence(
+    private static Reporting.Result<LangStringDefinitionTypeIec61360> tryLangStringDefinitionTypeIec61360FromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theLanguage = null;
@@ -11637,7 +11582,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class LangStringDefinitionTypeIec61360, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -11652,10 +11597,10 @@ public class Xmlization {
               "a property of an instance of class LangStringDefinitionTypeIec61360, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(LangStringDefinitionTypeIec61360.class);
           }
@@ -11675,7 +11620,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property language of an instance of class LangStringDefinitionTypeIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11687,7 +11632,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "language"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11703,7 +11648,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property text of an instance of class LangStringDefinitionTypeIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11715,7 +11660,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "text"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11725,13 +11670,13 @@ public class Xmlization {
                 "We expected properties of the class LangStringDefinitionTypeIec61360, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "LangStringDefinitionTypeIec61360",
             reader,
             tryElementName);
@@ -11744,17 +11689,17 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property language has not been given " +
           "in the XML representation of an instance of class LangStringDefinitionTypeIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
       if (theText == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property text has not been given " +
           "in the XML representation of an instance of class LangStringDefinitionTypeIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new LangStringDefinitionTypeIec61360(
+      return Reporting.Result.success(new LangStringDefinitionTypeIec61360(
         theLanguage,
         theText));
     }
@@ -11762,7 +11707,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class LangStringDefinitionTypeIec61360 from an XML element.
      */
-    private static _Result<? extends LangStringDefinitionTypeIec61360> tryLangStringDefinitionTypeIec61360FromElement(
+    private static Reporting.Result<? extends LangStringDefinitionTypeIec61360> tryLangStringDefinitionTypeIec61360FromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -11772,7 +11717,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class LangStringDefinitionTypeIec61360 " +
               "with element name langStringDefinitionTypeIec61360, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryLangStringDefinitionTypeIec61360FromSequence(reader, isEmptyElement);
@@ -11786,7 +11731,7 @@ public class Xmlization {
      * the instance from an empty sequence. That is, the parent element
      * was a self-closing element.
      */
-    private static _Result<DataSpecificationIec61360> tryDataSpecificationIec61360FromSequence(
+    private static Reporting.Result<DataSpecificationIec61360> tryDataSpecificationIec61360FromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
       List<ILangStringPreferredNameTypeIec61360> thePreferredName = null;
@@ -11809,7 +11754,7 @@ public class Xmlization {
             "Expected an XML element representing " +
             "a property of an instance of class DataSpecificationIec61360, " +
             "but reached the end-of-file");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         while (true) {
           skipWhitespaceAndComments(reader);
@@ -11824,10 +11769,10 @@ public class Xmlization {
               "a property of an instance of class DataSpecificationIec61360, " +
               "but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
               " with the value " + currentEvent(reader));
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
-          final _Result<String> tryElementName = tryElementName(reader);
+          final Reporting.Result<String> tryElementName = tryElementName(reader);
           if (tryElementName.isError()) {
             return tryElementName.castTo(DataSpecificationIec61360.class);
           }
@@ -11838,7 +11783,7 @@ public class Xmlization {
           switch (tryElementName.getResult()) {
             case "preferredName":
             {
-              final _Result<List<ILangStringPreferredNameTypeIec61360>> tryPreferredName = parseList(
+              final Reporting.Result<List<ILangStringPreferredNameTypeIec61360>> tryPreferredName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringPreferredNameTypeIec61360.class,
@@ -11857,7 +11802,7 @@ public class Xmlization {
             }
             case "shortName":
             {
-              final _Result<List<ILangStringShortNameTypeIec61360>> tryShortName = parseList(
+              final Reporting.Result<List<ILangStringShortNameTypeIec61360>> tryShortName = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringShortNameTypeIec61360.class,
@@ -11885,7 +11830,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property unit of an instance of class DataSpecificationIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11897,14 +11842,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "unit"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "unitId":
             {
-              _Result<Reference> tryUnitId = tryReferenceFromSequence(
+              Reporting.Result<Reference> tryUnitId = tryReferenceFromSequence(
                 reader, isEmptyProperty);
 
               if (tryUnitId.isError()) {
@@ -11929,7 +11874,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property sourceOfDefinition of an instance of class DataSpecificationIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11941,7 +11886,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "sourceOfDefinition"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11957,7 +11902,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property symbol of an instance of class DataSpecificationIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -11969,7 +11914,7 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "symbol"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
@@ -11984,7 +11929,7 @@ public class Xmlization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "dataType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               if (currentEvent(reader).isEndDocument()) {
@@ -11992,7 +11937,7 @@ public class Xmlization {
                     "Expected an XML content representing "
                         + "the property dataType of an instance of class DataSpecificationIec61360, "
                         + "but reached the end-of-file");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               String textDataType;
@@ -12005,7 +11950,7 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "dataType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
 
               final Optional<DataTypeIec61360> optionalDataType =
@@ -12022,13 +11967,13 @@ public class Xmlization {
                 error.prependSegment(
                     new Reporting.NameSegment(
                         "dataType"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
               break;
             }
             case "definition":
             {
-              final _Result<List<ILangStringDefinitionTypeIec61360>> tryDefinition = parseList(
+              final Reporting.Result<List<ILangStringDefinitionTypeIec61360>> tryDefinition = parseList(
                 reader,
                 isEmptyProperty,
                 ILangStringDefinitionTypeIec61360.class,
@@ -12056,7 +12001,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property valueFormat of an instance of class DataSpecificationIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -12068,14 +12013,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "valueFormat"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "valueList":
             {
-              _Result<ValueList> tryValueList = tryValueListFromSequence(
+              Reporting.Result<ValueList> tryValueList = tryValueListFromSequence(
                 reader, isEmptyProperty);
 
               if (tryValueList.isError()) {
@@ -12100,7 +12045,7 @@ public class Xmlization {
                     "Expected an XML content representing " +
                     "the property value of an instance of class DataSpecificationIec61360, " +
                     "but reached the end-of-file");
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
 
                 try {
@@ -12112,14 +12057,14 @@ public class Xmlization {
                   error.prependSegment(
                     new Reporting.NameSegment(
                       "value"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
                 }
               }
               break;
             }
             case "levelType":
             {
-              _Result<LevelType> tryLevelType = tryLevelTypeFromSequence(
+              Reporting.Result<LevelType> tryLevelType = tryLevelTypeFromSequence(
                 reader, isEmptyProperty);
 
               if (tryLevelType.isError()) {
@@ -12138,13 +12083,13 @@ public class Xmlization {
                 "We expected properties of the class DataSpecificationIec61360, " +
                 "but got an unexpected element " +
                 "with the name " + elementName);
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
           }
 
           skipWhitespaceAndComments(reader);
 
 
-          final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+          final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
             "DataSpecificationIec61360",
             reader,
             tryElementName);
@@ -12157,10 +12102,10 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "The required property preferredName has not been given " +
           "in the XML representation of an instance of class DataSpecificationIec61360");
-        return _Result.failure(error);
+        return Reporting.Result.failure(error);
       }
 
-      return _Result.success(new DataSpecificationIec61360(
+      return Reporting.Result.success(new DataSpecificationIec61360(
         thePreferredName,
         theShortName,
         theUnit,
@@ -12178,7 +12123,7 @@ public class Xmlization {
     /**
      * Deserialize an instance of class DataSpecificationIec61360 from an XML element.
      */
-    private static _Result<? extends DataSpecificationIec61360> tryDataSpecificationIec61360FromElement(
+    private static Reporting.Result<? extends DataSpecificationIec61360> tryDataSpecificationIec61360FromElement(
       XMLEventReader reader) {
       return parseInstanceFromElement(
         reader,
@@ -12188,7 +12133,7 @@ public class Xmlization {
             final Reporting.Error error = new Reporting.Error(
               "Expected an element representing an instance of class DataSpecificationIec61360 " +
               "with element name dataSpecificationIec61360, but got: " + elementName);
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
 
           return tryDataSpecificationIec61360FromSequence(reader, isEmptyElement);
@@ -12231,7 +12176,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IHasSemantics> result =
+      Reporting.Result<? extends IHasSemantics> result =
         _DeserializeImplementation.tryIHasSemanticsFromElement(
           reader);
 
@@ -12254,7 +12199,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Extension> result =
+      Reporting.Result<? extends Extension> result =
         _DeserializeImplementation.tryExtensionFromElement(
           reader);
 
@@ -12277,7 +12222,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IHasExtensions> result =
+      Reporting.Result<? extends IHasExtensions> result =
         _DeserializeImplementation.tryIHasExtensionsFromElement(
           reader);
 
@@ -12300,7 +12245,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IReferable> result =
+      Reporting.Result<? extends IReferable> result =
         _DeserializeImplementation.tryIReferableFromElement(
           reader);
 
@@ -12323,7 +12268,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IIdentifiable> result =
+      Reporting.Result<? extends IIdentifiable> result =
         _DeserializeImplementation.tryIIdentifiableFromElement(
           reader);
 
@@ -12346,7 +12291,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IHasKind> result =
+      Reporting.Result<? extends IHasKind> result =
         _DeserializeImplementation.tryIHasKindFromElement(
           reader);
 
@@ -12369,7 +12314,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IHasDataSpecification> result =
+      Reporting.Result<? extends IHasDataSpecification> result =
         _DeserializeImplementation.tryIHasDataSpecificationFromElement(
           reader);
 
@@ -12392,7 +12337,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends AdministrativeInformation> result =
+      Reporting.Result<? extends AdministrativeInformation> result =
         _DeserializeImplementation.tryAdministrativeInformationFromElement(
           reader);
 
@@ -12415,7 +12360,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IQualifiable> result =
+      Reporting.Result<? extends IQualifiable> result =
         _DeserializeImplementation.tryIQualifiableFromElement(
           reader);
 
@@ -12438,7 +12383,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Qualifier> result =
+      Reporting.Result<? extends Qualifier> result =
         _DeserializeImplementation.tryQualifierFromElement(
           reader);
 
@@ -12461,7 +12406,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends AssetAdministrationShell> result =
+      Reporting.Result<? extends AssetAdministrationShell> result =
         _DeserializeImplementation.tryAssetAdministrationShellFromElement(
           reader);
 
@@ -12484,7 +12429,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends AssetInformation> result =
+      Reporting.Result<? extends AssetInformation> result =
         _DeserializeImplementation.tryAssetInformationFromElement(
           reader);
 
@@ -12507,7 +12452,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Resource> result =
+      Reporting.Result<? extends Resource> result =
         _DeserializeImplementation.tryResourceFromElement(
           reader);
 
@@ -12530,7 +12475,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends SpecificAssetId> result =
+      Reporting.Result<? extends SpecificAssetId> result =
         _DeserializeImplementation.trySpecificAssetIdFromElement(
           reader);
 
@@ -12553,7 +12498,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Submodel> result =
+      Reporting.Result<? extends Submodel> result =
         _DeserializeImplementation.trySubmodelFromElement(
           reader);
 
@@ -12576,7 +12521,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends ISubmodelElement> result =
+      Reporting.Result<? extends ISubmodelElement> result =
         _DeserializeImplementation.tryISubmodelElementFromElement(
           reader);
 
@@ -12599,7 +12544,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IRelationshipElement> result =
+      Reporting.Result<? extends IRelationshipElement> result =
         _DeserializeImplementation.tryIRelationshipElementFromElement(
           reader);
 
@@ -12622,7 +12567,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends RelationshipElement> result =
+      Reporting.Result<? extends RelationshipElement> result =
         _DeserializeImplementation.tryRelationshipElementFromElement(
           reader);
 
@@ -12645,7 +12590,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends SubmodelElementList> result =
+      Reporting.Result<? extends SubmodelElementList> result =
         _DeserializeImplementation.trySubmodelElementListFromElement(
           reader);
 
@@ -12668,7 +12613,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends SubmodelElementCollection> result =
+      Reporting.Result<? extends SubmodelElementCollection> result =
         _DeserializeImplementation.trySubmodelElementCollectionFromElement(
           reader);
 
@@ -12691,7 +12636,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IDataElement> result =
+      Reporting.Result<? extends IDataElement> result =
         _DeserializeImplementation.tryIDataElementFromElement(
           reader);
 
@@ -12714,7 +12659,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Property> result =
+      Reporting.Result<? extends Property> result =
         _DeserializeImplementation.tryPropertyFromElement(
           reader);
 
@@ -12737,7 +12682,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends MultiLanguageProperty> result =
+      Reporting.Result<? extends MultiLanguageProperty> result =
         _DeserializeImplementation.tryMultiLanguagePropertyFromElement(
           reader);
 
@@ -12760,7 +12705,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Range> result =
+      Reporting.Result<? extends Range> result =
         _DeserializeImplementation.tryRangeFromElement(
           reader);
 
@@ -12783,7 +12728,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends ReferenceElement> result =
+      Reporting.Result<? extends ReferenceElement> result =
         _DeserializeImplementation.tryReferenceElementFromElement(
           reader);
 
@@ -12806,7 +12751,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Blob> result =
+      Reporting.Result<? extends Blob> result =
         _DeserializeImplementation.tryBlobFromElement(
           reader);
 
@@ -12829,7 +12774,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends File> result =
+      Reporting.Result<? extends File> result =
         _DeserializeImplementation.tryFileFromElement(
           reader);
 
@@ -12852,7 +12797,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends AnnotatedRelationshipElement> result =
+      Reporting.Result<? extends AnnotatedRelationshipElement> result =
         _DeserializeImplementation.tryAnnotatedRelationshipElementFromElement(
           reader);
 
@@ -12875,7 +12820,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Entity> result =
+      Reporting.Result<? extends Entity> result =
         _DeserializeImplementation.tryEntityFromElement(
           reader);
 
@@ -12898,7 +12843,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends EventPayload> result =
+      Reporting.Result<? extends EventPayload> result =
         _DeserializeImplementation.tryEventPayloadFromElement(
           reader);
 
@@ -12921,7 +12866,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IEventElement> result =
+      Reporting.Result<? extends IEventElement> result =
         _DeserializeImplementation.tryIEventElementFromElement(
           reader);
 
@@ -12944,7 +12889,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends BasicEventElement> result =
+      Reporting.Result<? extends BasicEventElement> result =
         _DeserializeImplementation.tryBasicEventElementFromElement(
           reader);
 
@@ -12967,7 +12912,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Operation> result =
+      Reporting.Result<? extends Operation> result =
         _DeserializeImplementation.tryOperationFromElement(
           reader);
 
@@ -12990,7 +12935,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends OperationVariable> result =
+      Reporting.Result<? extends OperationVariable> result =
         _DeserializeImplementation.tryOperationVariableFromElement(
           reader);
 
@@ -13013,7 +12958,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Capability> result =
+      Reporting.Result<? extends Capability> result =
         _DeserializeImplementation.tryCapabilityFromElement(
           reader);
 
@@ -13036,7 +12981,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends ConceptDescription> result =
+      Reporting.Result<? extends ConceptDescription> result =
         _DeserializeImplementation.tryConceptDescriptionFromElement(
           reader);
 
@@ -13059,7 +13004,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Reference> result =
+      Reporting.Result<? extends Reference> result =
         _DeserializeImplementation.tryReferenceFromElement(
           reader);
 
@@ -13082,7 +13027,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Key> result =
+      Reporting.Result<? extends Key> result =
         _DeserializeImplementation.tryKeyFromElement(
           reader);
 
@@ -13105,7 +13050,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IAbstractLangString> result =
+      Reporting.Result<? extends IAbstractLangString> result =
         _DeserializeImplementation.tryIAbstractLangStringFromElement(
           reader);
 
@@ -13128,7 +13073,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends LangStringNameType> result =
+      Reporting.Result<? extends LangStringNameType> result =
         _DeserializeImplementation.tryLangStringNameTypeFromElement(
           reader);
 
@@ -13151,7 +13096,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends LangStringTextType> result =
+      Reporting.Result<? extends LangStringTextType> result =
         _DeserializeImplementation.tryLangStringTextTypeFromElement(
           reader);
 
@@ -13174,7 +13119,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends Environment> result =
+      Reporting.Result<? extends Environment> result =
         _DeserializeImplementation.tryEnvironmentFromElement(
           reader);
 
@@ -13197,7 +13142,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends IDataSpecificationContent> result =
+      Reporting.Result<? extends IDataSpecificationContent> result =
         _DeserializeImplementation.tryIDataSpecificationContentFromElement(
           reader);
 
@@ -13220,7 +13165,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends EmbeddedDataSpecification> result =
+      Reporting.Result<? extends EmbeddedDataSpecification> result =
         _DeserializeImplementation.tryEmbeddedDataSpecificationFromElement(
           reader);
 
@@ -13243,7 +13188,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends LevelType> result =
+      Reporting.Result<? extends LevelType> result =
         _DeserializeImplementation.tryLevelTypeFromElement(
           reader);
 
@@ -13266,7 +13211,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends ValueReferencePair> result =
+      Reporting.Result<? extends ValueReferencePair> result =
         _DeserializeImplementation.tryValueReferencePairFromElement(
           reader);
 
@@ -13289,7 +13234,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends ValueList> result =
+      Reporting.Result<? extends ValueList> result =
         _DeserializeImplementation.tryValueListFromElement(
           reader);
 
@@ -13312,7 +13257,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends LangStringPreferredNameTypeIec61360> result =
+      Reporting.Result<? extends LangStringPreferredNameTypeIec61360> result =
         _DeserializeImplementation.tryLangStringPreferredNameTypeIec61360FromElement(
           reader);
 
@@ -13335,7 +13280,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends LangStringShortNameTypeIec61360> result =
+      Reporting.Result<? extends LangStringShortNameTypeIec61360> result =
         _DeserializeImplementation.tryLangStringShortNameTypeIec61360FromElement(
           reader);
 
@@ -13358,7 +13303,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends LangStringDefinitionTypeIec61360> result =
+      Reporting.Result<? extends LangStringDefinitionTypeIec61360> result =
         _DeserializeImplementation.tryLangStringDefinitionTypeIec61360FromElement(
           reader);
 
@@ -13381,7 +13326,7 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       _DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-      _Result<? extends DataSpecificationIec61360> result =
+      Reporting.Result<? extends DataSpecificationIec61360> result =
         _DeserializeImplementation.tryDataSpecificationIec61360FromElement(
           reader);
 
@@ -13402,118 +13347,257 @@ public class Xmlization {
 
     private boolean topLevel = true;
 
-    private void extensionToSequence(
-      IExtension that,
-      XMLStreamWriter writer) {
+    @FunctionalInterface
+    private interface ElementContentSerializer<T> {
+      void serialize(T that, XMLStreamWriter writer) throws XMLStreamException;
+    }
+
+    /**
+     * Write {@code that} as an XML element named {@code name}, delegating
+     * the content in-between the start and the end tag to
+     * {@code serializeContent}.
+     *
+     * <p>This is shared by all the property kinds (primitive, enumeration,
+     * class, interface, list) as they all wrap their content in exactly the
+     * same way.
+     */
+    private <T> void serializeElement(
+      String name,
+      T that,
+      XMLStreamWriter writer,
+      ElementContentSerializer<T> serializeContent) {
       try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "name");
+        writer.writeStartElement(name);
         if (topLevel) {
           writer.writeNamespace("xmlns", AAS_NAME_SPACE);
           topLevel = false;
         }
-        writer.writeCharacters(
-          that.getName().toString());
+        serializeContent.serialize(that, writer);
         writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getValueType().isPresent()) {
-          writer.writeStartElement(
-            "valueType");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          Optional<String> textValueType = Stringification.toString(
-            that.getValueType().get());
-
-          if (!textValueType.isPresent()) {
-            throw new IllegalArgumentException(
-              "Invalid literal for the enumeration DataTypeDefXsd: " +
-              that.getValueType().get().toString());
-          }
-
-          writer.writeCharacters(textValueType.get());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-            "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getValue().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getRefersTo().isPresent()) {
-          writer.writeStartElement(
-          "refersTo");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getRefersTo().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
       } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+        throw new SerializeException("", exception.getMessage());
+      }
+    }
+
+    /**
+     * Adapt {@code writeItem} to serialize every item of an iterable.
+     *
+     * <p>This is shared by all the list-typed properties, which only need to
+     * supply how a single item is written.
+     */
+    private <T> ElementContentSerializer<Iterable<T>> serializeItems(
+      ElementContentSerializer<T> writeItem) {
+      return (items, w) -> {
+        for (T item : items) {
+          writeItem.serialize(item, w);
+        }
+      };
+    }
+
+    /**
+     * Write {@code that.toString()} as XML content.
+     *
+     * <p>This is shared by every {@code boolean}/{@code long}/{@code double}/
+     * {@code String}-typed property or list item, standing in for the property-
+     * or item-specific {@link ElementContentSerializer}.
+     */
+    private <T> void writeStringifiedContent(T that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(that.toString());
+    }
+
+    /**
+     * Write {@code that} as base64-encoded XML content.
+     *
+     * <p>This is shared by every {@code byte[]}-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeByteArrayContent(byte[] that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(
+        Base64.getEncoder().encodeToString(that));
+    }
+
+    /**
+     * Write a literal of {@link ModellingKind} as XML content.
+     *
+     * <p>This is shared by every ModellingKind-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeModellingKindContent(ModellingKind that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link QualifierKind} as XML content.
+     *
+     * <p>This is shared by every QualifierKind-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeQualifierKindContent(QualifierKind that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link AssetKind} as XML content.
+     *
+     * <p>This is shared by every AssetKind-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeAssetKindContent(AssetKind that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link AasSubmodelElements} as XML content.
+     *
+     * <p>This is shared by every AasSubmodelElements-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeAasSubmodelElementsContent(AasSubmodelElements that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link EntityType} as XML content.
+     *
+     * <p>This is shared by every EntityType-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeEntityTypeContent(EntityType that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link Direction} as XML content.
+     *
+     * <p>This is shared by every Direction-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeDirectionContent(Direction that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link StateOfEvent} as XML content.
+     *
+     * <p>This is shared by every StateOfEvent-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeStateOfEventContent(StateOfEvent that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link ReferenceTypes} as XML content.
+     *
+     * <p>This is shared by every ReferenceTypes-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeReferenceTypesContent(ReferenceTypes that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link KeyTypes} as XML content.
+     *
+     * <p>This is shared by every KeyTypes-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeKeyTypesContent(KeyTypes that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link DataTypeDefXsd} as XML content.
+     *
+     * <p>This is shared by every DataTypeDefXsd-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeDataTypeDefXsdContent(DataTypeDefXsd that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    /**
+     * Write a literal of {@link DataTypeIec61360} as XML content.
+     *
+     * <p>This is shared by every DataTypeIec61360-typed property or list item,
+     * standing in for the property- or item-specific
+     * {@link ElementContentSerializer}.
+     */
+    private void writeDataTypeIec61360Content(DataTypeIec61360 that, XMLStreamWriter writer)
+      throws XMLStreamException {
+      writer.writeCharacters(Stringification.mustToString(that));
+    }
+
+    private void extensionToSequence(
+      IExtension that,
+      XMLStreamWriter writer) {
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
+      }
+
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
+      }
+
+      serializeElement(
+        "name",
+        that.getName(),
+        writer,
+        this::writeStringifiedContent);
+
+      if (that.getValueType().isPresent()) {
+        serializeElement(
+          "valueType",
+          that.getValueType().get(),
+          writer,
+          this::writeDataTypeDefXsdContent);
+      }
+
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          this::writeStringifiedContent);
+      }
+
+      if (that.getRefersTo().isPresent()) {
+        serializeElement(
+          "refersTo",
+          that.getRefersTo().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -13540,94 +13624,44 @@ public class Xmlization {
     private void administrativeInformationToSequence(
       IAdministrativeInformation that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getVersion().isPresent()) {
-          writer.writeStartElement(
-            "version");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getVersion().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getVersion().isPresent()) {
+        serializeElement(
+          "version",
+          that.getVersion().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getRevision().isPresent()) {
-          writer.writeStartElement(
-            "revision");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getRevision().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getRevision().isPresent()) {
+        serializeElement(
+          "revision",
+          that.getRevision().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getCreator().isPresent()) {
-          writer.writeStartElement(
-            "creator");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getCreator().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCreator().isPresent()) {
+        serializeElement(
+          "creator",
+          that.getCreator().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getTemplateId().isPresent()) {
-          writer.writeStartElement(
-            "templateId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getTemplateId().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getTemplateId().isPresent()) {
+        serializeElement(
+          "templateId",
+          that.getTemplateId().get(),
+          writer,
+          this::writeStringifiedContent);
       }
     }
 
@@ -13654,141 +13688,56 @@ public class Xmlization {
     private void qualifierToSequence(
       IQualifier that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getKind().isPresent()) {
-          writer.writeStartElement(
-            "kind");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          Optional<String> textKind = Stringification.toString(
-            that.getKind().get());
-
-          if (!textKind.isPresent()) {
-            throw new IllegalArgumentException(
-              "Invalid literal for the enumeration QualifierKind: " +
-              that.getKind().get().toString());
-          }
-
-          writer.writeCharacters(textKind.get());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getKind().isPresent()) {
+        serializeElement(
+          "kind",
+          that.getKind().get(),
+          writer,
+          this::writeQualifierKindContent);
       }
 
-      try {
-        writer.writeStartElement(
-          "type");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getType().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      serializeElement(
+        "type",
+        that.getType(),
+        writer,
+        this::writeStringifiedContent);
+
+      serializeElement(
+        "valueType",
+        that.getValueType(),
+        writer,
+        this::writeDataTypeDefXsdContent);
+
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        writer.writeStartElement(
-          "valueType");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        Optional<String> textValueType = Stringification.toString(
-          that.getValueType());
-
-        if (!textValueType.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration DataTypeDefXsd: " +
-            that.getValueType().toString());
-        }
-
-        writer.writeCharacters(textValueType.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-            "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getValue().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getValueId().isPresent()) {
-          writer.writeStartElement(
-            "valueId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getValueId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValueId().isPresent()) {
+        serializeElement(
+          "valueId",
+          that.getValueId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
     }
 
@@ -13815,194 +13764,88 @@ public class Xmlization {
     private void assetAdministrationShellToSequence(
       IAssetAdministrationShell that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getAdministration().isPresent()) {
-          writer.writeStartElement(
-            "administration");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.administrativeInformationToSequence(
-            that.getAdministration().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getAdministration().isPresent()) {
+        serializeElement(
+          "administration",
+          that.getAdministration().get(),
+          writer,
+          (value, w) -> this.administrativeInformationToSequence(value, w));
       }
 
-      try {
-        writer.writeStartElement(
-          "id");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getId().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      serializeElement(
+        "id",
+        that.getId(),
+        writer,
+        this::writeStringifiedContent);
+
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDerivedFrom().isPresent()) {
+        serializeElement(
+          "derivedFrom",
+          that.getDerivedFrom().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getDerivedFrom().isPresent()) {
-          writer.writeStartElement(
-            "derivedFrom");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
+      serializeElement(
+        "assetInformation",
+        that.getAssetInformation(),
+        writer,
+        (value, w) -> this.assetInformationToSequence(value, w));
 
-          this.referenceToSequence(
-            that.getDerivedFrom().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "assetInformation");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.assetInformationToSequence(
-          that.getAssetInformation(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getSubmodels().isPresent()) {
-          writer.writeStartElement(
-          "submodels");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSubmodels().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSubmodels().isPresent()) {
+        serializeElement(
+          "submodels",
+          that.getSubmodels().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -14029,100 +13872,42 @@ public class Xmlization {
     private void assetInformationToSequence(
       IAssetInformation that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "assetKind");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "assetKind",
+        that.getAssetKind(),
+        writer,
+        this::writeAssetKindContent);
 
-        Optional<String> textAssetKind = Stringification.toString(
-          that.getAssetKind());
-
-        if (!textAssetKind.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration AssetKind: " +
-            that.getAssetKind().toString());
-        }
-
-        writer.writeCharacters(textAssetKind.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getGlobalAssetId().isPresent()) {
+        serializeElement(
+          "globalAssetId",
+          that.getGlobalAssetId().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getGlobalAssetId().isPresent()) {
-          writer.writeStartElement(
-            "globalAssetId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getGlobalAssetId().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSpecificAssetIds().isPresent()) {
+        serializeElement(
+          "specificAssetIds",
+          that.getSpecificAssetIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSpecificAssetIds().isPresent()) {
-          writer.writeStartElement(
-          "specificAssetIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISpecificAssetId item : that.getSpecificAssetIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getAssetType().isPresent()) {
+        serializeElement(
+          "assetType",
+          that.getAssetType().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getAssetType().isPresent()) {
-          writer.writeStartElement(
-            "assetType");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getAssetType().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getDefaultThumbnail().isPresent()) {
-          writer.writeStartElement(
-            "defaultThumbnail");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.resourceToSequence(
-            that.getDefaultThumbnail().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDefaultThumbnail().isPresent()) {
+        serializeElement(
+          "defaultThumbnail",
+          that.getDefaultThumbnail().get(),
+          writer,
+          (value, w) -> this.resourceToSequence(value, w));
       }
     }
 
@@ -14149,36 +13934,18 @@ public class Xmlization {
     private void resourceToSequence(
       IResource that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "path");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getPath().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "path",
+        that.getPath(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        if (that.getContentType().isPresent()) {
-          writer.writeStartElement(
-            "contentType");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getContentType().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getContentType().isPresent()) {
+        serializeElement(
+          "contentType",
+          that.getContentType().get(),
+          writer,
+          this::writeStringifiedContent);
       }
     }
 
@@ -14205,87 +13972,40 @@ public class Xmlization {
     private void specificAssetIdToSequence(
       ISpecificAssetId that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "name");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getName().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "name",
+        that.getName(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "value");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getValue().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "value",
+        that.getValue(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        if (that.getExternalSubjectId().isPresent()) {
-          writer.writeStartElement(
-            "externalSubjectId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getExternalSubjectId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExternalSubjectId().isPresent()) {
+        serializeElement(
+          "externalSubjectId",
+          that.getExternalSubjectId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
     }
 
@@ -14312,237 +14032,106 @@ public class Xmlization {
     private void submodelToSequence(
       ISubmodel that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getAdministration().isPresent()) {
-          writer.writeStartElement(
-            "administration");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.administrativeInformationToSequence(
-            that.getAdministration().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getAdministration().isPresent()) {
+        serializeElement(
+          "administration",
+          that.getAdministration().get(),
+          writer,
+          (value, w) -> this.administrativeInformationToSequence(value, w));
       }
 
-      try {
-        writer.writeStartElement(
-          "id");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getId().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      serializeElement(
+        "id",
+        that.getId(),
+        writer,
+        this::writeStringifiedContent);
+
+      if (that.getKind().isPresent()) {
+        serializeElement(
+          "kind",
+          that.getKind().get(),
+          writer,
+          this::writeModellingKindContent);
       }
 
-      try {
-        if (that.getKind().isPresent()) {
-          writer.writeStartElement(
-            "kind");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          Optional<String> textKind = Stringification.toString(
-            that.getKind().get());
-
-          if (!textKind.isPresent()) {
-            throw new IllegalArgumentException(
-              "Invalid literal for the enumeration ModellingKind: " +
-              that.getKind().get().toString());
-          }
-
-          writer.writeCharacters(textKind.get());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getSubmodelElements().isPresent()) {
-          writer.writeStartElement(
-          "submodelElements");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISubmodelElement item : that.getSubmodelElements().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSubmodelElements().isPresent()) {
+        serializeElement(
+          "submodelElements",
+          that.getSubmodelElements().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -14569,196 +14158,89 @@ public class Xmlization {
     private void relationshipElementToSequence(
       IRelationshipElement that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "first");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "first",
+        that.getFirst(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-        this.referenceToSequence(
-          that.getFirst(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "second");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.referenceToSequence(
-          that.getSecond(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "second",
+        that.getSecond(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
     }
 
     @Override
@@ -14784,265 +14266,114 @@ public class Xmlization {
     private void submodelElementListToSequence(
       ISubmodelElementList that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getOrderRelevant().isPresent()) {
-          writer.writeStartElement(
-            "orderRelevant");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getOrderRelevant().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getOrderRelevant().isPresent()) {
+        serializeElement(
+          "orderRelevant",
+          that.getOrderRelevant().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getSemanticIdListElement().isPresent()) {
-          writer.writeStartElement(
-            "semanticIdListElement");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticIdListElement().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticIdListElement().isPresent()) {
+        serializeElement(
+          "semanticIdListElement",
+          that.getSemanticIdListElement().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        writer.writeStartElement(
-          "typeValueListElement");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "typeValueListElement",
+        that.getTypeValueListElement(),
+        writer,
+        this::writeAasSubmodelElementsContent);
 
-        Optional<String> textTypeValueListElement = Stringification.toString(
-          that.getTypeValueListElement());
-
-        if (!textTypeValueListElement.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration AasSubmodelElements: " +
-            that.getTypeValueListElement().toString());
-        }
-
-        writer.writeCharacters(textTypeValueListElement.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValueTypeListElement().isPresent()) {
+        serializeElement(
+          "valueTypeListElement",
+          that.getValueTypeListElement().get(),
+          writer,
+          this::writeDataTypeDefXsdContent);
       }
 
-      try {
-        if (that.getValueTypeListElement().isPresent()) {
-          writer.writeStartElement(
-            "valueTypeListElement");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          Optional<String> textValueTypeListElement = Stringification.toString(
-            that.getValueTypeListElement().get());
-
-          if (!textValueTypeListElement.isPresent()) {
-            throw new IllegalArgumentException(
-              "Invalid literal for the enumeration DataTypeDefXsd: " +
-              that.getValueTypeListElement().get().toString());
-          }
-
-          writer.writeCharacters(textValueTypeListElement.get());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-          "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISubmodelElement item : that.getValue().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -15069,178 +14400,84 @@ public class Xmlization {
     private void submodelElementCollectionToSequence(
       ISubmodelElementCollection that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-          "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISubmodelElement item : that.getValue().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -15267,222 +14504,98 @@ public class Xmlization {
     private void propertyToSequence(
       IProperty that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "valueType");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "valueType",
+        that.getValueType(),
+        writer,
+        this::writeDataTypeDefXsdContent);
 
-        Optional<String> textValueType = Stringification.toString(
-          that.getValueType());
-
-        if (!textValueType.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration DataTypeDefXsd: " +
-            that.getValueType().toString());
-        }
-
-        writer.writeCharacters(textValueType.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-            "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getValue().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getValueId().isPresent()) {
-          writer.writeStartElement(
-            "valueId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getValueId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValueId().isPresent()) {
+        serializeElement(
+          "valueId",
+          that.getValueId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
     }
 
@@ -15509,197 +14622,92 @@ public class Xmlization {
     private void multiLanguagePropertyToSequence(
       IMultiLanguageProperty that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-          "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getValue().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getValueId().isPresent()) {
-          writer.writeStartElement(
-            "valueId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getValueId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValueId().isPresent()) {
+        serializeElement(
+          "valueId",
+          that.getValueId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
     }
 
@@ -15726,221 +14734,98 @@ public class Xmlization {
     private void rangeToSequence(
       IRange that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "valueType");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "valueType",
+        that.getValueType(),
+        writer,
+        this::writeDataTypeDefXsdContent);
 
-        Optional<String> textValueType = Stringification.toString(
-          that.getValueType());
-
-        if (!textValueType.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration DataTypeDefXsd: " +
-            that.getValueType().toString());
-        }
-
-        writer.writeCharacters(textValueType.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getMin().isPresent()) {
+        serializeElement(
+          "min",
+          that.getMin().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getMin().isPresent()) {
-          writer.writeStartElement(
-            "min");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getMin().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getMax().isPresent()) {
-          writer.writeStartElement(
-            "max");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getMax().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getMax().isPresent()) {
+        serializeElement(
+          "max",
+          that.getMax().get(),
+          writer,
+          this::writeStringifiedContent);
       }
     }
 
@@ -15967,180 +14852,84 @@ public class Xmlization {
     private void referenceElementToSequence(
       IReferenceElement that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-            "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getValue().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
     }
 
@@ -16167,192 +14956,91 @@ public class Xmlization {
     private void blobToSequence(
       IBlob that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement("value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          String theB64Value = Base64.getEncoder().encodeToString(
-            that.getValue().get());
-          writer.writeCharacters(theB64Value);
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          this::writeByteArrayContent);
       }
 
-      try {
-        writer.writeStartElement(
-          "contentType");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getContentType().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "contentType",
+        that.getContentType(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -16378,194 +15066,91 @@ public class Xmlization {
     private void fileToSequence(
       IFile that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-            "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getValue().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        writer.writeStartElement(
-          "contentType");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getContentType().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "contentType",
+        that.getContentType(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -16591,212 +15176,96 @@ public class Xmlization {
     private void annotatedRelationshipElementToSequence(
       IAnnotatedRelationshipElement that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "first");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "first",
+        that.getFirst(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-        this.referenceToSequence(
-          that.getFirst(),
-          writer);
+      serializeElement(
+        "second",
+        that.getSecond(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "second");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.referenceToSequence(
-          that.getSecond(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getAnnotations().isPresent()) {
-          writer.writeStartElement(
-          "annotations");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IDataElement item : that.getAnnotations().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getAnnotations().isPresent()) {
+        serializeElement(
+          "annotations",
+          that.getAnnotations().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -16823,237 +15292,106 @@ public class Xmlization {
     private void entityToSequence(
       IEntity that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getStatements().isPresent()) {
-          writer.writeStartElement(
-          "statements");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISubmodelElement item : that.getStatements().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getStatements().isPresent()) {
+        serializeElement(
+          "statements",
+          that.getStatements().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "entityType");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "entityType",
+        that.getEntityType(),
+        writer,
+        this::writeEntityTypeContent);
 
-        Optional<String> textEntityType = Stringification.toString(
-          that.getEntityType());
-
-        if (!textEntityType.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration EntityType: " +
-            that.getEntityType().toString());
-        }
-
-        writer.writeCharacters(textEntityType.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getGlobalAssetId().isPresent()) {
+        serializeElement(
+          "globalAssetId",
+          that.getGlobalAssetId().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getGlobalAssetId().isPresent()) {
-          writer.writeStartElement(
-            "globalAssetId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getGlobalAssetId().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getSpecificAssetIds().isPresent()) {
-          writer.writeStartElement(
-          "specificAssetIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISpecificAssetId item : that.getSpecificAssetIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSpecificAssetIds().isPresent()) {
+        serializeElement(
+          "specificAssetIds",
+          that.getSpecificAssetIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -17080,143 +15418,62 @@ public class Xmlization {
     private void eventPayloadToSequence(
       IEventPayload that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "source");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "source",
+        that.getSource(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-        this.referenceToSequence(
-          that.getSource(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSourceSemanticId().isPresent()) {
+        serializeElement(
+          "sourceSemanticId",
+          that.getSourceSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSourceSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "sourceSemanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
+      serializeElement(
+        "observableReference",
+        that.getObservableReference(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-          this.referenceToSequence(
-            that.getSourceSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getObservableSemanticId().isPresent()) {
+        serializeElement(
+          "observableSemanticId",
+          that.getObservableSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        writer.writeStartElement(
-          "observableReference");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.referenceToSequence(
-          that.getObservableReference(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getTopic().isPresent()) {
+        serializeElement(
+          "topic",
+          that.getTopic().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getObservableSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "observableSemanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getObservableSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSubjectId().isPresent()) {
+        serializeElement(
+          "subjectId",
+          that.getSubjectId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getTopic().isPresent()) {
-          writer.writeStartElement(
-            "topic");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
+      serializeElement(
+        "timeStamp",
+        that.getTimeStamp(),
+        writer,
+        this::writeStringifiedContent);
 
-          writer.writeCharacters(
-            that.getTopic().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getSubjectId().isPresent()) {
-          writer.writeStartElement(
-            "subjectId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSubjectId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "timeStamp");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getTimeStamp().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getPayload().isPresent()) {
-          writer.writeStartElement("payload");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          String theB64Payload = Base64.getEncoder().encodeToString(
-            that.getPayload().get());
-          writer.writeCharacters(theB64Payload);
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getPayload().isPresent()) {
+        serializeElement(
+          "payload",
+          that.getPayload().get(),
+          writer,
+          this::writeByteArrayContent);
       }
     }
 
@@ -17243,317 +15500,134 @@ public class Xmlization {
     private void basicEventElementToSequence(
       IBasicEventElement that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        writer.writeStartElement(
-          "observed");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "observed",
+        that.getObserved(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-        this.referenceToSequence(
-          that.getObserved(),
-          writer);
+      serializeElement(
+        "direction",
+        that.getDirection(),
+        writer,
+        this::writeDirectionContent);
 
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      serializeElement(
+        "state",
+        that.getState(),
+        writer,
+        this::writeStateOfEventContent);
+
+      if (that.getMessageTopic().isPresent()) {
+        serializeElement(
+          "messageTopic",
+          that.getMessageTopic().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        writer.writeStartElement(
-          "direction");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        Optional<String> textDirection = Stringification.toString(
-          that.getDirection());
-
-        if (!textDirection.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration Direction: " +
-            that.getDirection().toString());
-        }
-
-        writer.writeCharacters(textDirection.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getMessageBroker().isPresent()) {
+        serializeElement(
+          "messageBroker",
+          that.getMessageBroker().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        writer.writeStartElement(
-          "state");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        Optional<String> textState = Stringification.toString(
-          that.getState());
-
-        if (!textState.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration StateOfEvent: " +
-            that.getState().toString());
-        }
-
-        writer.writeCharacters(textState.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getLastUpdate().isPresent()) {
+        serializeElement(
+          "lastUpdate",
+          that.getLastUpdate().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getMessageTopic().isPresent()) {
-          writer.writeStartElement(
-            "messageTopic");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getMessageTopic().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getMinInterval().isPresent()) {
+        serializeElement(
+          "minInterval",
+          that.getMinInterval().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getMessageBroker().isPresent()) {
-          writer.writeStartElement(
-            "messageBroker");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getMessageBroker().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getLastUpdate().isPresent()) {
-          writer.writeStartElement(
-            "lastUpdate");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getLastUpdate().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getMinInterval().isPresent()) {
-          writer.writeStartElement(
-            "minInterval");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getMinInterval().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getMaxInterval().isPresent()) {
-          writer.writeStartElement(
-            "maxInterval");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getMaxInterval().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getMaxInterval().isPresent()) {
+        serializeElement(
+          "maxInterval",
+          that.getMaxInterval().get(),
+          writer,
+          this::writeStringifiedContent);
       }
     }
 
@@ -17580,212 +15654,100 @@ public class Xmlization {
     private void operationToSequence(
       IOperation that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getInputVariables().isPresent()) {
-          writer.writeStartElement(
-          "inputVariables");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IOperationVariable item : that.getInputVariables().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getInputVariables().isPresent()) {
+        serializeElement(
+          "inputVariables",
+          that.getInputVariables().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getOutputVariables().isPresent()) {
-          writer.writeStartElement(
-          "outputVariables");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IOperationVariable item : that.getOutputVariables().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getOutputVariables().isPresent()) {
+        serializeElement(
+          "outputVariables",
+          that.getOutputVariables().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getInoutputVariables().isPresent()) {
-          writer.writeStartElement(
-          "inoutputVariables");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IOperationVariable item : that.getInoutputVariables().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getInoutputVariables().isPresent()) {
+        serializeElement(
+          "inoutputVariables",
+          that.getInoutputVariables().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -17812,22 +15774,11 @@ public class Xmlization {
     private void operationVariableToSequence(
       IOperationVariable that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "value");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.visit(
-          that.getValue(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "value",
+        that.getValue(),
+        writer,
+        this::visit);
     }
 
     @Override
@@ -17853,161 +15804,76 @@ public class Xmlization {
     private void capabilityToSequence(
       ICapability that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "semanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSemanticId().isPresent()) {
+        serializeElement(
+          "semanticId",
+          that.getSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getSupplementalSemanticIds().isPresent()) {
-          writer.writeStartElement(
-          "supplementalSemanticIds");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getSupplementalSemanticIds().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSupplementalSemanticIds().isPresent()) {
+        serializeElement(
+          "supplementalSemanticIds",
+          that.getSupplementalSemanticIds().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getQualifiers().isPresent()) {
-          writer.writeStartElement(
-          "qualifiers");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IQualifier item : that.getQualifiers().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getQualifiers().isPresent()) {
+        serializeElement(
+          "qualifiers",
+          that.getQualifiers().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -18034,158 +15900,74 @@ public class Xmlization {
     private void conceptDescriptionToSequence(
       IConceptDescription that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getExtensions().isPresent()) {
-          writer.writeStartElement(
-          "extensions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IExtension item : that.getExtensions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getExtensions().isPresent()) {
+        serializeElement(
+          "extensions",
+          that.getExtensions().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getCategory().isPresent()) {
-          writer.writeStartElement(
-            "category");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getCategory().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getCategory().isPresent()) {
+        serializeElement(
+          "category",
+          that.getCategory().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getIdShort().isPresent()) {
-          writer.writeStartElement(
-            "idShort");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getIdShort().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIdShort().isPresent()) {
+        serializeElement(
+          "idShort",
+          that.getIdShort().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getDisplayName().isPresent()) {
-          writer.writeStartElement(
-          "displayName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringNameType item : that.getDisplayName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDisplayName().isPresent()) {
+        serializeElement(
+          "displayName",
+          that.getDisplayName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDescription().isPresent()) {
-          writer.writeStartElement(
-          "description");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringTextType item : that.getDescription().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDescription().isPresent()) {
+        serializeElement(
+          "description",
+          that.getDescription().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getAdministration().isPresent()) {
-          writer.writeStartElement(
-            "administration");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.administrativeInformationToSequence(
-            that.getAdministration().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getAdministration().isPresent()) {
+        serializeElement(
+          "administration",
+          that.getAdministration().get(),
+          writer,
+          (value, w) -> this.administrativeInformationToSequence(value, w));
       }
 
-      try {
-        writer.writeStartElement(
-          "id");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getId().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      serializeElement(
+        "id",
+        that.getId(),
+        writer,
+        this::writeStringifiedContent);
+
+      if (that.getEmbeddedDataSpecifications().isPresent()) {
+        serializeElement(
+          "embeddedDataSpecifications",
+          that.getEmbeddedDataSpecifications().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getEmbeddedDataSpecifications().isPresent()) {
-          writer.writeStartElement(
-          "embeddedDataSpecifications");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IEmbeddedDataSpecification item : that.getEmbeddedDataSpecifications().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getIsCaseOf().isPresent()) {
-          writer.writeStartElement(
-          "isCaseOf");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IReference item : that.getIsCaseOf().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getIsCaseOf().isPresent()) {
+        serializeElement(
+          "isCaseOf",
+          that.getIsCaseOf().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -18212,65 +15994,25 @@ public class Xmlization {
     private void referenceToSequence(
       IReference that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "type");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "type",
+        that.getType(),
+        writer,
+        this::writeReferenceTypesContent);
 
-        Optional<String> textType = Stringification.toString(
-          that.getType());
-
-        if (!textType.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration ReferenceTypes: " +
-            that.getType().toString());
-        }
-
-        writer.writeCharacters(textType.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getReferredSemanticId().isPresent()) {
+        serializeElement(
+          "referredSemanticId",
+          that.getReferredSemanticId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getReferredSemanticId().isPresent()) {
-          writer.writeStartElement(
-            "referredSemanticId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getReferredSemanticId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "keys");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        for (IKey item : that.getKeys()) {
-          this.visit(item, writer);
-        }
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "keys",
+        that.getKeys(),
+        writer,
+        serializeItems(this::visit));
     }
 
     @Override
@@ -18296,43 +16038,17 @@ public class Xmlization {
     private void keyToSequence(
       IKey that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "type");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "type",
+        that.getType(),
+        writer,
+        this::writeKeyTypesContent);
 
-        Optional<String> textType = Stringification.toString(
-          that.getType());
-
-        if (!textType.isPresent()) {
-          throw new IllegalArgumentException(
-            "Invalid literal for the enumeration KeyTypes: " +
-            that.getType().toString());
-        }
-
-        writer.writeCharacters(textType.get());
-
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "value");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getValue().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "value",
+        that.getValue(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18358,33 +16074,17 @@ public class Xmlization {
     private void langStringNameTypeToSequence(
       ILangStringNameType that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "language");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getLanguage().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "language",
+        that.getLanguage(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "text");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getText().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "text",
+        that.getText(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18410,33 +16110,17 @@ public class Xmlization {
     private void langStringTextTypeToSequence(
       ILangStringTextType that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "language");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getLanguage().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "language",
+        that.getLanguage(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "text");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getText().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "text",
+        that.getText(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18462,55 +16146,28 @@ public class Xmlization {
     private void environmentToSequence(
       IEnvironment that,
       XMLStreamWriter writer) {
-      try {
-        if (that.getAssetAdministrationShells().isPresent()) {
-          writer.writeStartElement(
-          "assetAdministrationShells");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IAssetAdministrationShell item : that.getAssetAdministrationShells().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getAssetAdministrationShells().isPresent()) {
+        serializeElement(
+          "assetAdministrationShells",
+          that.getAssetAdministrationShells().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getSubmodels().isPresent()) {
-          writer.writeStartElement(
-          "submodels");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ISubmodel item : that.getSubmodels().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSubmodels().isPresent()) {
+        serializeElement(
+          "submodels",
+          that.getSubmodels().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getConceptDescriptions().isPresent()) {
-          writer.writeStartElement(
-          "conceptDescriptions");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (IConceptDescription item : that.getConceptDescriptions().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getConceptDescriptions().isPresent()) {
+        serializeElement(
+          "conceptDescriptions",
+          that.getConceptDescriptions().get(),
+          writer,
+          serializeItems(this::visit));
       }
     }
 
@@ -18537,39 +16194,17 @@ public class Xmlization {
     private void embeddedDataSpecificationToSequence(
       IEmbeddedDataSpecification that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "dataSpecification");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "dataSpecification",
+        that.getDataSpecification(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
 
-        this.referenceToSequence(
-          that.getDataSpecification(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
-          "dataSpecificationContent");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.visit(
-          that.getDataSpecificationContent(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "dataSpecificationContent",
+        that.getDataSpecificationContent(),
+        writer,
+        this::visit);
     }
 
     @Override
@@ -18595,61 +16230,29 @@ public class Xmlization {
     private void levelTypeToSequence(
       ILevelType that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "min");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getMin().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "min",
+        that.getMin(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "nom");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getNom().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "nom",
+        that.getNom(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "typ");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getTyp().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "typ",
+        that.getTyp(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "max");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getMax().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "max",
+        that.getMax(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18675,36 +16278,17 @@ public class Xmlization {
     private void valueReferencePairToSequence(
       IValueReferencePair that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "value");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getValue().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "value",
+        that.getValue(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "valueId");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.referenceToSequence(
-          that.getValueId(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "valueId",
+        that.getValueId(),
+        writer,
+        (value, w) -> this.referenceToSequence(value, w));
     }
 
     @Override
@@ -18730,22 +16314,11 @@ public class Xmlization {
     private void valueListToSequence(
       IValueList that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "valueReferencePairs");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        for (IValueReferencePair item : that.getValueReferencePairs()) {
-          this.visit(item, writer);
-        }
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "valueReferencePairs",
+        that.getValueReferencePairs(),
+        writer,
+        serializeItems(this::visit));
     }
 
     @Override
@@ -18771,33 +16344,17 @@ public class Xmlization {
     private void langStringPreferredNameTypeIec61360ToSequence(
       ILangStringPreferredNameTypeIec61360 that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "language");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getLanguage().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "language",
+        that.getLanguage(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "text");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getText().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "text",
+        that.getText(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18823,33 +16380,17 @@ public class Xmlization {
     private void langStringShortNameTypeIec61360ToSequence(
       ILangStringShortNameTypeIec61360 that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "language");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getLanguage().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "language",
+        that.getLanguage(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "text");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getText().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "text",
+        that.getText(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18875,33 +16416,17 @@ public class Xmlization {
     private void langStringDefinitionTypeIec61360ToSequence(
       ILangStringDefinitionTypeIec61360 that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "language");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getLanguage().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "language",
+        that.getLanguage(),
+        writer,
+        this::writeStringifiedContent);
 
-      try {
-        writer.writeStartElement(
-          "text");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-        writer.writeCharacters(
-          that.getText().toString());
-        writer.writeEndElement();
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
+      serializeElement(
+        "text",
+        that.getText(),
+        writer,
+        this::writeStringifiedContent);
     }
 
     @Override
@@ -18927,228 +16452,98 @@ public class Xmlization {
     private void dataSpecificationIec61360ToSequence(
       IDataSpecificationIec61360 that,
       XMLStreamWriter writer) {
-      try {
-        writer.writeStartElement(
-          "preferredName");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
+      serializeElement(
+        "preferredName",
+        that.getPreferredName(),
+        writer,
+        serializeItems(this::visit));
 
-        for (ILangStringPreferredNameTypeIec61360 item : that.getPreferredName()) {
-          this.visit(item, writer);
-        }
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getShortName().isPresent()) {
+        serializeElement(
+          "shortName",
+          that.getShortName().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getShortName().isPresent()) {
-          writer.writeStartElement(
-          "shortName");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringShortNameTypeIec61360 item : that.getShortName().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getUnit().isPresent()) {
+        serializeElement(
+          "unit",
+          that.getUnit().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getUnit().isPresent()) {
-          writer.writeStartElement(
-            "unit");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getUnit().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getUnitId().isPresent()) {
+        serializeElement(
+          "unitId",
+          that.getUnitId().get(),
+          writer,
+          (value, w) -> this.referenceToSequence(value, w));
       }
 
-      try {
-        if (that.getUnitId().isPresent()) {
-          writer.writeStartElement(
-            "unitId");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.referenceToSequence(
-            that.getUnitId().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSourceOfDefinition().isPresent()) {
+        serializeElement(
+          "sourceOfDefinition",
+          that.getSourceOfDefinition().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getSourceOfDefinition().isPresent()) {
-          writer.writeStartElement(
-            "sourceOfDefinition");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getSourceOfDefinition().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getSymbol().isPresent()) {
+        serializeElement(
+          "symbol",
+          that.getSymbol().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getSymbol().isPresent()) {
-          writer.writeStartElement(
-            "symbol");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getSymbol().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDataType().isPresent()) {
+        serializeElement(
+          "dataType",
+          that.getDataType().get(),
+          writer,
+          this::writeDataTypeIec61360Content);
       }
 
-      try {
-        if (that.getDataType().isPresent()) {
-          writer.writeStartElement(
-            "dataType");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          Optional<String> textDataType = Stringification.toString(
-            that.getDataType().get());
-
-          if (!textDataType.isPresent()) {
-            throw new IllegalArgumentException(
-              "Invalid literal for the enumeration DataTypeIec61360: " +
-              that.getDataType().get().toString());
-          }
-
-          writer.writeCharacters(textDataType.get());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getDefinition().isPresent()) {
+        serializeElement(
+          "definition",
+          that.getDefinition().get(),
+          writer,
+          serializeItems(this::visit));
       }
 
-      try {
-        if (that.getDefinition().isPresent()) {
-          writer.writeStartElement(
-          "definition");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-          for (ILangStringDefinitionTypeIec61360 item : that.getDefinition().get()) {
-            this.visit(item, writer);
-          }
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValueFormat().isPresent()) {
+        serializeElement(
+          "valueFormat",
+          that.getValueFormat().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getValueFormat().isPresent()) {
-          writer.writeStartElement(
-            "valueFormat");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getValueFormat().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValueList().isPresent()) {
+        serializeElement(
+          "valueList",
+          that.getValueList().get(),
+          writer,
+          (value, w) -> this.valueListToSequence(value, w));
       }
 
-      try {
-        if (that.getValueList().isPresent()) {
-          writer.writeStartElement(
-            "valueList");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.valueListToSequence(
-            that.getValueList().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getValue().isPresent()) {
+        serializeElement(
+          "value",
+          that.getValue().get(),
+          writer,
+          this::writeStringifiedContent);
       }
 
-      try {
-        if (that.getValue().isPresent()) {
-          writer.writeStartElement(
-            "value");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          writer.writeCharacters(
-            that.getValue().get().toString());
-
-          writer.writeEndElement();
-        }
-      } catch (Exception exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        if (that.getLevelType().isPresent()) {
-          writer.writeStartElement(
-            "levelType");
-          if (topLevel) {
-            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-            topLevel = false;
-          }
-
-          this.levelTypeToSequence(
-            that.getLevelType().get(),
-            writer);
-
-          writer.writeEndElement();
-        }
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
+      if (that.getLevelType().isPresent()) {
+        serializeElement(
+          "levelType",
+          that.getLevelType().get(),
+          writer,
+          (value, w) -> this.levelTypeToSequence(value, w));
       }
     }
 

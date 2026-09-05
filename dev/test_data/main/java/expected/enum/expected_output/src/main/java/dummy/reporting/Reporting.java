@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -158,6 +159,70 @@ public class Reporting
 
         public Collection<Segment> getPathSegments() {
             return pathSegments;
+        }
+    }
+
+    /**
+     * Represent the outcome of a de/serialization or a verification step.
+     *
+     * <p>This is shared by JSON de/serialization, XML de/serialization and
+     * verification, all of which propagate an {@link Error} instead of relying
+     * on exceptions for the common (successful) case.
+     */
+    public static class Result<T> {
+        private final T result;
+        private final Error error;
+        private final boolean success;
+
+        private Result(T result, Error error, boolean success) {
+            this.result = result;
+            this.error = error;
+            this.success = success;
+        }
+
+        public static <T> Result<T> success(T result) {
+            if (result == null) throw new IllegalArgumentException("Result must not be null.");
+            return new Result<>(result, null, true);
+        }
+
+        public static <T> Result<T> failure(Error error) {
+            if (error == null) throw new IllegalArgumentException("Error must not be null.");
+            return new Result<>(null, error, false);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <I> Result<I> castTo(Class<I> type) {
+            if (isError() || type.isInstance(result)) return (Result<I>) this;
+            throw new IllegalStateException("Result of type "
+                + result.getClass().getName()
+                + " is not an instance of "
+                + type.getName());
+        }
+
+        public T getResult() {
+            if (!isSuccess()) throw new IllegalStateException("Result is not present.");
+            return result;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public boolean isError() {
+            return !success;
+        }
+
+        public Error getError() {
+            if (isSuccess()) throw new IllegalStateException("Result is present.");
+            return error;
+        }
+
+        public <R> R map(Function<T, R> successFunction, Function<Error, R> errorFunction) {
+            return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
+        }
+
+        public T onError(Function<Error, T> errorFunction) {
+            return map(Function.identity(), errorFunction);
         }
     }
 }

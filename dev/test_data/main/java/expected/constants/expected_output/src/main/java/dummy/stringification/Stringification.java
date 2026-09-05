@@ -38,6 +38,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(someEnumToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(SomeEnum that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of SomeEnum: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, SomeEnum> someEnumFromString;
   static {
     final Map<String, SomeEnum> temp = new HashMap<>();

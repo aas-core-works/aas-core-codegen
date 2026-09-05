@@ -184,6 +184,72 @@ public static class Error {{
 {I}}}
 }}"""
         ),
+        Stripped(
+            f"""\
+/**
+ * Represent the outcome of a de/serialization or a verification step.
+ *
+ * <p>This is shared by JSON de/serialization, XML de/serialization and
+ * verification, all of which propagate an {{@link Error}} instead of relying
+ * on exceptions for the common (successful) case.
+ */
+public static class Result<T> {{
+{I}private final T result;
+{I}private final Error error;
+{I}private final boolean success;
+
+{I}private Result(T result, Error error, boolean success) {{
+{II}this.result = result;
+{II}this.error = error;
+{II}this.success = success;
+{I}}}
+
+{I}public static <T> Result<T> success(T result) {{
+{II}if (result == null) throw new IllegalArgumentException("Result must not be null.");
+{II}return new Result<>(result, null, true);
+{I}}}
+
+{I}public static <T> Result<T> failure(Error error) {{
+{II}if (error == null) throw new IllegalArgumentException("Error must not be null.");
+{II}return new Result<>(null, error, false);
+{I}}}
+
+{I}@SuppressWarnings("unchecked")
+{I}public <I> Result<I> castTo(Class<I> type) {{
+{II}if (isError() || type.isInstance(result)) return (Result<I>) this;
+{II}throw new IllegalStateException("Result of type "
+{III}+ result.getClass().getName()
+{III}+ " is not an instance of "
+{III}+ type.getName());
+{I}}}
+
+{I}public T getResult() {{
+{II}if (!isSuccess()) throw new IllegalStateException("Result is not present.");
+{II}return result;
+{I}}}
+
+{I}public boolean isSuccess() {{
+{II}return success;
+{I}}}
+
+{I}public boolean isError() {{
+{II}return !success;
+{I}}}
+
+{I}public Error getError() {{
+{II}if (isSuccess()) throw new IllegalStateException("Result is present.");
+{II}return error;
+{I}}}
+
+{I}public <R> R map(Function<T, R> successFunction, Function<Error, R> errorFunction) {{
+{II}return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
+{I}}}
+
+{I}public T onError(Function<Error, T> errorFunction) {{
+{II}return map(Function.identity(), errorFunction);
+{I}}}
+}}"""
+        ),
     ]  # type: List[Stripped]
 
     writer = io.StringIO()
@@ -198,6 +264,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

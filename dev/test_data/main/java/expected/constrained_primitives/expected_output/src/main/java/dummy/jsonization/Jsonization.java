@@ -44,56 +44,56 @@ public class Jsonization {
       /** Convert {@code value} to a string.
        * @param node JSON node to be parsed
        */
-      private static _Result<String> tryStringFrom(JsonNode value) {
+      private static Reporting.Result<String> tryStringFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asText());
+        return Reporting.Result.success(value.asText());
       }
 
       /** Convert {@code value} to a boolean.
        * @param node JSON node to be parsed
        */
-      private static _Result<Boolean> tryBooleanFrom(JsonNode value) {
+      private static Reporting.Result<Boolean> tryBooleanFrom(JsonNode value) {
         if (!value.isBoolean()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Boolean, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asBoolean());
+        return Reporting.Result.success(value.asBoolean());
       }
 
       /** Convert {@code value} to a long 64-bit integer.
        * @param node JSON node to be parsed
        */
-      private static _Result<Long> tryLongFrom(JsonNode value) {
+      private static Reporting.Result<Long> tryLongFrom(JsonNode value) {
         if (!value.isIntegralNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Long, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asLong());
+        return Reporting.Result.success(value.asLong());
       }
 
       /** Convert {@code value} to a double-precision 64-bit float.
        * @param node JSON node to be parsed
        */
-      private static _Result<Double> tryDoubleFrom(JsonNode value) {
+      private static Reporting.Result<Double> tryDoubleFrom(JsonNode value) {
         if (!value.isFloatingPointNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Double, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asDouble());
+        return Reporting.Result.success(value.asDouble());
       }
 
-      private static _Result<byte[]> tryBytesFrom(JsonNode value) {
+      private static Reporting.Result<byte[]> tryBytesFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         final byte[] decodedData;
         Base64.Decoder decoder = Base64.getDecoder();
@@ -104,10 +104,45 @@ public class Jsonization {
           final Reporting.Error error = new Reporting.Error(
             "Expected Base-64 encoded bytes, but the conversion failed " +
               "because: " + exception.getMessage());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(decodedData);
+        return Reporting.Result.success(decodedData);
+      }
+
+      /**
+       * Parse every item of {@code array} with {@code parseItem}.
+       *
+       * @param array JSON array to be parsed
+       * @param parseItem to parse a single item of the array
+       */
+      private static <T> Reporting.Result<List<T>> parseArray(
+        JsonNode array,
+        Function<JsonNode, Reporting.Result<? extends T>> parseItem) {
+        final List<T> result = new ArrayList<>(array.size());
+        int index = 0;
+        for (JsonNode item : array) {
+          if (item == null) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected a non-null item, but got a null");
+            error.prependSegment(
+              new Reporting.IndexSegment(index));
+            return Reporting.Result.failure(error);
+          }
+
+          final Reporting.Result<? extends T> parsedItemResult = parseItem.apply(item);
+          if (parsedItemResult.isError()) {
+            parsedItemResult.getError()
+              .prependSegment(
+              new Reporting.IndexSegment(index));
+            return Reporting.Result.failure(parsedItemResult.getError());
+          }
+
+          result.add(parsedItemResult.getResult());
+          index++;
+        }
+
+        return Reporting.Result.success(result);
       }
 
       /**
@@ -116,11 +151,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static _Result<Something> trySomethingFrom(JsonNode node) {
+      private static Reporting.Result<Something> trySomethingFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         Boolean theSomeBool = null;
@@ -138,7 +173,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends Boolean> theSomeBoolResult = tryBooleanFrom(currentNode.getValue());
+              final Reporting.Result<? extends Boolean> theSomeBoolResult = tryBooleanFrom(currentNode.getValue());
               if (theSomeBoolResult.isError()) {
                 theSomeBoolResult.getError()
                   .prependSegment(new Reporting.NameSegment("someBool"));
@@ -152,7 +187,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends Long> theSomeIntResult = tryLongFrom(currentNode.getValue());
+              final Reporting.Result<? extends Long> theSomeIntResult = tryLongFrom(currentNode.getValue());
               if (theSomeIntResult.isError()) {
                 theSomeIntResult.getError()
                   .prependSegment(new Reporting.NameSegment("someInt"));
@@ -166,7 +201,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends Double> theSomeFloatResult = tryDoubleFrom(currentNode.getValue());
+              final Reporting.Result<? extends Double> theSomeFloatResult = tryDoubleFrom(currentNode.getValue());
               if (theSomeFloatResult.isError()) {
                 theSomeFloatResult.getError()
                   .prependSegment(new Reporting.NameSegment("someFloat"));
@@ -180,7 +215,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends String> theSomeStringResult = tryStringFrom(currentNode.getValue());
+              final Reporting.Result<? extends String> theSomeStringResult = tryStringFrom(currentNode.getValue());
               if (theSomeStringResult.isError()) {
                 theSomeStringResult.getError()
                   .prependSegment(new Reporting.NameSegment("someString"));
@@ -194,7 +229,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends byte[]> theSomeBytesResult = tryBytesFrom(currentNode.getValue());
+              final Reporting.Result<? extends byte[]> theSomeBytesResult = tryBytesFrom(currentNode.getValue());
               if (theSomeBytesResult.isError()) {
                 theSomeBytesResult.getError()
                   .prependSegment(new Reporting.NameSegment("someBytes"));
@@ -206,7 +241,7 @@ public class Jsonization {
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
             }
           }
         }
@@ -214,34 +249,34 @@ public class Jsonization {
         if (theSomeBool == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someBool\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theSomeInt == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someInt\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theSomeFloat == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someFloat\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theSomeString == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someString\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theSomeBytes == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someBytes\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(new Something(
+        return Reporting.Result.success(new Something(
           theSomeBool,
           theSomeInt,
           theSomeFloat,
@@ -273,63 +308,6 @@ public class Jsonization {
         }
       }
 
-    private static class _Result<T> {
-      private final T result;
-      private final Reporting.Error error;
-      private final boolean success;
-
-      private _Result(T result, Reporting.Error error, boolean success) {
-        this.result = result;
-        this.error = error;
-        this.success = success;
-      }
-
-      public static <T> _Result<T> success(T result) {
-        if (result == null) throw new IllegalArgumentException("Result must not be null.");
-        return new _Result<>(result, null, true);
-      }
-
-      public static <T> _Result<T> failure(Reporting.Error error) {
-        if (error == null) throw new IllegalArgumentException("Error must not be null.");
-        return new _Result<>(null, error, false);
-      }
-
-      @SuppressWarnings("unchecked")
-      public <I> _Result<I> castTo(Class<I> type) {
-        if (isError() || type.isInstance(result)) return (_Result<I>) this;
-        throw new IllegalStateException("Result of type "
-          + result.getClass().getName()
-          + " is not an instance of "
-          + type.getName());
-      }
-
-      public T getResult() {
-        if (!isSuccess()) throw new IllegalStateException("Result is not present.");
-        return result;
-      }
-
-      public boolean isSuccess() {
-        return success;
-      }
-
-      public boolean isError() {
-        return !success;
-      }
-
-      public Reporting.Error getError() {
-        if (isSuccess()) throw new IllegalStateException("Result is present.");
-        return error;
-      }
-
-      public <R> R map(Function<T, R> successFunction, Function<Reporting.Error, R> errorFunction) {
-        return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
-      }
-
-      public T onError(Function<Reporting.Error, T> errorFunction) {
-        return map(Function.identity(), errorFunction);
-      }
-    }
-
     /**
      * Deserialize instances of meta-model classes from JSON nodes.
      *
@@ -350,7 +328,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Something deserializeSomething(JsonNode node) {
-        final _Result<? extends Something> result =
+        final Reporting.Result<? extends Something> result =
           _DeserializeImplementation.trySomethingFrom(
             node);
 
@@ -378,6 +356,34 @@ public class Jsonization {
         return JsonNodeFactory.instance.numberNode(that);
       }
 
+      /**
+       * Convert {@code that} byte array to a JSON value.
+       *
+       * @param that value to be converted
+       */
+      private static JsonNode bytesToJsonNode(byte[] that) {
+        return JsonNodeFactory.instance.textNode(
+          Base64.getEncoder().encodeToString(that));
+      }
+
+      /**
+       * Serialize every item of {@code items} with {@code serializeItem} into
+       * a JSON array.
+       *
+       * @param items to be serialized
+       * @param serializeItem to serialize a single item of {@code items}
+       */
+      private static <T> ArrayNode serializeArray(
+        Iterable<T> items,
+        Function<T, JsonNode> serializeItem) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        for (T item : items) {
+          result.add(
+            serializeItem.apply(item));
+        }
+        return result;
+      }
+
       @Override
       public JsonNode transformSomething(
         ISomething that
@@ -396,9 +402,8 @@ public class Jsonization {
         result.set("someString", JsonNodeFactory.instance.textNode(
           that.getSomeString()));
 
-        result.set("someBytes", JsonNodeFactory.instance.textNode(
-            Base64.getEncoder()
-              .encodeToString(that.getSomeBytes())));
+        result.set("someBytes", _Transformer.bytesToJsonNode(
+          that.getSomeBytes()));
 
         return result;
       }

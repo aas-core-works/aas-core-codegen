@@ -44,56 +44,56 @@ public class Jsonization {
       /** Convert {@code value} to a string.
        * @param node JSON node to be parsed
        */
-      private static _Result<String> tryStringFrom(JsonNode value) {
+      private static Reporting.Result<String> tryStringFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asText());
+        return Reporting.Result.success(value.asText());
       }
 
       /** Convert {@code value} to a boolean.
        * @param node JSON node to be parsed
        */
-      private static _Result<Boolean> tryBooleanFrom(JsonNode value) {
+      private static Reporting.Result<Boolean> tryBooleanFrom(JsonNode value) {
         if (!value.isBoolean()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Boolean, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asBoolean());
+        return Reporting.Result.success(value.asBoolean());
       }
 
       /** Convert {@code value} to a long 64-bit integer.
        * @param node JSON node to be parsed
        */
-      private static _Result<Long> tryLongFrom(JsonNode value) {
+      private static Reporting.Result<Long> tryLongFrom(JsonNode value) {
         if (!value.isIntegralNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Long, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asLong());
+        return Reporting.Result.success(value.asLong());
       }
 
       /** Convert {@code value} to a double-precision 64-bit float.
        * @param node JSON node to be parsed
        */
-      private static _Result<Double> tryDoubleFrom(JsonNode value) {
+      private static Reporting.Result<Double> tryDoubleFrom(JsonNode value) {
         if (!value.isFloatingPointNumber()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of Double, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        return _Result.success(value.asDouble());
+        return Reporting.Result.success(value.asDouble());
       }
 
-      private static _Result<byte[]> tryBytesFrom(JsonNode value) {
+      private static Reporting.Result<byte[]> tryBytesFrom(JsonNode value) {
         if (!value.isTextual()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonValue of String, but got " + value.getNodeType());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
         final byte[] decodedData;
         Base64.Decoder decoder = Base64.getDecoder();
@@ -104,10 +104,45 @@ public class Jsonization {
           final Reporting.Error error = new Reporting.Error(
             "Expected Base-64 encoded bytes, but the conversion failed " +
               "because: " + exception.getMessage());
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(decodedData);
+        return Reporting.Result.success(decodedData);
+      }
+
+      /**
+       * Parse every item of {@code array} with {@code parseItem}.
+       *
+       * @param array JSON array to be parsed
+       * @param parseItem to parse a single item of the array
+       */
+      private static <T> Reporting.Result<List<T>> parseArray(
+        JsonNode array,
+        Function<JsonNode, Reporting.Result<? extends T>> parseItem) {
+        final List<T> result = new ArrayList<>(array.size());
+        int index = 0;
+        for (JsonNode item : array) {
+          if (item == null) {
+            final Reporting.Error error = new Reporting.Error(
+              "Expected a non-null item, but got a null");
+            error.prependSegment(
+              new Reporting.IndexSegment(index));
+            return Reporting.Result.failure(error);
+          }
+
+          final Reporting.Result<? extends T> parsedItemResult = parseItem.apply(item);
+          if (parsedItemResult.isError()) {
+            parsedItemResult.getError()
+              .prependSegment(
+              new Reporting.IndexSegment(index));
+            return Reporting.Result.failure(parsedItemResult.getError());
+          }
+
+          result.add(parsedItemResult.getResult());
+          index++;
+        }
+
+        return Reporting.Result.success(result);
       }
 
       /**
@@ -116,20 +151,20 @@ public class Jsonization {
        *
        * @param node JSON node to be parsed
        */
-      public static _Result<? extends IAbstractItem> tryIAbstractItemFrom(JsonNode node) {
+      public static Reporting.Result<? extends IAbstractItem> tryIAbstractItemFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         final JsonNode modelTypeNode = node.get("modelType");
         if (modelTypeNode == null) {
           final Reporting.Error error = new Reporting.Error(
               "Expected a model type, but none is present");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
-        final _Result<String> modelTypeResult = tryStringFrom(modelTypeNode);
+        final Reporting.Result<String> modelTypeResult = tryStringFrom(modelTypeNode);
         if (modelTypeResult.isError()) {
           return modelTypeResult.castTo(IAbstractItem.class);
         }
@@ -143,7 +178,7 @@ public class Jsonization {
         }  default: {
             final Reporting.Error error = new Reporting.Error(
               "Unexpected model type for IAbstractItem: " + modelTypeResult.getResult());
-            return _Result.failure(error);
+            return Reporting.Result.failure(error);
           }
         }
       }
@@ -154,11 +189,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static _Result<SomeItem> trySomeItemFrom(JsonNode node) {
+      private static Reporting.Result<SomeItem> trySomeItemFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         String theName = null;
@@ -174,7 +209,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends String> theNameResult = tryStringFrom(currentNode.getValue());
+              final Reporting.Result<? extends String> theNameResult = tryStringFrom(currentNode.getValue());
               if (theNameResult.isError()) {
                 theNameResult.getError()
                   .prependSegment(new Reporting.NameSegment("name"));
@@ -187,9 +222,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
-              final _Result<? extends String> modelTypeResult =
+              final Reporting.Result<? extends String> modelTypeResult =
                 _DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -203,14 +238,14 @@ public class Jsonization {
                   "Expected the model type 'SomeItem', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
             }
           }
         }
@@ -218,16 +253,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theName == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"name\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(new SomeItem(
+        return Reporting.Result.success(new SomeItem(
           theName));
       }
 
@@ -237,11 +272,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static _Result<AnotherItem> tryAnotherItemFrom(JsonNode node) {
+      private static Reporting.Result<AnotherItem> tryAnotherItemFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         Long theSerialNumber = null;
@@ -257,7 +292,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends Long> theSerialNumberResult = tryLongFrom(currentNode.getValue());
+              final Reporting.Result<? extends Long> theSerialNumberResult = tryLongFrom(currentNode.getValue());
               if (theSerialNumberResult.isError()) {
                 theSerialNumberResult.getError()
                   .prependSegment(new Reporting.NameSegment("serialNumber"));
@@ -270,9 +305,9 @@ public class Jsonization {
               if (currentNode.getValue() == null) {
                 final Reporting.Error error = new Reporting.Error(
                   "Expected a model type, but got null");
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
-              final _Result<? extends String> modelTypeResult =
+              final Reporting.Result<? extends String> modelTypeResult =
                 _DeserializeImplementation.tryStringFrom(currentNode.getValue());
               if (modelTypeResult.isError()) {
                 modelTypeResult.getError()
@@ -286,14 +321,14 @@ public class Jsonization {
                   "Expected the model type 'AnotherItem', " +
                   "but got '" + modelType + "'");
                   error.prependSegment(new Reporting.NameSegment("modelType"));
-                  return _Result.failure(error);
+                  return Reporting.Result.failure(error);
               }
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
             }
           }
         }
@@ -301,16 +336,16 @@ public class Jsonization {
         if (modelType == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"modelType\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theSerialNumber == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"serialNumber\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(new AnotherItem(
+        return Reporting.Result.success(new AnotherItem(
           theSerialNumber));
       }
 
@@ -320,11 +355,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static _Result<Simple> trySimpleFrom(JsonNode node) {
+      private static Reporting.Result<Simple> trySimpleFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         String theName = null;
@@ -338,7 +373,7 @@ public class Jsonization {
                 continue;
               }
 
-              final _Result<? extends String> theNameResult = tryStringFrom(currentNode.getValue());
+              final Reporting.Result<? extends String> theNameResult = tryStringFrom(currentNode.getValue());
               if (theNameResult.isError()) {
                 theNameResult.getError()
                   .prependSegment(new Reporting.NameSegment("name"));
@@ -350,7 +385,7 @@ public class Jsonization {
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
             }
           }
         }
@@ -358,10 +393,10 @@ public class Jsonization {
         if (theName == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"name\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(new Simple(
+        return Reporting.Result.success(new Simple(
           theName));
       }
 
@@ -371,11 +406,11 @@ public class Jsonization {
        * @param node JSON node to be parsed
        * @param elem Error, if any, during the deserialization
        */
-      private static _Result<Something> trySomethingFrom(JsonNode node) {
+      private static Reporting.Result<Something> trySomethingFrom(JsonNode node) {
         if (node == null || !node.isObject()) {
           final Reporting.Error error = new Reporting.Error(
             "Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         List<IAbstractItem> theSomeItems = null;
@@ -397,42 +432,19 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "someItems"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
-              theSomeItems = new ArrayList<>(
-                arraySomeItems.size());
-              int indexSomeItems = 0;
-              for (JsonNode item : arraySomeItems) {
-                if (item == null) {
-                  final Reporting.Error error = new Reporting.Error(
-                    "Expected a non-null item, but got a null");
-                  error.prependSegment(
-                    new Reporting.IndexSegment(
-                      indexSomeItems));
-                  error.prependSegment(
+              final Reporting.Result<List<IAbstractItem>> theSomeItemsResult = parseArray(
+                arraySomeItems,
+                _DeserializeImplementation::tryIAbstractItemFrom);
+              if (theSomeItemsResult.isError()) {
+                theSomeItemsResult.getError()
+                  .prependSegment(
                     new Reporting.NameSegment(
                       "someItems"));
-                  return _Result.failure(error);
-                }
-                final _Result<? extends IAbstractItem> parsedItemResult =
-                  tryIAbstractItemFrom(item);
-                if (parsedItemResult.isError()) {
-                  parsedItemResult
-                    .getError()
-                    .prependSegment(
-                    new Reporting.IndexSegment(
-                      indexSomeItems));
-                  parsedItemResult
-                    .getError()
-                    .prependSegment(
-                    new Reporting.NameSegment(
-                      "someItems"));
-                  return parsedItemResult.castTo(Something.class);
-                }
-                theSomeItems.add(
-                  parsedItemResult.getResult());
-                indexSomeItems++;
+                return theSomeItemsResult.castTo(Something.class);
               }
+              theSomeItems = theSomeItemsResult.getResult();
               break;
             }
             case "someSimples": {
@@ -447,48 +459,25 @@ public class Jsonization {
                 error.prependSegment(
                   new Reporting.NameSegment(
                     "someSimples"));
-                return _Result.failure(error);
+                return Reporting.Result.failure(error);
               }
-              theSomeSimples = new ArrayList<>(
-                arraySomeSimples.size());
-              int indexSomeSimples = 0;
-              for (JsonNode item : arraySomeSimples) {
-                if (item == null) {
-                  final Reporting.Error error = new Reporting.Error(
-                    "Expected a non-null item, but got a null");
-                  error.prependSegment(
-                    new Reporting.IndexSegment(
-                      indexSomeSimples));
-                  error.prependSegment(
+              final Reporting.Result<List<ISimple>> theSomeSimplesResult = parseArray(
+                arraySomeSimples,
+                _DeserializeImplementation::trySimpleFrom);
+              if (theSomeSimplesResult.isError()) {
+                theSomeSimplesResult.getError()
+                  .prependSegment(
                     new Reporting.NameSegment(
                       "someSimples"));
-                  return _Result.failure(error);
-                }
-                final _Result<? extends ISimple> parsedItemResult =
-                  trySimpleFrom(item);
-                if (parsedItemResult.isError()) {
-                  parsedItemResult
-                    .getError()
-                    .prependSegment(
-                    new Reporting.IndexSegment(
-                      indexSomeSimples));
-                  parsedItemResult
-                    .getError()
-                    .prependSegment(
-                    new Reporting.NameSegment(
-                      "someSimples"));
-                  return parsedItemResult.castTo(Something.class);
-                }
-                theSomeSimples.add(
-                  parsedItemResult.getResult());
-                indexSomeSimples++;
+                return theSomeSimplesResult.castTo(Something.class);
               }
+              theSomeSimples = theSomeSimplesResult.getResult();
               break;
             }
             default: {
               final Reporting.Error error = new Reporting.Error(
                 "Unexpected property: " + currentNode.getKey());
-              return _Result.failure(error);
+              return Reporting.Result.failure(error);
             }
           }
         }
@@ -496,16 +485,16 @@ public class Jsonization {
         if (theSomeItems == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someItems\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
         if (theSomeSimples == null) {
           final Reporting.Error error = new Reporting.Error(
             "Required property \"someSimples\" is missing");
-          return _Result.failure(error);
+          return Reporting.Result.failure(error);
         }
 
-        return _Result.success(new Something(
+        return Reporting.Result.success(new Something(
           theSomeItems,
           theSomeSimples));
       }
@@ -534,63 +523,6 @@ public class Jsonization {
         }
       }
 
-    private static class _Result<T> {
-      private final T result;
-      private final Reporting.Error error;
-      private final boolean success;
-
-      private _Result(T result, Reporting.Error error, boolean success) {
-        this.result = result;
-        this.error = error;
-        this.success = success;
-      }
-
-      public static <T> _Result<T> success(T result) {
-        if (result == null) throw new IllegalArgumentException("Result must not be null.");
-        return new _Result<>(result, null, true);
-      }
-
-      public static <T> _Result<T> failure(Reporting.Error error) {
-        if (error == null) throw new IllegalArgumentException("Error must not be null.");
-        return new _Result<>(null, error, false);
-      }
-
-      @SuppressWarnings("unchecked")
-      public <I> _Result<I> castTo(Class<I> type) {
-        if (isError() || type.isInstance(result)) return (_Result<I>) this;
-        throw new IllegalStateException("Result of type "
-          + result.getClass().getName()
-          + " is not an instance of "
-          + type.getName());
-      }
-
-      public T getResult() {
-        if (!isSuccess()) throw new IllegalStateException("Result is not present.");
-        return result;
-      }
-
-      public boolean isSuccess() {
-        return success;
-      }
-
-      public boolean isError() {
-        return !success;
-      }
-
-      public Reporting.Error getError() {
-        if (isSuccess()) throw new IllegalStateException("Result is present.");
-        return error;
-      }
-
-      public <R> R map(Function<T, R> successFunction, Function<Reporting.Error, R> errorFunction) {
-        return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
-      }
-
-      public T onError(Function<Reporting.Error, T> errorFunction) {
-        return map(Function.identity(), errorFunction);
-      }
-    }
-
     /**
      * Deserialize instances of meta-model classes from JSON nodes.
      *
@@ -611,7 +543,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static IAbstractItem deserializeIAbstractItem(JsonNode node) {
-        final _Result<? extends IAbstractItem> result =
+        final Reporting.Result<? extends IAbstractItem> result =
           _DeserializeImplementation.tryIAbstractItemFrom(
             node);
 
@@ -628,7 +560,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static SomeItem deserializeSomeItem(JsonNode node) {
-        final _Result<? extends SomeItem> result =
+        final Reporting.Result<? extends SomeItem> result =
           _DeserializeImplementation.trySomeItemFrom(
             node);
 
@@ -645,7 +577,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static AnotherItem deserializeAnotherItem(JsonNode node) {
-        final _Result<? extends AnotherItem> result =
+        final Reporting.Result<? extends AnotherItem> result =
           _DeserializeImplementation.tryAnotherItemFrom(
             node);
 
@@ -662,7 +594,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Simple deserializeSimple(JsonNode node) {
-        final _Result<? extends Simple> result =
+        final Reporting.Result<? extends Simple> result =
           _DeserializeImplementation.trySimpleFrom(
             node);
 
@@ -679,7 +611,7 @@ public class Jsonization {
        * @param node JSON node to be parsed
        */
       public static Something deserializeSomething(JsonNode node) {
-        final _Result<? extends Something> result =
+        final Reporting.Result<? extends Something> result =
           _DeserializeImplementation.trySomethingFrom(
             node);
 
@@ -705,6 +637,34 @@ public class Jsonization {
             "The number can not be losslessly represented in JSON: " + that);
         }
         return JsonNodeFactory.instance.numberNode(that);
+      }
+
+      /**
+       * Convert {@code that} byte array to a JSON value.
+       *
+       * @param that value to be converted
+       */
+      private static JsonNode bytesToJsonNode(byte[] that) {
+        return JsonNodeFactory.instance.textNode(
+          Base64.getEncoder().encodeToString(that));
+      }
+
+      /**
+       * Serialize every item of {@code items} with {@code serializeItem} into
+       * a JSON array.
+       *
+       * @param items to be serialized
+       * @param serializeItem to serialize a single item of {@code items}
+       */
+      private static <T> ArrayNode serializeArray(
+        Iterable<T> items,
+        Function<T, JsonNode> serializeItem) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        for (T item : items) {
+          result.add(
+            serializeItem.apply(item));
+        }
+        return result;
       }
 
       @Override
@@ -753,20 +713,18 @@ public class Jsonization {
       ) {
         final ObjectNode result = JsonNodeFactory.instance.objectNode();
 
-        final ArrayNode arraySomeItems = JsonNodeFactory.instance.arrayNode();
-        for (IAbstractItem item : that.getSomeItems()) {
-          arraySomeItems.add(
+        final ArrayNode arraySomeItems = serializeArray(
+          that.getSomeItems(),
+          (IAbstractItem item) ->
             transform(
               item));
-        }
         result.set("someItems", arraySomeItems);
 
-        final ArrayNode arraySomeSimples = JsonNodeFactory.instance.arrayNode();
-        for (ISimple item : that.getSomeSimples()) {
-          arraySomeSimples.add(
+        final ArrayNode arraySomeSimples = serializeArray(
+          that.getSomeSimples(),
+          (ISimple item) ->
             transform(
               item));
-        }
         result.set("someSimples", arraySomeSimples);
 
         return result;

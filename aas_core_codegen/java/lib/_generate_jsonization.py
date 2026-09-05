@@ -45,17 +45,17 @@ def _generate_from_method_for_enumeration(
  *
  * @param node JSON node to be parsed
  */
-private static _Result<{name}> try{name}From(JsonNode node) {{
-{I}final _Result<String> textResult = tryStringFrom(node);
+private static Reporting.Result<{name}> try{name}From(JsonNode node) {{
+{I}final Reporting.Result<String> textResult = tryStringFrom(node);
 {I}if (textResult.isError()) {{
 {II}return textResult.castTo({name}.class);
 {I}}}
 {I}final Optional<{name}> {var_name} = Stringification.{method_name}(textResult.getResult());
 {I}if (!{var_name}.isPresent()) {{
 {II}final Reporting.Error error = new Reporting.Error({message_literal});
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}return _Result.success({var_name}.get());
+{I}return Reporting.Result.success({var_name}.get());
 }}"""
     )
 
@@ -73,16 +73,16 @@ def _generate_from_method_for_interface(
 if (node == null || !node.isObject()) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
 
 final JsonNode modelTypeNode = node.get("modelType");
 if (modelTypeNode == null) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a model type, but none is present");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
-final _Result<String> modelTypeResult = tryStringFrom(modelTypeNode);
+final Reporting.Result<String> modelTypeResult = tryStringFrom(modelTypeNode);
 if (modelTypeResult.isError()) {{
 {I}return modelTypeResult.castTo({interface_name}.class);
 }}"""
@@ -114,7 +114,7 @@ switch (modelTypeResult.getResult())
 {I}default: {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Unexpected model type for {name}: " + modelTypeResult.getResult());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 }}"""
     )
@@ -132,7 +132,7 @@ switch (modelTypeResult.getResult())
  *
  * @param node JSON node to be parsed
  */
-public static _Result<? extends {name}> try{name}From(JsonNode node) {{
+public static Reporting.Result<? extends {name}> try{name}From(JsonNode node) {{
 """
     )
 
@@ -223,7 +223,7 @@ def _generate_deserialize_constructor_argument(
 
         parse_block = Stripped(
             f"""\
-final _Result<? extends {value_type}> {target_var}Result = {parse_method}(currentNode.getValue());
+final Reporting.Result<? extends {value_type}> {target_var}Result = {parse_method}(currentNode.getValue());
 if ({target_var}Result.isError()) {{
 {I}{target_var}Result.getError()
 {II}.prependSegment(new Reporting.NameSegment("{json_name}"));
@@ -247,7 +247,6 @@ if ({target_var}Result.isError()) {{
         item_type = java_common.generate_type(type_anno.items)
 
         array_var = java_naming.variable_name(Identifier(f"array_{arg.name}"))
-        index_var = java_naming.variable_name(Identifier(f"index_{arg.name}"))
 
         cls_name = java_naming.class_name(cls.name)
 
@@ -262,42 +261,19 @@ if (!{array_var}.isArray()) {{
 {I}error.prependSegment(
 {II}new Reporting.NameSegment(
 {III}{json_literal}));
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
-{target_var} = new ArrayList<>(
-{I}{array_var}.size());
-int {index_var} = 0;
-for (JsonNode item : {array_var}) {{
-{I}if (item == null) {{
-{II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a non-null item, but got a null");
-{II}error.prependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-{II}error.prependSegment(
+final Reporting.Result<List<{item_type}>> {target_var}Result = parseArray(
+{I}{array_var},
+{I}_DeserializeImplementation::{parse_method});
+if ({target_var}Result.isError()) {{
+{I}{target_var}Result.getError()
+{II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{json_literal}));
-{II}return _Result.failure(error);
-{I}}}
-{I}final _Result<? extends {item_type}> parsedItemResult =
-{II}{parse_method}(item);
-{I}if (parsedItemResult.isError()) {{
-{II}parsedItemResult
-{III}.getError()
-{III}.prependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-{II}parsedItemResult
-{III}.getError()
-{III}.prependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{json_literal}));
-{II}return parsedItemResult.castTo({cls_name}.class);
-{I}}}
-{I}{target_var}.add(
-{II}parsedItemResult.getResult());
-{I}{index_var}++;
-}}"""
+{I}return {target_var}Result.castTo({cls_name}.class);
+}}
+{target_var} = {target_var}Result.getResult();"""
         )
     else:
         assert_never(arg.type_annotation)
@@ -320,7 +296,7 @@ def _generate_from_method_for_class(
 if (node == null || !node.isObject()) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -388,9 +364,9 @@ case "modelType": {{
 {I}if (currentNode.getValue() == null) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a model type, but got null");
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}final _Result<? extends String> modelTypeResult =
+{I}final Reporting.Result<? extends String> modelTypeResult =
 {II}_DeserializeImplementation.tryStringFrom(currentNode.getValue());
 {I}if (modelTypeResult.isError()) {{
 {II}modelTypeResult.getError()
@@ -404,7 +380,7 @@ case "modelType": {{
 {III}"Expected the model type '{model_type}', " +
 {III}"but got '" + modelType + "'");
 {III}error.prependSegment(new Reporting.NameSegment("modelType"));
-{III}return _Result.failure(error);
+{III}return Reporting.Result.failure(error);
 {I}}}
 {I}break;
 }}"""
@@ -417,7 +393,7 @@ case "modelType": {{
 default: {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Unexpected property: " + currentNode.getKey());
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
         )
     )
@@ -450,7 +426,7 @@ for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.ha
 if (modelType == null) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Required property \\"modelType\\" is missing");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
             )
         )
@@ -472,7 +448,7 @@ if (modelType == null) {{
 if ({arg_var} == null) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Required property \\\"{json_name}\\\" is missing");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
         )
 
@@ -497,10 +473,10 @@ if ({arg_var} == null) {{
     # fmt: on
 
     if len(cls.constructor.arguments) == 0:
-        blocks.append(Stripped(f"return _Result.success(new {name}());"))
+        blocks.append(Stripped(f"return Reporting.Result.success(new {name}());"))
     else:
         init_writer = io.StringIO()
-        init_writer.write(f"return _Result.success(new {name}(\n")
+        init_writer.write(f"return Reporting.Result.success(new {name}(\n")
 
         for i, arg in enumerate(cls.constructor.arguments):
             prop = cls.properties_by_name[arg.name]
@@ -561,7 +537,7 @@ if ({arg_var} == null) {{
  * @param node JSON node to be parsed
  * @param elem Error, if any, during the deserialization
  */
-private static _Result<{name}> try{name}From(JsonNode node) {{
+private static Reporting.Result<{name}> try{name}From(JsonNode node) {{
 """
     )
 
@@ -588,13 +564,13 @@ def _generate_deserialize_impl(
 /** Convert {{@code value}} to a string.
  * @param node JSON node to be parsed
  */
-private static _Result<String> tryStringFrom(JsonNode value) {{
+private static Reporting.Result<String> tryStringFrom(JsonNode value) {{
 {I}if (!value.isTextual()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of String, but got " + value.getNodeType());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}return _Result.success(value.asText());
+{I}return Reporting.Result.success(value.asText());
 }}"""
         ),
         Stripped(
@@ -602,13 +578,13 @@ private static _Result<String> tryStringFrom(JsonNode value) {{
 /** Convert {{@code value}} to a boolean.
  * @param node JSON node to be parsed
  */
-private static _Result<Boolean> tryBooleanFrom(JsonNode value) {{
+private static Reporting.Result<Boolean> tryBooleanFrom(JsonNode value) {{
 {I}if (!value.isBoolean()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of Boolean, but got " + value.getNodeType());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}return _Result.success(value.asBoolean());
+{I}return Reporting.Result.success(value.asBoolean());
 }}"""
         ),
         Stripped(
@@ -616,13 +592,13 @@ private static _Result<Boolean> tryBooleanFrom(JsonNode value) {{
 /** Convert {{@code value}} to a long 64-bit integer.
  * @param node JSON node to be parsed
  */
-private static _Result<Long> tryLongFrom(JsonNode value) {{
+private static Reporting.Result<Long> tryLongFrom(JsonNode value) {{
 {I}if (!value.isIntegralNumber()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of Long, but got " + value.getNodeType());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}return _Result.success(value.asLong());
+{I}return Reporting.Result.success(value.asLong());
 }}"""
         ),
         Stripped(
@@ -630,22 +606,22 @@ private static _Result<Long> tryLongFrom(JsonNode value) {{
 /** Convert {{@code value}} to a double-precision 64-bit float.
  * @param node JSON node to be parsed
  */
-private static _Result<Double> tryDoubleFrom(JsonNode value) {{
+private static Reporting.Result<Double> tryDoubleFrom(JsonNode value) {{
 {I}if (!value.isFloatingPointNumber()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of Double, but got " + value.getNodeType());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}return _Result.success(value.asDouble());
+{I}return Reporting.Result.success(value.asDouble());
 }}"""
         ),
         Stripped(
             f"""\
-private static _Result<byte[]> tryBytesFrom(JsonNode value) {{
+private static Reporting.Result<byte[]> tryBytesFrom(JsonNode value) {{
 {I}if (!value.isTextual()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of String, but got " + value.getNodeType());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 {I}final byte[] decodedData;
 {I}Base64.Decoder decoder = Base64.getDecoder();
@@ -656,10 +632,47 @@ private static _Result<byte[]> tryBytesFrom(JsonNode value) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected Base-64 encoded bytes, but the conversion failed " +
 {IIII}"because: " + exception.getMessage());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
-{I}return _Result.success(decodedData);
+{I}return Reporting.Result.success(decodedData);
+}}"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Parse every item of {{@code array}} with {{@code parseItem}}.
+ *
+ * @param array JSON array to be parsed
+ * @param parseItem to parse a single item of the array
+ */
+private static <T> Reporting.Result<List<T>> parseArray(
+{I}JsonNode array,
+{I}Function<JsonNode, Reporting.Result<? extends T>> parseItem) {{
+{I}final List<T> result = new ArrayList<>(array.size());
+{I}int index = 0;
+{I}for (JsonNode item : array) {{
+{II}if (item == null) {{
+{III}final Reporting.Error error = new Reporting.Error(
+{IIII}"Expected a non-null item, but got a null");
+{III}error.prependSegment(
+{IIII}new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(error);
+{II}}}
+
+{II}final Reporting.Result<? extends T> parsedItemResult = parseItem.apply(item);
+{II}if (parsedItemResult.isError()) {{
+{III}parsedItemResult.getError()
+{IIII}.prependSegment(
+{IIII}new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(parsedItemResult.getError());
+{II}}}
+
+{II}result.add(parsedItemResult.getResult());
+{II}index++;
+{I}}}
+
+{I}return Reporting.Result.success(result);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -760,7 +773,7 @@ def _generate_deserialize_from(name: str) -> Stripped:
     writer.write(
         f"""\
 public static {name} deserialize{name}(JsonNode node) {{
-{I}final _Result<? extends {name}> result =
+{I}final Reporting.Result<? extends {name}> result =
 {II}_DeserializeImplementation.try{name}From(
 {III}node);
 
@@ -904,9 +917,8 @@ _Transformer.toJsonNode(
         # We can not use textwrap due to indent_but_first_line.
         return Stripped(
             f"""\
-JsonNodeFactory.instance.textNode(
-{II}Base64.getEncoder()
-{III}.encodeToString({indent_but_first_line(source_expr, II)}))"""
+_Transformer.bytesToJsonNode(
+{I}{indent_but_first_line(source_expr, I)})"""
         )
     else:
         assert_never(primitive_type)
@@ -1016,11 +1028,10 @@ def _generate_transform_property(
         stmts.append(
             Stripped(
                 f"""\
-final ArrayNode {array_var} = JsonNodeFactory.instance.arrayNode();
-for ({item_type} item : {source_expr}) {{
-{I}{array_var}.add(
+final ArrayNode {array_var} = serializeArray(
+{I}{source_expr},
+{I}({item_type} item) ->
 {II}{indent_but_first_line(item_conversion_expr, II)});
-}}
 result.set({prop_literal}, {array_var});"""
             )
         )
@@ -1120,6 +1131,38 @@ private static JsonNode toJsonNode(Long that) {{
 {I}return JsonNodeFactory.instance.numberNode(that);
 }}"""
         ),
+        Stripped(
+            f"""\
+/**
+ * Convert {{@code that}} byte array to a JSON value.
+ *
+ * @param that value to be converted
+ */
+private static JsonNode bytesToJsonNode(byte[] that) {{
+{I}return JsonNodeFactory.instance.textNode(
+{II}Base64.getEncoder().encodeToString(that));
+}}"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Serialize every item of {{@code items}} with {{@code serializeItem}} into
+ * a JSON array.
+ *
+ * @param items to be serialized
+ * @param serializeItem to serialize a single item of {{@code items}}
+ */
+private static <T> ArrayNode serializeArray(
+{I}Iterable<T> items,
+{I}Function<T, JsonNode> serializeItem) {{
+{I}final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+{I}for (T item : items) {{
+{II}result.add(
+{III}serializeItem.apply(item));
+{I}}}
+{I}return result;
+}}"""
+        ),
     ]  # type: List[Stripped]
 
     for our_type in symbol_table.our_types:
@@ -1210,12 +1253,7 @@ public static JsonNode toJsonObject(IClass that) {{
  * Serialize a literal of {name} into a JSON string.
  */
 public static JsonNode {method_name}({name} that) {{
-{I}Optional<String> text = Stringification.toString(that);
-{I}if (!text.isPresent()) {{
-{II}throw new IllegalArgumentException("Invalid {name}: " + that);
-{I}}}
-
-{I}return JsonNodeFactory.instance.textNode(text.get());
+{I}return JsonNodeFactory.instance.textNode(Stringification.mustToString(that));
 }}"""
             )
         )
@@ -1355,70 +1393,9 @@ def generate(
 {I}}}"""
     )
 
-    result_block = Stripped(
-        f"""\
-private static class _Result<T> {{
-{I}private final T result;
-{I}private final Reporting.Error error;
-{I}private final boolean success;
-
-{I}private _Result(T result, Reporting.Error error, boolean success) {{
-{II}this.result = result;
-{II}this.error = error;
-{II}this.success = success;
-{I}}}
-
-{I}public static <T> _Result<T> success(T result) {{
-{II}if (result == null) throw new IllegalArgumentException("Result must not be null.");
-{II}return new _Result<>(result, null, true);
-{I}}}
-
-{I}public static <T> _Result<T> failure(Reporting.Error error) {{
-{II}if (error == null) throw new IllegalArgumentException("Error must not be null.");
-{II}return new _Result<>(null, error, false);
-{I}}}
-
-{I}@SuppressWarnings("unchecked")
-{I}public <I> _Result<I> castTo(Class<I> type) {{
-{II}if (isError() || type.isInstance(result)) return (_Result<I>) this;
-{II}throw new IllegalStateException("Result of type "
-{III}+ result.getClass().getName()
-{III}+ " is not an instance of "
-{III}+ type.getName());
-{I}}}
-
-{I}public T getResult() {{
-{II}if (!isSuccess()) throw new IllegalStateException("Result is not present.");
-{II}return result;
-{I}}}
-
-{I}public boolean isSuccess() {{
-{II}return success;
-{I}}}
-
-{I}public boolean isError() {{
-{II}return !success;
-{I}}}
-
-{I}public Reporting.Error getError() {{
-{II}if (isSuccess()) throw new IllegalStateException("Result is present.");
-{II}return error;
-{I}}}
-
-{I}public <R> R map(Function<T, R> successFunction, Function<Reporting.Error, R> errorFunction) {{
-{II}return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
-{I}}}
-
-{I}public T onError(Function<Reporting.Error, T> errorFunction) {{
-{II}return map(Function.identity(), errorFunction);
-{I}}}
-}}"""
-    )
-
     jsonization_blocks = [
         deserialize_impl_block,
         exception_block,
-        result_block,
         deserialize_block,
         transformer_block,
         serialize_block,

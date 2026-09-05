@@ -37,6 +37,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(resultToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(Result that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of Result: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, Result> resultFromString;
   static {
     final Map<String, Result> temp = new HashMap<>();
