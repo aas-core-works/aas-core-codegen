@@ -200,6 +200,132 @@ namespace dummy
             }
 
             /// <summary>
+            /// Read a single array item.
+            /// </summary>
+            /// <typeparam name="T">Type of the parsed item</typeparam>
+            private delegate T? JsonClassItemDeserializer<T>(
+                Nodes.JsonNode node,
+                out Reporting.Error? error
+                ) where T : class;
+
+            /// <summary>
+            /// Parse every item of <paramref name="array" /> with
+            /// <paramref name="deserializeItem" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed constructor arguments whose items are
+            /// de-serialized into a reference type (<em>e.g.</em>, a string, a byte array
+            /// or a class instance).
+            /// </remarks>
+            /// <typeparam name="T">Type of a single array item</typeparam>
+            private static List<T> ParseArrayOfClass<T>(
+                Nodes.JsonArray array,
+                JsonClassItemDeserializer<T> deserializeItem,
+                out Reporting.Error? error
+                ) where T : class
+            {
+                error = null;
+                List<T> result = new List<T>(array.Count);
+
+                int index = 0;
+                foreach (Nodes.JsonNode? item in array)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    T? parsedItem = deserializeItem(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+
+                    index++;
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Read a single array item.
+            /// </summary>
+            /// <typeparam name="T">Type of the parsed item</typeparam>
+            private delegate T? JsonStructItemDeserializer<T>(
+                Nodes.JsonNode node,
+                out Reporting.Error? error
+                ) where T : struct;
+
+            /// <summary>
+            /// Parse every item of <paramref name="array" /> with
+            /// <paramref name="deserializeItem" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed constructor arguments whose items are
+            /// de-serialized into a value type (<em>e.g.</em>, a bool, a number or
+            /// an enumeration literal).
+            /// </remarks>
+            /// <typeparam name="T">Type of a single array item</typeparam>
+            private static List<T> ParseArrayOfStruct<T>(
+                Nodes.JsonArray array,
+                JsonStructItemDeserializer<T> deserializeItem,
+                out Reporting.Error? error
+                ) where T : struct
+            {
+                error = null;
+                List<T> result = new List<T>(array.Count);
+
+                int index = 0;
+                foreach (Nodes.JsonNode? item in array)
+                {
+                    if (item == null)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a non-null item, but got a null");
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    T? parsedItem = deserializeItem(
+                        item ?? throw new System.InvalidOperationException(),
+                        out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                index));
+                        return result;
+                    }
+
+                    result.Add(
+                        parsedItem
+                            ?? throw new System.InvalidOperationException(
+                                "Unexpected result null when error is null"));
+
+                    index++;
+                }
+
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -250,41 +376,16 @@ namespace dummy
                                         "someBools"));
                                 return null;
                             }
-                            theSomeBools = new List<bool>(
-                                arraySomeBools.Count);
-                            int indexSomeBools = 0;
-                            foreach (Nodes.JsonNode? item in arraySomeBools)
+                            theSomeBools = ParseArrayOfStruct<bool>(
+                                arraySomeBools,
+                                DeserializeImplementation.BoolFrom,
+                                out error);
+                            if (error != null)
                             {
-                                if (item == null)
-                                {
-                                    error = new Reporting.Error(
-                                        "Expected a non-null item, but got a null");
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeBools));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someBools"));
-                                    return null;
-                                }
-                                bool? parsedItem = DeserializeImplementation.BoolFrom(
-                                    item ?? throw new System.InvalidOperationException(),
-                                    out error);
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeBools));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someBools"));
-                                    return null;
-                                }
-                                theSomeBools.Add(
-                                    parsedItem
-                                        ?? throw new System.InvalidOperationException(
-                                            "Unexpected result null when error is null"));
-                                indexSomeBools++;
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "someBools"));
+                                return null;
                             }
                             break;
                         }
@@ -310,41 +411,16 @@ namespace dummy
                                         "someInts"));
                                 return null;
                             }
-                            theSomeInts = new List<long>(
-                                arraySomeInts.Count);
-                            int indexSomeInts = 0;
-                            foreach (Nodes.JsonNode? item in arraySomeInts)
+                            theSomeInts = ParseArrayOfStruct<long>(
+                                arraySomeInts,
+                                DeserializeImplementation.LongFrom,
+                                out error);
+                            if (error != null)
                             {
-                                if (item == null)
-                                {
-                                    error = new Reporting.Error(
-                                        "Expected a non-null item, but got a null");
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeInts));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someInts"));
-                                    return null;
-                                }
-                                long? parsedItem = DeserializeImplementation.LongFrom(
-                                    item ?? throw new System.InvalidOperationException(),
-                                    out error);
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeInts));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someInts"));
-                                    return null;
-                                }
-                                theSomeInts.Add(
-                                    parsedItem
-                                        ?? throw new System.InvalidOperationException(
-                                            "Unexpected result null when error is null"));
-                                indexSomeInts++;
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "someInts"));
+                                return null;
                             }
                             break;
                         }
@@ -370,41 +446,16 @@ namespace dummy
                                         "someFloats"));
                                 return null;
                             }
-                            theSomeFloats = new List<double>(
-                                arraySomeFloats.Count);
-                            int indexSomeFloats = 0;
-                            foreach (Nodes.JsonNode? item in arraySomeFloats)
+                            theSomeFloats = ParseArrayOfStruct<double>(
+                                arraySomeFloats,
+                                DeserializeImplementation.DoubleFrom,
+                                out error);
+                            if (error != null)
                             {
-                                if (item == null)
-                                {
-                                    error = new Reporting.Error(
-                                        "Expected a non-null item, but got a null");
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeFloats));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someFloats"));
-                                    return null;
-                                }
-                                double? parsedItem = DeserializeImplementation.DoubleFrom(
-                                    item ?? throw new System.InvalidOperationException(),
-                                    out error);
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeFloats));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someFloats"));
-                                    return null;
-                                }
-                                theSomeFloats.Add(
-                                    parsedItem
-                                        ?? throw new System.InvalidOperationException(
-                                            "Unexpected result null when error is null"));
-                                indexSomeFloats++;
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "someFloats"));
+                                return null;
                             }
                             break;
                         }
@@ -430,41 +481,16 @@ namespace dummy
                                         "someStrings"));
                                 return null;
                             }
-                            theSomeStrings = new List<string>(
-                                arraySomeStrings.Count);
-                            int indexSomeStrings = 0;
-                            foreach (Nodes.JsonNode? item in arraySomeStrings)
+                            theSomeStrings = ParseArrayOfClass<string>(
+                                arraySomeStrings,
+                                DeserializeImplementation.StringFrom,
+                                out error);
+                            if (error != null)
                             {
-                                if (item == null)
-                                {
-                                    error = new Reporting.Error(
-                                        "Expected a non-null item, but got a null");
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeStrings));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someStrings"));
-                                    return null;
-                                }
-                                string? parsedItem = DeserializeImplementation.StringFrom(
-                                    item ?? throw new System.InvalidOperationException(),
-                                    out error);
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeStrings));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someStrings"));
-                                    return null;
-                                }
-                                theSomeStrings.Add(
-                                    parsedItem
-                                        ?? throw new System.InvalidOperationException(
-                                            "Unexpected result null when error is null"));
-                                indexSomeStrings++;
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "someStrings"));
+                                return null;
                             }
                             break;
                         }
@@ -490,41 +516,16 @@ namespace dummy
                                         "someBytes"));
                                 return null;
                             }
-                            theSomeBytes = new List<byte[]>(
-                                arraySomeBytes.Count);
-                            int indexSomeBytes = 0;
-                            foreach (Nodes.JsonNode? item in arraySomeBytes)
+                            theSomeBytes = ParseArrayOfClass<byte[]>(
+                                arraySomeBytes,
+                                DeserializeImplementation.BytesFrom,
+                                out error);
+                            if (error != null)
                             {
-                                if (item == null)
-                                {
-                                    error = new Reporting.Error(
-                                        "Expected a non-null item, but got a null");
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeBytes));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someBytes"));
-                                    return null;
-                                }
-                                byte[]? parsedItem = DeserializeImplementation.BytesFrom(
-                                    item ?? throw new System.InvalidOperationException(),
-                                    out error);
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexSomeBytes));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "someBytes"));
-                                    return null;
-                                }
-                                theSomeBytes.Add(
-                                    parsedItem
-                                        ?? throw new System.InvalidOperationException(
-                                            "Unexpected result null when error is null"));
-                                indexSomeBytes++;
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "someBytes"));
+                                return null;
                             }
                             break;
                         }
@@ -667,56 +668,67 @@ namespace dummy
                 return Nodes.JsonValue.Create(that);
             }
 
+            /// <summary>
+            /// Serialize every item of <paramref name="items" /> with
+            /// <paramref name="serializeItem" /> into a JSON array.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the list-typed properties.
+            /// </remarks>
+            /// <typeparam name="T">Type of a single list item</typeparam>
+            private static Nodes.JsonArray SerializeArray<T>(
+                IEnumerable<T> items,
+                System.Func<T, Nodes.JsonNode?> serializeItem)
+            {
+                var result = new Nodes.JsonArray();
+                foreach (T item in items)
+                {
+                    result.Add(
+                        serializeItem(item));
+                }
+                return result;
+            }
+
             public override Nodes.JsonObject TransformSomething(
                 Aas.ISomething that
             )
             {
                 var result = new Nodes.JsonObject();
 
-                var arraySomeBools = new Nodes.JsonArray();
-                foreach (bool item in that.SomeBools)
-                {
-                    arraySomeBools.Add(
+                Nodes.JsonArray arraySomeBools = SerializeArray(
+                    that.SomeBools,
+                    (bool item) =>
                         Nodes.JsonValue.Create(
                             item));
-                }
                 result["someBools"] = arraySomeBools;
 
-                var arraySomeInts = new Nodes.JsonArray();
-                foreach (long item in that.SomeInts)
-                {
-                    arraySomeInts.Add(
+                Nodes.JsonArray arraySomeInts = SerializeArray(
+                    that.SomeInts,
+                    (long item) =>
                         Transformer.ToJsonValue(
                             item));
-                }
                 result["someInts"] = arraySomeInts;
 
-                var arraySomeFloats = new Nodes.JsonArray();
-                foreach (double item in that.SomeFloats)
-                {
-                    arraySomeFloats.Add(
+                Nodes.JsonArray arraySomeFloats = SerializeArray(
+                    that.SomeFloats,
+                    (double item) =>
                         Nodes.JsonValue.Create(
                             item));
-                }
                 result["someFloats"] = arraySomeFloats;
 
-                var arraySomeStrings = new Nodes.JsonArray();
-                foreach (string item in that.SomeStrings)
-                {
-                    arraySomeStrings.Add(
+                Nodes.JsonArray arraySomeStrings = SerializeArray(
+                    that.SomeStrings,
+                    (string item) =>
                         Nodes.JsonValue.Create(
                             item));
-                }
                 result["someStrings"] = arraySomeStrings;
 
-                var arraySomeBytes = new Nodes.JsonArray();
-                foreach (byte[] item in that.SomeBytes)
-                {
-                    arraySomeBytes.Add(
+                Nodes.JsonArray arraySomeBytes = SerializeArray(
+                    that.SomeBytes,
+                    (byte[] item) =>
                         Nodes.JsonValue.Create(
                             System.Convert.ToBase64String(
                                 item)));
-                }
                 result["someBytes"] = arraySomeBytes;
 
                 return result;

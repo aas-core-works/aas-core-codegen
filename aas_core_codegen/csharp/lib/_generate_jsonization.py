@@ -226,6 +226,144 @@ def _parse_method_for_atomic_value(
     return Stripped(parse_method)
 
 
+def _generate_parse_array_of_class_helper() -> Stripped:
+    """Generate the generic helper to de-serialize an array of reference-type items."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read a single array item.
+/// </summary>
+/// <typeparam name="T">Type of the parsed item</typeparam>
+private delegate T? JsonClassItemDeserializer<T>(
+{I}Nodes.JsonNode node,
+{I}out Reporting.Error? error
+{I}) where T : class;
+
+/// <summary>
+/// Parse every item of <paramref name="array" /> with
+/// <paramref name="deserializeItem" />.
+/// </summary>
+/// <remarks>
+/// This is shared by all the list-typed constructor arguments whose items are
+/// de-serialized into a reference type (<em>e.g.</em>, a string, a byte array
+/// or a class instance).
+/// </remarks>
+/// <typeparam name="T">Type of a single array item</typeparam>
+private static List<T> ParseArrayOfClass<T>(
+{I}Nodes.JsonArray array,
+{I}JsonClassItemDeserializer<T> deserializeItem,
+{I}out Reporting.Error? error
+{I}) where T : class
+{{
+{I}error = null;
+{I}List<T> result = new List<T>(array.Count);
+
+{I}int index = 0;
+{I}foreach (Nodes.JsonNode? item in array)
+{I}{{
+{II}if (item == null)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected a non-null item, but got a null");
+{III}error.PrependSegment(
+{IIII}new Reporting.IndexSegment(
+{IIIII}index));
+{III}return result;
+{II}}}
+
+{II}T? parsedItem = deserializeItem(
+{III}item ?? throw new System.InvalidOperationException(),
+{III}out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.IndexSegment(
+{IIIII}index));
+{III}return result;
+{II}}}
+
+{II}result.Add(
+{III}parsedItem
+{IIII}?? throw new System.InvalidOperationException(
+{IIIII}"Unexpected result null when error is null"));
+
+{II}index++;
+{I}}}
+
+{I}return result;
+}}"""
+    )
+
+
+def _generate_parse_array_of_struct_helper() -> Stripped:
+    """Generate the generic helper to de-serialize an array of value-type items."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Read a single array item.
+/// </summary>
+/// <typeparam name="T">Type of the parsed item</typeparam>
+private delegate T? JsonStructItemDeserializer<T>(
+{I}Nodes.JsonNode node,
+{I}out Reporting.Error? error
+{I}) where T : struct;
+
+/// <summary>
+/// Parse every item of <paramref name="array" /> with
+/// <paramref name="deserializeItem" />.
+/// </summary>
+/// <remarks>
+/// This is shared by all the list-typed constructor arguments whose items are
+/// de-serialized into a value type (<em>e.g.</em>, a bool, a number or
+/// an enumeration literal).
+/// </remarks>
+/// <typeparam name="T">Type of a single array item</typeparam>
+private static List<T> ParseArrayOfStruct<T>(
+{I}Nodes.JsonArray array,
+{I}JsonStructItemDeserializer<T> deserializeItem,
+{I}out Reporting.Error? error
+{I}) where T : struct
+{{
+{I}error = null;
+{I}List<T> result = new List<T>(array.Count);
+
+{I}int index = 0;
+{I}foreach (Nodes.JsonNode? item in array)
+{I}{{
+{II}if (item == null)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected a non-null item, but got a null");
+{III}error.PrependSegment(
+{IIII}new Reporting.IndexSegment(
+{IIIII}index));
+{III}return result;
+{II}}}
+
+{II}T? parsedItem = deserializeItem(
+{III}item ?? throw new System.InvalidOperationException(),
+{III}out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.IndexSegment(
+{IIIII}index));
+{III}return result;
+{II}}}
+
+{II}result.Add(
+{III}parsedItem
+{IIII}?? throw new System.InvalidOperationException(
+{IIIII}"Unexpected result null when error is null"));
+
+{II}index++;
+{I}}}
+
+{I}return result;
+}}"""
+    )
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_deserialize_constructor_argument(
     arg: intermediate.Argument,
@@ -281,9 +419,24 @@ if ({target_var} == null)
         item_type = csharp_common.generate_type(type_anno.items)
 
         array_var = csharp_naming.variable_name(Identifier(f"array_{arg.name}"))
-        index_var = csharp_naming.variable_name(Identifier(f"index_{arg.name}"))
 
         parse_method = _parse_method_for_atomic_value(type_anno.items)
+
+        primitive_type = intermediate.try_primitive_type(type_anno.items)
+        if primitive_type is not None:
+            is_value_type = primitive_type in (
+                intermediate.PrimitiveType.BOOL,
+                intermediate.PrimitiveType.INT,
+                intermediate.PrimitiveType.FLOAT,
+            )
+        else:
+            is_value_type = isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(type_anno.items.our_type, intermediate.Enumeration)
+
+        parse_array_function = (
+            "ParseArrayOfStruct" if is_value_type else "ParseArrayOfClass"
+        )
 
         parse_block = Stripped(
             f"""\
@@ -297,41 +450,16 @@ if ({array_var} == null)
 {III}{json_literal}));
 {I}return null;
 }}
-{target_var} = new List<{item_type}>(
-{I}{array_var}.Count);
-int {index_var} = 0;
-foreach (Nodes.JsonNode? item in {array_var})
+{target_var} = {parse_array_function}<{item_type}>(
+{I}{array_var},
+{I}{parse_method},
+{I}out error);
+if (error != null)
 {{
-{I}if (item == null)
-{I}{{
-{II}error = new Reporting.Error(
-{III}"Expected a non-null item, but got a null");
-{II}error.PrependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-{II}error.PrependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{json_literal}));
-{II}return null;
-{I}}}
-{I}{item_type}? parsedItem = {parse_method}(
-{II}item ?? throw new System.InvalidOperationException(),
-{II}out error);
-{I}if (error != null)
-{I}{{
-{II}error.PrependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-{II}error.PrependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{json_literal}));
-{II}return null;
-{I}}}
-{I}{target_var}.Add(
-{II}parsedItem
-{III}?? throw new System.InvalidOperationException(
-{IIII}"Unexpected result null when error is null"));
-{I}{index_var}++;
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{json_literal}));
+{I}return null;
 }}"""
         )
     else:
@@ -849,6 +977,8 @@ internal static byte[]? BytesFrom(
 {I}}}
 }}"""
         ),
+        _generate_parse_array_of_class_helper(),
+        _generate_parse_array_of_struct_helper(),
     ]  # type: List[Stripped]
 
     for our_type in symbol_table.our_types:
@@ -1200,12 +1330,10 @@ def _generate_transform_property(
         stmts.append(
             Stripped(
                 f"""\
-var {array_var} = new Nodes.JsonArray();
-foreach ({item_type} item in {source_expr})
-{{
-{I}{array_var}.Add(
+Nodes.JsonArray {array_var} = SerializeArray(
+{I}{source_expr},
+{I}({item_type} item) =>
 {II}{indent_but_first_line(item_conversion_expr, II)});
-}}
 result[{prop_literal}] = {array_var};"""
             )
         )
@@ -1336,6 +1464,29 @@ private static Nodes.JsonValue ToJsonValue(long that)
 {III}$"The number can not be losslessly represented in JSON: {{that}}");
 {I}}}
 {I}return Nodes.JsonValue.Create(that);
+}}"""
+        ),
+        Stripped(
+            f"""\
+/// <summary>
+/// Serialize every item of <paramref name="items" /> with
+/// <paramref name="serializeItem" /> into a JSON array.
+/// </summary>
+/// <remarks>
+/// This is shared by all the list-typed properties.
+/// </remarks>
+/// <typeparam name="T">Type of a single list item</typeparam>
+private static Nodes.JsonArray SerializeArray<T>(
+{I}IEnumerable<T> items,
+{I}System.Func<T, Nodes.JsonNode?> serializeItem)
+{{
+{I}var result = new Nodes.JsonArray();
+{I}foreach (T item in items)
+{I}{{
+{II}result.Add(
+{III}serializeItem(item));
+{I}}}
+{I}return result;
 }}"""
         ),
     ]  # type: List[Stripped]
