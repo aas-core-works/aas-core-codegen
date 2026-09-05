@@ -824,6 +824,34 @@ namespace dummy
         internal class VisitorWithWriter
             : Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
         {
+            /// <summary>
+            /// Write the content of a property, positioned between its start and end tag.
+            /// </summary>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private delegate void ElementContentSerializer<T>(
+                T that, Xml.XmlWriter writer);
+
+            /// <summary>
+            /// Serialize <paramref name="that" /> as an XML element with
+            /// the given <paramref name="name" />, delegating the content in-between the
+            /// start and the end tag to <paramref name="serializeContent" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the property kinds (primitive, enumeration, class,
+            /// interface, list) as they all wrap their content in exactly the same way.
+            /// </remarks>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private static void SerializeElement<T>(
+                string name,
+                T that,
+                Xml.XmlWriter writer,
+                ElementContentSerializer<T> serializeContent)
+            {
+                writer.WriteStartElement(name, NS);
+                serializeContent(that, writer);
+                writer.WriteEndElement();
+            }
+
             [CodeAnalysis.SuppressMessage("ReSharper", "UnusedParameter.Local")]
             private void SomethingToSequence(
                 Aas.ISomething that,

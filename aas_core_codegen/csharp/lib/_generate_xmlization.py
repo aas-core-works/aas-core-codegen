@@ -1888,6 +1888,40 @@ public static class Deserialize
     return Stripped(writer.getvalue())
 
 
+def _generate_serialize_element_helper() -> Stripped:
+    """Generate the generic helper to write a property as a named XML element."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Write the content of a property, positioned between its start and end tag.
+/// </summary>
+/// <typeparam name="T">Type of the property value</typeparam>
+private delegate void ElementContentSerializer<T>(
+{I}T that, Xml.XmlWriter writer);
+
+/// <summary>
+/// Serialize <paramref name="that" /> as an XML element with
+/// the given <paramref name="name" />, delegating the content in-between the
+/// start and the end tag to <paramref name="serializeContent" />.
+/// </summary>
+/// <remarks>
+/// This is shared by all the property kinds (primitive, enumeration, class,
+/// interface, list) as they all wrap their content in exactly the same way.
+/// </remarks>
+/// <typeparam name="T">Type of the property value</typeparam>
+private static void SerializeElement<T>(
+{I}string name,
+{I}T that,
+{I}Xml.XmlWriter writer,
+{I}ElementContentSerializer<T> serializeContent)
+{{
+{I}writer.WriteStartElement(name, NS);
+{I}serializeContent(that, writer);
+{I}writer.WriteEndElement();
+}}"""
+    )
+
+
 def _generate_serialize_primitive_property_as_content(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -1902,7 +1936,7 @@ def _generate_serialize_primitive_property_as_content(
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
-    write_value_block: Stripped
+    content_serializer: Stripped
 
     if (
         a_type is intermediate.PrimitiveType.BOOL
@@ -1910,34 +1944,13 @@ def _generate_serialize_primitive_property_as_content(
         or a_type is intermediate.PrimitiveType.FLOAT
         or a_type is intermediate.PrimitiveType.STR
     ):
-        write_value_block = Stripped(
-            f"""\
-writer.WriteValue(
-{I}that.{prop_name});"""
-        )
+        content_serializer = Stripped("(value, w) => w.WriteValue(value)")
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
-        write_value_block = Stripped(
-            f"""\
-writer.WriteBase64(
-{I}that.{prop_name},
-{I}0,
-{I}that.{prop_name}.Length);"""
+        content_serializer = Stripped(
+            "(value, w) => w.WriteBase64(value, 0, value.Length)"
         )
     else:
         assert_never(a_type)
-
-    # NOTE (mristin, 2022-06-21):
-    # Wrap the write_value_block with property even if we discard it below
-    write_value_block = Stripped(
-        f"""\
-writer.WriteStartElement(
-{I}{xml_prop_name_literal},
-{I}NS);
-
-{write_value_block}
-
-writer.WriteEndElement();"""
-    )
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         if a_type in (
@@ -1945,30 +1958,38 @@ writer.WriteEndElement();"""
             intermediate.PrimitiveType.INT,
             intermediate.PrimitiveType.FLOAT,
         ):
-            write_value_block = Stripped(
+            return Stripped(
                 f"""\
 if (that.{prop_name}.HasValue)
 {{
-{I}writer.WriteStartElement(
+{I}SerializeElement(
 {II}{xml_prop_name_literal},
-{II}NS);
-
-{I}writer.WriteValue(
-{II}that.{prop_name}.Value);
-
-{I}writer.WriteEndElement();
+{II}that.{prop_name}.Value,
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
             )
         else:
-            write_value_block = Stripped(
+            return Stripped(
                 f"""\
 if (that.{prop_name} != null)
 {{
-{I}{indent_but_first_line(write_value_block, I)}
+{I}SerializeElement(
+{II}{xml_prop_name_literal},
+{II}that.{prop_name},
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
             )
 
-    return write_value_block
+    return Stripped(
+        f"""\
+SerializeElement(
+{I}{xml_prop_name_literal},
+{I}that.{prop_name},
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
+    )
 
 
 def _generate_serialize_enumeration_property_as_content(
@@ -1987,34 +2008,38 @@ def _generate_serialize_enumeration_property_as_content(
 
     enum_name = csharp_naming.enum_name(enumeration.name)
 
-    text_var = csharp_naming.variable_name(Identifier(f"text_{prop.name}"))
-    write_value_block = Stripped(
+    content_serializer = Stripped(
         f"""\
-writer.WriteStartElement(
+(value, w) =>
+{{
+{I}string? text = Stringification.ToString(value);
+{I}w.WriteValue(
+{II}text
+{III}?? throw new System.ArgumentException(
+{IIII}"Invalid literal for the enumeration {enum_name}: " +
+{IIII}value.ToString()));
+}}"""
+    )
+
+    result = Stripped(
+        f"""\
+SerializeElement(
 {I}{xml_prop_name_literal},
-{I}NS);
-
-string? {text_var} = Stringification.ToString(
-{I}that.{prop_name});
-writer.WriteValue(
-{I}{text_var}
-{II}?? throw new System.ArgumentException(
-{III}"Invalid literal for the enumeration {enum_name}: " +
-{III}that.{prop_name}.ToString()));
-
-writer.WriteEndElement();"""
+{I}that.{prop_name},
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        write_value_block = Stripped(
+        result = Stripped(
             f"""\
 if (that.{prop_name} != null)
 {{
-{I}{indent_but_first_line(write_value_block, I)}
+{I}{indent_but_first_line(result, I)}
 }}"""
         )
 
-    return write_value_block
+    return result
 
 
 def _generate_serialize_interface_property_as_content(
@@ -2039,17 +2064,15 @@ def _generate_serialize_interface_property_as_content(
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
+    content_serializer = Stripped("(value, w) => this.Visit(value, w)")
+
     result = Stripped(
         f"""\
-writer.WriteStartElement(
+SerializeElement(
 {I}{xml_prop_name_literal},
-{I}NS);
-
-this.Visit(
 {I}that.{prop_name},
-{I}writer);
-
-writer.WriteEndElement();"""
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -2079,17 +2102,15 @@ def _generate_serialize_concrete_class_property_as_sequence(
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
+    content_serializer = Stripped(f"(value, w) => this.{cls_to_sequence}(value, w)")
+
     result = Stripped(
         f"""\
-writer.WriteStartElement(
+SerializeElement(
 {I}{xml_prop_name_literal},
-{I}NS);
-
-this.{cls_to_sequence}(
 {I}that.{prop_name},
-{I}writer);
-
-writer.WriteEndElement();"""
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -2113,7 +2134,7 @@ def _generate_serialize_list_property_as_content(
 
     primitive_type = intermediate.try_primitive_type(type_anno.items)
 
-    body: Stripped
+    item_write_block: Stripped
 
     if primitive_type is not None:
         write_item_statement: Stripped
@@ -2126,21 +2147,21 @@ def _generate_serialize_list_property_as_content(
         ):
             write_item_statement = Stripped(
                 """\
-writer.WriteValue(item);"""
+w.WriteValue(item);"""
             )
         elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
             write_item_statement = Stripped(
                 """\
-writer.WriteBase64(item, 0, item.Length);"""
+w.WriteBase64(item, 0, item.Length);"""
             )
         else:
             assert_never(primitive_type)
 
-        body = Stripped(
+        item_write_block = Stripped(
             f"""\
-writer.WriteStartElement("v", NS);
+w.WriteStartElement("v", NS);
 {write_item_statement}
-writer.WriteEndElement();"""
+w.WriteEndElement();"""
         )
 
     elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
@@ -2149,15 +2170,15 @@ writer.WriteEndElement();"""
         if isinstance(our_type, intermediate.Enumeration):
             enum_name = csharp_naming.enum_name(our_type.name)
 
-            body = Stripped(
+            item_write_block = Stripped(
                 f"""\
-writer.WriteStartElement("v", NS);
-writer.WriteValue(
+w.WriteStartElement("v", NS);
+w.WriteValue(
 {I}Stringification.ToString(item)
 {II}?? throw new System.ArgumentException(
 {III}"Invalid literal for the enumeration {enum_name}: " +
 {III}item.ToString()));
-writer.WriteEndElement();"""
+w.WriteEndElement();"""
             )
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             raise AssertionError("This case should have been handled before.")
@@ -2165,10 +2186,12 @@ writer.WriteEndElement();"""
         elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            body = Stripped(
+            item_write_block = Stripped(
                 """\
-this.Visit(item, writer);"""
+this.Visit(item, w);"""
             )
+        else:
+            assert_never(our_type)
     else:
         raise NotImplementedError(
             "(mristin) We generate currently only the code for serializing lists of "
@@ -2177,21 +2200,27 @@ this.Visit(item, writer);"""
             f"Please contact the developers if you need this feature."
         )
 
+    content_serializer = Stripped(
+        f"""\
+(value, w) =>
+{{
+{I}foreach (var item in value)
+{I}{{
+{II}{indent_but_first_line(item_write_block, II)}
+{I}}}
+}}"""
+    )
+
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)
 
     result = Stripped(
         f"""\
-writer.WriteStartElement(
+SerializeElement(
 {I}{xml_prop_name_literal},
-{I}NS);
-
-foreach (var item in that.{prop_name})
-{{
-{I}{indent_but_first_line(body, I)}
-}}
-
-writer.WriteEndElement();"""
+{I}that.{prop_name},
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -2323,7 +2352,7 @@ def _generate_visitor(
     """Generate a visitor which serializes instances of the meta-model to XML."""
     errors = []  # type: List[Error]
 
-    blocks = []  # type: List[Stripped]
+    blocks = [_generate_serialize_element_helper()]  # type: List[Stripped]
 
     # The abstract classes are directly dispatched by the transformer,
     # so we do not need to handle them separately.

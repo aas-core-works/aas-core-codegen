@@ -1093,74 +1093,107 @@ namespace dummy
         internal class VisitorWithWriter
             : Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
         {
+            /// <summary>
+            /// Write the content of a property, positioned between its start and end tag.
+            /// </summary>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private delegate void ElementContentSerializer<T>(
+                T that, Xml.XmlWriter writer);
+
+            /// <summary>
+            /// Serialize <paramref name="that" /> as an XML element with
+            /// the given <paramref name="name" />, delegating the content in-between the
+            /// start and the end tag to <paramref name="serializeContent" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the property kinds (primitive, enumeration, class,
+            /// interface, list) as they all wrap their content in exactly the same way.
+            /// </remarks>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private static void SerializeElement<T>(
+                string name,
+                T that,
+                Xml.XmlWriter writer,
+                ElementContentSerializer<T> serializeContent)
+            {
+                writer.WriteStartElement(name, NS);
+                serializeContent(that, writer);
+                writer.WriteEndElement();
+            }
+
             private void SomethingToSequence(
                 Aas.ISomething that,
                 Xml.XmlWriter writer)
             {
-                writer.WriteStartElement(
+                SerializeElement(
                     "someBools",
-                    NS);
+                    that.SomeBools,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            w.WriteStartElement("v", NS);
+                            w.WriteValue(item);
+                            w.WriteEndElement();
+                        }
+                    });
 
-                foreach (var item in that.SomeBools)
-                {
-                    writer.WriteStartElement("v", NS);
-                    writer.WriteValue(item);
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "someInts",
-                    NS);
+                    that.SomeInts,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            w.WriteStartElement("v", NS);
+                            w.WriteValue(item);
+                            w.WriteEndElement();
+                        }
+                    });
 
-                foreach (var item in that.SomeInts)
-                {
-                    writer.WriteStartElement("v", NS);
-                    writer.WriteValue(item);
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "someFloats",
-                    NS);
+                    that.SomeFloats,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            w.WriteStartElement("v", NS);
+                            w.WriteValue(item);
+                            w.WriteEndElement();
+                        }
+                    });
 
-                foreach (var item in that.SomeFloats)
-                {
-                    writer.WriteStartElement("v", NS);
-                    writer.WriteValue(item);
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "someStrings",
-                    NS);
+                    that.SomeStrings,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            w.WriteStartElement("v", NS);
+                            w.WriteValue(item);
+                            w.WriteEndElement();
+                        }
+                    });
 
-                foreach (var item in that.SomeStrings)
-                {
-                    writer.WriteStartElement("v", NS);
-                    writer.WriteValue(item);
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "someBytes",
-                    NS);
-
-                foreach (var item in that.SomeBytes)
-                {
-                    writer.WriteStartElement("v", NS);
-                    writer.WriteBase64(item, 0, item.Length);
-                    writer.WriteEndElement();
-                }
-
-                writer.WriteEndElement();
+                    that.SomeBytes,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            w.WriteStartElement("v", NS);
+                            w.WriteBase64(item, 0, item.Length);
+                            w.WriteEndElement();
+                        }
+                    });
             }  // private void SomethingToSequence
 
             public override void VisitSomething(

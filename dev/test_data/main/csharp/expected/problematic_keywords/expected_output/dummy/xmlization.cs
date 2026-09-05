@@ -1115,45 +1115,61 @@ namespace dummy
         internal class VisitorWithWriter
             : Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
         {
+            /// <summary>
+            /// Write the content of a property, positioned between its start and end tag.
+            /// </summary>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private delegate void ElementContentSerializer<T>(
+                T that, Xml.XmlWriter writer);
+
+            /// <summary>
+            /// Serialize <paramref name="that" /> as an XML element with
+            /// the given <paramref name="name" />, delegating the content in-between the
+            /// start and the end tag to <paramref name="serializeContent" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the property kinds (primitive, enumeration, class,
+            /// interface, list) as they all wrap their content in exactly the same way.
+            /// </remarks>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private static void SerializeElement<T>(
+                string name,
+                T that,
+                Xml.XmlWriter writer,
+                ElementContentSerializer<T> serializeContent)
+            {
+                writer.WriteStartElement(name, NS);
+                serializeContent(that, writer);
+                writer.WriteEndElement();
+            }
+
             private void SomethingToSequence(
                 Aas.ISomething that,
                 Xml.XmlWriter writer)
             {
-                writer.WriteStartElement(
+                SerializeElement(
                     "interface",
-                    NS);
+                    that.Interface,
+                    writer,
+                    (value, w) => w.WriteValue(value));
 
-                writer.WriteValue(
-                    that.Interface);
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "type",
-                    NS);
+                    that.Type,
+                    writer,
+                    (value, w) => w.WriteValue(value));
 
-                writer.WriteValue(
-                    that.Type);
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "range",
-                    NS);
+                    that.Range,
+                    writer,
+                    (value, w) => w.WriteValue(value));
 
-                writer.WriteValue(
-                    that.Range);
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "void",
-                    NS);
-
-                writer.WriteValue(
-                    that.Void);
-
-                writer.WriteEndElement();
+                    that.Void,
+                    writer,
+                    (value, w) => w.WriteValue(value));
             }  // private void SomethingToSequence
 
             public override void VisitSomething(

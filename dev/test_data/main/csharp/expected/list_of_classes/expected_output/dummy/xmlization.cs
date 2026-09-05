@@ -1830,18 +1830,43 @@ namespace dummy
         internal class VisitorWithWriter
             : Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
         {
+            /// <summary>
+            /// Write the content of a property, positioned between its start and end tag.
+            /// </summary>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private delegate void ElementContentSerializer<T>(
+                T that, Xml.XmlWriter writer);
+
+            /// <summary>
+            /// Serialize <paramref name="that" /> as an XML element with
+            /// the given <paramref name="name" />, delegating the content in-between the
+            /// start and the end tag to <paramref name="serializeContent" />.
+            /// </summary>
+            /// <remarks>
+            /// This is shared by all the property kinds (primitive, enumeration, class,
+            /// interface, list) as they all wrap their content in exactly the same way.
+            /// </remarks>
+            /// <typeparam name="T">Type of the property value</typeparam>
+            private static void SerializeElement<T>(
+                string name,
+                T that,
+                Xml.XmlWriter writer,
+                ElementContentSerializer<T> serializeContent)
+            {
+                writer.WriteStartElement(name, NS);
+                serializeContent(that, writer);
+                writer.WriteEndElement();
+            }
+
             private void SomeItemToSequence(
                 Aas.ISomeItem that,
                 Xml.XmlWriter writer)
             {
-                writer.WriteStartElement(
+                SerializeElement(
                     "name",
-                    NS);
-
-                writer.WriteValue(
-                    that.Name);
-
-                writer.WriteEndElement();
+                    that.Name,
+                    writer,
+                    (value, w) => w.WriteValue(value));
             }  // private void SomeItemToSequence
 
             public override void VisitSomeItem(
@@ -1861,14 +1886,11 @@ namespace dummy
                 Aas.IAnotherItem that,
                 Xml.XmlWriter writer)
             {
-                writer.WriteStartElement(
+                SerializeElement(
                     "serialNumber",
-                    NS);
-
-                writer.WriteValue(
-                    that.SerialNumber);
-
-                writer.WriteEndElement();
+                    that.SerialNumber,
+                    writer,
+                    (value, w) => w.WriteValue(value));
             }  // private void AnotherItemToSequence
 
             public override void VisitAnotherItem(
@@ -1888,14 +1910,11 @@ namespace dummy
                 Aas.ISimple that,
                 Xml.XmlWriter writer)
             {
-                writer.WriteStartElement(
+                SerializeElement(
                     "name",
-                    NS);
-
-                writer.WriteValue(
-                    that.Name);
-
-                writer.WriteEndElement();
+                    that.Name,
+                    writer,
+                    (value, w) => w.WriteValue(value));
             }  // private void SimpleToSequence
 
             public override void VisitSimple(
@@ -1915,27 +1934,29 @@ namespace dummy
                 Aas.ISomething that,
                 Xml.XmlWriter writer)
             {
-                writer.WriteStartElement(
+                SerializeElement(
                     "someItems",
-                    NS);
+                    that.SomeItems,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            this.Visit(item, w);
+                        }
+                    });
 
-                foreach (var item in that.SomeItems)
-                {
-                    this.Visit(item, writer);
-                }
-
-                writer.WriteEndElement();
-
-                writer.WriteStartElement(
+                SerializeElement(
                     "someSimples",
-                    NS);
-
-                foreach (var item in that.SomeSimples)
-                {
-                    this.Visit(item, writer);
-                }
-
-                writer.WriteEndElement();
+                    that.SomeSimples,
+                    writer,
+                    (value, w) =>
+                    {
+                        foreach (var item in value)
+                        {
+                            this.Visit(item, w);
+                        }
+                    });
             }  // private void SomethingToSequence
 
             public override void VisitSomething(
