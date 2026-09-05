@@ -37,6 +37,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(modellingKindToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(ModellingKind that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of ModellingKind: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, ModellingKind> modellingKindFromString;
   static {
     final Map<String, ModellingKind> temp = new HashMap<>();
@@ -91,6 +105,20 @@ public class Stringification {
   public static Optional<String> toString(QualifierKind that)
   {
     return Optional.ofNullable(that).map(qualifierKindToString::get);
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(QualifierKind that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of QualifierKind: " + that);
+    }
+    return text.get();
   }
 
   private static final Map<String, QualifierKind> qualifierKindFromString;
@@ -148,6 +176,20 @@ public class Stringification {
   public static Optional<String> toString(AssetKind that)
   {
     return Optional.ofNullable(that).map(assetKindToString::get);
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(AssetKind that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of AssetKind: " + that);
+    }
+    return text.get();
   }
 
   private static final Map<String, AssetKind> assetKindFromString;
@@ -221,6 +263,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(aasSubmodelElementsToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(AasSubmodelElements that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of AasSubmodelElements: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, AasSubmodelElements> aasSubmodelElementsFromString;
   static {
     final Map<String, AasSubmodelElements> temp = new HashMap<>();
@@ -291,6 +347,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(entityTypeToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(EntityType that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of EntityType: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, EntityType> entityTypeFromString;
   static {
     final Map<String, EntityType> temp = new HashMap<>();
@@ -344,6 +414,20 @@ public class Stringification {
   public static Optional<String> toString(Direction that)
   {
     return Optional.ofNullable(that).map(directionToString::get);
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(Direction that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of Direction: " + that);
+    }
+    return text.get();
   }
 
   private static final Map<String, Direction> directionFromString;
@@ -401,6 +485,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(stateOfEventToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(StateOfEvent that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of StateOfEvent: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, StateOfEvent> stateOfEventFromString;
   static {
     final Map<String, StateOfEvent> temp = new HashMap<>();
@@ -454,6 +552,20 @@ public class Stringification {
   public static Optional<String> toString(ReferenceTypes that)
   {
     return Optional.ofNullable(that).map(referenceTypesToString::get);
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(ReferenceTypes that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of ReferenceTypes: " + that);
+    }
+    return text.get();
   }
 
   private static final Map<String, ReferenceTypes> referenceTypesFromString;
@@ -531,6 +643,20 @@ public class Stringification {
   public static Optional<String> toString(KeyTypes that)
   {
     return Optional.ofNullable(that).map(keyTypesToString::get);
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(KeyTypes that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of KeyTypes: " + that);
+    }
+    return text.get();
   }
 
   private static final Map<String, KeyTypes> keyTypesFromString;
@@ -638,6 +764,20 @@ public class Stringification {
     return Optional.ofNullable(that).map(dataTypeDefXsdToString::get);
   }
 
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(DataTypeDefXsd that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of DataTypeDefXsd: " + that);
+    }
+    return text.get();
+  }
+
   private static final Map<String, DataTypeDefXsd> dataTypeDefXsdFromString;
   static {
     final Map<String, DataTypeDefXsd> temp = new HashMap<>();
@@ -736,6 +876,20 @@ public class Stringification {
   public static Optional<String> toString(DataTypeIec61360 that)
   {
     return Optional.ofNullable(that).map(dataTypeIec61360ToString::get);
+  }
+
+  /**
+   * Retrieve the string representation of {@code that}.
+   *
+   * @throws IllegalArgumentException if {@code that} is not a valid literal
+   */
+  public static String mustToString(DataTypeIec61360 that)
+  {
+    final Optional<String> text = toString(that);
+    if (!text.isPresent()) {
+      throw new IllegalArgumentException("Invalid literal of DataTypeIec61360: " + that);
+    }
+    return text.get();
   }
 
   private static final Map<String, DataTypeIec61360> dataTypeIec61360FromString;

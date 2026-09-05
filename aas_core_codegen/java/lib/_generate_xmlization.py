@@ -31,67 +31,6 @@ from aas_core_codegen.java.common import (
 # region Generate
 
 
-def _generate_result() -> Stripped:
-    """Generate the class to represent XML de/serialize results."""
-    return Stripped(
-        f"""\
-private static class _Result<T> {{
-{I}private final T result;
-{I}private final Reporting.Error error;
-{I}private final boolean success;
-
-{I}private _Result(T result, Reporting.Error error, boolean success) {{
-{II}this.result = result;
-{II}this.error = error;
-{II}this.success = success;
-{I}}}
-
-{I}public static <T> _Result<T> success(T result) {{
-{II}if(result == null) throw new IllegalArgumentException("Result must not be null.");
-{II}return new _Result<>(result, null, true);
-{I}}}
-
-{I}public static <T> _Result<T> failure(Reporting.Error error) {{
-{II}if(error == null) throw new IllegalArgumentException("Error must not be null.");
-{II}return new _Result<>(null, error, false);
-{I}}}
-
-{I}@SuppressWarnings("unchecked")
-{I}public <I> _Result<I> castTo(Class<I> type){{
-{II}if(isError() || type.isInstance(result)) return (_Result<I>) this;
-{II}throw new IllegalStateException("Result of type "
-{III}+ result.getClass().getName()
-{III}+ " is not an instance of "
-{III}+ type.getName());
-{I}}}
-
-{I}public T getResult() {{
-{II}if (!isSuccess()) throw new IllegalStateException("Result is not present.");
-{II}return result;
-{I}}}
-
-{I}public boolean isSuccess() {{
-{II}return success;
-{I}}}
-
-{I}public boolean isError(){{return !success;}}
-
-{I}public Reporting.Error getError() {{
-{II}if (isSuccess()) throw new IllegalStateException("Result is present.");
-{II}return error;
-{I}}}
-
-{I}public <R> R map(Function<T, R> successFunction, Function<Reporting.Error, R> errorFunction) {{
-{II}return isSuccess() ? successFunction.apply(result) : errorFunction.apply(error);
-{I}}}
-
-{I}public T onError(Function<Reporting.Error, T>  errorFunction){{
-{II}return map(Function.identity(), errorFunction);
-{I}}}
-}}"""
-    )
-
-
 def _generate_current_event() -> Stripped:
     """Generate the function to a single XML event."""
 
@@ -206,21 +145,21 @@ def _generate_try_v_start_element() -> Stripped:
  * Consume a {{@code <v>}} element from the reader and return whether
  * it was a self-closing (empty) element.
  */
-private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {{
+private static Reporting.Result<Boolean> tryVStartElement(XMLEventReader reader) {{
 {I}if (currentEvent(reader).isEndDocument()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a <v> element, but got an end-of-file.");
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}if (!currentEvent(reader).isStartElement()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a <v> start element, but got the node of type "
 {IIII}+ getEventTypeAsString(currentEvent(reader)));
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
-{I}final _Result<String> tryElementName = tryElementName(reader);
+{I}final Reporting.Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
 {II}return tryElementName.castTo(Boolean.class);
 {I}}}
@@ -228,11 +167,11 @@ private static _Result<Boolean> tryVStartElement(XMLEventReader reader) {{
 {I}if (!"v".equals(tryElementName.getResult())) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a <v> element, but got an element " + tryElementName.getResult());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}final boolean isEmpty = isEmptyElement(reader);
-{I}return _Result.success(isEmpty);
+{I}return Reporting.Result.success(isEmpty);
 }}"""
     )
 
@@ -244,23 +183,23 @@ def _generate_try_v_end_element() -> Stripped:
 /**
  * Consume a {{@code </v>}} element from the reader.
  */
-private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {{
+private static Reporting.Result<XMLEvent> tryVEndElement(XMLEventReader reader) {{
 {I}skipWhitespaceAndComments(reader);
 
 {I}if (currentEvent(reader).isEndDocument()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a </v> element, but got an end-of-file.");
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}if (!currentEvent(reader).isEndElement()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a </v> end element, but got the node of type "
 {IIII}+ getEventTypeAsString(currentEvent(reader)));
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
-{I}final _Result<String> tryElementName = tryElementName(reader);
+{I}final Reporting.Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
 {II}return tryElementName.castTo(XMLEvent.class);
 {I}}}
@@ -268,11 +207,11 @@ private static _Result<XMLEvent> tryVEndElement(XMLEventReader reader) {{
 {I}if (!"v".equals(tryElementName.getResult())) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a </v> element, but got an end element " + tryElementName.getResult());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}try {{
-{II}return _Result.success(reader.nextEvent());
+{II}return Reporting.Result.success(reader.nextEvent());
 {I}}} catch (XMLStreamException xmlStreamException) {{
 {II}throw new Xmlization.DeserializeException("",
 {III}"Failed in method tryVEndElement because of: " +
@@ -297,8 +236,8 @@ def _generate_try_v_element_as_primitive_functions() -> List[Stripped]:
 /**
  * Read the content of a {{@code <v>}} element and parse it as {result_type}.
  */
-private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
-{I}final _Result<Boolean> tryVStart = tryVStartElement(reader);
+private static Reporting.Result<{result_type}> {function_name}(XMLEventReader reader) {{
+{I}final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
 {I}if (tryVStart.isError()) {{
 {II}return tryVStart.castTo({result_type}.class);
 {I}}}
@@ -307,7 +246,7 @@ private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected an XML content representing {result_type}, " +
 {III}"but got a self-closing <v /> element");
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}final {result_type} result;
@@ -317,15 +256,15 @@ private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"The content of a <v> element could not be de-serialized " +
 {III}"as {result_type}: " + exception.getMessage());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
-{I}final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+{I}final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
 {I}if (tryVEnd.isError()) {{
 {II}return tryVEnd.castTo({result_type}.class);
 {I}}}
 
-{I}return _Result.success(result);
+{I}return Reporting.Result.success(result);
 }}"""
             )
         )
@@ -337,8 +276,8 @@ private static _Result<{result_type}> {function_name}(XMLEventReader reader) {{
 /**
  * Read the content of a {{@code <v>}} element and parse it as a string.
  */
-private static _Result<String> tryVElementAsString(XMLEventReader reader) {{
-{I}final _Result<Boolean> tryVStart = tryVStartElement(reader);
+private static Reporting.Result<String> tryVElementAsString(XMLEventReader reader) {{
+{I}final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
 {I}if (tryVStart.isError()) {{
 {II}return tryVStart.castTo(String.class);
 {I}}}
@@ -353,7 +292,7 @@ private static _Result<String> tryVElementAsString(XMLEventReader reader) {{
 {III}final Reporting.Error error = new Reporting.Error(
 {IIII}"The content of a <v> element could not be de-serialized " +
 {IIII}"as String: " + exception.getMessage());
-{III}return _Result.failure(error);
+{III}return Reporting.Result.failure(error);
 {II}}}
 {I}}}
 
@@ -361,12 +300,12 @@ private static _Result<String> tryVElementAsString(XMLEventReader reader) {{
 {I}// A self-closing <v /> is represented as a pair of start and end events
 {I}// in StAX, so we need to consume the end element even if the <v /> was
 {I}// empty.
-{I}final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+{I}final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
 {I}if (tryVEnd.isError()) {{
 {II}return tryVEnd.castTo(String.class);
 {I}}}
 
-{I}return _Result.success(result);
+{I}return Reporting.Result.success(result);
 }}"""
         )
     )
@@ -378,8 +317,8 @@ private static _Result<String> tryVElementAsString(XMLEventReader reader) {{
 /**
  * Read a {{@code <v>}} element as base64-encoded bytes.
  */
-private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {{
-{I}final _Result<Boolean> tryVStart = tryVStartElement(reader);
+private static Reporting.Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {{
+{I}final Reporting.Result<Boolean> tryVStart = tryVStartElement(reader);
 {I}if (tryVStart.isError()) {{
 {II}return tryVStart.castTo(byte[].class);
 {I}}}
@@ -394,7 +333,7 @@ private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {{
 {III}final Reporting.Error error = new Reporting.Error(
 {IIII}"The content of a <v> element could not be de-serialized " +
 {IIII}"as base64-encoded bytes: " + exception.getMessage());
-{III}return _Result.failure(error);
+{III}return Reporting.Result.failure(error);
 {II}}}
 {I}}}
 
@@ -402,12 +341,12 @@ private static _Result<byte[]> tryVElementAsBytes(XMLEventReader reader) {{
 {I}// A self-closing <v /> is represented as a pair of start and end events
 {I}// in StAX, so we need to consume the end element even if the <v /> was
 {I}// empty.
-{I}final _Result<XMLEvent> tryVEnd = tryVEndElement(reader);
+{I}final Reporting.Result<XMLEvent> tryVEnd = tryVEndElement(reader);
 {I}if (tryVEnd.isError()) {{
 {II}return tryVEnd.castTo(byte[].class);
 {I}}}
 
-{I}return _Result.success(result);
+{I}return Reporting.Result.success(result);
 }}"""
         )
     )
@@ -430,8 +369,8 @@ def _generate_try_v_element_as_enumeration(
  * Read a {{@code <v>}} element and parse its content as a literal
  * of {{@link {enum_name}}}.
  */
-private static _Result<{enum_name}> tryVElementAs{enum_name}(XMLEventReader reader) {{
-{I}final _Result<String> tryText = tryVElementAsString(reader);
+private static Reporting.Result<{enum_name}> tryVElementAs{enum_name}(XMLEventReader reader) {{
+{I}final Reporting.Result<String> tryText = tryVElementAsString(reader);
 {I}if (tryText.isError()) {{
 {II}return tryText.castTo({enum_name}.class);
 {I}}}
@@ -443,10 +382,10 @@ private static _Result<{enum_name}> tryVElementAs{enum_name}(XMLEventReader read
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"The text could not be parsed as a literal of {enum_name}: " +
 {III}tryText.getResult());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
-{I}return _Result.success(result.get());
+{I}return Reporting.Result.success(result.get());
 }}"""
     )
 
@@ -461,14 +400,14 @@ def _generate_parse_list() -> Stripped:
  * <p>Every start element is considered to mark the start of an item. Parsing
  * stops as soon as a non-start element is encountered.
  */
-private static <T> _Result<List<T>> parseList(
+private static <T> Reporting.Result<List<T>> parseList(
 {I}XMLEventReader reader,
 {I}boolean isEmptyProperty,
 {I}Class<T> itemType,
-{I}Function<XMLEventReader, _Result<? extends T>> parseItem) {{
+{I}Function<XMLEventReader, Reporting.Result<? extends T>> parseItem) {{
 {I}final List<T> result = new ArrayList<>();
 {I}if (isEmptyProperty) {{
-{II}return _Result.success(result);
+{II}return Reporting.Result.success(result);
 {I}}}
 
 {I}skipWhitespaceAndComments(reader);
@@ -478,16 +417,16 @@ private static <T> _Result<List<T>> parseList(
 {III}"Expected a start element opening an instance of " + itemType.getSimpleName() +
 {IIII}", but got an XML " + getEventTypeAsString(currentEvent(reader)));
 {II}error.prependSegment(new Reporting.IndexSegment(index));
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}while (currentEvent(reader).isStartElement()) {{
-{II}final _Result<? extends T> itemResult = parseItem.apply(reader);
+{II}final Reporting.Result<? extends T> itemResult = parseItem.apply(reader);
 {II}if (itemResult.isError()) {{
 {III}itemResult.getError()
 {IIII}.prependSegment(
 {IIIII}new Reporting.IndexSegment(index));
-{III}return _Result.failure(itemResult.getError());
+{III}return Reporting.Result.failure(itemResult.getError());
 {II}}}
 
 {II}result.add(itemResult.getResult());
@@ -495,7 +434,7 @@ private static <T> _Result<List<T>> parseList(
 {II}skipWhitespaceAndComments(reader);
 {I}}}
 
-{I}return _Result.success(result);
+{I}return Reporting.Result.success(result);
 }}"""
     )
 
@@ -593,7 +532,7 @@ final Reporting.Error error = new Reporting.Error(
 error.prependSegment(
 {I}new Reporting.NameSegment(
 {II}{xml_prop_name_literal}));
-return _Result.failure(error);"""
+return Reporting.Result.failure(error);"""
         )
 
     return Stripped(
@@ -607,7 +546,7 @@ else {{
 {III}"Expected an XML content representing " +
 {III}"the property {prop_name} of an instance of class {cls_name}, " +
 {III}"but reached the end-of-file");
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}try {{
@@ -619,7 +558,7 @@ else {{
 {II}error.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}"{prop_name}"));
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 }}"""
     )
@@ -676,7 +615,7 @@ private static boolean invalidNameSpace(XMLEvent event) {{
 /**
  * Check the namespace and extract the element's name.
  */
-private static _Result<String> tryElementName(XMLEventReader reader) {{
+private static Reporting.Result<String> tryElementName(XMLEventReader reader) {{
 {I}final XMLEvent currentEvent = currentEvent(reader);
 {I}final boolean precondition = currentEvent.isStartElement() || currentEvent.isEndElement();
 {I}if (!precondition) {{
@@ -691,9 +630,9 @@ private static _Result<String> tryElementName(XMLEventReader reader) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {IIII}"Expected an element within a namespace " +
 {IIII}AAS_NAME_SPACE + ", " + "but got: " + namespace);
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}return _Result.success(currentEvent.isStartElement()
+{I}return Reporting.Result.success(currentEvent.isStartElement()
 {III}? currentEvent.asStartElement().getName().getLocalPart()
 {III}: currentEvent.asEndElement().getName().getLocalPart());
 }}"""
@@ -703,17 +642,17 @@ private static _Result<String> tryElementName(XMLEventReader reader) {{
 def _generate_verify_closing_tag_for_class() -> Stripped:
     return Stripped(
         f"""\
-private static _Result<XMLEvent> verifyClosingTagForClass(
+private static Reporting.Result<XMLEvent> verifyClosingTagForClass(
 {I}String className,
 {I}XMLEventReader reader,
-{I}_Result<String> tryElementName) {{
+{I}Reporting.Result<String> tryElementName) {{
 {I}final XMLEvent currentEvent = currentEvent(reader);
 {I}if (currentEvent.isEndDocument()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {IIII}"Expected an XML end element to conclude a property of class " + className
 {IIIIII}+ " with the element name " + tryElementName.getResult() + ", "
 {IIIIII}+ "but got the end-of-file.");
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
 {I}if (!currentEvent.isEndElement()) {{
@@ -722,9 +661,9 @@ private static _Result<XMLEvent> verifyClosingTagForClass(
 {IIIIII}+ " with the element name " + tryElementName.getResult() + ", "
 {IIIIII}+ "but got the node of type " + getEventTypeAsString(currentEvent)
 {IIIIII}+ " with the value " + currentEvent);
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
-{I}final _Result<String> tryEndElementName = tryElementName(reader);
+{I}final Reporting.Result<String> tryEndElementName = tryElementName(reader);
 {I}if (tryEndElementName.isError()) {{
 {II}return tryEndElementName.castTo(XMLEvent.class);
 {I}}}
@@ -733,10 +672,10 @@ private static _Result<XMLEvent> verifyClosingTagForClass(
 {IIII}"Expected an XML end element to conclude a property of class " + className
 {IIIIII}+ " with the element name " + tryElementName.getResult() + ", "
 {IIIIII}+ "but got the end element with the name " + tryEndElementName.getResult());
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 {I}try {{
-{II}return _Result.success(reader.nextEvent());
+{II}return Reporting.Result.success(reader.nextEvent());
 {I}}} catch (XMLStreamException xmlStreamException) {{
 {II}throw new Xmlization.DeserializeException("",
 {III}"Failed in method verifyClosingTagForClass because of: " +
@@ -757,45 +696,45 @@ def _generate_parse_instance_from_element_generic() -> Stripped:
  * the element is self-closing, and is expected to consume the properties of
  * the instance, but not the element's closing tag.
  */
-private static <T> _Result<? extends T> parseInstanceFromElement(
+private static <T> Reporting.Result<? extends T> parseInstanceFromElement(
 {I}XMLEventReader reader,
 {I}Class<T> type,
-{I}BiFunction<String, Boolean, _Result<? extends T>> parseAsSequence) {{
+{I}BiFunction<String, Boolean, Reporting.Result<? extends T>> parseAsSequence) {{
 {I}skipWhitespaceAndComments(reader);
 
 {I}final XMLEvent currentEvent = currentEvent(reader);
 {I}if (currentEvent.getEventType() == XMLStreamConstants.END_DOCUMENT) {{
-{II}return _Result.failure(new Reporting.Error(
+{II}return Reporting.Result.failure(new Reporting.Error(
 {III}"Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
 {IIII}"but reached the end-of-file"));
 {I}}}
 
 {I}if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
-{II}return _Result.failure(new Reporting.Error(
+{II}return Reporting.Result.failure(new Reporting.Error(
 {III}"Expected an XML element representing an instance of " + type.getSimpleName() + ", " +
 {IIII}"but got a node of type " + getEventTypeAsString(currentEvent) +
 {IIII}" with value " + currentEvent));
 {I}}}
 
-{I}final _Result<String> tryElementName = tryElementName(reader);
+{I}final Reporting.Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
-{II}return _Result.failure(tryElementName.getError());
+{II}return Reporting.Result.failure(tryElementName.getError());
 {I}}}
 
 {I}final String elementName = tryElementName.getResult();
 {I}final boolean isEmptyElement = isEmptyElement(reader);
 
-{I}final _Result<? extends T> result = parseAsSequence.apply(elementName, isEmptyElement);
+{I}final Reporting.Result<? extends T> result = parseAsSequence.apply(elementName, isEmptyElement);
 {I}if (result.isError()) {{
 {II}return result;
 {I}}}
 
-{I}final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+{I}final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
 {II}type.getSimpleName(),
 {II}reader,
 {II}tryElementName);
 {I}if (checkEndElement.isError()) {{
-{II}return _Result.failure(checkEndElement.getError());
+{II}return Reporting.Result.failure(checkEndElement.getError());
 {I}}}
 
 {I}return result;
@@ -835,7 +774,7 @@ if (isEmptyProperty) {{
 {I}error.prependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
 
 if (currentEvent(reader).isEndDocument()) {{
@@ -843,7 +782,7 @@ if (currentEvent(reader).isEndDocument()) {{
 {III}"Expected an XML content representing "
 {IIIII}+ "the property {prop_name} of an instance of class {cls_name}, "
 {IIIII}+ "but reached the end-of-file");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
 
 String {text_target_var};
@@ -856,7 +795,7 @@ try {{
 {I}error.prependSegment(
 {III}new Reporting.NameSegment(
 {IIIII}"{prop_name}"));
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
 
 final Optional<{prop_type_name}> {optional_target_var} =
@@ -873,7 +812,7 @@ if ({optional_target_var}.isPresent()) {{
 {I}error.prependSegment(
 {III}new Reporting.NameSegment(
 {IIIII}"{prop_name}"));
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
     )
 
@@ -909,7 +848,7 @@ if (isEmptyProperty) {{
 {II}"Expected an XML element within the element " + tryElementName.getResult() + " representing " +
 {II}"the property {prop_name} of an instance of class {cls_name}, " +
 {II}"but encountered a self-closing element.");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
 
 // We need to skip the whitespace here in order to be able to look ahead
@@ -921,7 +860,7 @@ if (currentEvent(reader).isEndDocument()) {{
 {II}"Expected an XML element within the element " + tryElementName.getResult() + " representing " +
 {II}"the property {prop_name} of an instance of class {cls_name}, " +
 {II}"but reached the end-of-file");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}
 
 // Try to look ahead the discriminator name;
@@ -930,12 +869,12 @@ if (currentEvent(reader).isEndDocument()) {{
 // checks.
 String discriminatorElementName = null;
 if (currentEvent(reader).isStartElement()) {{
-{I}_Result<String> tryDiscriminatorElementName = tryElementName(reader);
+{I}Reporting.Result<String> tryDiscriminatorElementName = tryElementName(reader);
 {I}assert(!tryDiscriminatorElementName.isError());
 {I}discriminatorElementName = tryDiscriminatorElementName.getResult();
 }}
 
-_Result<? extends {interface_name}> {try_target_var} = try{interface_name}FromElement(reader);
+Reporting.Result<? extends {interface_name}> {try_target_var} = try{interface_name}FromElement(reader);
 
 if ({try_target_var}.isError()) {{
 {I}if (discriminatorElementName != null) {{
@@ -979,7 +918,7 @@ def _generate_deserialize_cls_property(
 
     return Stripped(
         f"""\
-_Result<{target_cls_name}> {try_target_var} = try{target_cls_name}FromSequence(
+Reporting.Result<{target_cls_name}> {try_target_var} = try{target_cls_name}FromSequence(
 {I}reader, isEmptyProperty);
 
 if ({try_target_var}.isError()) {{
@@ -1066,7 +1005,7 @@ def _generate_deserialize_list_property(
 
     return Stripped(
         f"""\
-final _Result<List<{item_type}>> {try_target_var} = parseList(
+final Reporting.Result<List<{item_type}>> {try_target_var} = parseList(
 {I}reader,
 {I}isEmptyProperty,
 {I}{item_type}.class,
@@ -1154,10 +1093,10 @@ def _generate_deserialize_impl_cls_from_sequence(
             Stripped(
                 f"""\
 {description}
-private static _Result<{name}> try{name}FromSequence(
+private static Reporting.Result<{name}> try{name}FromSequence(
 {I}XMLEventReader reader,
 {I}boolean isEmptySequence) {{
-{I}return _Result.success(new {name}());
+{I}return Reporting.Result.success(new {name}());
 }}"""
             ),
             None,
@@ -1199,7 +1138,7 @@ if (currentEvent(reader).isEndDocument()) {{
 {II}"Expected an XML element representing " +
 {II}"a property of an instance of class {name}, " +
 {II}"but reached the end-of-file");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
         )
     )
@@ -1237,7 +1176,7 @@ default:
 {II}"We expected properties of the class {name}, " +
 {II}"but got an unexpected element " +
 {II}"with the name " + elementName);
-{I}return _Result.failure(error);"""
+{I}return Reporting.Result.failure(error);"""
         )
     )
 
@@ -1259,10 +1198,10 @@ while (true) {{
 {III}"a property of an instance of class {name}, " +
 {III}"but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
 {III}" with the value " + currentEvent(reader));
-{II}return _Result.failure(error);
+{II}return Reporting.Result.failure(error);
 {I}}}
 
-{I}final _Result<String> tryElementName = tryElementName(reader);
+{I}final Reporting.Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
 {II}return tryElementName.castTo({name}.class);
 {I}}}
@@ -1277,7 +1216,7 @@ while (true) {{
 {I}skipWhitespaceAndComments(reader);
 
 
-{I}final _Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+{I}final Reporting.Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
 {II}"{name}",
 {II}reader,
 {II}tryElementName);
@@ -1311,7 +1250,7 @@ if ({target_var} == null) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"The required property {prop_java} has not been given " +
 {II}"in the XML representation of an instance of class {name}");
-{I}return _Result.failure(error);
+{I}return Reporting.Result.failure(error);
 }}"""
                 )
             )
@@ -1335,7 +1274,7 @@ if ({target_var} == null) {{
     # fmt: on
 
     init_writer = io.StringIO()
-    init_writer.write(f"return _Result.success(new {name}(\n")
+    init_writer.write(f"return Reporting.Result.success(new {name}(\n")
 
     for i, arg in enumerate(cls.constructor.arguments):
         prop = cls.properties_by_name[arg.name]
@@ -1390,7 +1329,7 @@ if ({target_var} == null) {{
     writer.write(
         f"""\
 {description}
-private static _Result<{name}> try{name}FromSequence(
+private static Reporting.Result<{name}> try{name}FromSequence(
 {I}XMLEventReader reader,
 {I}boolean isEmptySequence) {{
 """
@@ -1419,7 +1358,7 @@ def _generate_deserialize_impl_concrete_cls_from_element(
 /**
  * Deserialize an instance of class {name} from an XML element.
  */
-private static _Result<? extends {name}> try{name}FromElement(
+private static Reporting.Result<? extends {name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
 {I}return parseInstanceFromElement(
 {II}reader,
@@ -1429,7 +1368,7 @@ private static _Result<? extends {name}> try{name}FromElement(
 {IIII}final Reporting.Error error = new Reporting.Error(
 {IIIII}"Expected an element representing an instance of class {name} " +
 {IIIII}"with element name {xml_name}, but got: " + elementName);
-{IIII}return _Result.failure(error);
+{IIII}return Reporting.Result.failure(error);
 {III}}}
 
 {III}return try{name}FromSequence(reader, isEmptyElement);
@@ -1466,7 +1405,7 @@ case {implementer_xml_name_literal}:
 default:
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Unexpected element with the name " + elementName);
-{I}return _Result.failure(error);"""
+{I}return Reporting.Result.failure(error);"""
         )
     )
 
@@ -1477,7 +1416,7 @@ default:
 /**
  * Deserialize an instance of {name} from an XML element.
  */
-private static _Result<? extends {name}> try{name}FromElement(
+private static Reporting.Result<? extends {name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
 {I}return parseInstanceFromElement(
 {II}reader,
@@ -1640,7 +1579,7 @@ public static {name} deserialize{name}(
 {I}_DeserializeImplementation.skipStartDocument(reader);
 {I}_DeserializeImplementation.skipWhitespaceAndComments(reader);
 
-{I}_Result<? extends {name}> result =
+{I}Reporting.Result<? extends {name}> result =
 {II}_DeserializeImplementation.try{name}FromElement(
 {III}reader);
 
@@ -1743,6 +1682,127 @@ public static class Deserialize
     return Stripped(writer.getvalue())
 
 
+def _generate_serialize_element() -> Stripped:
+    """Generate the generic helper to write a property as a named XML element."""
+    return Stripped(
+        f"""\
+@FunctionalInterface
+private interface ElementContentSerializer<T> {{
+{I}void serialize(T that, XMLStreamWriter writer) throws XMLStreamException;
+}}
+
+/**
+ * Write {{@code that}} as an XML element named {{@code name}}, delegating
+ * the content in-between the start and the end tag to
+ * {{@code serializeContent}}.
+ *
+ * <p>This is shared by all the property kinds (primitive, enumeration,
+ * class, interface, list) as they all wrap their content in exactly the
+ * same way.
+ */
+private <T> void serializeElement(
+{I}String name,
+{I}T that,
+{I}XMLStreamWriter writer,
+{I}ElementContentSerializer<T> serializeContent) {{
+{I}try {{
+{II}writer.writeStartElement(name);
+{II}if (topLevel) {{
+{III}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{III}topLevel = false;
+{II}}}
+{II}serializeContent.serialize(that, writer);
+{II}writer.writeEndElement();
+{I}}} catch (XMLStreamException exception) {{
+{II}throw new SerializeException("", exception.getMessage());
+{I}}}
+}}"""
+    )
+
+
+def _generate_serialize_items() -> Stripped:
+    """Generate the generic helper to write every item of a list property."""
+    return Stripped(
+        f"""\
+/**
+ * Adapt {{@code writeItem}} to serialize every item of an iterable.
+ *
+ * <p>This is shared by all the list-typed properties, which only need to
+ * supply how a single item is written.
+ */
+private <T> ElementContentSerializer<Iterable<T>> serializeItems(
+{I}ElementContentSerializer<T> writeItem) {{
+{I}return (items, w) -> {{
+{II}for (T item : items) {{
+{III}writeItem.serialize(item, w);
+{II}}}
+{I}}};
+}}"""
+    )
+
+
+def _generate_write_stringified_content() -> Stripped:
+    """Generate the helper to write a value's ``toString()`` as XML content."""
+    return Stripped(
+        f"""\
+/**
+ * Write {{@code that.toString()}} as XML content.
+ *
+ * <p>This is shared by every {{@code boolean}}/{{@code long}}/{{@code double}}/
+ * {{@code String}}-typed property or list item, standing in for the property-
+ * or item-specific {{@link ElementContentSerializer}}.
+ */
+private <T> void writeStringifiedContent(T that, XMLStreamWriter writer)
+{I}throws XMLStreamException {{
+{I}writer.writeCharacters(that.toString());
+}}"""
+    )
+
+
+def _generate_write_byte_array_content() -> Stripped:
+    """Generate the helper to write a byte array as base64-encoded XML content."""
+    return Stripped(
+        f"""\
+/**
+ * Write {{@code that}} as base64-encoded XML content.
+ *
+ * <p>This is shared by every {{@code byte[]}}-typed property or list item,
+ * standing in for the property- or item-specific
+ * {{@link ElementContentSerializer}}.
+ */
+private void writeByteArrayContent(byte[] that, XMLStreamWriter writer)
+{I}throws XMLStreamException {{
+{I}writer.writeCharacters(
+{II}Base64.getEncoder().encodeToString(that));
+}}"""
+    )
+
+
+def _generate_write_enum_content(
+    enumeration: intermediate.Enumeration,
+) -> Stripped:
+    """Generate the helper to write a literal of ``enumeration`` as XML content."""
+    enum_name = java_naming.enum_name(enumeration.name)
+    method_name = java_naming.method_name(
+        Identifier(f"write_{enumeration.name}_content")
+    )
+
+    return Stripped(
+        f"""\
+/**
+ * Write a literal of {{@link {enum_name}}} as XML content.
+ *
+ * <p>This is shared by every {enum_name}-typed property or list item,
+ * standing in for the property- or item-specific
+ * {{@link ElementContentSerializer}}.
+ */
+private void {method_name}({enum_name} that, XMLStreamWriter writer)
+{I}throws XMLStreamException {{
+{I}writer.writeCharacters(Stringification.mustToString(that));
+}}"""
+    )
+
+
 def _generate_serialize_primitive_property_as_content(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -1754,11 +1814,10 @@ def _generate_serialize_primitive_property_as_content(
         a_type is not None
     ), f"Unexpected non-primitive type of the property {prop.name!r}: {type_anno}"
 
-    prop_name = java_naming.property_name(prop.name)
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
-    write_value_block: Stripped
+    content_serializer: Stripped
 
     if (
         a_type is intermediate.PrimitiveType.BOOL
@@ -1766,87 +1825,32 @@ def _generate_serialize_primitive_property_as_content(
         or a_type is intermediate.PrimitiveType.FLOAT
         or a_type is intermediate.PrimitiveType.STR
     ):
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            write_value_block = Stripped(
-                f"""\
-if (that.{getter_name}().isPresent()) {{
-{I}writer.writeStartElement(
-{II}{xml_prop_name_literal});
-{I}if (topLevel) {{
-{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{II}topLevel = false;
-{I}}}
-
-{I}writer.writeCharacters(
-{II}that.{getter_name}().get().toString());
-
-{I}writer.writeEndElement();
-}}"""
-            )
-        else:
-            write_value_block = Stripped(
-                f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-if (topLevel) {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{I}topLevel = false;
-}}
-writer.writeCharacters(
-{I}that.{getter_name}().toString());
-writer.writeEndElement();"""
-            )
+        content_serializer = Stripped("this::writeStringifiedContent")
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            base64_prop_name = java_naming.property_name(
-                Identifier(f"the_b64_{prop_name}")
-            )
-            write_value_block = Stripped(
-                f"""\
-if (that.{getter_name}().isPresent()) {{
-{I}writer.writeStartElement({xml_prop_name_literal});
-{I}if (topLevel) {{
-{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{II}topLevel = false;
-{I}}}
-{I}String {base64_prop_name} = Base64.getEncoder().encodeToString(
-{II}that.{getter_name}().get());
-{I}writer.writeCharacters({base64_prop_name});
-{I}writer.writeEndElement();
-}}"""
-            )
-        else:
-            base64_prop_name = java_naming.property_name(
-                Identifier(f"the_b64_{prop_name}")
-            )
-            write_value_block = Stripped(
-                f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-if (topLevel) {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{I}topLevel = false;
-}}
-String {base64_prop_name} = Base64.getEncoder().encodeToString(
-{I}that.{getter_name}());
-writer.writeCharacters({base64_prop_name});
-writer.writeEndElement();"""
-            )
+        content_serializer = Stripped("this::writeByteArrayContent")
     else:
         assert_never(a_type)
 
-    assert write_value_block is not None
-
-    write_value_block = Stripped(
-        f"""\
-try {{
-{I}{indent_but_first_line(write_value_block, I)}
-}} catch (Exception exception) {{
-{I}throw new SerializeException("",exception.getMessage());
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        return Stripped(
+            f"""\
+if (that.{getter_name}().isPresent()) {{
+{I}serializeElement(
+{II}{xml_prop_name_literal},
+{II}that.{getter_name}().get(),
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
-    )
+        )
 
-    return write_value_block
+    return Stripped(
+        f"""\
+serializeElement(
+{I}{xml_prop_name_literal},
+{I}that.{getter_name}(),
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
+    )
 
 
 def _generate_serialize_enumeration_property_as_content(
@@ -1864,76 +1868,35 @@ def _generate_serialize_enumeration_property_as_content(
         f"{prop.name!r} has the type {prop.type_annotation}."
     )
 
-    enumeration = type_anno.our_type
+    write_content_method = java_naming.method_name(
+        Identifier(f"write_{type_anno.our_type.name}_content")
+    )
 
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
-    enum_name = java_naming.enum_name(enumeration.name)
-
-    text_var = java_naming.variable_name(Identifier(f"text_{prop.name}"))
-
-    write_value_block: Stripped
+    content_serializer = Stripped(f"this::{write_content_method}")
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        write_value_block = Stripped(
+        return Stripped(
             f"""\
 if (that.{getter_name}().isPresent()) {{
-{I}writer.writeStartElement(
-{II}{xml_prop_name_literal});
-{I}if (topLevel) {{
-{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{II}topLevel = false;
-{I}}}
-
-{I}Optional<String> {text_var} = Stringification.toString(
-{II}that.{getter_name}().get());
-
-{I}if (!{text_var}.isPresent()) {{
-{II}throw new IllegalArgumentException(
-{III}"Invalid literal for the enumeration {enum_name}: " +
-{III}that.{getter_name}().get().toString());
-{I}}}
-
-{I}writer.writeCharacters({text_var}.get());
-
-{I}writer.writeEndElement();
+{I}serializeElement(
+{II}{xml_prop_name_literal},
+{II}that.{getter_name}().get(),
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
         )
-    else:
-        write_value_block = Stripped(
-            f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-if (topLevel) {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{I}topLevel = false;
-}}
 
-Optional<String> {text_var} = Stringification.toString(
-{I}that.{getter_name}());
-
-if (!{text_var}.isPresent()) {{
-{I}throw new IllegalArgumentException(
-{II}"Invalid literal for the enumeration {enum_name}: " +
-{II}that.{getter_name}().toString());
-}}
-
-writer.writeCharacters({text_var}.get());
-
-writer.writeEndElement();"""
-        )
-
-    write_value_block = Stripped(
+    return Stripped(
         f"""\
-try {{
-{I}{indent_but_first_line(write_value_block, I)}
-}} catch (Exception exception) {{
-{I}throw new SerializeException("",exception.getMessage());
-}}"""
+serializeElement(
+{I}{xml_prop_name_literal},
+{I}that.{getter_name}(),
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
-
-    return write_value_block
 
 
 def _generate_serialize_interface_property_as_content(
@@ -1966,53 +1929,28 @@ def _generate_serialize_interface_property_as_content(
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
-    result: Stripped
+    content_serializer = Stripped("this::visit")
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        result = Stripped(
+        return Stripped(
             f"""\
 if (that.{getter_name}().isPresent()) {{
-{I}writer.writeStartElement(
-{II}{xml_prop_name_literal});
-{I}if (topLevel) {{
-{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{II}topLevel = false;
-{I}}}
-
-{I}this.visit(
+{I}serializeElement(
+{II}{xml_prop_name_literal},
 {II}that.{getter_name}().get(),
-{II}writer);
-
-{I}writer.writeEndElement();
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
         )
-    else:
-        result = Stripped(
-            f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-if (topLevel) {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{I}topLevel = false;
-}}
 
-this.visit(
-{I}that.{getter_name}(),
-{I}writer);
-
-writer.writeEndElement();"""
-        )
-
-    result = Stripped(
+    return Stripped(
         f"""\
-try {{
-{I}{indent_but_first_line(result, I)}
-}} catch (XMLStreamException exception) {{
-{I}throw new SerializeException("",exception.getMessage());
-}}"""
+serializeElement(
+{I}{xml_prop_name_literal},
+{I}that.{getter_name}(),
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
-
-    return result
 
 
 def _generate_serialize_concrete_class_property_as_sequence(
@@ -2030,53 +1968,28 @@ def _generate_serialize_concrete_class_property_as_sequence(
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
-    result: Stripped
+    content_serializer = Stripped(f"(value, w) -> this.{cls_to_sequence}(value, w)")
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        result = Stripped(
+        return Stripped(
             f"""\
 if (that.{getter_name}().isPresent()) {{
-{I}writer.writeStartElement(
-{II}{xml_prop_name_literal});
-{I}if (topLevel) {{
-{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{II}topLevel = false;
-{I}}}
-
-{I}this.{cls_to_sequence}(
+{I}serializeElement(
+{II}{xml_prop_name_literal},
 {II}that.{getter_name}().get(),
-{II}writer);
-
-{I}writer.writeEndElement();
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
         )
-    else:
-        result = Stripped(
-            f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-if (topLevel) {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{I}topLevel = false;
-}}
 
-this.{cls_to_sequence}(
-{I}that.{getter_name}(),
-{I}writer);
-
-writer.writeEndElement();"""
-        )
-
-    result = Stripped(
+    return Stripped(
         f"""\
-try {{
-{I}{indent_but_first_line(result, I)}
-}} catch (XMLStreamException exception) {{
-{I}throw new SerializeException("",exception.getMessage());
-}}"""
+serializeElement(
+{I}{xml_prop_name_literal},
+{I}that.{getter_name}(),
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
-
-    return result
 
 
 def _generate_serialize_list_property_as_content(
@@ -2095,54 +2008,55 @@ def _generate_serialize_list_property_as_content(
 
     primitive_type = intermediate.try_primitive_type(type_anno.items)
 
-    item_write_stmt: Stripped
+    content_serializer: Stripped
 
     if primitive_type is not None:
+        item_content_method_ref: Stripped
+
         if (
             primitive_type is intermediate.PrimitiveType.BOOL
             or primitive_type is intermediate.PrimitiveType.INT
             or primitive_type is intermediate.PrimitiveType.FLOAT
             or primitive_type is intermediate.PrimitiveType.STR
         ):
-            item_write_stmt = Stripped(
-                """\
-writer.writeStartElement("v");
-writer.writeCharacters(item.toString());
-writer.writeEndElement();"""
-            )
+            item_content_method_ref = Stripped("this::writeStringifiedContent")
         elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-            item_write_stmt = Stripped(
-                f"""\
-writer.writeStartElement("v");
-writer.writeCharacters(
-{I}Base64.getEncoder().encodeToString(item));
-writer.writeEndElement();"""
-            )
+            item_content_method_ref = Stripped("this::writeByteArrayContent")
         else:
             assert_never(primitive_type)
+
+        # NOTE (mristin):
+        # An atomic item is wrapped in its own ``v`` element, exactly like a
+        # standalone atomic property is wrapped in its own named element --
+        # so we reuse ``serializeElement`` and the same content-writing
+        # method reference for both.
+        content_serializer = Stripped(
+            f"""\
+serializeItems((item, w) -> serializeElement(
+{I}"v", item, w, {item_content_method_ref}))"""
+        )
     elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
         type_anno.items.our_type, intermediate.Enumeration
     ):
-        enum_name = java_naming.enum_name(type_anno.items.our_type.name)
-        item_write_stmt = Stripped(
+        write_content_method = java_naming.method_name(
+            Identifier(f"write_{type_anno.items.our_type.name}_content")
+        )
+
+        content_serializer = Stripped(
             f"""\
-writer.writeStartElement("v");
-final Optional<String> itemText = Stringification.toString(item);
-if (!itemText.isPresent()) {{
-{I}throw new IllegalArgumentException(
-{II}"Invalid literal for the enumeration {enum_name}: " + item.toString());
-}}
-writer.writeCharacters(itemText.get());
-writer.writeEndElement();"""
+serializeItems((item, w) -> serializeElement(
+{I}"v", item, w, this::{write_content_method}))"""
         )
     elif isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
         type_anno.items.our_type,
         (intermediate.AbstractClass, intermediate.ConcreteClass),
     ):
-        item_write_stmt = Stripped(
-            """\
-this.visit(item, writer);"""
-        )
+        # NOTE (mristin):
+        # A class item is dispatched through ``this.visit``, which already
+        # matches the shape ``ElementContentSerializer<T>`` expects, so we
+        # pass it directly as a method reference instead of wrapping it in
+        # a lambda.
+        content_serializer = Stripped("serializeItems(this::visit)")
     else:
         raise NotImplementedError(
             f"We only handle XML de/serialization of lists containing atomic "
@@ -2152,56 +2066,29 @@ this.visit(item, writer);"""
             f"this feature."
         )
 
-    item_type = java_common.generate_type(type_anno.items)
-
     getter_name = java_naming.getter_name(prop.name)
     xml_prop_name_literal = java_common.string_literal(prop.xml_name)
 
-    result: Stripped
-
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        result = Stripped(
+        return Stripped(
             f"""\
 if (that.{getter_name}().isPresent()) {{
-{I}writer.writeStartElement(
-{I}{xml_prop_name_literal});
-{I}if (topLevel) {{
-{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{II}topLevel = false;
-{I}}}
-{I}for ({item_type} item : that.{getter_name}().get()) {{
-{II}{indent_but_first_line(item_write_stmt, II)}
-{I}}}
-{I}writer.writeEndElement();
+{I}serializeElement(
+{II}{xml_prop_name_literal},
+{II}that.{getter_name}().get(),
+{II}writer,
+{II}{indent_but_first_line(content_serializer, II)});
 }}"""
         )
-    else:
-        result = Stripped(
-            f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-if (topLevel) {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-{I}topLevel = false;
-}}
 
-for ({item_type} item : that.{getter_name}()) {{
-{I}{indent_but_first_line(item_write_stmt, I)}
-}}
-
-writer.writeEndElement();"""
-        )
-
-    result = Stripped(
+    return Stripped(
         f"""\
-try {{
-{I}{indent_but_first_line(result, I)}
-}} catch (XMLStreamException exception) {{
-{I}throw new SerializeException("",exception.getMessage());
-}}"""
+serializeElement(
+{I}{xml_prop_name_literal},
+{I}that.{getter_name}(),
+{I}writer,
+{I}{indent_but_first_line(content_serializer, I)});"""
     )
-
-    return result
 
 
 def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stripped:
@@ -2327,7 +2214,15 @@ def _generate_visitor(
     """Generate a visitor which serializes instances of the meta-model to XML."""
     errors = []  # type: List[Error]
 
-    blocks = []  # type: List[Stripped]
+    blocks = [
+        _generate_serialize_element(),
+        _generate_serialize_items(),
+        _generate_write_stringified_content(),
+        _generate_write_byte_array_content(),
+    ]  # type: List[Stripped]
+
+    for enumeration in symbol_table.enumerations:
+        blocks.append(_generate_write_enum_content(enumeration=enumeration))
 
     # The abstract classes are directly dispatched by the transformer,
     # so we do not need to handle them separately.
@@ -2504,8 +2399,6 @@ def generate(
 
     # region Deserialization helpers
 
-    xml_result_class = _generate_result()
-
     xml_namespace_literal = java_common.string_literal(
         symbol_table.meta_model.xml_namespace
     )
@@ -2606,8 +2499,6 @@ public class Xmlization {{
 {I} */
 {I}public static final String AAS_NAME_SPACE =
 {II}{xml_namespace_literal};
-
-{I}{indent_but_first_line(xml_result_class, I)}
 
 {I}{indent_but_first_line(deserialize_impl_block, I)}
 

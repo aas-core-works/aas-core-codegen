@@ -91,6 +91,31 @@ public static Optional<String> {to_str_name}({name} that)
 
     # endregion
 
+    # region Must-to-string-method
+
+    must_to_str_name = java_naming.method_name(Identifier("must_to_string"))
+
+    blocks.append(
+        Stripped(
+            f"""\
+/**
+ * Retrieve the string representation of {{@code that}}.
+ *
+ * @throws IllegalArgumentException if {{@code that}} is not a valid literal
+ */
+public static String {must_to_str_name}({name} that)
+{{
+{I}final Optional<String> text = {to_str_name}(that);
+{I}if (!text.isPresent()) {{
+{II}throw new IllegalArgumentException("Invalid literal of {name}: " + that);
+{I}}}
+{I}return text.get();
+}}"""
+        )
+    )
+
+    # endregion
+
     # region From-string-map
 
     string_to_enum_blocks = []  # type: List[Stripped]

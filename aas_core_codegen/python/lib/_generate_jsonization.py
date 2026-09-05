@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List, TypeVar
+from typing import Tuple, Optional, List
 
 from icontract import ensure, require
 
