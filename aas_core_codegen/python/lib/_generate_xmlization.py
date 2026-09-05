@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List, Union
+from typing import Tuple, Optional, List, TypeVar, Union
 
 from icontract import ensure, require
 
@@ -959,6 +959,12 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                 read_item = Identifier(
                     _READ_FUNCTION_BY_PRIMITIVE_TYPE[items_primitive_type]
                 )
+                read_item_callable = Stripped(
+                    f"""\
+lambda el, it: _read_v_element(
+{I}el, it, 'v', {read_item}
+)"""
+                )
             else:
                 if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
                     raise AssertionError("Expected to handle this case before")
@@ -969,6 +975,12 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                             Identifier(
                                 f"read_{type_anno.items.our_type.name}_from_element_text"
                             )
+                        )
+                        read_item_callable = Stripped(
+                            f"""\
+lambda el, it: _read_v_element(
+{I}el, it, 'v', {read_item}
+)"""
                         )
 
                     elif isinstance(
@@ -985,6 +997,7 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                                 f"_read_{type_anno.items.our_type.name}_as_element"
                             )
                         )
+                        read_item_callable = Stripped(read_item)
                     else:
                         # noinspection PyTypeChecker
                         assert_never(type_anno.items.our_type)
@@ -998,56 +1011,13 @@ self.{prop_name} = {read_prop_cls_as_sequence}(
                         "Please contact the developers if you need this feature."
                     )
 
-            items_type = python_common.generate_type(
-                type_anno.items, types_module=Identifier("aas_types")
-            )
-
             method_body = Stripped(
                 f"""\
-if element.text is not None and len(element.text.strip()) != 0:
-{I}raise DeserializationException(
-{II}f"Expected only item elements and whitespace text, "
-{II}f"but got text: {{element.text!r}}"
-{I})
-
-result: List[
-{I}{items_type}
-] = []
-
-item_i = 0
-
-while True:
-{I}next_event_element = next(iterator, None)
-{I}if next_event_element is None:
-{II}raise DeserializationException(
-{III}"Expected one or more items from a list or the end element, "
-{III}"but got end-of-input"
-{II})
-
-{I}next_event, next_element = next_event_element
-{I}if next_event == 'end' and next_element.tag == element.tag:
-{II}# We reached the end of the list.
-{II}break
-
-{I}if next_event != 'start':
-{II}raise DeserializationException(
-{III}"Expected a start element corresponding to an item, "
-{III}f"but got event {{next_event!r}} and element {{next_element.tag!r}}"
-{II})
-
-{I}try:
-{II}item = {read_item}(
-{III}next_element,
-{III}iterator
-{II})
-{I}except DeserializationException as exception:
-{II}exception.path._prepend(IndexSegment(next_element, item_i))
-{II}raise
-
-{I}result.append(item)
-{I}item_i += 1
-
-self.{prop_name} = result"""
+self.{prop_name} = _read_list_of_items(
+{I}element,
+{I}iterator,
+{I}{indent_but_first_line(read_item_callable, I)}
+)"""
             )
 
         else:
@@ -1620,11 +1590,6 @@ def _generate_write_cls_as_sequence(cls: intermediate.ConcreteClass) -> Stripped
     )
     # fmt: on
 
-    # NOTE (mristin, 2022-10-14):
-    # We need to introduce a new loop variable for each loop since Python tracks
-    # the variables in the function scope instead of the block scope.
-    generator_for_loop_variables = python_common.GeneratorForLoopVariables()
-
     body_blocks = []  # type: List[Stripped]
 
     if len(cls.properties) == 0:
@@ -1702,8 +1667,6 @@ self._write_end_element({xml_prop_literal})"""
                         assert_never(our_type)
 
                 elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                    variable = next(generator_for_loop_variables)
-
                     items_primitive_type = intermediate.try_primitive_type(
                         type_anno.items
                     )
@@ -1714,13 +1677,13 @@ self._write_end_element({xml_prop_literal})"""
                         ]
                         write_prop = Stripped(
                             f"""\
-if len(that.{prop_name}) == 0:
-{I}self._write_empty_element({xml_prop_literal})
-else:
-{I}self._write_start_element({xml_prop_literal})
-{I}for {variable} in that.{prop_name}:
-{II}self.{write_method}('v', {variable})
-{I}self._write_end_element({xml_prop_literal})"""
+self._write_list_of_items(
+{I}{xml_prop_literal},
+{I}that.{prop_name},
+{I}lambda v: self.{write_method}(
+{II}'v', v
+{I})
+)"""
                         )
                     else:
                         if isinstance(
@@ -1736,13 +1699,13 @@ else:
                             ):
                                 write_prop = Stripped(
                                     f"""\
-if len(that.{prop_name}) == 0:
-{I}self._write_empty_element({xml_prop_literal})
-else:
-{I}self._write_start_element({xml_prop_literal})
-{I}for {variable} in that.{prop_name}:
-{II}self._write_str_as_element('v', {variable}.value)
-{I}self._write_end_element({xml_prop_literal})"""
+self._write_list_of_items(
+{I}{xml_prop_literal},
+{I}that.{prop_name},
+{I}lambda v: self._write_str_as_element(
+{II}'v', v.value
+{I})
+)"""
                                 )
 
                             elif isinstance(
@@ -1760,13 +1723,11 @@ else:
                             ):
                                 write_prop = Stripped(
                                     f"""\
-if len(that.{prop_name}) == 0:
-{I}self._write_empty_element({xml_prop_literal})
-else:
-{I}self._write_start_element({xml_prop_literal})
-{I}for {variable} in that.{prop_name}:
-{II}self.visit({variable})
-{I}self._write_end_element({xml_prop_literal})"""
+self._write_list_of_items(
+{I}{xml_prop_literal},
+{I}that.{prop_name},
+{I}self.visit
+)"""
                                 )
 
                             else:
@@ -2238,6 +2199,32 @@ def _write_bytes_as_element(
         ),
         Stripped(
             f"""\
+def _write_list_of_items(
+{I}self,
+{I}name: str,
+{I}items: Sequence[_ItemT],
+{I}write_item: Callable[[_ItemT], None]
+) -> None:
+{I}\"\"\"
+{I}Write :paramref:`items` enclosed in the :paramref:`name` element.
+
+{I}:param name: of the enclosing element
+{I}:param items: to be written
+{I}:param write_item:
+{II}to write a single item of :paramref:`items` -- either into its own
+{II}``v`` element (for scalars/enumerations) or its own natural class
+{II}element (for classes, via :py:meth:`~visit`)
+{I}\"\"\"
+{I}if len(items) == 0:
+{II}self._write_empty_element(name)
+{I}else:
+{II}self._write_start_element(name)
+{II}for item in items:
+{III}write_item(item)
+{II}self._write_end_element(name)"""
+        ),
+        Stripped(
+            f"""\
 def __init__(
 {I}self,
 {I}stream: TextIO
@@ -2393,6 +2380,7 @@ from typing import (
 {I}Sequence,
 {I}TextIO,
 {I}Tuple,
+{I}TypeVar,
 {I}Union,
 {I}TYPE_CHECKING
 )
@@ -2756,6 +2744,112 @@ def _read_end_element(
 {I}_raise_if_has_tail_or_attrib(next_element)
 
 {I}return next_element"""
+            ),
+            Stripped('_ItemT = TypeVar("_ItemT")'),
+            Stripped(
+                f"""\
+def _read_v_element(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]],
+{I}expected_tag: str,
+{I}read_content: Callable[
+{II}[Element, Iterator[Tuple[str, Element]]],
+{II}_ItemT
+{I}]
+) -> _ItemT:
+{I}\"\"\"
+{I}Verify that :paramref:`element` bears the :paramref:`expected_tag`, and
+{I}delegate the reading of its content to :paramref:`read_content`.
+
+{I}This is used to read a single positional item wrapped in a named element,
+{I}such as ``<v>`` for a list item.
+
+{I}:param element: look-ahead element
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:param expected_tag: expected tag of :paramref:`element`
+{I}:param read_content: to read the content of :paramref:`element`
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return: parsed value
+{I}\"\"\"
+{I}tag_wo_ns = _parse_element_tag(element)
+{I}if tag_wo_ns != expected_tag:
+{II}raise DeserializationException(
+{III}f"Expected an element with the tag {{expected_tag!r}}, "
+{III}f"but got an element with tag: {{tag_wo_ns!r}}"
+{II})
+
+{I}return read_content(element, iterator)"""
+            ),
+            Stripped(
+                f"""\
+def _read_list_of_items(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]],
+{I}read_item: Callable[
+{II}[Element, Iterator[Tuple[str, Element]]],
+{II}_ItemT
+{I}]
+) -> List[_ItemT]:
+{I}\"\"\"
+{I}Read a list of items from :paramref:`iterator`.
+
+{I}:paramref:`read_item` is responsible for verifying the tag of each item
+{I}element itself -- *e.g.*, by wrapping a scalar/enumeration reader with
+{I}:py:func:`_read_v_element`, or by relying on a class's own dispatch by
+{I}its natural element tag.
+
+{I}The end element corresponding to :paramref:`element` will be read as well.
+
+{I}:param element: start element enclosing the list
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:param read_item: to read a single item, including its own end element
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return: parsed items
+{I}\"\"\"
+{I}if element.text is not None and len(element.text.strip()) != 0:
+{II}raise DeserializationException(
+{III}f"Expected only item elements and whitespace text, "
+{III}f"but got text: {{element.text!r}}"
+{II})
+
+{I}result = []  # type: List[_ItemT]
+{I}item_i = 0
+
+{I}while True:
+{II}next_event_element = next(iterator, None)
+{II}if next_event_element is None:
+{III}raise DeserializationException(
+{IIII}"Expected one or more items from a list or the end element, "
+{IIII}"but got end-of-input"
+{III})
+
+{II}next_event, next_element = next_event_element
+{II}if next_event == 'end' and next_element.tag == element.tag:
+{III}# We reached the end of the list.
+{III}break
+
+{II}if next_event != 'start':
+{III}raise DeserializationException(
+{IIII}"Expected a start element corresponding to an item, "
+{IIII}f"but got event {{next_event!r}} and element {{next_element.tag!r}}"
+{III})
+
+{II}try:
+{III}item = read_item(next_element, iterator)
+{II}except DeserializationException as exception:
+{III}exception.path._prepend(IndexSegment(next_element, item_i))
+{III}raise
+
+{II}result.append(item)
+{II}item_i += 1
+
+{I}return result"""
             ),
             Stripped(
                 f"""\

@@ -24,6 +24,7 @@ from typing import (
     MutableMapping,
     Optional,
     Sequence,
+    TypeVar,
     Union,
 )
 
@@ -165,6 +166,9 @@ MutableJsonable = Union[
 # region De-serialization
 
 
+_ItemT = TypeVar("_ItemT")
+
+
 def _bool_from_jsonable(
     jsonable: Jsonable
 ) -> bool:
@@ -304,6 +308,38 @@ def _try_to_cast_to_array_like(
     return None
 
 
+def _list_from_jsonable(
+    jsonable: Jsonable,
+    parse_item: Callable[[Jsonable], _ItemT]
+) -> List[_ItemT]:
+    """
+    Parse :paramref:`jsonable` as a list, applying :paramref:`parse_item` on
+    every item.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param parse_item: to parse a single item of the array
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    array_like = _try_to_cast_to_array_like(jsonable)
+    if array_like is None:
+        raise DeserializationException(
+            f"Expected something array-like, but got: {type(jsonable)}"
+        )
+
+    result = []  # type: List[_ItemT]
+    for i, jsonable_item in enumerate(array_like):
+        try:
+            item = parse_item(jsonable_item)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(array_like, i))
+            raise
+
+        result.append(item)
+
+    return result
+
+
 class _SetterForSomething:
     """Provide de-serialization-setters for properties."""
 
@@ -328,32 +364,10 @@ class _SetterForSomething:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            bool
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = _bool_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.some_bools = items
+        self.some_bools = _list_from_jsonable(
+            jsonable,
+            _bool_from_jsonable
+        )
 
     def set_some_ints_from_jsonable(
             self,
@@ -364,32 +378,10 @@ class _SetterForSomething:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            int
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = _int_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.some_ints = items
+        self.some_ints = _list_from_jsonable(
+            jsonable,
+            _int_from_jsonable
+        )
 
     def set_some_floats_from_jsonable(
             self,
@@ -400,32 +392,10 @@ class _SetterForSomething:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            float
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = _float_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.some_floats = items
+        self.some_floats = _list_from_jsonable(
+            jsonable,
+            _float_from_jsonable
+        )
 
     def set_some_strings_from_jsonable(
             self,
@@ -436,32 +406,10 @@ class _SetterForSomething:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            str
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = _str_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.some_strings = items
+        self.some_strings = _list_from_jsonable(
+            jsonable,
+            _str_from_jsonable
+        )
 
     def set_some_bytes_from_jsonable(
             self,
@@ -472,32 +420,10 @@ class _SetterForSomething:
 
         :param jsonable: input to be parsed
         """
-        array_like = _try_to_cast_to_array_like(jsonable)
-        if array_like is None:
-            raise DeserializationException(
-                f"Expected something array-like, but got: {type(jsonable)}"
-            )
-
-        items: List[
-            bytes
-        ] = []
-        for i, jsonable_item in enumerate(array_like):
-            try:
-                item = _bytes_from_jsonable(
-                    jsonable_item
-                )
-            except DeserializationException as exception:
-                exception.path._prepend(
-                    IndexSegment(
-                        array_like,
-                        i
-                    )
-                )
-                raise
-
-            items.append(item)
-
-        self.some_bytes = items
+        self.some_bytes = _list_from_jsonable(
+            jsonable,
+            _bytes_from_jsonable
+        )
 
 
 def something_from_jsonable(

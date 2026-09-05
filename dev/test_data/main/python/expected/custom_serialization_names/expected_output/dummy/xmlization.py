@@ -83,6 +83,7 @@ from typing import (
     Sequence,
     TextIO,
     Tuple,
+    TypeVar,
     Union,
     TYPE_CHECKING
 )
@@ -779,6 +780,112 @@ def _read_end_element(
     _raise_if_has_tail_or_attrib(next_element)
 
     return next_element
+
+
+_ItemT = TypeVar("_ItemT")
+
+
+def _read_v_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    expected_tag: str,
+    read_content: Callable[
+        [Element, Iterator[Tuple[str, Element]]],
+        _ItemT
+    ]
+) -> _ItemT:
+    """
+    Verify that :paramref:`element` bears the :paramref:`expected_tag`, and
+    delegate the reading of its content to :paramref:`read_content`.
+
+    This is used to read a single positional item wrapped in a named element,
+    such as ``<v>`` for a list item.
+
+    :param element: look-ahead element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param expected_tag: expected tag of :paramref:`element`
+    :param read_content: to read the content of :paramref:`element`
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed value
+    """
+    tag_wo_ns = _parse_element_tag(element)
+    if tag_wo_ns != expected_tag:
+        raise DeserializationException(
+            f"Expected an element with the tag {expected_tag!r}, "
+            f"but got an element with tag: {tag_wo_ns!r}"
+        )
+
+    return read_content(element, iterator)
+
+
+def _read_list_of_items(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_item: Callable[
+        [Element, Iterator[Tuple[str, Element]]],
+        _ItemT
+    ]
+) -> List[_ItemT]:
+    """
+    Read a list of items from :paramref:`iterator`.
+
+    :paramref:`read_item` is responsible for verifying the tag of each item
+    element itself -- *e.g.*, by wrapping a scalar/enumeration reader with
+    :py:func:`_read_v_element`, or by relying on a class's own dispatch by
+    its natural element tag.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the list
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_item: to read a single item, including its own end element
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed items
+    """
+    if element.text is not None and len(element.text.strip()) != 0:
+        raise DeserializationException(
+            f"Expected only item elements and whitespace text, "
+            f"but got text: {element.text!r}"
+        )
+
+    result = []  # type: List[_ItemT]
+    item_i = 0
+
+    while True:
+        next_event_element = next(iterator, None)
+        if next_event_element is None:
+            raise DeserializationException(
+                "Expected one or more items from a list or the end element, "
+                "but got end-of-input"
+            )
+
+        next_event, next_element = next_event_element
+        if next_event == 'end' and next_element.tag == element.tag:
+            # We reached the end of the list.
+            break
+
+        if next_event != 'start':
+            raise DeserializationException(
+                "Expected a start element corresponding to an item, "
+                f"but got event {next_event!r} and element {next_element.tag!r}"
+            )
+
+        try:
+            item = read_item(next_element, iterator)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(next_element, item_i))
+            raise
+
+        result.append(item)
+        item_i += 1
+
+    return result
 
 
 def _read_text_from_element(
@@ -1490,6 +1597,30 @@ class _Serializer(aas_types.AbstractVisitor):
         # See: https://datatracker.ietf.org/doc/html/rfc4648#section-4
         self.stream.write(encoded)
         self._write_end_element(name)
+
+    def _write_list_of_items(
+        self,
+        name: str,
+        items: Sequence[_ItemT],
+        write_item: Callable[[_ItemT], None]
+    ) -> None:
+        """
+        Write :paramref:`items` enclosed in the :paramref:`name` element.
+
+        :param name: of the enclosing element
+        :param items: to be written
+        :param write_item:
+            to write a single item of :paramref:`items` -- either into its own
+            ``v`` element (for scalars/enumerations) or its own natural class
+            element (for classes, via :py:meth:`~visit`)
+        """
+        if len(items) == 0:
+            self._write_empty_element(name)
+        else:
+            self._write_start_element(name)
+            for item in items:
+                write_item(item)
+            self._write_end_element(name)
 
     def __init__(
         self,
