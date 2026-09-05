@@ -2189,7 +2189,8 @@ std::pair<
   common::optional<DeserializationError>
 > DeserializeValueFromVElement(
   ReaderMergingText& reader,
-  const DeserializeT& deserialize_content
+  const DeserializeT& deserialize_content,
+  const std::string& expected_name
 ) {
   #ifdef DEBUG
   if (reader.node().kind() == NodeKind::Error) {
@@ -2203,7 +2204,9 @@ std::pair<
   if (reader.node().kind() != NodeKind::Start) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a start element <v> enclosing a value, but got ",
+        L"Expected a start element <",
+        common::Utf8ToWstring(expected_name),
+        L"> enclosing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
@@ -2215,17 +2218,19 @@ std::pair<
     >(reader.node()).name
   );
 
-  if (start_name != "v") {
+  if (start_name != expected_name) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a start element <v> enclosing a value, but got ",
+        L"Expected a start element <",
+        common::Utf8ToWstring(expected_name),
+        L"> enclosing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
   }
 
   // NOTE (mristin):
-  // We consume the <v>.
+  // We consume the start element.
   reader.Read();
 
   if (reader.node().kind() == NodeKind::Error) {
@@ -2241,7 +2246,9 @@ std::pair<
 
   if (error.has_value()) {
     error->path.segments.emplace_front(
-      common::make_unique<ElementSegment>(L"v")
+      common::make_unique<ElementSegment>(
+        common::Utf8ToWstring(expected_name)
+      )
     );
 
     return NoInstanceAndDeserializationError<T>(
@@ -2252,7 +2259,9 @@ std::pair<
   if (reader.node().kind() != NodeKind::Stop) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a closing element </v> closing a value, but got ",
+        L"Expected a closing element </",
+        common::Utf8ToWstring(expected_name),
+        L"> closing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
@@ -2265,17 +2274,19 @@ std::pair<
   );
 
 
-  if (stop_name != "v") {
+  if (stop_name != expected_name) {
     return NoInstanceAndDeserializationErrorWithCause<T>(
       common::Concat(
-        L"Expected a stop element </v> closing a value, but got ",
+        L"Expected a closing element </",
+        common::Utf8ToWstring(expected_name),
+        L"> closing a value, but got ",
         NodeToHumanReadableWstring(reader.node())
       )
     );
   }
 
   // NOTE (mristin):
-  // We consume the </v>.
+  // We consume the closing element.
   reader.Read();
 
   if (reader.node().kind() == NodeKind::Error) {
@@ -2514,7 +2525,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeNames:
+      case properties::OfSomething::kSomeNames: {
         std::tie(
           the_some_names,
           error
@@ -2527,11 +2538,13 @@ std::pair<
               std::wstring
             >(
               a_reader,
-              DeserializeWstring
+              DeserializeWstring,
+              "v"
             );
           }
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3567,6 +3580,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * Serialize a list of items enclosed in <v> elements.
  */
 template <typename T, typename SerializeT>
@@ -3660,38 +3709,19 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "someNames"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeListOfVElements(
+  error = SerializePropertyAsElement(
+    "someNames",
     that.some_names(),
     writer,
-    SerializeWstring
+    iteration::Property::kSomeNames,
+    [](
+      const std::vector<std::wstring>& a_list,
+      SelfClosingWriter& a_writer
+    ) {
+      return SerializeListOfVElements(a_list, a_writer, SerializeWstring);
+    }
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeNames
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someNames"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeNames
-      )
-    );
-
     return error;
   }
 

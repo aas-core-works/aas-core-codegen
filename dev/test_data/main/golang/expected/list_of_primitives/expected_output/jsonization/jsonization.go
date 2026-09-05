@@ -221,6 +221,29 @@ func bytesFromJsonable(
 	return
 }
 
+// Parse `jsonableArray` into a slice of `T` by calling `parseItem` on every
+// item, or return an error.
+func parseArray[T any](
+	jsonableArray []interface{},
+	parseItem func(jsonable interface{}) (T, error),
+) (result []T, err error) {
+	result = make([]T, len(jsonableArray))
+	for i, itemJsonable := range jsonableArray {
+		var item T
+		item, err = parseItem(itemJsonable)
+		if err != nil {
+			if deseriaErr, ok := err.(*DeserializationError); ok {
+				deseriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+		result[i] = item
+	}
+	return
+}
+
 // Parse `jsonable` as an instance of [aastypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
@@ -295,36 +318,21 @@ func somethingFromMapWithoutDispatch(
 				return
 			}
 
-			array := make(
-				[]bool,
-				len(jsonableArray),
+			theSomeBools, err = parseArray(
+				jsonableArray,
+				boolFromJsonable,
 			)
-			for i, itemJsonable := range jsonableArray {
-				var item bool
-				item, err = boolFromJsonable(
-					itemJsonable,
-				)
-				if err != nil {
-					if deseriaErr, ok := err.(*DeserializationError); ok {
-						deseriaErr.Path.PrependIndex(
-							&aasreporting.IndexSegment{
-								Index: i,
-							},
-						)
-
-						deseriaErr.Path.PrependName(
-							&aasreporting.NameSegment{
-								Name: "someBools",
-							},
-						)
-					}
-
-					return
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "someBools",
+						},
+					)
 				}
 
-				array[i] = item
+				return
 			}
-			theSomeBools = array
 			foundSomeBools = true
 
 		case "someInts":
@@ -348,36 +356,21 @@ func somethingFromMapWithoutDispatch(
 				return
 			}
 
-			array := make(
-				[]int64,
-				len(jsonableArray),
+			theSomeInts, err = parseArray(
+				jsonableArray,
+				int64FromJsonable,
 			)
-			for i, itemJsonable := range jsonableArray {
-				var item int64
-				item, err = int64FromJsonable(
-					itemJsonable,
-				)
-				if err != nil {
-					if deseriaErr, ok := err.(*DeserializationError); ok {
-						deseriaErr.Path.PrependIndex(
-							&aasreporting.IndexSegment{
-								Index: i,
-							},
-						)
-
-						deseriaErr.Path.PrependName(
-							&aasreporting.NameSegment{
-								Name: "someInts",
-							},
-						)
-					}
-
-					return
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "someInts",
+						},
+					)
 				}
 
-				array[i] = item
+				return
 			}
-			theSomeInts = array
 			foundSomeInts = true
 
 		case "someFloats":
@@ -401,36 +394,21 @@ func somethingFromMapWithoutDispatch(
 				return
 			}
 
-			array := make(
-				[]float64,
-				len(jsonableArray),
+			theSomeFloats, err = parseArray(
+				jsonableArray,
+				float64FromJsonable,
 			)
-			for i, itemJsonable := range jsonableArray {
-				var item float64
-				item, err = float64FromJsonable(
-					itemJsonable,
-				)
-				if err != nil {
-					if deseriaErr, ok := err.(*DeserializationError); ok {
-						deseriaErr.Path.PrependIndex(
-							&aasreporting.IndexSegment{
-								Index: i,
-							},
-						)
-
-						deseriaErr.Path.PrependName(
-							&aasreporting.NameSegment{
-								Name: "someFloats",
-							},
-						)
-					}
-
-					return
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "someFloats",
+						},
+					)
 				}
 
-				array[i] = item
+				return
 			}
-			theSomeFloats = array
 			foundSomeFloats = true
 
 		case "someStrings":
@@ -454,36 +432,21 @@ func somethingFromMapWithoutDispatch(
 				return
 			}
 
-			array := make(
-				[]string,
-				len(jsonableArray),
+			theSomeStrings, err = parseArray(
+				jsonableArray,
+				stringFromJsonable,
 			)
-			for i, itemJsonable := range jsonableArray {
-				var item string
-				item, err = stringFromJsonable(
-					itemJsonable,
-				)
-				if err != nil {
-					if deseriaErr, ok := err.(*DeserializationError); ok {
-						deseriaErr.Path.PrependIndex(
-							&aasreporting.IndexSegment{
-								Index: i,
-							},
-						)
-
-						deseriaErr.Path.PrependName(
-							&aasreporting.NameSegment{
-								Name: "someStrings",
-							},
-						)
-					}
-
-					return
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "someStrings",
+						},
+					)
 				}
 
-				array[i] = item
+				return
 			}
-			theSomeStrings = array
 			foundSomeStrings = true
 
 		case "someBytes":
@@ -507,36 +470,21 @@ func somethingFromMapWithoutDispatch(
 				return
 			}
 
-			array := make(
-				[][]byte,
-				len(jsonableArray),
+			theSomeBytes, err = parseArray(
+				jsonableArray,
+				bytesFromJsonable,
 			)
-			for i, itemJsonable := range jsonableArray {
-				var item []byte
-				item, err = bytesFromJsonable(
-					itemJsonable,
-				)
-				if err != nil {
-					if deseriaErr, ok := err.(*DeserializationError); ok {
-						deseriaErr.Path.PrependIndex(
-							&aasreporting.IndexSegment{
-								Index: i,
-							},
-						)
-
-						deseriaErr.Path.PrependName(
-							&aasreporting.NameSegment{
-								Name: "someBytes",
-							},
-						)
-					}
-
-					return
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "someBytes",
+						},
+					)
 				}
 
-				array[i] = item
+				return
 			}
-			theSomeBytes = array
 			foundSomeBytes = true
 
 		default:
@@ -663,6 +611,29 @@ func bytesToJsonable(
 	return
 }
 
+// Serialize every item of `items` with `serializeItem` into a JSON-able array,
+// or return an error.
+func serializeArray[T any](
+	items []T,
+	serializeItem func(item T) (interface{}, error),
+) (result []interface{}, err error) {
+	result = make([]interface{}, len(items))
+	for i, item := range items {
+		var jsonable interface{}
+		jsonable, err = serializeItem(item)
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+		result[i] = jsonable
+	}
+	return
+}
+
 // Serialize [aastypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
@@ -674,90 +645,107 @@ func somethingToMap(
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
-	jsonableSomeBools := make(
-		[]interface{},
-		len(that.SomeBools()),
+	var jsonableSomeBools []interface{}
+	jsonableSomeBools, err = serializeArray(
+		that.SomeBools(),
+		func(item bool) (interface{}, error) {
+			return item, nil
+		},
 	)
-	for i, v := range that.SomeBools() {
-		jsonableSomeBools[i] = v
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeBools()",
+				},
+			)
+		}
+
+		return
 	}
 	result["someBools"] = jsonableSomeBools
 
-	jsonableSomeInts := make(
-		[]interface{},
-		len(that.SomeInts()),
+	var jsonableSomeInts []interface{}
+	jsonableSomeInts, err = serializeArray(
+		that.SomeInts(),
+		func(item int64) (interface{}, error) {
+			return int64ToJsonable(
+				item,
+			)
+		},
 	)
-	for i, v := range that.SomeInts() {
-		var jsonable interface{}
-		jsonable, err = int64ToJsonable(
-			v,
-		)
-		if err != nil {
-			if seriaErr, ok := err.(*SerializationError); ok {
-				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
-
-				seriaErr.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SomeInts()",
-					},
-				)
-			}
-
-			return
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeInts()",
+				},
+			)
 		}
-		jsonableSomeInts[i] = jsonable
+
+		return
 	}
 	result["someInts"] = jsonableSomeInts
 
-	jsonableSomeFloats := make(
-		[]interface{},
-		len(that.SomeFloats()),
+	var jsonableSomeFloats []interface{}
+	jsonableSomeFloats, err = serializeArray(
+		that.SomeFloats(),
+		func(item float64) (interface{}, error) {
+			return item, nil
+		},
 	)
-	for i, v := range that.SomeFloats() {
-		jsonableSomeFloats[i] = v
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeFloats()",
+				},
+			)
+		}
+
+		return
 	}
 	result["someFloats"] = jsonableSomeFloats
 
-	jsonableSomeStrings := make(
-		[]interface{},
-		len(that.SomeStrings()),
+	var jsonableSomeStrings []interface{}
+	jsonableSomeStrings, err = serializeArray(
+		that.SomeStrings(),
+		func(item string) (interface{}, error) {
+			return item, nil
+		},
 	)
-	for i, v := range that.SomeStrings() {
-		jsonableSomeStrings[i] = v
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeStrings()",
+				},
+			)
+		}
+
+		return
 	}
 	result["someStrings"] = jsonableSomeStrings
 
-	jsonableSomeBytes := make(
-		[]interface{},
-		len(that.SomeBytes()),
+	var jsonableSomeBytes []interface{}
+	jsonableSomeBytes, err = serializeArray(
+		that.SomeBytes(),
+		func(item []byte) (interface{}, error) {
+			return bytesToJsonable(
+				item,
+			)
+		},
 	)
-	for i, v := range that.SomeBytes() {
-		var jsonable interface{}
-		jsonable, err = bytesToJsonable(
-			v,
-		)
-		if err != nil {
-			if seriaErr, ok := err.(*SerializationError); ok {
-				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
-
-				seriaErr.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SomeBytes()",
-					},
-				)
-			}
-
-			return
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeBytes()",
+				},
+			)
 		}
-		jsonableSomeBytes[i] = jsonable
+
+		return
 	}
 	result["someBytes"] = jsonableSomeBytes
 

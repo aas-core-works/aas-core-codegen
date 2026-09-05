@@ -6,10 +6,9 @@
 #include "dummy/wstringification.hpp"
 
 #pragma warning(push, 0)
-#include <functional>
-#include <map>
 #include <set>
 #include <sstream>
+#include <unordered_map>
 #pragma warning(pop)
 
 namespace dummy {
@@ -492,6 +491,46 @@ std::pair<
 }
 
 /**
+ * Map JSON \c modelType strings to model types.
+ */
+const std::unordered_map<
+  std::string,
+  types::ModelType
+> kModelTypeStringToModelType = {
+  {
+    "Branch",
+    types::ModelType::kBranch
+  },
+  {
+    "Leaf",
+    types::ModelType::kLeaf
+  },
+  {
+    "Blossom",
+    types::ModelType::kBlossom
+  },
+  {
+    "Something",
+    types::ModelType::kSomething
+  },
+  {
+    "Container",
+    types::ModelType::kContainer
+  }
+};
+
+common::optional<types::ModelType> ModelTypeFromModelTypeString(
+  const std::string& model_type_str
+) {
+  auto it = kModelTypeStringToModelType.find(model_type_str);
+  if (it == kModelTypeStringToModelType.end()) {
+    return common::nullopt;
+  }
+
+  return it->second;
+}
+
+/**
  * \brief Dispatch the deserialization for an instance
  * of types::INode.
  *
@@ -655,35 +694,6 @@ std::pair<
   bool additional_properties
 );
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::INode> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeNodeByModelType = {
-  {
-    "Branch",
-    ConcretelyDeserializeBranch<
-      types::INode
-    >
-  },
-  {
-    "Leaf",
-    ConcretelyDeserializeLeaf<
-      types::INode
-    >
-  },
-  {
-    "Blossom",
-    DeserializeBlossom<
-      types::INode
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::INode>
@@ -693,11 +703,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -711,13 +721,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeNodeByModelType.find(*model_type);
-  if (it == kDeserializeNodeByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::INode "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -731,7 +742,38 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kBranch:
+      return ConcretelyDeserializeBranch<
+        types::INode
+      >(json, additional_properties);
+    case types::ModelType::kLeaf:
+      return ConcretelyDeserializeLeaf<
+        types::INode
+      >(json, additional_properties);
+    case types::ModelType::kBlossom:
+      return DeserializeBlossom<
+        types::INode
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::INode "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::INode> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInBranch = {
@@ -966,35 +1008,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::IBranch> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeBranchByModelType = {
-  {
-    "Branch",
-    ConcretelyDeserializeBranch<
-      types::IBranch
-    >
-  },
-  {
-    "Leaf",
-    ConcretelyDeserializeLeaf<
-      types::IBranch
-    >
-  },
-  {
-    "Blossom",
-    DeserializeBlossom<
-      types::IBranch
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::IBranch>
@@ -1004,11 +1017,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -1022,13 +1035,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeBranchByModelType.find(*model_type);
-  if (it == kDeserializeBranchByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::IBranch "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -1042,7 +1056,38 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kBranch:
+      return ConcretelyDeserializeBranch<
+        types::IBranch
+      >(json, additional_properties);
+    case types::ModelType::kLeaf:
+      return ConcretelyDeserializeLeaf<
+        types::IBranch
+      >(json, additional_properties);
+    case types::ModelType::kBlossom:
+      return DeserializeBlossom<
+        types::IBranch
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::IBranch "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IBranch> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInLeaf = {
@@ -1320,29 +1365,6 @@ std::pair<
   );
 }
 
-std::map<
-  std::string,
-  std::function<
-    std::pair<
-      common::optional<std::shared_ptr<types::ILeaf> >,
-      common::optional<DeserializationError>
-    >(const nlohmann::json&, bool)
-  >
-> kDeserializeLeafByModelType = {
-  {
-    "Leaf",
-    ConcretelyDeserializeLeaf<
-      types::ILeaf
-    >
-  },
-  {
-    "Blossom",
-    DeserializeBlossom<
-      types::ILeaf
-    >
-  }
-};
-
 std::pair<
   common::optional<
     std::shared_ptr<types::ILeaf>
@@ -1352,11 +1374,11 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 ) {
-  const std::string* model_type;
+  const std::string* model_type_str;
   common::optional<DeserializationError> error;
 
   std::tie(
-    model_type,
+    model_type_str,
     error
   ) = GetModelTypeFrom(json);
 
@@ -1370,13 +1392,14 @@ std::pair<
     );
   }
 
-  const auto it = kDeserializeLeafByModelType.find(*model_type);
-  if (it == kDeserializeLeafByModelType.end()) {
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
     std::wstring message = common::Concat(
-      L"The dispatch to the JSON de-serialization of "
-      L"types::ILeaf "
-      L"is not defined for model type: ",
-      common::Utf8ToWstring(*model_type)
+      L"The model type does not correspond to any known class: ",
+      common::Utf8ToWstring(*model_type_str)
     );
 
     return std::make_pair<
@@ -1390,7 +1413,34 @@ std::pair<
     );
   }
 
-  return (it->second)(json, additional_properties);
+  switch (*model_type) {
+    case types::ModelType::kLeaf:
+      return ConcretelyDeserializeLeaf<
+        types::ILeaf
+      >(json, additional_properties);
+    case types::ModelType::kBlossom:
+      return DeserializeBlossom<
+        types::ILeaf
+      >(json, additional_properties);
+    default: {
+      std::wstring message = common::Concat(
+        L"The dispatch to the JSON de-serialization of "
+        L"types::ILeaf "
+        L"is not defined for model type: ",
+        common::Utf8ToWstring(*model_type_str)
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::ILeaf> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          message
+        )
+      );
+    }
+  }
 }
 
 std::set<std::string> kPropertiesInBlossom = {
@@ -2323,6 +2373,15 @@ const iteration::Path& SerializationException::path() const noexcept {
 // endregion SerializationException
 
 /**
+ * Serialize the given boolean to a JSON value.
+ */
+nlohmann::json SerializeBool(
+  bool value
+) {
+  return value;
+}
+
+/**
  * \brief Serialize the given number to a JSON value.
  *
  * We verify that the integer is within the range representable by 64-bit floats
@@ -2362,6 +2421,15 @@ std::pair<
     common::make_optional<nlohmann::json>(value),
     common::nullopt
   );
+}
+
+/**
+ * Serialize the given floating-point number to a JSON value.
+ */
+nlohmann::json SerializeDouble(
+  double value
+) {
+  return value;
 }
 
 /**
@@ -2466,14 +2534,6 @@ nlohmann::json SerializeListWithInfallible(
   }
 
   return serialized;
-}
-
-/**
- * Just forward the value as it is.
- */
-template<typename T>
-const T& Identity(const T& value) {
-  return value;
 }
 
 std::pair<

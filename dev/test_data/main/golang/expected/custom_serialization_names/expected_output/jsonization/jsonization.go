@@ -221,6 +221,29 @@ func bytesFromJsonable(
 	return
 }
 
+// Parse `jsonableArray` into a slice of `T` by calling `parseItem` on every
+// item, or return an error.
+func parseArray[T any](
+	jsonableArray []interface{},
+	parseItem func(jsonable interface{}) (T, error),
+) (result []T, err error) {
+	result = make([]T, len(jsonableArray))
+	for i, itemJsonable := range jsonableArray {
+		var item T
+		item, err = parseItem(itemJsonable)
+		if err != nil {
+			if deseriaErr, ok := err.(*DeserializationError); ok {
+				deseriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+		result[i] = item
+	}
+	return
+}
+
 // Parse `jsonable` as an instance of [aastypes.IQueryCondition],
 // or return an error.
 func QueryConditionFromJsonable(
@@ -385,6 +408,29 @@ func bytesToJsonable(
 	result = b64.StdEncoding.EncodeToString(
 		bytes,
 	)
+	return
+}
+
+// Serialize every item of `items` with `serializeItem` into a JSON-able array,
+// or return an error.
+func serializeArray[T any](
+	items []T,
+	serializeItem func(item T) (interface{}, error),
+) (result []interface{}, err error) {
+	result = make([]interface{}, len(items))
+	for i, item := range items {
+		var jsonable interface{}
+		jsonable, err = serializeItem(item)
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+		result[i] = jsonable
+	}
 	return
 }
 

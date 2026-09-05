@@ -246,7 +246,17 @@ func readTextAsLong(
 		return
 	}
 
-	value, err = strconv.ParseInt(text, 10, 64)
+	var parseErr error
+	value, parseErr = strconv.ParseInt(text, 10, 64)
+	if parseErr != nil {
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Expected a value as xs:long, but it could not be parsed: %s: %s",
+				parseErr.Error(), text,
+			),
+		)
+		return
+	}
 
 	return
 }

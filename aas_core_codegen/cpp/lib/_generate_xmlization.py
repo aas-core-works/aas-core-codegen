@@ -2808,7 +2808,11 @@ std::pair<
 
 
 def _generate_deserialize_atomic_value_from_v_element() -> Stripped:
-    """Generate the function to deserialize non-class atomic values from ``<v>``."""
+    """
+    Generate the function to deserialize non-class atomic values from a named
+    element such as ``<v>`` (for list items) or ``<v1>``, ``<v2>``, *etc.*
+    (for other fixed-position items).
+    """
     return Stripped(
         f"""\
 template <typename T, typename DeserializeT>
@@ -2817,7 +2821,8 @@ std::pair<
 {I}common::optional<DeserializationError>
 > DeserializeValueFromVElement(
 {I}ReaderMergingText& reader,
-{I}const DeserializeT& deserialize_content
+{I}const DeserializeT& deserialize_content,
+{I}const std::string& expected_name
 ) {{
 {I}#ifdef DEBUG
 {I}if (reader.node().kind() == NodeKind::Error) {{
@@ -2831,7 +2836,9 @@ std::pair<
 {I}if (reader.node().kind() != NodeKind::Start) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a start element <v> enclosing a value, but got ",
+{IIII}L"Expected a start element <",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> enclosing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
@@ -2843,17 +2850,19 @@ std::pair<
 {II}>(reader.node()).name
 {I});
 
-{I}if (start_name != "v") {{
+{I}if (start_name != expected_name) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a start element <v> enclosing a value, but got ",
+{IIII}L"Expected a start element <",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> enclosing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
 {I}}}
 
 {I}// NOTE (mristin):
-{I}// We consume the <v>.
+{I}// We consume the start element.
 {I}reader.Read();
 
 {I}if (reader.node().kind() == NodeKind::Error) {{
@@ -2869,7 +2878,9 @@ std::pair<
 
 {I}if (error.has_value()) {{
 {II}error->path.segments.emplace_front(
-{III}common::make_unique<ElementSegment>(L"v")
+{III}common::make_unique<ElementSegment>(
+{IIII}common::Utf8ToWstring(expected_name)
+{III})
 {II});
 
 {II}return NoInstanceAndDeserializationError<T>(
@@ -2880,7 +2891,9 @@ std::pair<
 {I}if (reader.node().kind() != NodeKind::Stop) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a closing element </v> closing a value, but got ",
+{IIII}L"Expected a closing element </",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> closing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
@@ -2893,17 +2906,19 @@ std::pair<
 {I});
 
 
-{I}if (stop_name != "v") {{
+{I}if (stop_name != expected_name) {{
 {II}return NoInstanceAndDeserializationErrorWithCause<T>(
 {III}common::Concat(
-{IIII}L"Expected a stop element </v> closing a value, but got ",
+{IIII}L"Expected a closing element </",
+{IIII}common::Utf8ToWstring(expected_name),
+{IIII}L"> closing a value, but got ",
 {IIII}NodeToHumanReadableWstring(reader.node())
 {III})
 {II});
 {I}}}
 
 {I}// NOTE (mristin):
-{I}// We consume the </v>.
+{I}// We consume the closing element.
 {I}reader.Read();
 
 {I}if (reader.node().kind() == NodeKind::Error) {{
@@ -3169,6 +3184,84 @@ const std::unordered_map<
     return result
 
 
+def _xml_deserialize_item_expr(
+    item_type_anno: intermediate.AtomicTypeAnnotation,
+    item_type: Stripped,
+    v_element_name: str,
+) -> Stripped:
+    """
+    Generate the expression of the callable to de-serialize an atomic item from XML.
+
+    The ``v_element_name`` denotes the wrapping element expected for a non-class
+    atomic value (*e.g.*, ``v`` for a list item). Class items ignore
+    ``v_element_name`` as they are de-serialized directly from their own element.
+    """
+    items_primitive_type = intermediate.try_primitive_type(item_type_anno)
+
+    if items_primitive_type is not None:
+        deserialize_text = _PRIMITIVE_TYPE_TO_DESERIALIZE[items_primitive_type]
+
+        v_element_name_literal = cpp_common.string_literal(v_element_name)
+
+        return Stripped(
+            f"""\
+[](ReaderMergingText& a_reader) {{
+{I}return DeserializeValueFromVElement<
+{II}{indent_but_first_line(item_type, II)}
+{I}>(
+{II}a_reader,
+{II}{deserialize_text},
+{II}{v_element_name_literal}
+{I});
+}}"""
+        )
+
+    if isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
+        raise AssertionError("Expected to handle this case before")
+
+    elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(item_type_anno.our_type, intermediate.Enumeration):
+            deserialize_text = cpp_naming.function_name(
+                Identifier(f"deserialize_{item_type_anno.our_type.name}")
+            )
+
+            v_element_name_literal = cpp_common.string_literal(v_element_name)
+
+            return Stripped(
+                f"""\
+[](ReaderMergingText& a_reader) {{
+{I}return DeserializeValueFromVElement<
+{II}{indent_but_first_line(item_type, II)}
+{I}>(
+{II}a_reader,
+{II}{deserialize_text},
+{II}{v_element_name_literal}
+{I});
+}}"""
+            )
+
+        elif isinstance(item_type_anno.our_type, intermediate.ConstrainedPrimitive):
+            raise AssertionError("Expected to handle this case before")
+
+        elif isinstance(
+            item_type_anno.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        ):
+            return cpp_naming.function_name(
+                Identifier(f"{item_type_anno.our_type.name}_from_element")
+            )
+
+        else:
+            # noinspection PyTypeChecker
+            assert_never(item_type_anno.our_type)
+
+    else:
+        # noinspection PyTypeChecker
+        assert_never(item_type_anno)
+
+    raise AssertionError("Should not have gotten here")
+
+
 def _generate_deserialize_list_property(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -3190,70 +3283,16 @@ def _generate_deserialize_list_property(
         type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
-    deserialize_item_expr: Stripped
-
-    items_primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-    if items_primitive_type is not None:
-        deserialize_text = _PRIMITIVE_TYPE_TO_DESERIALIZE[items_primitive_type]
-
-        deserialize_item_expr = Stripped(
-            f"""\
-[](ReaderMergingText& a_reader) {{
-{I}return DeserializeValueFromVElement<
-{II}{indent_but_first_line(item_type, II)}
-{I}>(
-{II}a_reader,
-{II}{deserialize_text}
-{I});
-}}"""
+    if not isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple):
+        raise NotImplementedError(
+            "NOTE (mristin): We currently generate XML de-serialization only for "
+            f"the lists of atomic values, but we got: {prop.type_annotation}. "
+            f"Please contact the developers if you need this feature."
         )
 
-    else:
-        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-            raise AssertionError("Expected to handle this case before")
-
-        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                deserialize_text = cpp_naming.function_name(
-                    Identifier(f"deserialize_{type_anno.items.our_type.name}")
-                )
-
-                deserialize_item_expr = Stripped(
-                    f"""\
-[](ReaderMergingText& a_reader) {{
-{I}return DeserializeValueFromVElement<
-{II}{indent_but_first_line(item_type, II)}
-{I}>(
-{II}a_reader,
-{II}{deserialize_text}
-{I});
-}}"""
-                )
-
-            elif isinstance(
-                type_anno.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                raise AssertionError("Expected to handle this case before")
-
-            elif isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                deserialize_item_expr = cpp_naming.function_name(
-                    Identifier(f"{type_anno.items.our_type.name}_from_element")
-                )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.items.our_type)
-
-        else:
-            raise NotImplementedError(
-                "NOTE (mristin): We currently generate XML de-serialization only for "
-                f"the lists of atomic values, but we got: {prop.type_annotation}. "
-                f"Please contact the developers if you need this feature."
-            )
+    deserialize_item_expr = _xml_deserialize_item_expr(
+        item_type_anno=type_anno.items, item_type=item_type, v_element_name="v"
+    )
 
     return Stripped(
         f"""\
@@ -3462,9 +3501,10 @@ common::optional<
         case_blocks.append(
             Stripped(
                 f"""\
-case properties::{prop_enum_name}::{prop_literal}:
+case properties::{prop_enum_name}::{prop_literal}: {{
 {I}{indent_but_first_line(code, I)}
-{I}break;"""
+{I}break;
+}}"""
             )
         )
 
@@ -4814,28 +4854,72 @@ common::optional<SerializationError> {function_name}(
     )
 
 
-def _generate_serialize_list_property(
-    item_type_annotation: intermediate.TypeAnnotationUnion, getter_expr: Stripped
-) -> Stripped:
-    """Serialize the list at ``var_name``."""
-    # NOTE (mristin):
-    # We separated this logic from the _generate_serialize_property function since it
-    # grew too large to comprehend and debug -- Python does not support scopes, so we
-    # could not make sure that the variables are not re-used.
+def _generate_serialize_property_as_element() -> Stripped:
+    """
+    Generate the generic function to serialize a property wrapped in its own
+    named XML element.
 
+    This factors out the ``StartElement``/serialize-call/``StopElement``
+    skeleton shared by every property regardless of kind (primitive, enum,
+    class or list), so that :py:func:`_generate_serialize_property` only
+    needs to supply the element name, the value and a value-specific
+    ``serialize_value`` callable.
+    """
+    return Stripped(
+        f"""\
+/**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+{I}const std::string& name,
+{I}const T& value,
+{I}SelfClosingWriter& writer,
+{I}iteration::Property property,
+{I}const SerializeT& serialize_value
+) {{
+{I}writer.StartElement(name);
+{I}if (writer.error().has_value()) {{
+{II}return writer.move_error();
+{I}}}
+
+{I}common::optional<SerializationError> error = serialize_value(value, writer);
+{I}if (error.has_value()) {{
+{II}error->path.segments.emplace_front(
+{III}common::make_unique<iteration::PropertySegment>(property)
+{II});
+{II}return error;
+{I}}}
+
+{I}writer.StopElement(name);
+{I}if (writer.error().has_value()) {{
+{II}error = writer.move_error();
+{II}error->path.segments.emplace_front(
+{III}common::make_unique<iteration::PropertySegment>(property)
+{II});
+{II}return error;
+{I}}}
+
+{I}return common::nullopt;
+}}"""
+    )
+
+
+def _xml_serialize_list_value_expr(
+    item_type_annotation: intermediate.TypeAnnotationUnion, item_type: Stripped
+) -> Stripped:
+    """
+    Build the ``(list, writer) -> optional<SerializationError>`` callable for
+    a list-typed property, to be plugged into ``SerializePropertyAsElement``.
+    """
     items_primitive_type = intermediate.try_primitive_type(item_type_annotation)
 
-    if items_primitive_type is not None:
-        serialize_function = _PRIMITIVE_TYPE_TO_SERIALIZE[items_primitive_type]
+    list_helper: str
+    serialize_item: str
 
-        return Stripped(
-            f"""\
-error = SerializeListOfVElements(
-{I}{indent_but_first_line(getter_expr, I)},
-{I}writer,
-{I}{serialize_function}
-);"""
-        )
+    if items_primitive_type is not None:
+        serialize_item = _PRIMITIVE_TYPE_TO_SERIALIZE[items_primitive_type]
+        list_helper = "SerializeListOfVElements"
 
     else:
         if isinstance(item_type_annotation, intermediate.PrimitiveTypeAnnotation):
@@ -4843,18 +4927,10 @@ error = SerializeListOfVElements(
 
         elif isinstance(item_type_annotation, intermediate.OurTypeAnnotation):
             if isinstance(item_type_annotation.our_type, intermediate.Enumeration):
-                serialize_function = cpp_naming.function_name(
+                serialize_item = cpp_naming.function_name(
                     Identifier(f"serialize_{item_type_annotation.our_type.name}")
                 )
-
-                return Stripped(
-                    f"""\
-error = SerializeListOfVElements(
-{I}{indent_but_first_line(getter_expr, I)},
-{I}writer,
-{I}{serialize_function}
-);"""
-                )
+                list_helper = "SerializeListOfVElements"
 
             elif isinstance(
                 item_type_annotation.our_type, intermediate.ConstrainedPrimitive
@@ -4865,24 +4941,16 @@ error = SerializeListOfVElements(
                 item_type_annotation.our_type,
                 (intermediate.AbstractClass, intermediate.ConcreteClass),
             ):
-                serialize_function = cpp_naming.function_name(
+                serialize_item = cpp_naming.function_name(
                     Identifier(
                         f"serialize_{item_type_annotation.our_type.name}_ptr_as_element"
                     )
                 )
-
-                return Stripped(
-                    f"""\
-error = SerializeListOfInstances(
-{I}{indent_but_first_line(getter_expr, I)},
-{I}writer,
-{I}{serialize_function}
-);"""
-                )
+                list_helper = "SerializeListOfInstances"
 
             else:
                 # noinspection PyTypeChecker
-                assert_never(item_type_annotation)
+                assert_never(item_type_annotation.our_type)
 
         else:
             raise NotImplementedError(
@@ -4892,11 +4960,26 @@ error = SerializeListOfInstances(
                 f"Please contact the developers if you need this feature."
             )
 
+    return Stripped(
+        f"""\
+[](
+{I}const std::vector<{indent_but_first_line(item_type, I)}>& a_list,
+{I}SelfClosingWriter& a_writer
+) {{
+{I}return {list_helper}(a_list, a_writer, {serialize_item});
+}}"""
+    )
+
 
 def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
-    """Generate code to serialize a property."""
-    blocks = []  # type: List[Stripped]
+    """
+    Generate code to serialize a property.
 
+    The property is wrapped in its own named XML element via the generic
+    :py:func:`_generate_serialize_property_as_element`; this function only
+    needs to determine the value expression and the value-specific
+    ``serialize_value`` callable for the property's kind.
+    """
     getter_name = cpp_naming.getter_name(prop.name)
 
     getter_expr: Stripped
@@ -4908,50 +4991,28 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
 
     xml_name_literal = cpp_common.string_literal(prop.xml_name)
 
-    blocks.append(
-        Stripped(
-            f"""\
-writer.StartElement(
-{I}{xml_name_literal}
-);
-if (writer.error().has_value()) {{
-{I}return writer.move_error();
-}}"""
-        )
-    )
-
-    code: Stripped
-
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
     primitive_type = intermediate.try_primitive_type(type_anno)
 
-    if primitive_type is not None:
-        serialize_function = _PRIMITIVE_TYPE_TO_SERIALIZE[primitive_type]
+    value_expr: Stripped
+    serialize_value_expr: Stripped
 
-        code = Stripped(
-            f"""\
-error = {serialize_function}(
-{I}{getter_expr},
-{I}writer
-);"""
-        )
+    if primitive_type is not None:
+        value_expr = getter_expr
+        serialize_value_expr = Stripped(_PRIMITIVE_TYPE_TO_SERIALIZE[primitive_type])
+
     else:
         if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
             raise AssertionError("Expected to handle this case before")
 
         elif isinstance(type_anno, intermediate.OurTypeAnnotation):
             if isinstance(type_anno.our_type, intermediate.Enumeration):
-                serialize_function = cpp_naming.function_name(
-                    Identifier(f"serialize_{type_anno.our_type.name}")
-                )
-
-                code = Stripped(
-                    f"""\
-error = {serialize_function}(
-{I}{getter_expr},
-{I}writer
-);"""
+                value_expr = getter_expr
+                serialize_value_expr = Stripped(
+                    cpp_naming.function_name(
+                        Identifier(f"serialize_{type_anno.our_type.name}")
+                    )
                 )
 
             elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
@@ -4961,74 +5022,58 @@ error = {serialize_function}(
                 type_anno.our_type,
                 (intermediate.AbstractClass, intermediate.ConcreteClass),
             ):
+                value_expr = Stripped(f"*({getter_expr})")
+
                 if len(type_anno.our_type.concrete_descendants) == 0:
-                    serialize_function = cpp_naming.function_name(
-                        Identifier(f"serialize_{type_anno.our_type.name}_as_sequence")
+                    serialize_value_expr = Stripped(
+                        cpp_naming.function_name(
+                            Identifier(
+                                f"serialize_{type_anno.our_type.name}_as_sequence"
+                            )
+                        )
                     )
                 else:
-                    serialize_function = cpp_naming.function_name(
-                        Identifier(f"serialize_{type_anno.our_type.name}_as_element")
+                    serialize_value_expr = Stripped(
+                        cpp_naming.function_name(
+                            Identifier(
+                                f"serialize_{type_anno.our_type.name}_as_element"
+                            )
+                        )
                     )
-
-                code = Stripped(
-                    f"""\
-error = {serialize_function}(
-{I}*({getter_expr}),
-{I}writer
-);"""
-                )
             else:
                 # noinspection PyTypeChecker
                 assert_never(type_anno.our_type)
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            code = _generate_serialize_list_property(
-                item_type_annotation=type_anno.items, getter_expr=getter_expr
+            value_expr = getter_expr
+
+            item_type = cpp_common.generate_type(
+                type_annotation=type_anno.items,
+                types_namespace=cpp_common.TYPES_NAMESPACE,
+            )
+            serialize_value_expr = _xml_serialize_list_value_expr(
+                item_type_annotation=type_anno.items, item_type=item_type
             )
 
         else:
             # noinspection PyTypeChecker
             assert_never(type_anno)
 
-    blocks.append(code)
-
     prop_literal = cpp_naming.enum_literal_name(prop.name)
-    blocks.append(
-        Stripped(
-            f"""\
-if (error.has_value()) {{
-{I}error->path.segments.emplace_front(
-{II}common::make_unique<iteration::PropertySegment>(
-{III}iteration::Property::{prop_literal}
-{II})
-{I});
 
-{I}return error;
-}}"""
-        )
-    )
-
-    blocks.append(
-        Stripped(
-            f"""\
-writer.StopElement(
-{I}{xml_name_literal}
+    code = Stripped(
+        f"""\
+error = SerializePropertyAsElement(
+{I}{xml_name_literal},
+{I}{indent_but_first_line(value_expr, I)},
+{I}writer,
+{I}iteration::Property::{prop_literal},
+{I}{indent_but_first_line(serialize_value_expr, I)}
 );
-if (writer.error().has_value()) {{
-{I}error = writer.move_error();
-
-{I}error->path.segments.emplace_front(
-{II}common::make_unique<iteration::PropertySegment>(
-{III}iteration::Property::{prop_literal}
-{II})
-{I});
-
+if (error.has_value()) {{
 {I}return error;
 }}"""
-        )
     )
-
-    code = Stripped("\n".join(blocks))
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         code = Stripped(
@@ -5913,6 +5958,9 @@ common::optional<SerializationError> CheckOstreamState(
             *_generate_serialize_primitives(),
         ]
     )
+
+    if any(len(cls.properties) > 0 for cls in symbol_table.concrete_classes):
+        blocks.append(_generate_serialize_property_as_element())
 
     if any(
         _type_annotation_contains_list_of_atomic_non_class_values(prop.type_annotation)

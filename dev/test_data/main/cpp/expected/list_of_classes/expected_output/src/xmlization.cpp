@@ -2722,12 +2722,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomeItem::kName:
+      case properties::OfSomeItem::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -2950,12 +2951,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfAnotherItem::kSerialNumber:
+      case properties::OfAnotherItem::kSerialNumber: {
         std::tie(
           the_serial_number,
           error
         ) = DeserializeInt64(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3178,12 +3180,13 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSimple::kName:
+      case properties::OfSimple::kName: {
         std::tie(
           the_name,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3416,7 +3419,7 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeItems:
+      case properties::OfSomething::kSomeItems: {
         std::tie(
           the_some_items,
           error
@@ -3427,7 +3430,8 @@ std::pair<
           AbstractItemFromElement
         );
         break;
-      case properties::OfSomething::kSomeSimples:
+      }
+      case properties::OfSomething::kSomeSimples: {
         std::tie(
           the_some_simples,
           error
@@ -3438,6 +3442,7 @@ std::pair<
           SimpleFromElement
         );
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -4682,6 +4687,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * Serialize a list of instances.
  */
 template <typename T, typename SerializeT>
@@ -4910,37 +4951,14 @@ common::optional<SerializationError> SerializeSomeItemAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "name",
     that.name(),
-    writer
+    writer,
+    iteration::Property::kName,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
     return error;
   }
 
@@ -5010,37 +5028,14 @@ common::optional<SerializationError> SerializeAnotherItemAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "serialNumber"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeInt64(
+  error = SerializePropertyAsElement(
+    "serialNumber",
     that.serial_number(),
-    writer
+    writer,
+    iteration::Property::kSerialNumber,
+    SerializeInt64
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSerialNumber
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "serialNumber"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSerialNumber
-      )
-    );
-
     return error;
   }
 
@@ -5110,37 +5105,14 @@ common::optional<SerializationError> SerializeSimpleAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "name",
     that.name(),
-    writer
+    writer,
+    iteration::Property::kName,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "name"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kName
-      )
-    );
-
     return error;
   }
 
@@ -5210,73 +5182,35 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "someItems"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeListOfInstances(
+  error = SerializePropertyAsElement(
+    "someItems",
     that.some_items(),
     writer,
-    SerializeAbstractItemPtrAsElement
+    iteration::Property::kSomeItems,
+    [](
+      const std::vector<std::shared_ptr<types::IAbstractItem>>& a_list,
+      SelfClosingWriter& a_writer
+    ) {
+      return SerializeListOfInstances(a_list, a_writer, SerializeAbstractItemPtrAsElement);
+    }
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeItems
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someItems"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeItems
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "someSimples"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeListOfInstances(
+  error = SerializePropertyAsElement(
+    "someSimples",
     that.some_simples(),
     writer,
-    SerializeSimplePtrAsElement
+    iteration::Property::kSomeSimples,
+    [](
+      const std::vector<std::shared_ptr<types::ISimple>>& a_list,
+      SelfClosingWriter& a_writer
+    ) {
+      return SerializeListOfInstances(a_list, a_writer, SerializeSimplePtrAsElement);
+    }
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeSimples
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someSimples"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeSimples
-      )
-    );
-
     return error;
   }
 

@@ -6,10 +6,9 @@
 #include "dummy/wstringification.hpp"
 
 #pragma warning(push, 0)
-#include <functional>
-#include <map>
 #include <set>
 #include <sstream>
+#include <unordered_map>
 #pragma warning(pop)
 
 namespace dummy {
@@ -907,6 +906,15 @@ const iteration::Path& SerializationException::path() const noexcept {
 // endregion SerializationException
 
 /**
+ * Serialize the given boolean to a JSON value.
+ */
+nlohmann::json SerializeBool(
+  bool value
+) {
+  return value;
+}
+
+/**
  * \brief Serialize the given number to a JSON value.
  *
  * We verify that the integer is within the range representable by 64-bit floats
@@ -946,6 +954,15 @@ std::pair<
     common::make_optional<nlohmann::json>(value),
     common::nullopt
   );
+}
+
+/**
+ * Serialize the given floating-point number to a JSON value.
+ */
+nlohmann::json SerializeDouble(
+  double value
+) {
+  return value;
 }
 
 /**
@@ -1052,14 +1069,6 @@ nlohmann::json SerializeListWithInfallible(
   return serialized;
 }
 
-/**
- * Just forward the value as it is.
- */
-template<typename T>
-const T& Identity(const T& value) {
-  return value;
-}
-
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
@@ -1084,7 +1093,9 @@ std::pair<
 
   common::optional<SerializationError> error;
 
-  result["someBool"] = that.some_bool();
+  result["someBool"] = SerializeBool(
+    that.some_bool()
+  );
 
   common::optional<nlohmann::json> json_some_int;
   std::tie(
@@ -1113,7 +1124,9 @@ std::pair<
     json_some_int.value()
   );
 
-  result["someFloat"] = that.some_float();
+  result["someFloat"] = SerializeDouble(
+    that.some_float()
+  );
 
   result["someString"] = SerializeWstring(
     that.some_string()

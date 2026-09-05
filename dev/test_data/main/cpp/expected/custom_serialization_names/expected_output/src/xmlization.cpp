@@ -2321,18 +2321,20 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfQueryCondition::kEq:
+      case properties::OfQueryCondition::kEq: {
         std::tie(
           the_eq,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfQueryCondition::kNotEq:
+      }
+      case properties::OfQueryCondition::kNotEq: {
         std::tie(
           the_not_eq,
           error
         ) = DeserializeWstring(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3357,6 +3359,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
  * Each XML element corresponds to a property.
@@ -3404,73 +3442,27 @@ common::optional<SerializationError> SerializeQueryConditionAsSequence(
   common::optional<SerializationError> error;
 
   if (that.eq().has_value()) {
-    writer.StartElement(
-      "eq"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "eq",
       *(that.eq()),
-      writer
+      writer,
+      iteration::Property::kEq,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEq
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "eq"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kEq
-        )
-      );
-
       return error;
     }
   }
 
   if (that.not_eQ().has_value()) {
-    writer.StartElement(
-      "not-eq"
-    );
-    if (writer.error().has_value()) {
-      return writer.move_error();
-    }
-    error = SerializeWstring(
+    error = SerializePropertyAsElement(
+      "not-eq",
       *(that.not_eQ()),
-      writer
+      writer,
+      iteration::Property::kNotEq,
+      SerializeWstring
     );
     if (error.has_value()) {
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kNotEq
-        )
-      );
-
-      return error;
-    }
-    writer.StopElement(
-      "not-eq"
-    );
-    if (writer.error().has_value()) {
-      error = writer.move_error();
-
-      error->path.segments.emplace_front(
-        common::make_unique<iteration::PropertySegment>(
-          iteration::Property::kNotEq
-        )
-      );
-
       return error;
     }
   }

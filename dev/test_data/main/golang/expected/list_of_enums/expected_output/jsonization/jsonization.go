@@ -221,6 +221,29 @@ func bytesFromJsonable(
 	return
 }
 
+// Parse `jsonableArray` into a slice of `T` by calling `parseItem` on every
+// item, or return an error.
+func parseArray[T any](
+	jsonableArray []interface{},
+	parseItem func(jsonable interface{}) (T, error),
+) (result []T, err error) {
+	result = make([]T, len(jsonableArray))
+	for i, itemJsonable := range jsonableArray {
+		var item T
+		item, err = parseItem(itemJsonable)
+		if err != nil {
+			if deseriaErr, ok := err.(*DeserializationError); ok {
+				deseriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+		result[i] = item
+	}
+	return
+}
+
 // Parse `jsonable` as a literal of [aastypes.Result],
 // or return an error.
 func ResultFromJsonable(
@@ -327,36 +350,21 @@ func somethingFromMapWithoutDispatch(
 				return
 			}
 
-			array := make(
-				[]aastypes.Result,
-				len(jsonableArray),
+			theSomeResults, err = parseArray(
+				jsonableArray,
+				ResultFromJsonable,
 			)
-			for i, itemJsonable := range jsonableArray {
-				var item aastypes.Result
-				item, err = ResultFromJsonable(
-					itemJsonable,
-				)
-				if err != nil {
-					if deseriaErr, ok := err.(*DeserializationError); ok {
-						deseriaErr.Path.PrependIndex(
-							&aasreporting.IndexSegment{
-								Index: i,
-							},
-						)
-
-						deseriaErr.Path.PrependName(
-							&aasreporting.NameSegment{
-								Name: "someResults",
-							},
-						)
-					}
-
-					return
+			if err != nil {
+				if deseriaErr, ok := err.(*DeserializationError); ok {
+					deseriaErr.Path.PrependName(
+						&aasreporting.NameSegment{
+							Name: "someResults",
+						},
+					)
 				}
 
-				array[i] = item
+				return
 			}
-			theSomeResults = array
 			foundSomeResults = true
 
 		default:
@@ -451,6 +459,29 @@ func bytesToJsonable(
 	return
 }
 
+// Serialize every item of `items` with `serializeItem` into a JSON-able array,
+// or return an error.
+func serializeArray[T any](
+	items []T,
+	serializeItem func(item T) (interface{}, error),
+) (result []interface{}, err error) {
+	result = make([]interface{}, len(items))
+	for i, item := range items {
+		var jsonable interface{}
+		jsonable, err = serializeItem(item)
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&aasreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+		result[i] = jsonable
+	}
+	return
+}
+
 // Serialize `that` to a string, or return an error.
 func ResultToJsonable(
 	that aastypes.Result,
@@ -483,33 +514,25 @@ func somethingToMap(
 ) (result map[string]interface{}, err error) {
 	result = make(map[string]interface{})
 
-	jsonableSomeResults := make(
-		[]interface{},
-		len(that.SomeResults()),
+	var jsonableSomeResults []interface{}
+	jsonableSomeResults, err = serializeArray(
+		that.SomeResults(),
+		func(item aastypes.Result) (interface{}, error) {
+			return ResultToJsonable(
+				item,
+			)
+		},
 	)
-	for i, v := range that.SomeResults() {
-		var jsonable interface{}
-		jsonable, err = ResultToJsonable(
-			v,
-		)
-		if err != nil {
-			if seriaErr, ok := err.(*SerializationError); ok {
-				seriaErr.Path.PrependIndex(
-					&aasreporting.IndexSegment{
-						Index: i,
-					},
-				)
-
-				seriaErr.Path.PrependName(
-					&aasreporting.NameSegment{
-						Name: "SomeResults()",
-					},
-				)
-			}
-
-			return
+	if err != nil {
+		if seriaErr, ok := err.(*SerializationError); ok {
+			seriaErr.Path.PrependName(
+				&aasreporting.NameSegment{
+					Name: "SomeResults()",
+				},
+			)
 		}
-		jsonableSomeResults[i] = jsonable
+
+		return
 	}
 	result["someResults"] = jsonableSomeResults
 

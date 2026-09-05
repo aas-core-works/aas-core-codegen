@@ -2342,36 +2342,41 @@ std::pair<
     );
 
     switch (property) {
-      case properties::OfSomething::kSomeBool:
+      case properties::OfSomething::kSomeBool: {
         std::tie(
           the_some_bool,
           error
         ) = DeserializeBool(reader);
         break;
-      case properties::OfSomething::kSomeInt:
+      }
+      case properties::OfSomething::kSomeInt: {
         std::tie(
           the_some_int,
           error
         ) = DeserializeInt64(reader);
         break;
-      case properties::OfSomething::kSomeFloat:
+      }
+      case properties::OfSomething::kSomeFloat: {
         std::tie(
           the_some_float,
           error
         ) = DeserializeDouble(reader);
         break;
-      case properties::OfSomething::kSomeString:
+      }
+      case properties::OfSomething::kSomeString: {
         std::tie(
           the_some_string,
           error
         ) = DeserializeWstring(reader);
         break;
-      case properties::OfSomething::kSomeBytes:
+      }
+      case properties::OfSomething::kSomeBytes: {
         std::tie(
           the_some_bytes,
           error
         ) = DeserializeByteArray(reader);
         break;
+      }
       default:
         throw std::logic_error(
           common::Concat(
@@ -3443,6 +3448,42 @@ common::optional<SerializationError> SerializeByteArray(
 }
 
 /**
+ * Serialize a property wrapped in its own named XML element.
+ */
+template <typename T, typename SerializeT>
+common::optional<SerializationError> SerializePropertyAsElement(
+  const std::string& name,
+  const T& value,
+  SelfClosingWriter& writer,
+  iteration::Property property,
+  const SerializeT& serialize_value
+) {
+  writer.StartElement(name);
+  if (writer.error().has_value()) {
+    return writer.move_error();
+  }
+
+  common::optional<SerializationError> error = serialize_value(value, writer);
+  if (error.has_value()) {
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  writer.StopElement(name);
+  if (writer.error().has_value()) {
+    error = writer.move_error();
+    error->path.segments.emplace_front(
+      common::make_unique<iteration::PropertySegment>(property)
+    );
+    return error;
+  }
+
+  return common::nullopt;
+}
+
+/**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
  * Each XML element corresponds to a property.
@@ -3489,173 +3530,58 @@ common::optional<SerializationError> SerializeSomethingAsSequence(
 ) {
   common::optional<SerializationError> error;
 
-  writer.StartElement(
-    "someBool"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeBool(
+  error = SerializePropertyAsElement(
+    "someBool",
     that.some_bool(),
-    writer
+    writer,
+    iteration::Property::kSomeBool,
+    SerializeBool
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeBool
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someBool"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeBool
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "someInt"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeInt64(
+  error = SerializePropertyAsElement(
+    "someInt",
     that.some_int(),
-    writer
+    writer,
+    iteration::Property::kSomeInt,
+    SerializeInt64
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeInt
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someInt"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeInt
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "someFloat"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeDouble(
+  error = SerializePropertyAsElement(
+    "someFloat",
     that.some_float(),
-    writer
+    writer,
+    iteration::Property::kSomeFloat,
+    SerializeDouble
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeFloat
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someFloat"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeFloat
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "someString"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeWstring(
+  error = SerializePropertyAsElement(
+    "someString",
     that.some_string(),
-    writer
+    writer,
+    iteration::Property::kSomeString,
+    SerializeWstring
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeString
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someString"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeString
-      )
-    );
-
     return error;
   }
 
-  writer.StartElement(
-    "someBytes"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeByteArray(
+  error = SerializePropertyAsElement(
+    "someBytes",
     that.some_bytes(),
-    writer
+    writer,
+    iteration::Property::kSomeBytes,
+    SerializeByteArray
   );
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeBytes
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "someBytes"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kSomeBytes
-      )
-    );
-
     return error;
   }
 
